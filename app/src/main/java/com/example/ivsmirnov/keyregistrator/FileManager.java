@@ -167,26 +167,17 @@ public class FileManager extends ListActivity {
                         getDir(mPathList.get(position));
                 }else{
                     String absPath = file.getAbsolutePath();
-                    String [] items = null;
-                    DataBases db = new DataBases(getApplicationContext());
 
                     if (what==10){
-
-                        Loader loader = new Loader(getApplicationContext(),absPath,FileManager.this);
+                        Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_JOURNAL);
+                        loader.execute();
+                    }else if (what==11){
+                        Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_TEACHERS);
                         loader.execute();
                     }else{
-                        db.clearTeachersDB();
-                        try {
-                            items = readFile(absPath);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        for (String s : items){
-                            db.writeInDBTeachers(s);
-                        }
+                        Toast.makeText(getApplicationContext(),"Error",  Toast.LENGTH_SHORT).show();
                     }
 
-                    db.closeDBconnection();
                 }
 
         }

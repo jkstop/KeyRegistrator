@@ -1,5 +1,6 @@
 package com.example.ivsmirnov.keyregistrator;
 
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.app.FragmentManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,10 +57,14 @@ public class Fragment_settings_journal extends Fragment {
                         String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC, Environment.getExternalStorageDirectory().getPath());
                         String srFileJournal = mPath + "/Journal.txt";
                         String dtFileJournal = path + "/Journal.txt";
-                        DataBases.copyfile(context,srFileJournal, dtFileJournal);
+                        DataBases.copyfile(context, srFileJournal, dtFileJournal);
                         break;
                     case 2:
                         startActivity(new Intent(context,FileManager.class).putExtra("what",10));
+                        break;
+                    case 3:
+                        Dialog_Fragment dialog = new Dialog_Fragment(context,Values.DIALOG_CLEAR_JOURNAL);
+                        dialog.show(getFragmentManager(),"clearJournal");
                         break;
                     default:
                         break;

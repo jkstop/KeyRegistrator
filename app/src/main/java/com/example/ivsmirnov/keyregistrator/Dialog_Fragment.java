@@ -12,11 +12,12 @@ import android.support.annotation.NonNull;
 import android.app.DialogFragment;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 /**
  * Created by ivsmirnov on 25.06.2015.
  */
-public class Dialog_Fragment extends DialogFragment {
+public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
     private Context context;
     private int dialog_id;
@@ -65,6 +66,46 @@ public class Dialog_Fragment extends DialogFragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
+                            }
+                        })
+                        .create();
+            case Values.DIALOG_CLEAR_JOURNAL:
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle("ВНИМАНИЕ!")
+                        .setMessage("Из журнала будут удалены все записи. Продолжить?")
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                DataBases db = new DataBases(context);
+                                db.clearJournalDB();
+                                db.closeDBconnection();
+                                Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .create();
+            case Values.DIALOG_CLEAR_TEACHERS:
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle("ВНИМАНИЕ!")
+                        .setMessage("Из базы данных преподавателей будут удалены все записи. Продолжить?")
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                DataBases db = new DataBases(context);
+                                db.clearTeachersDB();
+                                db.closeDBconnection();
+                                Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
                             }
                         })
                         .create();

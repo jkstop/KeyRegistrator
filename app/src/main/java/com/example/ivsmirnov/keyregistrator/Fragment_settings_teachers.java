@@ -60,9 +60,11 @@ public class Fragment_settings_teachers extends Fragment {
                         DataBases.copyfile(context, srFileTeachers, dtFileTeachers);
                         break;
                     case 2:
-                        Intent startFileManager = new Intent(context, FileManager.class);
-                        startFileManager.putExtra("buttonChoise", false);
-                        startActivity(startFileManager);
+                        startActivity( new Intent(context, FileManager.class).putExtra("what",11));
+                        break;
+                    case 3:
+                        Dialog_Fragment dialog = new Dialog_Fragment(context,Values.DIALOG_CLEAR_TEACHERS);
+                        dialog.show(getFragmentManager(),"clearTeachers");
                         break;
                     default:
                         break;

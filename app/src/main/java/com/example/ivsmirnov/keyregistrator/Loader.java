@@ -26,11 +26,13 @@ public class Loader extends AsyncTask <String,Integer,Void> {
     private ProgressDialog dialog;
     private SharedPreferences preferences;
     private FileManager fileManagerActivity;
+    private int LOAD_TYPE;
 
-    public Loader (Context c,String abs,FileManager activity){
+    public Loader (Context c,FileManager activity,String abs,int load){
         context = c;
         absPath = abs;
         fileManagerActivity = activity;
+        LOAD_TYPE = load;
         dialog = new ProgressDialog(fileManagerActivity);
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
@@ -64,45 +66,29 @@ public class Loader extends AsyncTask <String,Integer,Void> {
     protected Void doInBackground(String... params) {
 
         DataBases db = new DataBases(context);
-        db.clearJournalDB();
         String [] items = null;
         int count = 0;
-        try {
-            items = FileManager.readFile(absPath);
-            dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-        for (String s : items){
-            String [] split = s.split("\\s+");
 
-            String aud = "";
-            String name = "";
-            Long time = (long)1;
-            Long timePut = (long)1;
+        if (LOAD_TYPE == Values.LOAD_JOURNAL){
+            db.clearJournalDB();
+            try {
+                items = FileManager.readFile(absPath);
+                dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+            for (String s : items){
+                String [] split = s.split("\\s+");
 
-            if(split.length>5){
-                aud = split[0];
-                int nameIndexLast = split.length-3;
-                for (int i=1;i<=nameIndexLast;i++){
-                    name += split[i]+" ";
-                }
-                try {
-                    time = parseDate(split[split.length-2]);
-                    timePut = parseDate(split[split.length-1]);
-                } catch (ParseException e) {
-                    time = (long)1;
-                    timePut = (long)1;
-                }
-            }else if(split.length<5){
-                if (split[0].length()!=3){
-                    aud = "_";
-                    for (int i=0;i<=split.length-1;i++){
-                        name += split[i]+" ";
-                    }
-                }else{
+                String aud = "";
+                String name = "";
+                Long time = (long)1;
+                Long timePut = (long)1;
+
+                if(split.length>5){
                     aud = split[0];
-                    for (int i = 1;i<=split.length-3;i++){
+                    int nameIndexLast = split.length-3;
+                    for (int i=1;i<=nameIndexLast;i++){
                         name += split[i]+" ";
                     }
                     try {
@@ -112,23 +98,58 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                         time = (long)1;
                         timePut = (long)1;
                     }
+                }else if(split.length<5){
+                    if (split[0].length()!=3){
+                        aud = "_";
+                        for (int i=0;i<=split.length-1;i++){
+                            name += split[i]+" ";
+                        }
+                    }else{
+                        aud = split[0];
+                        for (int i = 1;i<=split.length-3;i++){
+                            name += split[i]+" ";
+                        }
+                        try {
+                            time = parseDate(split[split.length-2]);
+                            timePut = parseDate(split[split.length-1]);
+                        } catch (ParseException e) {
+                            time = (long)1;
+                            timePut = (long)1;
+                        }
+                    }
+                }else{
+                    aud = split[0];
+                    name = split[1]+ " "+ split[2];
+                    try {
+                        time = parseDate(split[3]);
+                        timePut = parseDate(split[4]);
+                    } catch (ParseException e) {
+                        time = (long)1;
+                        timePut = (long)1;
+                    }
                 }
-            }else{
-                aud = split[0];
-                name = split[1]+ " "+ split[2];
-                try {
-                    time = parseDate(split[3]);
-                    timePut = parseDate(split[4]);
-                } catch (ParseException e) {
-                    time = (long)1;
-                    timePut = (long)1;
-                }
-            }
-            db.writeInDBJournal(aud,name,time,timePut,true);
-            publishProgress(count++);
+                db.writeInDBJournal(aud,name,time,timePut,true);
+                publishProgress(count++);
 
+            }
+
+        }else if (LOAD_TYPE == Values.LOAD_TEACHERS){
+            db.clearTeachersDB();
+            try {
+                items = FileManager.readFile(absPath);
+                dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            for (String s : items){
+                db.writeInDBTeachers(s);
+                publishProgress(count++);
+            }
+        }else{
+            Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show();
         }
         db.closeDBconnection();
+
         return null;
     }
 

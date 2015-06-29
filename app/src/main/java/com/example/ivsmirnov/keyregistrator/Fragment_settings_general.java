@@ -28,7 +28,7 @@ import android.widget.TextView;
 /**
  * Created by ivsmirnov on 18.06.2015.
  */
-public class Fragment_settings_general extends Fragment {
+public class Fragment_settings_general extends android.support.v4.app.Fragment {
 
     private ListView listView;
     private Context context;
@@ -73,9 +73,8 @@ public class Fragment_settings_general extends Fragment {
                         startActivity(startFileManager);
                         break;
                     case 1:
-                        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
                         Dialog_Fragment dialog = new Dialog_Fragment(context,Values.DIALOG_SEEKBAR);
-                        dialog.show(fragmentTransaction,"seek");
+                        dialog.show(getFragmentManager(),"seek");
                         break;
                     default:
                         break;

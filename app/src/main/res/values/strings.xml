@@ -29,11 +29,13 @@
         <item>Выгрузить базу в файл</item>
         <item>Скопировать на ПК</item>
         <item>Загрузить из файла</item>
+        <item>Очистить</item>
     </string-array>
     <string-array name="db_teacher_items">
         <item>Выгрузить базу в файл</item>
         <item>Скопировать на ПК</item>
         <item>Загрузить из файла</item>
+        <item>Очистить</item>
     </string-array>
     <string-array name="db_share_items">
         <item>Место хранения баз на ПК</item>
