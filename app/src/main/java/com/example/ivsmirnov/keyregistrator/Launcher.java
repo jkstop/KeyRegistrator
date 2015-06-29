@@ -369,7 +369,9 @@ public class Launcher extends FragmentActivity {
         disclaimer = (LinearLayout)findViewById(R.id.disclaimer);
         disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
 
-        if (!preferences.getBoolean(Values.ALARM_SET,false)){
+        Boolean isAlarmSet = preferences.getBoolean(Values.ALARM_SET,false);
+        Log.d("alarm",String.valueOf(isAlarmSet));
+        if (!isAlarmSet){
             setAlarm(closingTime());
         }
 

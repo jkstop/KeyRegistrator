@@ -109,7 +109,7 @@ public class Loader extends AsyncTask <String,Void,Void> {
         Log.d("DONE!","");
         Dialog_Fragment dialog = new Dialog_Fragment(context,Values.DIALOG_LOADING);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        dialog.show(fragmentTransaction, "load");//не
+        dialog.show(fragmentTransaction, "load");//не работает
     }
 
     private static long parseDate(String text)
