@@ -26,7 +26,6 @@ public class Loader extends AsyncTask <String,Void,Void> {
         fragmentManager = fm;
     }
 
-//chggdfg
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
