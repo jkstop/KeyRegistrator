@@ -42,7 +42,7 @@ public class FileManager extends ListActivity {
     int what;
 
 
-    private SharedPreferences.Editor editor;
+    private static SharedPreferences.Editor editor;
 
 
     @Override
@@ -171,73 +171,13 @@ public class FileManager extends ListActivity {
                     DataBases db = new DataBases(getApplicationContext());
 
                     if (what==10){
-                        FragmentManager fragmentManager = getFragmentManager();
-                        Loader loader = new Loader(getApplicationContext(),absPath,fragmentManager);
+
+                        Loader loader = new Loader(getApplicationContext(),absPath,FileManager.this);
                         loader.execute();
-                       /* db.clearJournalDB();
-                        try {
-                            items = readFile(getApplicationContext(),absPath);
-                        } catch (IOException e){
-                            e.printStackTrace();
-                        }
-                        for (String s : items){
-                            String [] split = s.split("\\s+");
-
-                            String aud = "";
-                            String name = "";
-                            Long time = (long)1;
-                            Long timePut = (long)1;
-
-                            if(split.length>5){
-                                aud = split[0];
-                                int nameIndexLast = split.length-3;
-                                for (int i=1;i<=nameIndexLast;i++){
-                                    name += split[i]+" ";
-                                }
-                                try {
-                                    time = parseDate(split[split.length-2]);
-                                    timePut = parseDate(split[split.length-1]);
-                                } catch (ParseException e) {
-                                    time = (long)1;
-                                    timePut = (long)1;
-                                }
-                            }else if(split.length<5){
-                                if (split[0].length()!=3){
-                                    aud = "_";
-                                    for (int i=0;i<=split.length-1;i++){
-                                        name += split[i]+" ";
-                                    }
-                                }else{
-                                    aud = split[0];
-                                    for (int i = 1;i<=split.length-3;i++){
-                                        name += split[i]+" ";
-                                    }
-                                    try {
-                                        time = parseDate(split[split.length-2]);
-                                        timePut = parseDate(split[split.length-1]);
-                                    } catch (ParseException e) {
-                                        time = (long)1;
-                                        timePut = (long)1;
-                                    }
-                                }
-                            }else{
-                                aud = split[0];
-                                name = split[1]+ " "+ split[2];
-                                try {
-                                    time = parseDate(split[3]);
-                                    timePut = parseDate(split[4]);
-                                } catch (ParseException e) {
-                                    time = (long)1;
-                                    timePut = (long)1;
-                                }
-                            }
-                            db.writeInDBJournal(aud,name,time,timePut,true);
-
-                        }*/
                     }else{
                         db.clearTeachersDB();
                         try {
-                            items = readFile(getApplicationContext(),absPath);
+                            items = readFile(absPath);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -247,7 +187,6 @@ public class FileManager extends ListActivity {
                     }
 
                     db.closeDBconnection();
-                    finish();
                 }
 
         }
@@ -255,10 +194,14 @@ public class FileManager extends ListActivity {
 
     }
 
-    public static String[] readFile (Context context, String path) throws IOException {
+    public static String[] readFile (String path) throws IOException {
         File file = new File(path);
         BufferedReader fin = new BufferedReader(new FileReader(file));
         int count = getStringCount(file);
+
+        editor.putInt(Values.LINES_COUNT_IN_FILE,count);
+        editor.commit();
+
         int i = 0;
         String line;
         String [] lines = new String[count];
@@ -268,11 +211,10 @@ public class FileManager extends ListActivity {
                 i++;
             }
         }
-//        Toast.makeText(context,"Из файла загружено "+count+" записей",Toast.LENGTH_LONG).show();
         return lines;
     }
 
-    private static int getStringCount(File file)
+    public static int getStringCount(File file)
     {
         int i=0;
         BufferedReader bufferedReader = null;

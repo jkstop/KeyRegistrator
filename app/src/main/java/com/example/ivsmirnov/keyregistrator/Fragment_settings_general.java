@@ -24,7 +24,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Created by ivsmirnov on 18.06.2015.

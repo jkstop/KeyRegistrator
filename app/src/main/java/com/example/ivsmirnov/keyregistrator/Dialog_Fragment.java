@@ -68,13 +68,6 @@ public class Dialog_Fragment extends DialogFragment {
                             }
                         })
                         .create();
-            case Values.DIALOG_LOADING:
-                ProgressBar progressBar = new ProgressBar(context);
-                return new AlertDialog.Builder(getActivity())
-                        //.setView(progressBar)
-                        .setMessage("LOAD")
-                        .create();
-
         }
 
         return null;

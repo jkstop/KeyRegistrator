@@ -340,8 +340,6 @@ public class Launcher extends FragmentActivity {
         lastVisiters = new ArrayList<>(db.readLastVisiterRoom());
         db.closeDBconnection();
 
-        Log.d("rooms",String.valueOf(rooms.isEmpty()));
-
         int columns = preferences.getInt(Values.COLUMNS_COUNT, 1);
         ButtonsAdapter adapter = new ButtonsAdapter(context,rooms,isFreeAud,lastVisiters);
         TextView textEmptyAud = (TextView)findViewById(R.id.text_empty_aud_list);

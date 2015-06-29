@@ -1,11 +1,16 @@
 package com.example.ivsmirnov.keyregistrator;
 
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.app.FragmentManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,34 +19,57 @@ import java.util.Locale;
 /**
  * Created by ivsmirnov on 26.06.2015.
  */
-public class Loader extends AsyncTask <String,Void,Void> {
+public class Loader extends AsyncTask <String,Integer,Void> {
 
     private Context context;
     private String absPath;
-    private FragmentManager fragmentManager;
+    private ProgressDialog dialog;
+    private SharedPreferences preferences;
+    private FileManager fileManagerActivity;
 
-    public Loader (Context c,String abs,FragmentManager fm){
+    public Loader (Context c,String abs,FileManager activity){
         context = c;
         absPath = abs;
-        fragmentManager = fm;
+        fileManagerActivity = activity;
+        dialog = new ProgressDialog(fileManagerActivity);
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setCancelable(false);
+        dialog.setMessage("Загрузка...");
+        dialog.show();
+    }
 
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+        dialog.setProgress(values[0]);
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        if (dialog.isShowing()){
+            dialog.cancel();
+        }
+        fileManagerActivity.finish();
+        Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected Void doInBackground(String... params) {
 
-
-
         DataBases db = new DataBases(context);
         db.clearJournalDB();
         String [] items = null;
+        int count = 0;
         try {
-            items = FileManager.readFile(context,absPath);
+            items = FileManager.readFile(absPath);
+            dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
         } catch (IOException e){
             e.printStackTrace();
         }
@@ -97,20 +125,13 @@ public class Loader extends AsyncTask <String,Void,Void> {
                 }
             }
             db.writeInDBJournal(aud,name,time,timePut,true);
+            publishProgress(count++);
 
         }
         db.closeDBconnection();
         return null;
     }
 
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        Log.d("DONE!","");
-        Dialog_Fragment dialog = new Dialog_Fragment(context,Values.DIALOG_LOADING);
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        dialog.show(fragmentTransaction, "load");//не работает
-    }
 
     private static long parseDate(String text)
             throws ParseException
