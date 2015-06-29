@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/bg_settings_fragment">
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="База данных преподавателей"
+        android:gravity="center"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        android:layout_margin="20dp" />
+
+    <ListView
+        android:id="@+id/fragment_list_teachers"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        style="@style/Base.Widget.AppCompat.ListView"
+        android:layout_margin="50dp" />
+
+</LinearLayout>

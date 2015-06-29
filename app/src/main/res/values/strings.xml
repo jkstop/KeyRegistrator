@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">Key Registrator</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Загрузить первоначальную базу</string>
+    <string name="aud">Аудитория</string>
+    <string name="name">Фамилия</string>
+    <string name="okButton">ОК</string>
+    <string name="cancelButton">Отмена</string>
+    <string name="time">Время</string>
+    <string name="timeGet">Взял</string>
+    <string name="timePut">Сдал</string>
+    <string-array name="aud">
+        <item>401</item>
+        <item>402</item>
+        <item>407</item>
+        <item>408</item>
+        <item>409</item>
+        <item>507</item>
+        <item>508</item>
+        <item>509</item>
+    </string-array>
+    <string-array name="drawer_list">
+        <item>Настройки</item>
+        <item>Статистика</item>
+        <item>Журнал</item>
+    </string-array>
+    <string-array name="db_journal_items">
+        <item>Выгрузить базу в файл</item>
+        <item>Скопировать на ПК</item>
+        <item>Загрузить из файла</item>
+    </string-array>
+    <string-array name="db_teacher_items">
+        <item>Выгрузить базу в файл</item>
+        <item>Скопировать на ПК</item>
+        <item>Загрузить из файла</item>
+    </string-array>
+    <string-array name="db_share_items">
+        <item>Место хранения баз на ПК</item>
+        <item>Размер уведомления</item>
+    </string-array>
+    <string-array name="db_rooms_items">
+        <item>Список аудиторий</item>
+        <item>Количество колонок</item>
+    </string-array>
+    <string name="fragment_tag">fragment_list_journal</string>
+    <string name="grid_tag">fragment_grid</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="title_activity_archive">archive</string>
+    <string name="title_activity_base">base</string>
+    <string name="title_activity_teachers_">Teachers_Activity</string>
+    <string name="title_activity_teachers__activity_v2">Teachers_Activity_v2</string>
+    <string name="title_activity_close_day_dialog"> </string>
+    <string name="text_warning">Уважаемые преподаватели!\n
+    Брать и сдавать ключи по завершении занятий необходимо ЛИЧНО ВАМ!\n
+    Категорически запрещается передавать ключи другому преподавателю и оставлять компьютерный класс открытым в ваше отсутствие в нём!</string>
+    <string name="title_activity_rooms">Список аудиторий: </string>
+    <string name="fragment1">fragment 1</string>
+    <string name="fragment2">fragment 2</string>
+    <string name="fragment3">fragment 3</string>
+    <string name="fragment4">fragment 4</string>
+</resources>

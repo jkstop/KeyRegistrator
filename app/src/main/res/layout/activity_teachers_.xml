@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    android:padding="15dp">
+
+    <GridView
+        android:id="@+id/gridview_for_teachers_2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnWidth="90dp"
+        android:numColumns="4"
+        android:verticalSpacing="15dp"
+        android:horizontalSpacing="15dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center" />
+
+</RelativeLayout>

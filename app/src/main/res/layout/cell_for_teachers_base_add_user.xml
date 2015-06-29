@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button
+    android:id="@+id/grid_item_teachers_base_add"
+    android:layout_gravity="center"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:textSize="20sp"
+    android:background="#ffafffc9"
+    android:drawableLeft="@drawable/add"
+    android:clickable="false"
+    android:focusable="false"
+    xmlns:android="http://schemas.android.com/apk/res/android" />

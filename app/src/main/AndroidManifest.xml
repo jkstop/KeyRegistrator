@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.ivsmirnov.keyregistrator" >
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+        <activity
+            android:name=".Launcher"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".FileManager"
+            android:theme="@style/Base.Theme.AppCompat.Light.Dialog" />
+
+        <service android:name=".CloseDayService" />
+
+        <activity
+            android:name=".Teachers_Activity"
+            android:label="@string/title_activity_teachers_" >
+        </activity>
+        <activity
+            android:name=".CloseDayDialog"
+            android:label="@string/title_activity_close_day_dialog"
+            >
+        </activity>
+        <activity
+            android:name=".Rooms"
+            android:label="@string/title_activity_rooms"
+            android:theme="@style/Base.Theme.AppCompat.Light.DialogWhenLarge">
+        </activity>
+        <activity android:name=".Preferences"
+            android:label="Настройки"
+            />
+        <activity android:name=".Journal"
+            android:label="Журнал"/>
+    </application>
+
+</manifest>

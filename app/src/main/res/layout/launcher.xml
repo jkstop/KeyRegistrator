@@ -1,0 +1,222 @@
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!-- The main content view -->
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".MainActivity"
+            android:orientation="vertical"
+            android:id="@+id/mainLayout"
+            tools:showIn="@layout/layout_main_fragment">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.08">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_menu_grey600_36dp"
+                    android:onClick="ClickMenu"
+                    android:layout_gravity="bottom|left"
+                    android:layout_marginLeft="15dp" />
+
+                <!--<TextView
+                    android:id="@+id/textHelp"
+                    android:text="Выберите нужную аудиторию нажатием на экран"
+                    android:textStyle="italic"
+                    android:layout_marginTop="20dp"
+                    android:longClickable="true"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_weight="0.05"
+                    android:textSize="32sp" />-->
+
+                <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                    android:text="Выберите нужную аудиторию нажатием на экран"
+                    android:textStyle="italic"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:ellipsize="none"
+                    android:maxLines="5"
+                    android:textSize="100sp" />
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/frame_for_grid_aud"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.45">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+                    android:text="Список пуст. Добавьте аудитории через настройки."
+                    android:id="@+id/text_empty_aud_list"
+                    android:gravity="center"
+                    android:textColor="#ff000000"
+                    android:textStyle="italic" />
+
+                <GridView
+                    android:id="@+id/gridView"
+                    android:columnWidth="90dp"
+                    android:gravity="center"
+                    android:horizontalSpacing="20dp"
+                    android:verticalSpacing="@dimen/grid_vertical_spacing"
+                    android:stretchMode="columnWidth"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="15dp"/>
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/disclaimer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp">
+                <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:ellipsize="none"
+                    android:maxLines="5"
+                    android:text="@string/text_warning"
+                    android:textStyle="bold|italic"
+                    android:textColor="#ffff1800"
+                    android:gravity="center"
+                    android:textSize="100sp" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.3"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                xmlns:android="http://schemas.android.com/apk/res/android">
+
+                <LinearLayout
+                    android:id="@+id/textLayout"
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp">
+
+                    <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                        android:layout_width="0dp"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="0.2"
+                        android:ellipsize="none"
+                        android:maxLines="1"
+                        android:text="@string/aud"
+                        android:textSize="20sp"
+                        android:textStyle="bold|italic"
+                        android:gravity="center_vertical" />
+
+                    <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                        android:layout_width="0dp"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="0.5"
+                        android:ellipsize="none"
+                        android:maxLines="1"
+                        android:textSize="20sp"
+                        android:text="@string/name"
+                        android:gravity="center"
+                        android:textStyle="bold|italic" />
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="0.3">
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="0.5">
+                            <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:gravity="center"
+                                android:textSize="20sp"
+                                android:ellipsize="none"
+                                android:maxLines="1"
+                                android:text="@string/time"
+                                android:textStyle="bold|italic" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="fill_parent"
+                            android:orientation="horizontal"
+                            android:layout_height="0dp"
+                            android:layout_weight="0.5">
+
+                            <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:layout_weight="0.5"
+                                android:textSize="20sp"
+                                android:ellipsize="none"
+                                android:maxLines="1"
+                                android:text="@string/timeGet"
+                                android:textStyle="bold|italic" />
+                            <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textSize="20sp"
+                                android:layout_weight="0.5"
+                                android:ellipsize="none"
+                                android:maxLines="1"
+                                android:text="@string/timePut"
+                                android:textStyle="bold|italic" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ListView
+                    android:id="@+id/list"
+                    android:transcriptMode="alwaysScroll"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- The navigation drawer -->
+    <ListView android:id="@+id/left_drawer"
+        android:layout_width="500dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="5dp"
+        android:padding="5dp" />
+</android.support.v4.widget.DrawerLayout>
