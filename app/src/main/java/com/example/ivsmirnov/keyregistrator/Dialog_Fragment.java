@@ -22,14 +22,19 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
     private Context context;
     private int dialog_id;
 
+    public Dialog_Fragment(){
+    }
+/*
     public Dialog_Fragment(Context c,int id){
         context = c;
         dialog_id = id;
-    }
+    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dialog_id = getArguments().getInt(Values.DIALOG_TYPE,0);
+        context = getActivity().getApplicationContext();
     }
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {

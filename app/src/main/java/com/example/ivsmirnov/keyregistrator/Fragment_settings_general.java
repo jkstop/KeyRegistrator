@@ -73,7 +73,10 @@ public class Fragment_settings_general extends android.support.v4.app.Fragment {
                         startActivity(startFileManager);
                         break;
                     case 1:
-                        Dialog_Fragment dialog = new Dialog_Fragment(context,Values.DIALOG_SEEKBAR);
+                        Dialog_Fragment dialog = new Dialog_Fragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_SEEKBAR);
+                        dialog.setArguments(bundle);
                         dialog.show(getFragmentManager(),"seek");
                         break;
                     default:

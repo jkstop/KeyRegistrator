@@ -24,6 +24,8 @@ public class Values {
     public static final int LOAD_JOURNAL = 106;
     public static final int LOAD_TEACHERS = 107;
     public static final String LINES_COUNT_IN_FILE = "lines_count";
+    public static final String DIALOG_TYPE = "dialog_type";
+
 
 
 }

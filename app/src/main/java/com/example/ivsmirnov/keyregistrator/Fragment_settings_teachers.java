@@ -63,7 +63,10 @@ public class Fragment_settings_teachers extends Fragment {
                         startActivity( new Intent(context, FileManager.class).putExtra("what",11));
                         break;
                     case 3:
-                        Dialog_Fragment dialog = new Dialog_Fragment(context,Values.DIALOG_CLEAR_TEACHERS);
+                        Dialog_Fragment dialog = new Dialog_Fragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLEAR_TEACHERS);
+                        dialog.setArguments(bundle);
                         dialog.show(getFragmentManager(),"clearTeachers");
                         break;
                     default:
