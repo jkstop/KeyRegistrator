@@ -220,10 +220,9 @@ public class Launcher extends FragmentActivity {
 
         mDrawerLayout.setDrawerListener(mDrawerToogle);
 
-        /*if (savedInstanceState==null){
-            //selectItem(0);
+        if (savedInstanceState==null){
             setAlarm(closingTime());
-        }*/
+        }
 
 
     }
@@ -233,7 +232,6 @@ public class Launcher extends FragmentActivity {
     {
         SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss",
                 new Locale("ru"));
-        //dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dateFormat.parse(text).getTime();
     }
 
