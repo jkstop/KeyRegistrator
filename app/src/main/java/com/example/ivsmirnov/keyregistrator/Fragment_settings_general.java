@@ -79,6 +79,9 @@ public class Fragment_settings_general extends android.support.v4.app.Fragment {
                         dialog.setArguments(bundle);
                         dialog.show(getFragmentManager(),"seek");
                         break;
+                    case 2:
+                        startActivity(new Intent(context,FileManager.class).putExtra("what",66));
+                        break;
                     default:
                         break;
                 }

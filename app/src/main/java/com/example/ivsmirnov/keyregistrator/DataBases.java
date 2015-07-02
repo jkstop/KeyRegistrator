@@ -29,7 +29,7 @@ public class DataBases {
 
     public DataBasesRegist dataBasesRegist;
     public SQLiteDatabase base;
-    public Cursor cursorJournal, cursorTeachers, cursorRoom;
+    public Cursor cursorJournal, cursorTeachers, cursorRoom, cursorBaseSql;
 
     private SharedPreferences.Editor editor;
     private SharedPreferences sharedPreferences;
@@ -50,6 +50,7 @@ public class DataBases {
         cursorJournal = base.query(DataBasesRegist.TABLE_JOURNAL, null, null, null, null, null, null);
         cursorTeachers = base.query(DataBasesRegist.TABLE_TEACHER,null,null,null,null,null,null);
         cursorRoom = base.query(DataBasesRegist.TABLE_ROOMS,null,null,null,null,null,null);
+        cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,null,null,null,null,null,null);
         Log.d("DB connection is", "OPEN");
     }
 
@@ -162,6 +163,21 @@ public class DataBases {
     public void clearJournalDB(){
         base.delete(DataBasesRegist.TABLE_JOURNAL,null,null);
         Log.d("Clear Journal DB", "OK");
+    }
+
+    public void clearBaseSQL(){
+        base.delete(DataBasesRegist.TABLE_BASE,null,null);
+        Log.d("Clear DB", "OK");
+    }
+
+    public void writeInDBSQL(String kaf,String name,String surname,String lastname,String photo){
+        ContentValues cv = new ContentValues();
+        cv.put(DataBasesRegist.COLUMN_KAF,kaf);
+        cv.put(DataBasesRegist.COLUMN_IMYA,name);
+        cv.put(DataBasesRegist.COLUMN_FAMILIA,surname);
+        cv.put(DataBasesRegist.COLUMN_OTCHESTVO,lastname);
+        cv.put(DataBasesRegist.COLUMN_FOTO,photo);
+        base.insert(DataBasesRegist.TABLE_BASE,null,cv);
     }
 
     //обновление БД преподавателей

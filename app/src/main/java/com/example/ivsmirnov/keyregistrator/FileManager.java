@@ -174,6 +174,9 @@ public class FileManager extends ListActivity {
                     }else if (what==11){
                         Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_TEACHERS);
                         loader.execute();
+                    }else if(what==66){
+                        Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,66);
+                        loader.execute();
                     }else{
                         Toast.makeText(getApplicationContext(),"Error",  Toast.LENGTH_SHORT).show();
                     }

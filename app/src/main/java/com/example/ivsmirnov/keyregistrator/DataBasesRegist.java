@@ -12,7 +12,7 @@ import android.util.Log;
 public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
 
     private static final String name = "Key_registrator_database.db";
-    private static final int version = 13;
+    private static final int version = 14;
 
     public static final String TABLE_JOURNAL = "Журнал";
     public static final String COLUMN_AUD = "Аудитория";
@@ -39,6 +39,17 @@ public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
             COLUMN_ROOM + " integer, " + COLUMN_STATUS + " integer, "+ COLUMN_LAST_VISITER + " text not null);";
     public static final String DELETE_ROOMS_BASE = "DROP TABLE IF EXISTS " + TABLE_ROOMS;
 
+    public static final String TABLE_BASE = "База";
+    public static final String COLUMN_KAF = "Кафедра";
+    public static final String COLUMN_IMYA = "Имя";
+    public static final String COLUMN_FAMILIA = "Фамилия";
+    public static final String COLUMN_OTCHESTVO = "Отчество";
+    public static final String COLUMN_FOTO = "Фото";
+    public static final String CREATE_BASE_SQL = "CREATE TABLE " + TABLE_BASE + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            COLUMN_KAF + " text not null, " + COLUMN_IMYA + " text not null, "+ COLUMN_FAMILIA + " text not null, " +
+            COLUMN_OTCHESTVO + " text not null, " +  COLUMN_FOTO + " text not null);";
+    public static final String DELETE_BASE_SQL = "DROP TABLE IF EXISTS " + TABLE_BASE;
+
     public DataBasesRegist(Context context) {
         super(context, name, null, version);
     }
@@ -48,6 +59,7 @@ public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
         sqLiteDatabase.execSQL(SQL_CREATE_BASE_JOURNAL);
         sqLiteDatabase.execSQL(SQL_CREATE_TEACHERS_BASE);
         sqLiteDatabase.execSQL(CREATE_ROOMS_BASE);
+        sqLiteDatabase.execSQL(CREATE_BASE_SQL);
     }
 
     @Override
@@ -55,6 +67,7 @@ public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
         sqLiteDatabase.execSQL(SQL_DELETE_BASE_JOURNAL);
         sqLiteDatabase.execSQL(SQL_DELETE_TEACHERS_BASE);
         sqLiteDatabase.execSQL(DELETE_ROOMS_BASE);
+        sqLiteDatabase.execSQL(DELETE_BASE_SQL);
         onCreate(sqLiteDatabase);
 
         Log.d("DataBase version update","from "+String.valueOf(oldVersion)+" to "+String.valueOf(newVersion));

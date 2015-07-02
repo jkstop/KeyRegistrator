@@ -145,6 +145,27 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                 db.writeInDBTeachers(s);
                 publishProgress(count++);
             }
+        }else if (LOAD_TYPE ==66){
+            try {
+                items = FileManager.readFile(absPath);
+                dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+            db.clearBaseSQL();
+            Log.d("items",String.valueOf(items.length));
+            String delims = ";";
+            for (String s : items){
+                String [] split = s.split(delims);
+                String kaf = split[0];
+                String name = split[1];
+                String surname = split[2];
+                String lastname = split[3];
+                String photo = split[4];
+                //Log.d("item",kaf+ " "+ name+ " "+ surname + " " + lastname); //работает, надо создать TABLE и грузить это все туда
+                db.writeInDBSQL(kaf,name,surname,lastname,photo);
+                publishProgress(count++);
+            }
         }else{
             Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show();
         }
