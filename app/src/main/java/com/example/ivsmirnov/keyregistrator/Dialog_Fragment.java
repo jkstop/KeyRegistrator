@@ -10,9 +10,19 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.app.DialogFragment;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 /**
  * Created by ivsmirnov on 25.06.2015.
@@ -114,6 +124,27 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                             }
                         })
                         .create();
+            case 33:
+                DataBases db = new DataBases(context);
+                ArrayList <String> items = db.readSQL();
+                db.closeDBconnection();
+                AutoCompleteTextView autoCompleteTextView =  new AutoCompleteTextView(context);
+                autoCompleteTextView.setAdapter(new Adapter_SQL_popup(context,items));
+                AlertDialog.Builder builder =  new AlertDialog.Builder(getActivity());
+                        builder.setTitle("Ввод")
+                        .setView(autoCompleteTextView)
+                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+                lp.gravity = Gravity.TOP;
+                return dialog;
+
         }
 
         return null;

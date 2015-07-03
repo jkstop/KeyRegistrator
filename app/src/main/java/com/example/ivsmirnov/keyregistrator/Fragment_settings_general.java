@@ -21,7 +21,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -36,6 +39,8 @@ public class Fragment_settings_general extends android.support.v4.app.Fragment {
     private String [] items;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
+
+    Boolean click;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,7 +71,7 @@ public class Fragment_settings_general extends android.support.v4.app.Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch (position){
+                switch (position) {
                     case 0:
                         Intent startFileManager = new Intent(context, FileManager.class);
                         startFileManager.putExtra("buttonChoise", true);
@@ -75,12 +80,22 @@ public class Fragment_settings_general extends android.support.v4.app.Fragment {
                     case 1:
                         Dialog_Fragment dialog = new Dialog_Fragment();
                         Bundle bundle = new Bundle();
-                        bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_SEEKBAR);
+                        bundle.putInt(Values.DIALOG_TYPE, Values.DIALOG_SEEKBAR);
                         dialog.setArguments(bundle);
-                        dialog.show(getFragmentManager(),"seek");
+                        dialog.show(getFragmentManager(), "seek");
                         break;
                     case 2:
-                        startActivity(new Intent(context,FileManager.class).putExtra("what",66));
+                        startActivity(new Intent(context, FileManager.class).putExtra("what", 66));
+                        break;
+                    case 3:
+                        startActivity(new Intent(context, base_sql_activity.class));
+                        break;
+                    case 4:
+                        Dialog_Fragment dialogType = new Dialog_Fragment();
+                        Bundle bundle1 = new Bundle();
+                        bundle1.putInt(Values.DIALOG_TYPE,33);
+                        dialogType.setArguments(bundle1);
+                        dialogType.show(getFragmentManager(),"type");
                         break;
                     default:
                         break;

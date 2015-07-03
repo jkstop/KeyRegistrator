@@ -170,15 +170,40 @@ public class DataBases {
         Log.d("Clear DB", "OK");
     }
 
-    public void writeInDBSQL(String kaf,String name,String surname,String lastname,String photo){
+    public void writeInDBSQL(String kaf,String name,String surname,String lastname){
         ContentValues cv = new ContentValues();
         cv.put(DataBasesRegist.COLUMN_KAF,kaf);
         cv.put(DataBasesRegist.COLUMN_IMYA,name);
         cv.put(DataBasesRegist.COLUMN_FAMILIA,surname);
-        cv.put(DataBasesRegist.COLUMN_OTCHESTVO,lastname);
-        cv.put(DataBasesRegist.COLUMN_FOTO,photo);
-        base.insert(DataBasesRegist.TABLE_BASE,null,cv);
+        cv.put(DataBasesRegist.COLUMN_OTCHESTVO, lastname);
+        base.insert(DataBasesRegist.TABLE_BASE, null, cv);
     }
+
+    public ArrayList <String> readFromBaseSQL(String column){
+        ArrayList <String> items = new ArrayList<>();
+        cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,new String[]{column},null,null,null,null,null);
+        cursorBaseSql.moveToPosition(-1);
+        while (cursorBaseSql.moveToNext()){
+            String row = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(column));
+            items.add(row);
+        }
+        return items;
+    }
+
+    public ArrayList<String> readSQL(){
+        ArrayList<String> items = new ArrayList<>();
+        cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,new String[]{DataBasesRegist.COLUMN_FAMILIA,DataBasesRegist.COLUMN_IMYA,DataBasesRegist.COLUMN_OTCHESTVO,DataBasesRegist.COLUMN_KAF},null,null,null,null,null);
+        cursorBaseSql.moveToPosition(-1);
+        while (cursorBaseSql.moveToNext()){
+            String name = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_IMYA));
+            String surname = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_FAMILIA));
+            String lastname = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_OTCHESTVO));
+            String kaf = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_KAF));
+            items.add(name+ ";"+ surname + ";" + lastname + ";" + kaf);
+        }
+        return items;
+    }
+
 
     //обновление БД преподавателей
     public void updateTeachersDB(String nameForEdit, String editName){
@@ -334,6 +359,7 @@ public class DataBases {
         cursorJournal.close();
         cursorTeachers.close();
         cursorRoom.close();
+        cursorBaseSql.close();
         Log.d("DB connection is", "CLOSE");
     }
 

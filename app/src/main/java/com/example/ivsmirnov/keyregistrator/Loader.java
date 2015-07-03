@@ -161,9 +161,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                 String name = split[1];
                 String surname = split[2];
                 String lastname = split[3];
-                String photo = split[4];
-                //Log.d("item",kaf+ " "+ name+ " "+ surname + " " + lastname); //работает, надо создать TABLE и грузить это все туда
-                db.writeInDBSQL(kaf,name,surname,lastname,photo);
+                db.writeInDBSQL(kaf,name,surname,lastname);
                 publishProgress(count++);
             }
         }else{
