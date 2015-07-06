@@ -55,7 +55,7 @@ public class Teachers_Activity extends ActionBarActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         openBase();
-        items = new ArrayList<>(db.readTeachersFromDB());
+        items = new ArrayList<>(db.readTeachersFromDB(DataBasesRegist.COLUMN_FAMILIA));
         closeBase();
 
         gridView = (GridView)findViewById(R.id.gridview_for_teachers_2);
@@ -129,16 +129,16 @@ public class Teachers_Activity extends ActionBarActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()){
                             case R.id.popup_menu_edit:
-                                Bundle b = new Bundle();
-                                b.putString("name", name);
-                                b.putInt("pos",position);
-                                editor.putString("nameForEdit",name);
-                                editor.commit();
-                                showDialog(DIALOG_EDIT, b);
+                                //Bundle b = new Bundle();
+                                //b.putString("name", name);
+                                //b.putInt("pos",position);
+                                //editor.putString("nameForEdit",name);
+                                //editor.commit();
+                                //showDialog(DIALOG_EDIT, b);
                                 break;
                             case R.id.popup_menu_clear:
                                 openBase();
-                                db.deleteFromTeachersDB(name);
+                                //db.deleteFromTeachersDB(name);
                                 closeBase();
                                 items.remove(position);
                                 adapter.notifyDataSetChanged();
@@ -214,7 +214,7 @@ public class Teachers_Activity extends ActionBarActivity {
 
                                 if (checkBoxAddInBase.isChecked()){
                                     db = new DataBases(context);
-                                    db.writeInDBTeachers(name);
+                                    db.writeInDBTeachers(name,null,null,null,null);
                                     db.closeDBconnection();
                                 }
                                 finish();

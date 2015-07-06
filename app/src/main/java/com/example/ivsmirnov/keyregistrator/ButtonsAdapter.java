@@ -74,7 +74,7 @@ public class ButtonsAdapter extends BaseAdapter {
             rows = (int)Math.ceil((double)childCount/preferences.getInt(Values.COLUMNS_COUNT,1));
             int btnHeight = heightGrid/rows - space;
 
-            //text.setTextSize((int) (heightGrid * 0.45f * 0.6f));
+
             text.setText(String.valueOf(items.get(position)));
             AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     btnHeight);

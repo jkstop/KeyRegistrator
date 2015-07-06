@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:background="#ffc6ffec">
 
     <ImageView
         android:id="@+id/image_sql"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.2"/>
+        android:layout_weight="0.3"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -16,25 +22,51 @@
         android:orientation="vertical">
 
 
-        <TextView
+        <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/text_familia"/>
+            android:layout_height="0dp"
+            android:id="@+id/text_familia"
+            android:layout_weight="0.5"
+            android:textColor="#ff000000"
+            android:textSize="100dp"
+            android:padding="0dp"
+            android:gravity="center_vertical" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_weight="0.3"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp">
+
+            <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/text_imya"
+                android:textColor="#ff000000"
+                android:textSize="100dp"
+                android:gravity="center_vertical"
+                android:layout_marginRight="15dp" />
+
+            <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/otchestvo"
+                android:textColor="#ff000000"
+                android:textSize="100dp"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/text_imya"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/otchestvo"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/kafedra"/>
+            android:layout_height="0dp"
+            android:layout_weight="0.25"
+            android:id="@+id/kafedra"
+            android:ellipsize="none"
+            android:textStyle="italic"
+            android:gravity="center_vertical"
+            android:textSize="15dp" />
     </LinearLayout>
 
 </LinearLayout>

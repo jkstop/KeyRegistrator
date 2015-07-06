@@ -12,7 +12,7 @@ import android.util.Log;
 public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
 
     private static final String name = "Key_registrator_database.db";
-    private static final int version = 16;
+    private static final int version = 17;
 
     public static final String TABLE_JOURNAL = "Журнал";
     public static final String COLUMN_AUD = "Аудитория";
@@ -25,9 +25,14 @@ public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
             + TABLE_JOURNAL;
 
     public static final String TABLE_TEACHER = "Список";
-    public static final String COLUMN_TEACHER = "ФИО";
+    public static final String COLUMN_SURNAME_FAVORITE = "Фамилия";
+    public static final String COLUMN_NAME_FAVORITE = "Имя";
+    public static final String COLUMN_LASTNAME_FAVORITE = "Отчество";
+    public static final String COLUMN_KAF_FAVORITE = "Кафедра";
+    public static final String COLUMN_GENDER_FAVORITE = "Пол";
     public static final String SQL_CREATE_TEACHERS_BASE = "create table " + TABLE_TEACHER + " (" + BaseColumns._ID + " integer primary key autoincrement, "
-            + COLUMN_TEACHER + " text not null);";
+            + COLUMN_SURNAME_FAVORITE + " text not null, " + COLUMN_NAME_FAVORITE + " text not null, " + COLUMN_LASTNAME_FAVORITE + " text not null, " +
+            COLUMN_KAF_FAVORITE + " text not null, " + COLUMN_GENDER_FAVORITE + " text not null);";
     public static final String SQL_DELETE_TEACHERS_BASE = "DROP TABLE IF EXISTS "
             + TABLE_TEACHER;
 
@@ -44,10 +49,8 @@ public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
     public static final String COLUMN_IMYA = "Имя";
     public static final String COLUMN_FAMILIA = "Фамилия";
     public static final String COLUMN_OTCHESTVO = "Отчество";
-    public static final String COLUMN_FOTO = "Фото";
     public static final String CREATE_BASE_SQL = "CREATE TABLE " + TABLE_BASE + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            COLUMN_KAF + " text not null, " + COLUMN_IMYA + " text not null, "+ COLUMN_FAMILIA + " text not null, " +
-            COLUMN_OTCHESTVO + " text not null);";
+            COLUMN_KAF + " text not null, " + COLUMN_IMYA + " text not null, "+ COLUMN_FAMILIA + " text not null, " + COLUMN_OTCHESTVO + " text not null);";
     public static final String DELETE_BASE_SQL = "DROP TABLE IF EXISTS " + TABLE_BASE;
 
     public DataBasesRegist(Context context) {

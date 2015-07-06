@@ -1,24 +1,18 @@
 package com.example.ivsmirnov.keyregistrator;
 
-import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.app.FragmentManager;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
-/**
- * Created by ivsmirnov on 26.06.2015.
- */
 public class Loader extends AsyncTask <String,Integer,Void> {
 
     private Context context;
@@ -66,7 +60,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
     protected Void doInBackground(String... params) {
 
         DataBases db = new DataBases(context);
-        String [] items = null;
+        ArrayList<String> items = null;
         int count = 0;
 
         if (LOAD_TYPE == Values.LOAD_JOURNAL){
@@ -77,36 +71,19 @@ public class Loader extends AsyncTask <String,Integer,Void> {
             } catch (IOException e){
                 e.printStackTrace();
             }
-            for (String s : items){
-                String [] split = s.split("\\s+");
+            if (items != null) {
+                for (String s : items){
+                    String [] split = s.split("\\s+");
 
-                String aud = "";
-                String name = "";
-                Long time = (long)1;
-                Long timePut = (long)1;
+                    String aud = "";
+                    String name = "";
+                    Long time = (long)1;
+                    Long timePut = (long)1;
 
-                if(split.length>5){
-                    aud = split[0];
-                    int nameIndexLast = split.length-3;
-                    for (int i=1;i<=nameIndexLast;i++){
-                        name += split[i]+" ";
-                    }
-                    try {
-                        time = parseDate(split[split.length-2]);
-                        timePut = parseDate(split[split.length-1]);
-                    } catch (ParseException e) {
-                        time = (long)1;
-                        timePut = (long)1;
-                    }
-                }else if(split.length<5){
-                    if (split[0].length()!=3){
-                        aud = "_";
-                        for (int i=0;i<=split.length-1;i++){
-                            name += split[i]+" ";
-                        }
-                    }else{
+                    if(split.length>5){
                         aud = split[0];
-                        for (int i = 1;i<=split.length-3;i++){
+                        int nameIndexLast = split.length-3;
+                        for (int i=1;i<=nameIndexLast;i++){
                             name += split[i]+" ";
                         }
                         try {
@@ -116,21 +93,40 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                             time = (long)1;
                             timePut = (long)1;
                         }
+                    }else if(split.length<5){
+                        if (split[0].length()!=3){
+                            aud = "_";
+                            for (int i=0;i<=split.length-1;i++){
+                                name += split[i]+" ";
+                            }
+                        }else{
+                            aud = split[0];
+                            for (int i = 1;i<=split.length-3;i++){
+                                name += split[i]+" ";
+                            }
+                            try {
+                                time = parseDate(split[split.length-2]);
+                                timePut = parseDate(split[split.length-1]);
+                            } catch (ParseException e) {
+                                time = (long)1;
+                                timePut = (long)1;
+                            }
+                        }
+                    }else{
+                        aud = split[0];
+                        name = split[1]+ " "+ split[2];
+                        try {
+                            time = parseDate(split[3]);
+                            timePut = parseDate(split[4]);
+                        } catch (ParseException e) {
+                            time = (long)1;
+                            timePut = (long)1;
+                        }
                     }
-                }else{
-                    aud = split[0];
-                    name = split[1]+ " "+ split[2];
-                    try {
-                        time = parseDate(split[3]);
-                        timePut = parseDate(split[4]);
-                    } catch (ParseException e) {
-                        time = (long)1;
-                        timePut = (long)1;
-                    }
-                }
-                db.writeInDBJournal(aud,name,time,timePut,true);
-                publishProgress(count++);
+                    db.writeInDBJournal(aud,name,time,timePut,true);
+                    publishProgress(count++);
 
+                }
             }
 
         }else if (LOAD_TYPE == Values.LOAD_TEACHERS){
@@ -141,9 +137,11 @@ public class Loader extends AsyncTask <String,Integer,Void> {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            for (String s : items){
-                db.writeInDBTeachers(s);
-                publishProgress(count++);
+            if (items != null) {
+                for (String s : items){
+                    db.writeInDBTeachers(s,null,null,null,null);
+                    publishProgress(count++);
+                }
             }
         }else if (LOAD_TYPE ==66){
             try {
@@ -153,16 +151,18 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                 e.printStackTrace();
             }
             db.clearBaseSQL();
-            Log.d("items",String.valueOf(items.length));
+
             String delims = ";";
-            for (String s : items){
-                String [] split = s.split(delims);
-                String kaf = split[0];
-                String name = split[1];
-                String surname = split[2];
-                String lastname = split[3];
-                db.writeInDBSQL(kaf,name,surname,lastname);
-                publishProgress(count++);
+            if (items != null) {
+                for (String s : items){
+                    String [] split = s.split(delims);
+                    String kaf = split[0];
+                    String name = split[1];
+                    String surname = split[2];
+                    String lastname = split[3];
+                    db.writeInDBSQL(kaf,name,surname,lastname);
+                    publishProgress(count++);
+                }
             }
         }else{
             Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show();

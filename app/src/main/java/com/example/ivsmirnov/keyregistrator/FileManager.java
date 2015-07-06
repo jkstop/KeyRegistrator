@@ -188,7 +188,7 @@ public class FileManager extends ListActivity {
 
     }
 
-    public static String[] readFile (String path) throws IOException {
+    public static ArrayList<String> readFile (String path) throws IOException { //make return ArrayList<String>
         File file = new File(path);
         BufferedReader fin = new BufferedReader(new FileReader(file));
         int count = getStringCount(file);
@@ -198,11 +198,13 @@ public class FileManager extends ListActivity {
 
         int i = 0;
         String line;
-        String [] lines = new String[count];
+        ArrayList<String> lines = new ArrayList<>(count);
         while ((line = fin.readLine())!=null){
             if (i<count){
-                lines [i] = line;
-                i++;
+                if (!lines.contains(line)){
+                    lines.add(line);
+                    i++;
+                }
             }
         }
         return lines;

@@ -48,7 +48,8 @@ public class DataBases {
         dataBasesRegist = new DataBasesRegist(context);
         base = dataBasesRegist.getWritableDatabase();
         cursorJournal = base.query(DataBasesRegist.TABLE_JOURNAL, null, null, null, null, null, null);
-        cursorTeachers = base.query(DataBasesRegist.TABLE_TEACHER,null,null,null,null,null,null);
+        cursorTeachers = base.query(DataBasesRegist.TABLE_TEACHER,new String[]{DataBasesRegist._ID,DataBasesRegist.COLUMN_SURNAME_FAVORITE,DataBasesRegist.COLUMN_NAME_FAVORITE,
+                DataBasesRegist.COLUMN_LASTNAME_FAVORITE,DataBasesRegist.COLUMN_KAF_FAVORITE,DataBasesRegist.COLUMN_GENDER_FAVORITE},null,null,null,null,null);
         cursorRoom = base.query(DataBasesRegist.TABLE_ROOMS,null,null,null,null,null,null);
         cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,null,null,null,null,null,null);
         Log.d("DB connection is", "OPEN");
@@ -125,32 +126,38 @@ public class DataBases {
     }
 
     //запись в БД преподавателей
-    public void writeInDBTeachers(String name){
+    public void writeInDBTeachers(String surname, String name, String lastname, String kaf,String gender){
         ContentValues cv = new ContentValues();
-
-        cv.put(DataBasesRegist.COLUMN_TEACHER,name);
+        cv.put(DataBasesRegist.COLUMN_SURNAME_FAVORITE,surname);
+        cv.put(DataBasesRegist.COLUMN_NAME_FAVORITE,name);
+        cv.put(DataBasesRegist.COLUMN_LASTNAME_FAVORITE,lastname);
+        cv.put(DataBasesRegist.COLUMN_KAF_FAVORITE, kaf);
+        cv.put(DataBasesRegist.COLUMN_GENDER_FAVORITE,gender);
         base.insert(DataBasesRegist.TABLE_TEACHER, null, cv);
         Log.d("Write in Teachers DB", "OK");
     }
 
     //чтение из БД преподавателей
-    public ArrayList<String> readTeachersFromDB(){
+    public ArrayList<String> readTeachersFromDB(String column){
         cursorTeachers.moveToPosition(-1);
         ArrayList <String> items = new ArrayList<>();
         while (cursorTeachers.moveToNext()){
-            items.add(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_TEACHER))) ;
+            items.add(cursorTeachers.getString(cursorTeachers.getColumnIndex(column))) ;
         }
-        items.add("яяя");
+        //items.add("яяя");
         return items;
     }
     //удаление из БД преподавателей
-    public void deleteFromTeachersDB(String name){
+    public void deleteFromTeachersDB(String surname, String name,String lastname,String kaf){
+
         cursorTeachers.moveToPosition(-1);
         while (cursorTeachers.moveToNext()){
-            String needName = cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_TEACHER));
-            if (needName.equals(name)){
-                int row = cursorTeachers.getInt(cursorTeachers.getColumnIndex(BaseColumns._ID));
-                base.delete(DataBasesRegist.TABLE_TEACHER, BaseColumns._ID + "=" + row, null);
+            if (surname.equals(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE)))&&
+                    name.equals(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_NAME_FAVORITE)))&&
+                    lastname.equals(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_LASTNAME_FAVORITE)))&&
+                    kaf.equals(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_KAF_FAVORITE)))){
+                int row = cursorTeachers.getInt(cursorTeachers.getColumnIndex(DataBasesRegist._ID));
+                base.delete(DataBasesRegist.TABLE_TEACHER,DataBasesRegist._ID + "=" + row,null);
             }
         }
     }
@@ -210,15 +217,14 @@ public class DataBases {
 
         cursorTeachers.moveToPosition(-1);
         while (cursorTeachers.moveToNext()){
-            String needName = cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_TEACHER));
+            String needName = cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE));
             if (needName.equals(nameForEdit)){
                 int row = cursorTeachers.getInt(cursorTeachers.getColumnIndex(BaseColumns._ID));
                 ContentValues cv = new ContentValues();
-                cv.put(DataBasesRegist.COLUMN_TEACHER, editName);
+                cv.put(DataBasesRegist.COLUMN_SURNAME_FAVORITE, editName);
                 base.update(DataBasesRegist.TABLE_TEACHER, cv, BaseColumns._ID + "=" + row, null);
             }
         }
-
     }
 
     //запись в БД журнала
@@ -237,14 +243,10 @@ public class DataBases {
             editor.putInt(Values.POSITION_IN_BASE_FOR_ROOM + aud, (int) id);
             editor.commit();
         }
-
-
     }
-
 
     //изменение записи журнала в БД
     public void updateDB(int id){
-
         ContentValues cv = new ContentValues();
         cv.put(DataBasesRegist.COLUMN_TIME_PUT, getTime());
         base.update(DataBasesRegist.TABLE_JOURNAL, cv,
@@ -255,7 +257,6 @@ public class DataBases {
     //запись в БД журнала даты
     public void writeInDBJournalHeaderDate(){
         ContentValues cv = new ContentValues();
-
         cursorJournal.moveToPosition(-1);
         cv.put(DataBasesRegist.COLUMN_AUD, "_");
         cv.put(DataBasesRegist.COLUMN_NAME, showDate());
@@ -301,7 +302,7 @@ public class DataBases {
                 file = new File(mPath + "/Teachers.txt");
                 cursorTeachers.moveToPosition(-1);
                 while (cursorTeachers.moveToNext()){
-                    itemList.add(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_TEACHER)));
+                    itemList.add(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE)));
                 }
                 break;
         }
@@ -369,7 +370,6 @@ public class DataBases {
             File f1 = new File(srFile);
             File f2 = new File(dtFile);
             InputStream in = new FileInputStream(f1);
-
             OutputStream out = new FileOutputStream(f2);
 
             byte[] buf = new byte[1024];

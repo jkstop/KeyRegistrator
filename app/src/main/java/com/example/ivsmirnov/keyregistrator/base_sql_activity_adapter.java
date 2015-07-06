@@ -25,16 +25,18 @@ public class base_sql_activity_adapter extends BaseAdapter {
     private ArrayList <String> name;
     private ArrayList <String> surname;
     private ArrayList <String> lastname;
+    private ArrayList <String> gender;
 
     private Context context;
     private LayoutInflater inflater;
 
-    public base_sql_activity_adapter(Context c,ArrayList<String> k,ArrayList<String> i, ArrayList<String> f, ArrayList<String> o){
+    public base_sql_activity_adapter(Context c,ArrayList<String> k,ArrayList<String> i, ArrayList<String> f, ArrayList<String> o, ArrayList<String> g){
         kaf = k;
         name = i;
         surname = f;
         lastname = o;
         context = c;
+        gender = g;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
@@ -53,17 +55,6 @@ public class base_sql_activity_adapter extends BaseAdapter {
         return name.indexOf(name.get(position));
     }
 
-    public Bitmap StringToBitMap(String encodedString){
-        try{
-            byte [] encodeByte= Base64.decode(encodedString, Base64.DEFAULT);
-            Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-            return bitmap;
-        }catch(Exception e){
-            e.getMessage();
-            return null;
-        }
-    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view;
@@ -78,13 +69,21 @@ public class base_sql_activity_adapter extends BaseAdapter {
         TextView imya = (TextView)view.findViewById(R.id.text_imya);
         TextView otchestvo = (TextView)view.findViewById(R.id.otchestvo);
         TextView kafedra = (TextView)view.findViewById(R.id.kafedra);
+        ImageView image = (ImageView)view.findViewById(R.id.image_sql);
 
-
-
-        familia.setText(name.get(position));
-        imya.setText(surname.get(position));
+        familia.setText(surname.get(position));
+        imya.setText(name.get(position));
         otchestvo.setText(lastname.get(position));
         kafedra.setText(kaf.get(position));
+        if (gender.get(position).equals("Ж")){
+            image.setBackgroundResource(R.drawable.person_female);
+        }else{
+            image.setBackgroundResource(R.drawable.person_male);
+        }
+
+        int gridHeight = base_sql_activity.gridView.getHeight();
+        int buttonHeight = gridHeight/6;
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,buttonHeight));
         return view;
     }
 
