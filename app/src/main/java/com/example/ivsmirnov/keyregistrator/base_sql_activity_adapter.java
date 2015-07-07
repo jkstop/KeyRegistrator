@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -83,7 +84,7 @@ public class base_sql_activity_adapter extends BaseAdapter {
 
         int gridHeight = base_sql_activity.gridView.getHeight();
         int buttonHeight = gridHeight/6;
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,buttonHeight));
+        view.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,buttonHeight));
         return view;
     }
 

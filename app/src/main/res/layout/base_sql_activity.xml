@@ -16,4 +16,14 @@
         android:stretchMode="columnWidth"
         android:gravity="center" />
 
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/imageView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/ic_add_circle_outline_black_48dp"
+        android:onClick="showAddUserDialog" />
+
 </RelativeLayout>

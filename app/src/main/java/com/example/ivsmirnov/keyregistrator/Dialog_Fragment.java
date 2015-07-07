@@ -1,5 +1,6 @@
 package com.example.ivsmirnov.keyregistrator;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -13,16 +14,24 @@ import android.support.annotation.NonNull;
 import android.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -34,6 +43,8 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
     private Context context;
     private int dialog_id;
+
+    DialogInterface.OnDismissListener onDismissListener;
 
     public Dialog_Fragment(){
     }
@@ -209,9 +220,69 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                 WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
                 lp.gravity = Gravity.TOP;
                 return dialog;
+            case 44:
+                LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                final TableLayout tableLayout = new TableLayout(context);
+
+                final DataBases dbses = new DataBases(context);
+                for (int i=1;i<dbses.cursorTeachers.getColumnCount();i++){
+                    TableRow tableRow = new TableRow(context);
+                    View rowLayot = inflater.inflate(R.layout.row_for_editor,null);
+
+                    TextView textParametr = (TextView)rowLayot.findViewById(R.id.textEditParametr);
+                    textParametr.setText(dbses.cursorTeachers.getColumnName(i));
+
+                    EditText editParametr = (EditText)rowLayot.findViewById(R.id.editParemetr);
+                    String [] values = getArguments().getStringArray("valuesForEdit");
+                    editParametr.setText(values[i-1]);
+
+                    tableRow.addView(rowLayot);
+                    tableLayout.addView(tableRow);
+                }
+
+                tableLayout.setColumnStretchable(0, true);
+
+
+                AlertDialog.Builder builderEdit = new AlertDialog.Builder(getActivity());
+                builderEdit.setTitle("Редактирование");
+                builderEdit.setView(tableLayout);
+                builderEdit.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        dbses.closeDBconnection();
+                    }
+                });
+                builderEdit.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String [] source = getArguments().getStringArray("valuesForEdit");
+                        String [] edited = new String[5];
+                        for (int i = 0; i < tableLayout.getChildCount(); i++) {
+                            LinearLayout linearLayout = (LinearLayout)tableLayout.getChildAt(i);
+                            EditText editText = (EditText)linearLayout.findViewById(R.id.editParemetr);
+                            String text = editText.getText().toString();
+                            edited[i] = text;
+                        }
+                        dbses.updateTeachersDB(source, edited);
+                        dbses.closeDBconnection();
+
+                        int position = getArguments().getInt("position");
+                        EditDialogListener activity = (EditDialogListener)getActivity();
+                        activity.onFinishEditDialog(edited,position);
+
+                    }
+                });
+                builderEdit.setCancelable(false);
+                return builderEdit.create();
 
         }
 
         return null;
+    }
+
+    public interface EditDialogListener{
+        void onFinishEditDialog(String [] values, int position);
     }
 }

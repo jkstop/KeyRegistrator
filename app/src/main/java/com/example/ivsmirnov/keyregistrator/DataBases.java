@@ -213,16 +213,22 @@ public class DataBases {
 
 
     //обновление БД преподавателей
-    public void updateTeachersDB(String nameForEdit, String editName){
+    public void updateTeachersDB(String [] source, String [] edited){
 
         cursorTeachers.moveToPosition(-1);
         while (cursorTeachers.moveToNext()){
-            String needName = cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE));
-            if (needName.equals(nameForEdit)){
-                int row = cursorTeachers.getInt(cursorTeachers.getColumnIndex(BaseColumns._ID));
+            if (source[0].equals(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE)))&&
+                    source[1].equals(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_NAME_FAVORITE)))&&
+                    source[2].equals(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_LASTNAME_FAVORITE)))&&
+                    source[3].equals(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_KAF_FAVORITE)))){
+                int row = cursorTeachers.getInt(cursorTeachers.getColumnIndex(DataBasesRegist._ID));
                 ContentValues cv = new ContentValues();
-                cv.put(DataBasesRegist.COLUMN_SURNAME_FAVORITE, editName);
-                base.update(DataBasesRegist.TABLE_TEACHER, cv, BaseColumns._ID + "=" + row, null);
+                cv.put(DataBasesRegist.COLUMN_SURNAME_FAVORITE,edited[0]);
+                cv.put(DataBasesRegist.COLUMN_NAME_FAVORITE,edited[1]);
+                cv.put(DataBasesRegist.COLUMN_LASTNAME_FAVORITE,edited[2]);
+                cv.put(DataBasesRegist.COLUMN_KAF_FAVORITE,edited[3]);
+                cv.put(DataBasesRegist.COLUMN_GENDER_FAVORITE,edited[4]);
+                base.update(DataBasesRegist.TABLE_TEACHER, cv, DataBasesRegist._ID + "=" + row, null);
             }
         }
     }

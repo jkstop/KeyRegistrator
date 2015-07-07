@@ -243,7 +243,7 @@ public class Teachers_Activity extends ActionBarActivity {
                                 sortByABC();
                                 adapter.notifyDataSetChanged();
                                 openBase();
-                                db.updateTeachersDB(nameForEdit, edited);
+                                //db.updateTeachersDB(nameForEdit, edited);
                                 closeBase();
                                 removeDialog(DIALOG_EDIT);
                             }

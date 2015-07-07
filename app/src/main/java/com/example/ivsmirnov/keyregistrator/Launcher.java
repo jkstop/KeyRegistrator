@@ -121,7 +121,8 @@ public class Launcher extends FragmentActivity {
                 selected_aud = position;
 
                 if (isFreeAud.get(position)) {
-                    startActivity(new Intent(context, Teachers_Activity.class).putExtra(Values.AUDITROOM,view.getTag().toString()));
+                    //startActivity(new Intent(context, Teachers_Activity.class).putExtra(Values.AUDITROOM,view.getTag().toString()));
+                    startActivity(new Intent(context, base_sql_activity.class).putExtra(Values.AUDITROOM,view.getTag().toString()));
                 } else {
                     int pos = preferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM+view.getTag().toString(),-1);
 
