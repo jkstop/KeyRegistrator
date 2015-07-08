@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.util.Log;
+import android.util.SparseArray;
 import android.widget.Toast;
 
 import java.io.File;
@@ -22,6 +23,7 @@ import java.io.OutputStream;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 
@@ -138,12 +140,22 @@ public class DataBases {
     }
 
     //чтение из БД преподавателей
-    public ArrayList<String> readTeachersFromDB(String column){
+    public ArrayList<SparseArray> readTeachersFromDB(){
         cursorTeachers.moveToPosition(-1);
-        ArrayList <String> items = new ArrayList<>();
+        ArrayList <SparseArray> items = new ArrayList<>();
+
         while (cursorTeachers.moveToNext()){
-            items.add(cursorTeachers.getString(cursorTeachers.getColumnIndex(column))) ;
+            SparseArray <String> card = new SparseArray<String>();
+            card.put(0, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE)));
+            card.put(1, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_NAME_FAVORITE)));
+            card.put(2, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_LASTNAME_FAVORITE)));
+            card.put(3, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_KAF_FAVORITE)));
+            card.put(4, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_GENDER_FAVORITE)));
+
+            items.add(card);
+
         }
+
         //items.add("яяя");
         return items;
     }

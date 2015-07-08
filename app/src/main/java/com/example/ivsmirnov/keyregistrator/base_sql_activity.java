@@ -17,9 +17,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,22 +32,18 @@ import java.util.Map;
  */
 public class base_sql_activity extends ActionBarActivity implements Dialog_Fragment.EditDialogListener{
 
-    public static final int DIALOG_NEW = 0;
-    public static final int DIALOG_EDIT = 1;
     static final int POPUP_MENU_TEACHER = 1;
 
     private SharedPreferences.Editor editor;
     private SharedPreferences sharedPreferences;
 
+    private static long today,lastDate;
+
     private Context context;
     public static GridView gridView;
     private DataBases db;
 
-    public static ArrayList <String> nameList;
-    public static ArrayList <String> surnameList;
-    public static ArrayList <String> lastnameList;
-    public static ArrayList <String> kafList;
-    public static ArrayList <String> genderList;
+    ArrayList<SparseArray> allItems;
     public static base_sql_activity_adapter adapter;
 
     @Override
@@ -61,30 +61,85 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Bundle b = new Bundle();
-                b.putString("surname", surnameList.get(position));
-                b.putString("name", nameList.get(position));
-                b.putString("lastname", lastnameList.get(position));
-                b.putString("kaf", kafList.get(position));
+                b.putString("surname", (String) allItems.get(position).get(0));
+                b.putString("name", (String) allItems.get(position).get(1));
+                b.putString("lastname", (String) allItems.get(position).get(2));
+                b.putString("kaf", (String) allItems.get(position).get(3));
                 showPopupMenu(POPUP_MENU_TEACHER, view, position, b);
                 return false;
             }
         });
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int pos = position - parent.getFirstVisiblePosition();
+                View rootView = parent.getChildAt(pos);
+                TextView text = (TextView) rootView.findViewById(R.id.text_familia);
+                String aud = getIntent().getStringExtra(Values.AUDITROOM);
+                String name = text.getText().toString();
+                final Long time = System.currentTimeMillis();
+
+                writeIt(aud, name, time);
+
+                finish();
+            }
+        });
+
+
+    }
+
+    private void writeIt (String aud,String name,Long time){
+        openBase();
+        if (today==lastDate){
+            db.writeInDBJournal(aud,name,time,(long)0,false);
+            editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount());
+        }else{
+            db.writeInDBJournalHeaderDate();
+            editor.putInt(Values.CURSOR_POSITION, db.cursorJournal.getCount());
+            editor.commit();
+            db.writeInDBJournal(aud, name, time, (long) 0,false);
+            editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount()+1);
+        }
+        db.updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), 0);
+        db.updateLastVisitersRoom(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), name);
+        closeBase();
+
+        editor.putLong(Values.DATE, today);
+        editor.commit();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-Log.d("onResume","ok");
+
+        Calendar calendar = Calendar.getInstance();
+        today = calendar.get(Calendar.DATE);
+        lastDate = sharedPreferences.getLong(Values.DATE, 0);
+
         openBase();
-        nameList = db.readTeachersFromDB(DataBasesRegist.COLUMN_NAME_FAVORITE);
-        surnameList = db.readTeachersFromDB(DataBasesRegist.COLUMN_SURNAME_FAVORITE);
-        lastnameList = db.readTeachersFromDB(DataBasesRegist.COLUMN_LASTNAME_FAVORITE);
-        kafList = db.readTeachersFromDB(DataBasesRegist.COLUMN_KAF_FAVORITE);
-        genderList = db.readTeachersFromDB(DataBasesRegist.COLUMN_GENDER_FAVORITE);
+        allItems = db.readTeachersFromDB();
         closeBase();
-        adapter = new base_sql_activity_adapter(context,kafList,nameList,surnameList,lastnameList,genderList);
+
+        sortByABC();
+
+
+        adapter = new base_sql_activity_adapter(context,allItems);
         gridView.setAdapter(adapter);
     }
+
+    private void sortByABC(){
+        Collections.sort(allItems, new Comparator<SparseArray>() {
+            @Override
+            public int compare(SparseArray lhs, SparseArray rhs) {
+                String first = String.valueOf(lhs.get(0));
+                String second = String.valueOf(rhs.get(0));
+                return first.compareToIgnoreCase(second);
+            }
+        });
+    }
+
+
 
     private void showPopupMenu(int menu, View v,final int position,Bundle args){
         final PopupMenu popupMenu = new PopupMenu(this,v);
@@ -123,11 +178,7 @@ Log.d("onResume","ok");
                                 db.deleteFromTeachersDB(surname, name, lastname, kaf);
                                 closeBase();
 
-                                nameList.remove(position);
-                                surnameList.remove(position);
-                                lastnameList.remove(position);
-                                kafList.remove(position);
-                                genderList.remove(position);
+                                allItems.remove(position);
                                 adapter.notifyDataSetChanged();
                                 break;
                             default:
@@ -151,16 +202,6 @@ Log.d("onResume","ok");
         dialogType.show(getSupportFragmentManager(), "type");
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
-            case 99:
-                Toast.makeText(context,"TOAST",Toast.LENGTH_SHORT).show();
-                break;
-        }
-    }
-
     private void openBase(){
         db = new DataBases(context);
     }
@@ -170,20 +211,19 @@ Log.d("onResume","ok");
 
 
     @Override
-    public void onFinishEditDialog(String[] values, int position) {
-        surnameList.remove(position);
-        nameList.remove(position);
-        lastnameList.remove(position);
-        kafList.remove(position);
-        genderList.remove(position);
+    public void onFinishEditDialog(String[] values, int position, int type) {
 
-        surnameList.add(values[0]);
-        nameList.add(values[1]);
-        lastnameList.add(values[2]);
-        kafList.add(values[3]);
-        genderList.add(values[4]);
-
+        if (type==1){
+            allItems.remove(position);
+        }
+        SparseArray<String> newItems = new SparseArray<>();
+        for (int i=0;i<values.length;i++){
+            newItems.put(i,values[i]);
+        }
+        allItems.add(newItems);
         adapter.notifyDataSetChanged();
+        sortByABC();
+
 
     }
 }

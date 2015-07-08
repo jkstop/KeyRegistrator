@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Base64InputStream;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,43 +23,38 @@ import java.util.ArrayList;
  */
 public class base_sql_activity_adapter extends BaseAdapter {
 
-    private ArrayList <String> kaf;
-    private ArrayList <String> name;
-    private ArrayList <String> surname;
-    private ArrayList <String> lastname;
-    private ArrayList <String> gender;
+    private SparseArray <String> card;
+
+    private ArrayList <SparseArray> allItems;
 
     private Context context;
     private LayoutInflater inflater;
 
-    public base_sql_activity_adapter(Context c,ArrayList<String> k,ArrayList<String> i, ArrayList<String> f, ArrayList<String> o, ArrayList<String> g){
-        kaf = k;
-        name = i;
-        surname = f;
-        lastname = o;
+    public base_sql_activity_adapter(Context c,ArrayList<SparseArray> all){
+        allItems = all;
         context = c;
-        gender = g;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
     @Override
     public int getCount() {
-        return name.size();
+        return allItems.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return name.get(position);
+        return allItems.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return name.indexOf(name.get(position));
+        return allItems.indexOf(allItems.get(position));
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view;
+        card = allItems.get(position);
 
         if (convertView==null){
             view = inflater.inflate(R.layout.cell_for_base_sql,parent,false);
@@ -72,11 +68,11 @@ public class base_sql_activity_adapter extends BaseAdapter {
         TextView kafedra = (TextView)view.findViewById(R.id.kafedra);
         ImageView image = (ImageView)view.findViewById(R.id.image_sql);
 
-        familia.setText(surname.get(position));
-        imya.setText(name.get(position));
-        otchestvo.setText(lastname.get(position));
-        kafedra.setText(kaf.get(position));
-        if (gender.get(position).equals("Ж")){
+        familia.setText(card.get(0));
+        imya.setText(card.get(1));
+        otchestvo.setText(card.get(2));
+        kafedra.setText(card.get(3));
+        if (card.get(4).equals("Ж")){
             image.setBackgroundResource(R.drawable.person_female);
         }else{
             image.setBackgroundResource(R.drawable.person_male);

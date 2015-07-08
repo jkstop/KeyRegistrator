@@ -178,6 +178,9 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         DataBases db = new DataBases(context);
                         db.writeInDBTeachers(surname, name, lastname, kaf, gender);
                         db.closeDBconnection();
+                        String [] ed = new String[]{surname,name,lastname,kaf,gender};
+                        EditDialogListener dialogListener = (EditDialogListener)getActivity();
+                        dialogListener.onFinishEditDialog(ed, 5, 2);
                         dismiss();
                     }
                 });
@@ -212,7 +215,9 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 DataBases db = new DataBases(context);
                                 db.writeInDBTeachers(surname, name, lastname, kaf, gender);
                                 db.closeDBconnection();
-                                dismiss();
+                                String [] ed = new String[]{surname,name,lastname,kaf,gender};
+                                EditDialogListener dialogListener = (EditDialogListener)getActivity();
+                                dialogListener.onFinishEditDialog(ed, 5, 2);
                             }
                         });
                 AlertDialog dialog = builder.create();
@@ -270,7 +275,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
                         int position = getArguments().getInt("position");
                         EditDialogListener activity = (EditDialogListener)getActivity();
-                        activity.onFinishEditDialog(edited,position);
+                        activity.onFinishEditDialog(edited,position,1);
 
                     }
                 });
@@ -283,6 +288,6 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
     }
 
     public interface EditDialogListener{
-        void onFinishEditDialog(String [] values, int position);
+        void onFinishEditDialog(String [] values, int position, int type);
     }
 }

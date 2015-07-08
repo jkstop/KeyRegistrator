@@ -55,7 +55,7 @@ public class Teachers_Activity extends ActionBarActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         openBase();
-        items = new ArrayList<>(db.readTeachersFromDB(DataBasesRegist.COLUMN_FAMILIA));
+        //items = new ArrayList<>(db.readTeachersFromDB(DataBasesRegist.COLUMN_FAMILIA));
         closeBase();
 
         gridView = (GridView)findViewById(R.id.gridview_for_teachers_2);
