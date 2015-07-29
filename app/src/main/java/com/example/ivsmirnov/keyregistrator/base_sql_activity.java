@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -30,7 +31,7 @@ import java.util.Map;
 /**
  * Created by IVSmirnov on 02.07.2015.
  */
-public class base_sql_activity extends ActionBarActivity implements Dialog_Fragment.EditDialogListener{
+public class base_sql_activity extends ActionBarActivity implements Dialog_Fragment.EditDialogListener,Loader_Image.OnImageLoaded{
 
     static final int POPUP_MENU_TEACHER = 1;
 
@@ -46,6 +47,8 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
     ArrayList<SparseArray> allItems;
     public static base_sql_activity_adapter adapter;
 
+    Loader_Image.OnImageLoaded loader;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +57,8 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
         context = this;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+
+        loader = this;
 
         gridView = (GridView)findViewById(R.id.grid_for_base_sql);
 
@@ -75,9 +80,14 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int pos = position - parent.getFirstVisiblePosition();
                 View rootView = parent.getChildAt(pos);
-                TextView text = (TextView) rootView.findViewById(R.id.text_familia);
+                TextView textSurname = (TextView) rootView.findViewById(R.id.text_familia);
+                TextView textName = (TextView) rootView.findViewById(R.id.text_imya);
+                TextView textLastName = (TextView) rootView.findViewById(R.id.otchestvo);
+
                 String aud = getIntent().getStringExtra(Values.AUDITROOM);
-                String name = text.getText().toString();
+                String name = textSurname.getText().toString() + " "
+                        + textName.getText().toString().charAt(0) + "." +
+                        textLastName.getText().toString().charAt(0) + ".";
                 final Long time = System.currentTimeMillis();
 
                 writeIt(aud, name, time);
@@ -113,6 +123,8 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
     protected void onResume() {
         super.onResume();
 
+        Log.d("onResume","basesql");
+
         Calendar calendar = Calendar.getInstance();
         today = calendar.get(Calendar.DATE);
         lastDate = sharedPreferences.getLong(Values.DATE, 0);
@@ -123,9 +135,15 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
 
         sortByABC();
 
-
-        adapter = new base_sql_activity_adapter(context,allItems);
+        adapter = new base_sql_activity_adapter(context,allItems, loader);
         gridView.setAdapter(adapter);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        allItems.clear();
     }
 
     private void sortByABC(){
@@ -166,7 +184,7 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
                                 }
                                 String [] values = new String[]{surname,name,lastname,kaf,gender};
                                 Bundle b = new Bundle();
-                                b.putInt(Values.DIALOG_TYPE,44);
+                                b.putInt(Values.DIALOG_TYPE,Values.DIALOG_EDIT);
                                 b.putStringArray("valuesForEdit", values);
                                 b.putInt("position", position);
                                 dialog.setArguments(b);
@@ -195,11 +213,12 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
     }
 
     public void showAddUserDialog(View view) {
-        Dialog_Fragment dialogType = new Dialog_Fragment();
+       /* Dialog_Fragment dialogType = new Dialog_Fragment();
         Bundle bundle1 = new Bundle();
-        bundle1.putInt(Values.DIALOG_TYPE,33);
+        bundle1.putInt(Values.DIALOG_TYPE,Values.INPUT_DIALOG);
         dialogType.setArguments(bundle1);
-        dialogType.show(getSupportFragmentManager(), "type");
+        dialogType.show(getSupportFragmentManager(), "type");*/
+        startActivity(new Intent(this,Add_user.class));
     }
 
     private void openBase(){
@@ -210,20 +229,35 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
     }
 
 
+
     @Override
     public void onFinishEditDialog(String[] values, int position, int type) {
+        Log.d("onFinishEditing","interface");
 
-        if (type==1){
-            allItems.remove(position);
-        }
-        SparseArray<String> newItems = new SparseArray<>();
-        for (int i=0;i<values.length;i++){
-            newItems.put(i,values[i]);
-        }
-        allItems.add(newItems);
-        adapter.notifyDataSetChanged();
+        openBase();
+        Log.d("read All Items", "OK");
+        allItems = db.readTeachersFromDB();
+        closeBase();
+
         sortByABC();
+        //adapter.notifyDataSetChanged();
+        adapter = new base_sql_activity_adapter(context,allItems,this);
+        gridView.setAdapter(adapter);
+    }
 
+    @Override
+    public void doneLoad(boolean isDone) {
+        if (isDone){
+            Log.d("Done load","catch");
+            openBase();
+            allItems.clear();
+            allItems = db.readTeachersFromDB();
+            closeBase();
 
+            sortByABC();
+
+            adapter = new base_sql_activity_adapter(context,allItems,this);
+            gridView.setAdapter(adapter);
+        }
     }
 }

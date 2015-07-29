@@ -4,11 +4,18 @@ package com.example.ivsmirnov.keyregistrator;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
+import android.provider.MediaStore;
+import android.support.v7.widget.Toolbar;
+import android.text.LoginFilter;
+import android.util.Base64;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
@@ -51,7 +58,7 @@ public class DataBases {
         base = dataBasesRegist.getWritableDatabase();
         cursorJournal = base.query(DataBasesRegist.TABLE_JOURNAL, null, null, null, null, null, null);
         cursorTeachers = base.query(DataBasesRegist.TABLE_TEACHER,new String[]{DataBasesRegist._ID,DataBasesRegist.COLUMN_SURNAME_FAVORITE,DataBasesRegist.COLUMN_NAME_FAVORITE,
-                DataBasesRegist.COLUMN_LASTNAME_FAVORITE,DataBasesRegist.COLUMN_KAF_FAVORITE,DataBasesRegist.COLUMN_GENDER_FAVORITE},null,null,null,null,null);
+                DataBasesRegist.COLUMN_LASTNAME_FAVORITE,DataBasesRegist.COLUMN_KAF_FAVORITE,DataBasesRegist.COLUMN_GENDER_FAVORITE,DataBasesRegist.COLUMN_PHOTO_FAVORITE},null,null,null,null,null);
         cursorRoom = base.query(DataBasesRegist.TABLE_ROOMS,null,null,null,null,null,null);
         cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,null,null,null,null,null,null);
         Log.d("DB connection is", "OPEN");
@@ -128,14 +135,17 @@ public class DataBases {
     }
 
     //запись в БД преподавателей
-    public void writeInDBTeachers(String surname, String name, String lastname, String kaf,String gender){
+    public void writeInDBTeachers(String surname, String name, String lastname, String kaf,String gender,String photo){
         ContentValues cv = new ContentValues();
         cv.put(DataBasesRegist.COLUMN_SURNAME_FAVORITE,surname);
-        cv.put(DataBasesRegist.COLUMN_NAME_FAVORITE,name);
+        cv.put(DataBasesRegist.COLUMN_NAME_FAVORITE, name);
         cv.put(DataBasesRegist.COLUMN_LASTNAME_FAVORITE,lastname);
         cv.put(DataBasesRegist.COLUMN_KAF_FAVORITE, kaf);
-        cv.put(DataBasesRegist.COLUMN_GENDER_FAVORITE,gender);
-        base.insert(DataBasesRegist.TABLE_TEACHER, null, cv);
+        cv.put(DataBasesRegist.COLUMN_GENDER_FAVORITE, gender);
+        cv.put(DataBasesRegist.COLUMN_PHOTO_FAVORITE, photo);
+        long id = base.insert(DataBasesRegist.TABLE_TEACHER, null, cv);
+        editor.putLong("id",id);
+        editor.commit();
         Log.d("Write in Teachers DB", "OK");
     }
 
@@ -151,12 +161,12 @@ public class DataBases {
             card.put(2, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_LASTNAME_FAVORITE)));
             card.put(3, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_KAF_FAVORITE)));
             card.put(4, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_GENDER_FAVORITE)));
+            card.put(5,cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_PHOTO_FAVORITE)));
 
             items.add(card);
 
         }
 
-        //items.add("яяя");
         return items;
     }
     //удаление из БД преподавателей
@@ -185,17 +195,122 @@ public class DataBases {
     }
 
     public void clearBaseSQL(){
-        base.delete(DataBasesRegist.TABLE_BASE,null,null);
+        base.delete(DataBasesRegist.TABLE_BASE, null, null);
         Log.d("Clear DB", "OK");
     }
 
-    public void writeInDBSQL(String kaf,String name,String surname,String lastname){
+    public void writeInDBSQL(String kaf,String surname,String name,String lastname, String photo){
         ContentValues cv = new ContentValues();
         cv.put(DataBasesRegist.COLUMN_KAF,kaf);
         cv.put(DataBasesRegist.COLUMN_IMYA,name);
         cv.put(DataBasesRegist.COLUMN_FAMILIA,surname);
         cv.put(DataBasesRegist.COLUMN_OTCHESTVO, lastname);
+        cv.put(DataBasesRegist.COLUMN_PHOTO, photo);
         base.insert(DataBasesRegist.TABLE_BASE, null, cv);
+    }
+
+    public void findPhotoByName(String surname, String name, String lastname, String kaf){
+        cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,new String[]{DataBasesRegist._ID,DataBasesRegist.COLUMN_FAMILIA,DataBasesRegist.COLUMN_IMYA,
+        DataBasesRegist.COLUMN_OTCHESTVO,DataBasesRegist.COLUMN_KAF},null,null,null,null,null);
+        cursorBaseSql.moveToPosition(-1);
+        String photo = "null";
+        while (cursorBaseSql.moveToNext()){
+            if (kaf.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_KAF)))){
+                if (surname.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_FAMILIA)))){
+                    if (name.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_IMYA)))){
+                        if (lastname.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_OTCHESTVO)))){
+                            int row = cursorBaseSql.getPosition();
+                            cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,null,null,null,null,null,null);
+                            cursorBaseSql.moveToPosition(row);
+                            photo = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_PHOTO));
+                        }
+                    }
+                }
+            }
+        }
+
+        String photoPath = savePhotoToSD(photo,surname);
+        updatePhoto(photoPath);
+
+        //return photo;
+    }
+
+    public void updatePhoto(String path){
+       /* ContentValues cv = new ContentValues();
+        cv.put(DataBasesRegist.COLUMN_PHOTO_FAVORITE, photo);
+        int row = (int) sharedPreferences.getLong("id", -1);
+        Log.d("row", String.valueOf(row));
+        base.update(DataBasesRegist.TABLE_TEACHER, cv, DataBasesRegist._ID + "=" + row, null);*/
+        ContentValues cv = new ContentValues();
+        cv.put(DataBasesRegist.COLUMN_PHOTO_FAVORITE, path);
+        int row = (int)sharedPreferences.getLong("id",-1);
+        base.update(DataBasesRegist.TABLE_TEACHER,cv,DataBasesRegist._ID + "=" + row,null);
+    }
+
+    public String getPhotoID(SparseArray<String> items){
+        String photoID = "null";
+        cursorTeachers.moveToPosition(-1);
+        while (cursorTeachers.moveToNext()){
+            if (items.get(0).equalsIgnoreCase(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE)))&&
+                    items.get(1).equalsIgnoreCase(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_NAME_FAVORITE)))&&
+                    items.get(2).equalsIgnoreCase(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_LASTNAME_FAVORITE)))&&
+                    items.get(3).equalsIgnoreCase(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_KAF_FAVORITE)))){
+                photoID = cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_PHOTO_FAVORITE));
+            }
+        }
+
+        return photoID;
+    }
+
+    public String savePhotoToSD(String photo, String filename){
+
+        File folder = new File(Environment.getExternalStorageDirectory() + "/KeyRegistrator");
+
+        if (!folder.exists()){
+            folder.mkdir();
+        }
+
+        if (!photo.equalsIgnoreCase("null")){
+
+            byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+            FileOutputStream out = null;
+            try {
+                out = new FileOutputStream(folder.getAbsolutePath()+"/"+filename+".jpg");
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (out != null) {
+                        out.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }else{
+            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.person_female);
+            FileOutputStream out = null;
+            try {
+                out = new FileOutputStream(folder.getAbsolutePath()+"/"+filename+".jpg");
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                // PNG is a lossless format, the compression factor (100) is ignored
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (out != null) {
+                        out.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            }
+        return folder.getAbsolutePath()+"/"+filename+".jpg";
+
     }
 
     public ArrayList <String> readFromBaseSQL(String column){
@@ -214,11 +329,11 @@ public class DataBases {
         cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,new String[]{DataBasesRegist.COLUMN_FAMILIA,DataBasesRegist.COLUMN_IMYA,DataBasesRegist.COLUMN_OTCHESTVO,DataBasesRegist.COLUMN_KAF},null,null,null,null,null);
         cursorBaseSql.moveToPosition(-1);
         while (cursorBaseSql.moveToNext()){
-            String name = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_IMYA));
             String surname = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_FAMILIA));
+            String name = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_IMYA));
             String lastname = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_OTCHESTVO));
             String kaf = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_KAF));
-            items.add(name+ ";"+ surname + ";" + lastname + ";" + kaf);
+            items.add(surname+ ";"+ name + ";" + lastname + ";" + kaf);
         }
         return items;
     }
@@ -320,7 +435,11 @@ public class DataBases {
                 file = new File(mPath + "/Teachers.txt");
                 cursorTeachers.moveToPosition(-1);
                 while (cursorTeachers.moveToNext()){
-                    itemList.add(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE)));
+                    itemList.add(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE))+";"
+                    +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_NAME_FAVORITE))+";"
+                    +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_LASTNAME_FAVORITE))+";"
+                    +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_KAF_FAVORITE))+";"
+                    +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_GENDER_FAVORITE)));
                 }
                 break;
         }

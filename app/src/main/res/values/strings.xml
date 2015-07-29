@@ -34,15 +34,14 @@
     <string-array name="db_teacher_items">
         <item>Выгрузить базу в файл</item>
         <item>Скопировать на ПК</item>
-        <item>Загрузить из файла</item>
+        <item>Загрузить избранное из файла</item>
+        <item>Загрузить глобальную базу из CSV</item>
         <item>Очистить</item>
     </string-array>
     <string-array name="db_share_items">
         <item>Место хранения баз на ПК</item>
         <item>Размер уведомления</item>
-        <item>read CSV</item>
-        <item>view base</item>
-        <item>show popup</item>
+        <item>convert image</item>
     </string-array>
     <string-array name="db_rooms_items">
         <item>Список аудиторий</item>

@@ -9,44 +9,41 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.sql.Time;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Locale;
 
 
-public class Launcher extends FragmentActivity {
+public class Launcher extends ActionBarActivity {
 
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerListView;
+    private RelativeLayout mDrawerPane;
     private ActionBarDrawerToggle mDrawerToogle;
 
     public static Context context;
@@ -66,6 +63,7 @@ public class Launcher extends FragmentActivity {
 
     private ListView listView;
     public static adapter myListAdapter;
+    ButtonsAdapter adapter;
     public static ArrayList<String> audList = new ArrayList<>();
     public static ArrayList<String> nameList = new ArrayList<>();
     public static ArrayList<Long> timeList = new ArrayList<>();
@@ -79,8 +77,6 @@ public class Launcher extends FragmentActivity {
 
     public ButtonsAdapter btnsAdapter;
 
-    static FragmentManager fragmentManager;
-    static Resources resources;
 
 
     @Override
@@ -89,14 +85,17 @@ public class Launcher extends FragmentActivity {
         setContentView(R.layout.launcher);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         context = this;
         preferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        fragmentManager = getSupportFragmentManager();
-        resources = getResources();
+
 
         db = new DataBases(context);
         rooms = new ArrayList<>(db.readFromRoomsDB());
@@ -106,42 +105,38 @@ public class Launcher extends FragmentActivity {
 
         int columns = preferences.getInt(Values.COLUMNS_COUNT,1);
 
-        btnsAdapter = new ButtonsAdapter(context,rooms,isFreeAud,lastVisiters);
-
         gridView = (GridView)findViewById(R.id.gridView);
-
         gridView.setNumColumns(columns);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
                 View viewGridItem = parent.getChildAt(position);
-                TextView textButton = (TextView)viewGridItem.findViewById(R.id.textButton);
+                TextView textButton = (TextView) viewGridItem.findViewById(R.id.textButton);
 
                 selected_aud = position;
 
                 if (isFreeAud.get(position)) {
-                    //startActivity(new Intent(context, Teachers_Activity.class).putExtra(Values.AUDITROOM,view.getTag().toString()));
-                    startActivity(new Intent(context, base_sql_activity.class).putExtra(Values.AUDITROOM,view.getTag().toString()));
+                    startActivity(new Intent(context, base_sql_activity.class).putExtra(Values.AUDITROOM, view.getTag().toString()));
                 } else {
-                    int pos = preferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM+view.getTag().toString(),-1);
+                    int pos = preferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + view.getTag().toString(), -1);
 
                     textButton.setText(String.valueOf(view.getTag()));
 
                     viewGridItem.setBackgroundResource(R.drawable.button_background);
                     db = new DataBases(context);
-                    if (pos == -1){
+                    if (pos == -1) {
                         Toast.makeText(context, "Был какой-то глюк...", Toast.LENGTH_SHORT).show();
-                    }else{
+                    } else {
                         db.updateDB(pos);
-                        timePutList.set(preferences.getInt(Values.POSITION_IN_LIST_FOR_ROOM + view.getTag(),-1),System.currentTimeMillis());
+                        timePutList.set(preferences.getInt(Values.POSITION_IN_LIST_FOR_ROOM + view.getTag(), -1), System.currentTimeMillis());
                         myListAdapter.notifyDataSetChanged();
                     }
 
                     db.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), 1);
                     db.closeDBconnection();
                     isFreeAud.set(position, true);
-
+                    gridView.setAdapter(adapter);
                 }
             }
         });
@@ -193,18 +188,18 @@ public class Launcher extends FragmentActivity {
             }
         });
 
-        String[] mDrawerTitles = getResources().getStringArray(R.array.drawer_list);
+        ArrayList<String> mDrawerTitles = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.drawer_list)));
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        mDrawerListView = (ListView)findViewById(R.id.left_drawer);
+        mDrawerListView = (ListView)findViewById(R.id.list_view_drawer);
+        mDrawerPane = (RelativeLayout)findViewById(R.id.left_drawer);
 
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.layout_drawer_list_item, mDrawerTitles));
+        mDrawerListView.setAdapter(new NavDrawableAdapter(context,mDrawerTitles));
         mDrawerListView.setOnItemClickListener(new DrawerItemClickListener());
 
         mDrawerToogle = new ActionBarDrawerToggle(
                 this,
                 mDrawerLayout,
-                R.drawable.ic_menu_grey600_36dp,
+                toolbar,
                 R.string.drawer_open,
                 R.string.drawer_close
         ){
@@ -226,14 +221,6 @@ public class Launcher extends FragmentActivity {
         }
 
 
-    }
-
-    private static long parseDate(String text)
-            throws ParseException
-    {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss",
-                new Locale("ru"));
-        return dateFormat.parse(text).getTime();
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener{
@@ -271,7 +258,6 @@ public class Launcher extends FragmentActivity {
 
     private void selectItem(int position){
 
-        Fragment fragment = null;
 
         switch (position){
             case 0:
@@ -288,13 +274,9 @@ public class Launcher extends FragmentActivity {
                 break;
         }
 
-        if (fragment!=null){
-            android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_frame,fragment).commit();
-        }
 
         mDrawerListView.setItemChecked(position, true);
-        mDrawerLayout.closeDrawer(mDrawerListView);
+        mDrawerLayout.closeDrawer(mDrawerPane);
     }
 
     //закрытие всех позиций в 22.01
@@ -340,7 +322,7 @@ public class Launcher extends FragmentActivity {
         db.closeDBconnection();
 
         int columns = preferences.getInt(Values.COLUMNS_COUNT, 1);
-        ButtonsAdapter adapter = new ButtonsAdapter(context,rooms,isFreeAud,lastVisiters);
+        adapter = new ButtonsAdapter(context,rooms,isFreeAud,lastVisiters);
         TextView textEmptyAud = (TextView)findViewById(R.id.text_empty_aud_list);
         if (rooms.isEmpty()){
             textEmptyAud.setVisibility(View.VISIBLE);
@@ -399,7 +381,7 @@ public class Launcher extends FragmentActivity {
     }
 
     public void ClickMenu(View view) {
-        mDrawerLayout.openDrawer(mDrawerListView);
+        mDrawerLayout.openDrawer(mDrawerPane);
     }
 
 

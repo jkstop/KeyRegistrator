@@ -85,17 +85,11 @@ public class Fragment_settings_general extends android.support.v4.app.Fragment {
                         dialog.show(getFragmentManager(), "seek");
                         break;
                     case 2:
-                        startActivity(new Intent(context, FileManager.class).putExtra("what", 66));
-                        break;
-                    case 3:
-                        startActivity(new Intent(context, base_sql_activity.class));
-                        break;
-                    case 4:
-                        Dialog_Fragment dialogType = new Dialog_Fragment();
-                        Bundle bundle1 = new Bundle();
-                        bundle1.putInt(Values.DIALOG_TYPE,33);
-                        dialogType.setArguments(bundle1);
-                        dialogType.show(getFragmentManager(),"type");
+                        Dialog_Fragment dialogImage = new Dialog_Fragment();
+                        Bundle bundle2 = new Bundle();
+                        bundle2.putInt(Values.DIALOG_TYPE,67);
+                        dialogImage.setArguments(bundle2);
+                        dialogImage.show(getFragmentManager(),"image");
                         break;
                     default:
                         break;

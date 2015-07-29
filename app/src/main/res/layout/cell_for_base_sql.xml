@@ -2,23 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
-    android:background="#ffc6ffec">
+    android:background="@drawable/button_grid_background"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:paddingRight="10dp"
+    android:paddingLeft="5dp">
 
-    <ImageView
-        android:id="@+id/image_sql"
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.3"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="20dp" />
+        android:layout_weight="0.3">
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"
+            android:layout_gravity="center" />
+        <ImageView
+            android:id="@+id/image_sql"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+
+
+
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.8"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp">
 
 
         <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
@@ -36,21 +51,21 @@
             android:layout_width="fill_parent"
             android:layout_height="0dp">
 
-            <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:id="@+id/text_imya"
                 android:textColor="#ff000000"
-                android:textSize="100dp"
+                android:textSize="26dp"
                 android:gravity="left|center_vertical"
                 android:layout_marginRight="15dp" />
 
-            <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:id="@+id/otchestvo"
                 android:textColor="#ff000000"
-                android:textSize="100dp"
+                android:textSize="26dp"
                 android:gravity="center_vertical" />
 
         </LinearLayout>

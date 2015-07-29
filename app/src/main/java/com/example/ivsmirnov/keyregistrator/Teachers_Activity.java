@@ -214,7 +214,7 @@ public class Teachers_Activity extends ActionBarActivity {
 
                                 if (checkBoxAddInBase.isChecked()){
                                     db = new DataBases(context);
-                                    db.writeInDBTeachers(name,null,null,null,null);
+                                    db.writeInDBTeachers(name,null,null,null,null,null);
                                     db.closeDBconnection();
                                 }
                                 finish();

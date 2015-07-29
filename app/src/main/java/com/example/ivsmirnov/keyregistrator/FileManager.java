@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
@@ -188,7 +189,7 @@ public class FileManager extends ListActivity {
 
     }
 
-    public static ArrayList<String> readFile (String path) throws IOException { //make return ArrayList<String>
+    public static ArrayList<String> readFile (String path) throws IOException {
         File file = new File(path);
         BufferedReader fin = new BufferedReader(new FileReader(file));
         int count = getStringCount(file);
@@ -204,11 +205,45 @@ public class FileManager extends ListActivity {
                 if (!lines.contains(line)){
                     lines.add(line);
                     i++;
+                    Log.d("lines",String.valueOf(i));
                 }
             }
         }
         return lines;
     }
+
+    public static void readLine (Context context,String path) throws IOException {
+        File file = new File(path);
+        BufferedReader fin = new BufferedReader(new FileReader(file));
+        int count = getStringCount(file);
+
+        editor.putInt(Values.LINES_COUNT_IN_FILE,count);
+        editor.commit();
+
+        int i = 0;
+        String line;
+        ArrayList<String> lines = new ArrayList<>(count);
+        DataBases db = new DataBases(context);
+        db.clearBaseSQL();
+        while ((line = fin.readLine())!=null){
+            if (i<count){
+                if (!lines.contains(line)){
+                    String [] split = line.split(";");
+
+                    db.writeInDBSQL(split[0],
+                            split[1],
+                            split[2],
+                            split[3],
+                            split[4]);
+
+                    i++;
+                    Log.d("lines",String.valueOf(i));
+                }
+            }
+        }
+        db.closeDBconnection();
+    }
+
 
     public static int getStringCount(File file)
     {

@@ -1,9 +1,7 @@
 package com.example.ivsmirnov.keyregistrator;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,9 +11,7 @@ import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -57,43 +53,54 @@ public class ButtonsAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
         View view = null;
 
-            Button button;
+        Button button;
+        ImageView image;
+        TextView textAud,textPerson;
             if (convertView == null) {
-                view = inflater.inflate(R.layout.cell_for_grid, null);
+                if (isFree.get(position)){
+                    view = inflater.inflate(R.layout.cell_for_grid_is_free, null);
+                }else{
+                    view = inflater.inflate(R.layout.cell_for_grid_is_busy,null);
+                }
+
             }else{
                 view = convertView;
             }
-            ImageView image = (ImageView)view.findViewById(R.id.imageButton);
-            TextView text = (TextView)view.findViewById(R.id.textButton);
 
+        int space = (int) context.getResources().getDimension(R.dimen.grid_vertical_spacing);
+        int heightGrid = Launcher.gridView.getHeight();
+        int childCount = Launcher.gridView.getCount();
+        int rows;
+        rows = (int)Math.ceil((double)childCount/preferences.getInt(Values.COLUMNS_COUNT,1));
+        int btnHeight = heightGrid/rows - space;
+
+        AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                btnHeight);
+        view.setLayoutParams(layoutParams);
+
+        if (isFree.get(position)){
+            image = (ImageView)view.findViewById(R.id.imageButton);
+            textAud = (TextView)view.findViewById(R.id.textButton);
+            textAud.setText(String.valueOf(items.get(position)));
+            view.setBackgroundResource(R.drawable.button_background);
             image.setImageResource(R.drawable.key_colored);
-            int space = (int) context.getResources().getDimension(R.dimen.grid_vertical_spacing);
-            int heightGrid = Launcher.gridView.getHeight();
-            int childCount = Launcher.gridView.getCount();
-            int rows;
-            rows = (int)Math.ceil((double)childCount/preferences.getInt(Values.COLUMNS_COUNT,1));
-            int btnHeight = heightGrid/rows - space;
+        }else{
+            image = (ImageView)view.findViewById(R.id.image_key_person);
+            textAud = (TextView)view.findViewById(R.id.text_aud);
+            textPerson = (TextView)view.findViewById(R.id.textButton);
 
+            image.setImageResource(R.drawable.person_key);
+            textAud.setText(String.valueOf(items.get(position)));
+            textPerson.setText(lastVisiters.get(position));
 
-            text.setText(String.valueOf(items.get(position)));
-            AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    btnHeight);
-            view.setLayoutParams(layoutParams);
-            if (isFree.get(position)){
-                view.setBackgroundResource(R.drawable.button_background);
-
+            if (lastVisiters.get(position).equalsIgnoreCase("Центр поддержки")){
+                view.setBackgroundResource(R.drawable.button_background_support);
             }else{
-                if (lastVisiters.get(position).equalsIgnoreCase("Центр поддержки")){
-                    view.setBackgroundResource(R.drawable.button_background_support);
-                }else{
-                    view.setBackgroundResource(R.drawable.button_background_selected);
-                }
-                text.setText(String.valueOf(items.get(position))+ "\n"+lastVisiters.get(position));
-                //textAud.setText(String.valueOf(items[position]));
-                //text.setTextSize(heightGrid*0.35f*0.35f);
+                view.setBackgroundResource(R.drawable.button_background_selected);
             }
-            //view.setPadding(5,0,0,0);
-            view.setTag(items.get(position));
+        }
+
+        view.setTag(items.get(position));
 
         return view;
     }

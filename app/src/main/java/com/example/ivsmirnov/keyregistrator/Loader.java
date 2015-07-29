@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -139,12 +141,24 @@ public class Loader extends AsyncTask <String,Integer,Void> {
             }
             if (items != null) {
                 for (String s : items){
-                    db.writeInDBTeachers(s,null,null,null,null);
+                    String [] split = s.split(";");
+                    try {
+                        db.writeInDBTeachers(split[0],split[1],split[2],split[3],split[4],"null");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                     publishProgress(count++);
                 }
             }
         }else if (LOAD_TYPE ==66){
+
             try {
+                FileManager.readLine(context, absPath);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            /*try {
                 items = FileManager.readFile(absPath);
                 dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
             } catch (IOException e){
@@ -160,10 +174,11 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                     String name = split[1];
                     String surname = split[2];
                     String lastname = split[3];
-                    db.writeInDBSQL(kaf,name,surname,lastname);
-                    publishProgress(count++);
+                    String photo = split[4];
+                    db.writeInDBSQL(kaf,name,surname,lastname,photo);
+                   publishProgress(count++);
                 }
-            }
+            }*/
         }else{
             Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show();
         }

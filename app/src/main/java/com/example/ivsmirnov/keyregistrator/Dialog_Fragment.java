@@ -1,40 +1,45 @@
 package com.example.ivsmirnov.keyregistrator;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.app.DialogFragment;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MultiAutoCompleteTextView;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by ivsmirnov on 25.06.2015.
@@ -45,6 +50,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
     private int dialog_id;
 
     DialogInterface.OnDismissListener onDismissListener;
+
 
     public Dialog_Fragment(){
     }
@@ -59,6 +65,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
         super.onCreate(savedInstanceState);
         dialog_id = getArguments().getInt(Values.DIALOG_TYPE,0);
         context = getActivity().getApplicationContext();
+
     }
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -138,7 +145,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                             }
                         })
                         .create();
-            case 33:
+            case Values.INPUT_DIALOG:
                 DataBases db = new DataBases(context);
                 ArrayList <String> items = db.readSQL();
                 db.closeDBconnection();
@@ -158,6 +165,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                 });
                 autoCompleteTextView.setAdapter(new Adapter_SQL_popup(context, items));
                 autoCompleteTextView.setTextColor(Color.BLACK);
+                autoCompleteTextView.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
                 autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -176,12 +184,19 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         }
 
                         DataBases db = new DataBases(context);
-                        db.writeInDBTeachers(surname, name, lastname, kaf, gender);
+
+                        //Loader_Image loader_image = new Loader_Image(context,new String[]{surname,name,lastname,kaf},null);
+                        //loader_image.execute();
+
+                        //String photo = db.findPhotoByName(surname, name, lastname, kaf);
+                        db.writeInDBTeachers(surname, name, lastname, kaf, gender, "preload");
                         db.closeDBconnection();
+
                         String [] ed = new String[]{surname,name,lastname,kaf,gender};
                         EditDialogListener dialogListener = (EditDialogListener)getActivity();
-                        dialogListener.onFinishEditDialog(ed, 5, 2);
+                        dialogListener.onFinishEditDialog(ed, 0, 2);
                         dismiss();
+
                     }
                 });
                 AlertDialog.Builder builder =  new AlertDialog.Builder(getActivity());
@@ -213,11 +228,12 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 }
 
                                 DataBases db = new DataBases(context);
-                                db.writeInDBTeachers(surname, name, lastname, kaf, gender);
+                                //String photo = db.findPhotoByName(surname, name, lastname, kaf);
+                                //db.writeInDBTeachers(surname, name, lastname, kaf, gender,photo);
                                 db.closeDBconnection();
                                 String [] ed = new String[]{surname,name,lastname,kaf,gender};
                                 EditDialogListener dialogListener = (EditDialogListener)getActivity();
-                                dialogListener.onFinishEditDialog(ed, 5, 2);
+                                dialogListener.onFinishEditDialog(ed, 0, 2);
                             }
                         });
                 AlertDialog dialog = builder.create();
@@ -225,13 +241,13 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                 WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
                 lp.gravity = Gravity.TOP;
                 return dialog;
-            case 44:
+            case Values.DIALOG_EDIT:
                 LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
                 final TableLayout tableLayout = new TableLayout(context);
 
                 final DataBases dbses = new DataBases(context);
-                for (int i=1;i<dbses.cursorTeachers.getColumnCount();i++){
+                for (int i=1;i<6;i++){
                     TableRow tableRow = new TableRow(context);
                     View rowLayot = inflater.inflate(R.layout.row_for_editor,null);
 
@@ -281,7 +297,40 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                 });
                 builderEdit.setCancelable(false);
                 return builderEdit.create();
+            case 67:
+                ImageView imageView = new ImageView(context);
 
+                File sdcard = Environment.getExternalStorageDirectory();
+                File file = new File(sdcard,"str.txt");
+                StringBuilder text = new StringBuilder();
+
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+                    String line;
+
+
+                    while ((line=bufferedReader.readLine())!= null){
+                        text.append(line);
+                    }
+
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Log.d("length", String.valueOf(text.toString().length()));
+
+
+
+                byte[] decodedString = Base64.decode(text.toString(), Base64.NO_PADDING);
+                Bitmap image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                imageView.setImageBitmap(image);
+
+
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle("Image")
+                        .setView(imageView)
+                        .create();
         }
 
         return null;
@@ -290,4 +339,6 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
     public interface EditDialogListener{
         void onFinishEditDialog(String [] values, int position, int type);
     }
+
+
 }
