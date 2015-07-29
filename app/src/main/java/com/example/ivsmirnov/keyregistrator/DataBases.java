@@ -203,49 +203,34 @@ public class DataBases {
         ContentValues cv = new ContentValues();
         cv.put(DataBasesRegist.COLUMN_KAF,kaf);
         cv.put(DataBasesRegist.COLUMN_IMYA,name);
-        cv.put(DataBasesRegist.COLUMN_FAMILIA,surname);
+        cv.put(DataBasesRegist.COLUMN_FAMILIA, surname);
         cv.put(DataBasesRegist.COLUMN_OTCHESTVO, lastname);
         cv.put(DataBasesRegist.COLUMN_PHOTO, photo);
         base.insert(DataBasesRegist.TABLE_BASE, null, cv);
     }
 
-    public void findPhotoByName(String surname, String name, String lastname, String kaf){
+    public void writeCardInBase(String surname, String name, String lastname, String kaf, String gender){
         cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,new String[]{DataBasesRegist._ID,DataBasesRegist.COLUMN_FAMILIA,DataBasesRegist.COLUMN_IMYA,
         DataBasesRegist.COLUMN_OTCHESTVO,DataBasesRegist.COLUMN_KAF},null,null,null,null,null);
         cursorBaseSql.moveToPosition(-1);
         String photo = "null";
         while (cursorBaseSql.moveToNext()){
-            if (kaf.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_KAF)))){
-                if (surname.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_FAMILIA)))){
-                    if (name.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_IMYA)))){
-                        if (lastname.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_OTCHESTVO)))){
-                            int row = cursorBaseSql.getPosition();
-                            cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,null,null,null,null,null,null);
-                            cursorBaseSql.moveToPosition(row);
-                            photo = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_PHOTO));
-                        }
-                    }
-                }
+            if (kaf.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_KAF)))&&
+                    surname.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_FAMILIA)))&&
+                    name.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_IMYA)))&&
+                    lastname.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_OTCHESTVO)))){
+                int row = cursorBaseSql.getPosition();
+                cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,null,null,null,null,null,null);
+                cursorBaseSql.moveToPosition(row);
+                photo = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_PHOTO));
             }
         }
 
-        String photoPath = savePhotoToSD(photo,surname);
-        updatePhoto(photoPath);
+        String photoPath = savePhotoToSD(photo,surname+"_"+name+"_"+lastname);
+        writeInDBTeachers(surname, name, lastname, kaf, gender, photoPath);
 
-        //return photo;
     }
 
-    public void updatePhoto(String path){
-       /* ContentValues cv = new ContentValues();
-        cv.put(DataBasesRegist.COLUMN_PHOTO_FAVORITE, photo);
-        int row = (int) sharedPreferences.getLong("id", -1);
-        Log.d("row", String.valueOf(row));
-        base.update(DataBasesRegist.TABLE_TEACHER, cv, DataBasesRegist._ID + "=" + row, null);*/
-        ContentValues cv = new ContentValues();
-        cv.put(DataBasesRegist.COLUMN_PHOTO_FAVORITE, path);
-        int row = (int)sharedPreferences.getLong("id",-1);
-        base.update(DataBasesRegist.TABLE_TEACHER,cv,DataBasesRegist._ID + "=" + row,null);
-    }
 
     public String getPhotoID(SparseArray<String> items){
         String photoID = "null";
@@ -278,7 +263,7 @@ public class DataBases {
             FileOutputStream out = null;
             try {
                 out = new FileOutputStream(folder.getAbsolutePath()+"/"+filename+".jpg");
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 30, out);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

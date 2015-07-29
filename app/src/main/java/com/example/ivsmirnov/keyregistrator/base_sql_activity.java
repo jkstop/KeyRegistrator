@@ -15,11 +15,14 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewOutlineProvider;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.graphics.Outline;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +34,7 @@ import java.util.Map;
 /**
  * Created by IVSmirnov on 02.07.2015.
  */
-public class base_sql_activity extends ActionBarActivity implements Dialog_Fragment.EditDialogListener,Loader_Image.OnImageLoaded{
+public class base_sql_activity extends ActionBarActivity implements Dialog_Fragment.EditDialogListener{
 
     static final int POPUP_MENU_TEACHER = 1;
 
@@ -58,7 +61,7 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
 
-        loader = this;
+
 
         gridView = (GridView)findViewById(R.id.grid_for_base_sql);
 
@@ -135,16 +138,11 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
 
         sortByABC();
 
-        adapter = new base_sql_activity_adapter(context,allItems, loader);
+        adapter = new base_sql_activity_adapter(context,allItems);
         gridView.setAdapter(adapter);
 
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        allItems.clear();
-    }
 
     private void sortByABC(){
         Collections.sort(allItems, new Comparator<SparseArray>() {
@@ -232,32 +230,15 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
 
     @Override
     public void onFinishEditDialog(String[] values, int position, int type) {
-        Log.d("onFinishEditing","interface");
 
         openBase();
-        Log.d("read All Items", "OK");
         allItems = db.readTeachersFromDB();
         closeBase();
 
         sortByABC();
-        //adapter.notifyDataSetChanged();
-        adapter = new base_sql_activity_adapter(context,allItems,this);
+        adapter = new base_sql_activity_adapter(context,allItems);
         gridView.setAdapter(adapter);
     }
 
-    @Override
-    public void doneLoad(boolean isDone) {
-        if (isDone){
-            Log.d("Done load","catch");
-            openBase();
-            allItems.clear();
-            allItems = db.readTeachersFromDB();
-            closeBase();
 
-            sortByABC();
-
-            adapter = new base_sql_activity_adapter(context,allItems,this);
-            gridView.setAdapter(adapter);
-        }
-    }
 }

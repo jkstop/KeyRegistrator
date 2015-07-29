@@ -188,7 +188,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         //Loader_Image loader_image = new Loader_Image(context,new String[]{surname,name,lastname,kaf},null);
                         //loader_image.execute();
 
-                        //String photo = db.findPhotoByName(surname, name, lastname, kaf);
+                        //String photo = db.writeCardInBase(surname, name, lastname, kaf);
                         db.writeInDBTeachers(surname, name, lastname, kaf, gender, "preload");
                         db.closeDBconnection();
 
@@ -228,7 +228,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 }
 
                                 DataBases db = new DataBases(context);
-                                //String photo = db.findPhotoByName(surname, name, lastname, kaf);
+                                //String photo = db.writeCardInBase(surname, name, lastname, kaf);
                                 //db.writeInDBTeachers(surname, name, lastname, kaf, gender,photo);
                                 db.closeDBconnection();
                                 String [] ed = new String[]{surname,name,lastname,kaf,gender};
