@@ -5,7 +5,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="com.example.ivsmirnov.keyregistrator.Rooms">
+    tools:context="com.example.ivsmirnov.keyregistrator.activities.Rooms">
 
         <ListView
             android:layout_width="match_parent"
@@ -19,7 +19,7 @@
         android:layout_height="0dp"
         android:layout_weight="0.05"
         android:orientation="horizontal">
-        <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+        <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.5"

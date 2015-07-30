@@ -15,7 +15,7 @@
         android:layout_height="fill_parent"
         android:contentDescription="imageButton" />
 
-    <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+    <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
         android:id="@+id/textPerson"
         android:layout_width="0dp"
         android:layout_weight="0.8"

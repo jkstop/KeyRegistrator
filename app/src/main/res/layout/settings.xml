@@ -15,7 +15,7 @@
 
 
         <fragment
-            android:name="com.example.ivsmirnov.keyregistrator.Fragment_settings_journal"
+            android:name="com.example.ivsmirnov.keyregistrator.fragments.Fragment_settings_journal"
             tools:layout="@layout/fragment_settings_journal"
             app:layout_columnWeight="1"
         app:layout_rowWeight="1"
@@ -27,7 +27,7 @@
             android:layout_margin="15dp" />
 
         <fragment
-            android:name="com.example.ivsmirnov.keyregistrator.Fragment_settings_teachers"
+            android:name="com.example.ivsmirnov.keyregistrator.fragments.Fragment_settings_teachers"
             tools:layout="@layout/fragment_settings_teachers"
             app:layout_rowWeight="1"
             app:layout_gravity="fill"
@@ -39,7 +39,7 @@
             android:layout_margin="15dp" />
 
         <fragment
-            android:name="com.example.ivsmirnov.keyregistrator.Fragment_settings_general"
+            android:name="com.example.ivsmirnov.keyregistrator.fragments.Fragment_settings_general"
             tools:layout="@layout/fragment_settings_general"
             app:layout_rowWeight="1"
             app:layout_gravity="fill"
@@ -51,7 +51,7 @@
             android:layout_margin="15dp" />
 
         <fragment
-            android:name="com.example.ivsmirnov.keyregistrator.Fragment_settings_rooms"
+            android:name="com.example.ivsmirnov.keyregistrator.fragments.Fragment_settings_rooms"
             tools:layout="@layout/fragment_settings_rooms"
             app:layout_rowWeight="1"
             app:layout_gravity="fill"

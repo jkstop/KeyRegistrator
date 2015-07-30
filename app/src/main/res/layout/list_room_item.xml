@@ -10,7 +10,7 @@
         android:src="@drawable/key_colored"
         android:layout_weight="0.2"/>
 
-    <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+    <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
         android:id="@+id/text_rooms"
         android:layout_width="0dp"
         android:layout_height="match_parent"

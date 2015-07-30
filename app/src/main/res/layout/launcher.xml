@@ -74,7 +74,7 @@
                 android:id="@+id/disclaimer"
                 android:layout_width="match_parent"
                 android:layout_height="0dp">
-                <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:ellipsize="none"
@@ -107,7 +107,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp">
 
-                    <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                    <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                         android:layout_width="0dp"
                         android:layout_height="fill_parent"
                         android:layout_weight="0.2"
@@ -118,7 +118,7 @@
                         android:textStyle="bold|italic"
                         android:gravity="center_vertical" />
 
-                    <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                    <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                         android:layout_width="0dp"
                         android:layout_height="fill_parent"
                         android:layout_weight="0.5"
@@ -139,7 +139,7 @@
                             android:layout_width="fill_parent"
                             android:layout_height="0dp"
                             android:layout_weight="0.5">
-                            <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                                 android:layout_width="fill_parent"
                                 android:layout_height="fill_parent"
                                 android:gravity="center"
@@ -156,7 +156,7 @@
                             android:layout_height="0dp"
                             android:layout_weight="0.5">
 
-                            <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
@@ -166,7 +166,7 @@
                                 android:maxLines="1"
                                 android:text="@string/timeGet"
                                 android:textStyle="bold|italic" />
-                            <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+                            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
@@ -195,7 +195,7 @@
 
     <!-- The navigation drawer -->
 
-    <RelativeLayout
+    <!--<RelativeLayout
         android:id="@+id/left_drawer"
         android:layout_width="500dp"
         android:layout_height="match_parent"
@@ -215,6 +215,8 @@
             android:layout_height="fill_parent"
             android:layout_below="@id/image_view"
             android:choiceMode="singleChoice" />
-    </RelativeLayout>
+    </RelativeLayout>-->
+    <include
+        layout="@layout/navigation_drawer"/>
 
 </android.support.v4.widget.DrawerLayout>

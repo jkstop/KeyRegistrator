@@ -14,7 +14,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp" />
 
-    <com.example.ivsmirnov.keyregistrator.AutoResizeTextView
+    <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
         android:id="@+id/textButton"
         android:layout_width="0dp"
         android:layout_weight="0.8"

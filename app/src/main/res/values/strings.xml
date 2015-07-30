@@ -64,4 +64,25 @@
     <string name="fragment2">fragment 2</string>
     <string name="fragment3">fragment 3</string>
     <string name="fragment4">fragment 4</string>
+
+    <!-- Toolbar titles -->
+    <string name="toolbar_title_home">Home</string>
+    <string name="toolbar_title_explore">Explore</string>
+    <string name="other_activity">Other Activity</string>
+
+    <!-- Navigation Drawer -->
+    <string name="nav_drawer_item_settings">Настройки</string>
+    <string name="nav_drawer_item_statistics">Статистика</string>
+    <string name="nav_drawer_item_journal">Журнал</string>
+    <string name="nav_drawer_item_about">О приложении</string>
+    <string name="navigation_drawer_opened">The navigation drawer is opened</string>
+    <string name="navigation_drawer_closed">The navigation drawer is closed</string>
+    <string name="tag_nav_drawer_main_entry">nav_drawer_main_entry</string>
+    <string name="tag_nav_drawer_special_entry">nav_drawer_special_entry</string>
+    <string name="tools_text_account_information_username">Центр поддержки "Щербаковская"</string>
+    <string name="tools_text_account_information_email">shsupport@fa.ru</string>
+
+    <!-- Typeface names -->
+    <string name="typeface_roboto_regular">Roboto-Regular</string>
+    <string name="typeface_roboto_medium">Roboto-Medium</string>
 </resources>

@@ -7,7 +7,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_horizontal_margin"
-    tools:context="com.example.ivsmirnov.keyregistrator.CloseDayDialog"
+    tools:context="com.example.ivsmirnov.keyregistrator.activities.CloseDayDialog"
     android:background="#fcfbfa">
 
     <TextView
@@ -33,7 +33,7 @@
             android:layout_width="0dp"
             android:layout_weight="0.6"
             android:layout_height="wrap_content"
-            android:name="com.example.ivsmirnov.keyregistrator.Fragment_closeDay_stat"
+            android:name="com.example.ivsmirnov.keyregistrator.fragments.Fragment_closeDay_stat"
             tools:layout="@layout/fragment_close_day_stat"/>
 
         <ImageView

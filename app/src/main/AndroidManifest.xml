@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
         <activity
-            android:name=".Launcher"
+            android:name=".activities.Launcher"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,32 +19,32 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FileManager"
+            android:name=".activities.FileManager"
             android:theme="@style/Base.Theme.AppCompat.Light.Dialog" />
 
-        <service android:name=".CloseDayService" />
+        <service android:name=".services.CloseDayService" />
 
         <activity
-            android:name=".Teachers_Activity"
+            android:name=".activities.Teachers_Activity"
             android:label="@string/title_activity_teachers_" >
         </activity>
         <activity
-            android:name=".CloseDayDialog"
+            android:name=".activities.CloseDayDialog"
             android:label="@string/title_activity_close_day_dialog"
             >
         </activity>
         <activity
-            android:name=".Rooms"
+            android:name=".activities.Rooms"
             android:label="@string/title_activity_rooms"
             android:theme="@style/Base.Theme.AppCompat.Light.DialogWhenLarge">
         </activity>
-        <activity android:name=".Preferences"
+        <activity android:name=".activities.Preferences"
             android:label="Настройки"
             />
-        <activity android:name=".Journal"
+        <activity android:name=".activities.Journal"
             android:label="Журнал"/>
-        <activity android:name=".base_sql_activity"/>
-        <activity android:name=".Add_user"
+        <activity android:name=".activities.base_sql_activity"/>
+        <activity android:name=".activities.Add_user"
             />
     </application>
 
