@@ -7,8 +7,6 @@
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/ivsmirnov/keyregistrator/activities/Launcher.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/ivsmirnov/keyregistrator/activities/Preferences.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/ivsmirnov/keyregistrator/activities/Rooms.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/ivsmirnov/keyregistrator/custom_views/ScrimInsetsFrameLayout.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/ivsmirnov/keyregistrator/custom_views/TintOnStateImageView.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/ivsmirnov/keyregistrator/databases/DataBases.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/ivsmirnov/keyregistrator/databases/DataBasesRegist.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/example/ivsmirnov/keyregistrator/utils/UtilsDevice.java" charset="windows-1251" />
