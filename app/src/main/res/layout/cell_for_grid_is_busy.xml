@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.6"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.4"
+            android:id="@+id/image_key_person"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp" />
+        <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:id="@+id/text_aud"
+            android:maxLines="1"
+            android:textColor="#000000"
+            android:gravity="left|center_vertical"
+            android:textSize="100dp"
+            android:layout_weight="0.6" />
+    </LinearLayout>
+
+    <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
+        android:id="@+id/textButton"
+        android:layout_width="fill_parent"
+        android:layout_weight="0.5"
+        android:height="0dp"
+        android:ellipsize="none"
+        android:maxLines="3"
+        android:layout_height="0dp"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:textSize="100sp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="15dp" />
+
+</LinearLayout>

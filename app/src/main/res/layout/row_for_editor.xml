@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="fill_parent"
+    android:layout_height="match_parent" android:id="@+id/rowLayoutEdit">
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.3"
+        android:textSize="20dp"
+        android:textColor="#000000"
+        android:id="@+id/textEditParametr"
+        android:gravity="center_vertical"
+        android:layout_margin="15dp" />
+
+    <EditText
+        android:hint="Не указано"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.7"
+        android:id="@+id/editParemetr"
+        android:textColor="#ff000000"
+        android:textStyle="italic" />
+
+</LinearLayout>
