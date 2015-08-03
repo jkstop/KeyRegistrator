@@ -6,7 +6,7 @@
     android:id="@+id/main_activity_navigation_drawer_rootLayout"
     style="@style/ScrimInsetsLayout"
     tools:context=".MainActivity"
-    android:layout_width="400dp"
+    android:layout_width="320dp"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -26,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:foreground="@color/black_alpha_50"
-                android:background="@drawable/image_nav_drawer_account_background">
+                android:background="@drawable/rrr">
             </FrameLayout>
 
             <RelativeLayout

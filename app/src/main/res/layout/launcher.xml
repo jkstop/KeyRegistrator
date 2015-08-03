@@ -13,7 +13,13 @@
             tools:context=".MainActivity"
             android:orientation="vertical"
             android:id="@+id/mainLayout"
-            tools:showIn="@layout/layout_main_fragment">
+            tools:showIn="@layout/layout_main_fragment"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="16dp">
+
+            <include
+                layout="@layout/toolbar"/>
 
             <!-- <android.support.v7.widget.Toolbar
                  android:id="@+id/toolbar"
@@ -23,13 +29,12 @@
                  android:elevation="4dp"
                  android:minHeight="?attr/actionBarSize"
                  android:transitionName="actionBar" />-->
-            <android.support.v7.widget.Toolbar
+            <!--<android.support.v7.widget.Toolbar
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/toolbar"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:minHeight="?attr/actionBarSize"
-                android:background="?attr/colorPrimary">
+                android:minHeight="?attr/actionBarSize">
                 <TextView
                     android:text="Выберите нужную аудиторию нажатием на экран"
                     android:textStyle="italic"
@@ -38,7 +43,7 @@
                     android:gravity="center"
                     android:textSize="28sp"
                     android:textColor="#ff000000" />
-            </android.support.v7.widget.Toolbar>
+            </android.support.v7.widget.Toolbar>-->
 
             <FrameLayout
                 android:id="@+id/frame_for_grid_aud"
@@ -64,24 +69,23 @@
                     android:verticalSpacing="@dimen/grid_vertical_spacing"
                     android:stretchMode="columnWidth"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginRight="15dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginTop="15dp"/>
+                    android:layout_height="match_parent" />
             </FrameLayout>
 
             <LinearLayout
                 android:id="@+id/disclaimer"
                 android:layout_width="match_parent"
-                android:layout_height="0dp">
+                android:layout_height="0dp"
+                android:background="#ff4e4c">
                 <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:ellipsize="none"
+                    android:textStyle="italic"
                     android:maxLines="5"
                     android:text="@string/text_warning"
-                    android:textStyle="bold|italic"
-                    android:textColor="#ffff1800"
+                    android:id="@+id/text_disclaimer"
+                    android:textColor="#ffffff"
                     android:gravity="center"
                     android:textSize="100sp" />
 
@@ -93,19 +97,14 @@
                 android:layout_width="fill_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.3"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp"
                 android:layout_marginTop="15dp"
-                android:layout_marginBottom="15dp"
                 xmlns:android="http://schemas.android.com/apk/res/android">
 
                 <LinearLayout
                     android:id="@+id/textLayout"
                     android:orientation="horizontal"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp">
+                    android:layout_height="wrap_content">
 
                     <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                         android:layout_width="0dp"
@@ -184,9 +183,7 @@
                     android:id="@+id/list"
                     android:transcriptMode="alwaysScroll"
                     android:layout_width="fill_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp" />
+                    android:layout_height="match_parent" />
             </LinearLayout>
 
 

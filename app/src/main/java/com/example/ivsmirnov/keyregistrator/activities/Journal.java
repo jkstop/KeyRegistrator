@@ -6,7 +6,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -21,7 +24,7 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 18.06.2015.
  */
-public class Journal extends Activity {
+public class Journal extends AppCompatActivity {
     private ListView listView;
     private static Context context;
     private DataBases db;
@@ -37,6 +40,8 @@ public class Journal extends Activity {
         setContentView(R.layout.layout_list_journal);
 
         context = this;
+
+        initialiseToolbar();
 
         listView = (ListView)findViewById(R.id.list);
         myListAdapter = new adapter(context,audList,nameList,timeList,timePutList);
@@ -118,5 +123,30 @@ public class Journal extends Activity {
         }
         Log.d("read journal", "ok");
         closeBase();
+    }
+
+    private void initialiseToolbar()
+    {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null)
+        {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            //getSupportActionBar().setHomeButtonEnabled(true);
+            //getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

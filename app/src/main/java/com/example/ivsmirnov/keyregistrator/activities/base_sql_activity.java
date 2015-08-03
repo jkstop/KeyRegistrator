@@ -3,11 +3,13 @@ package com.example.ivsmirnov.keyregistrator.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.example.ivsmirnov.keyregistrator.custom_views.FloatingActionButton;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
 import com.example.ivsmirnov.keyregistrator.R;
@@ -58,7 +61,13 @@ public class base_sql_activity extends ActionBarActivity implements Dialog_Fragm
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
 
-
+/*        FloatingActionButton fab = new FloatingActionButton.Builder(this)
+                .withDrawable(getResources().getDrawable(R.drawable.fab_ic_add))
+                .withButtonColor(Color.BLUE)
+                .withGravity(Gravity.BOTTOM|Gravity.LEFT)
+                .withMargins(0,0,16,16)
+                .withButtonSize(100)
+                .create();*/
 
         gridView = (GridView)findViewById(R.id.grid_for_base_sql);
 

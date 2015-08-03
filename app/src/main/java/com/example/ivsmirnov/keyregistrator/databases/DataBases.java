@@ -254,13 +254,16 @@ public class DataBases {
 
         if (!photo.equalsIgnoreCase("null")){
 
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 6;
             byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length,options);
 
             FileOutputStream out = null;
             try {
                 out = new FileOutputStream(folder.getAbsolutePath()+"/"+filename+".jpg");
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 30, out);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out);
+
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

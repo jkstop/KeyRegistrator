@@ -6,6 +6,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.Toolbar;
+
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -23,6 +25,9 @@ public class Preferences extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
+
+
+
     }
 
     @Override
@@ -48,4 +53,6 @@ public class Preferences extends FragmentActivity {
                 return null;
         }
     }
+
+
 }

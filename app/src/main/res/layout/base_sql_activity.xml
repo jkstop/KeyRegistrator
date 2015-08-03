@@ -5,19 +5,17 @@
     android:layout_width="fill_parent"
     android:padding="15dp">
 
+
     <GridView
-        android:id="@+id/grid_for_base_sql"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:columnWidth="90dp"
-        android:numColumns="4"
-        android:verticalSpacing="15dp"
-        android:horizontalSpacing="15dp"
-        android:stretchMode="columnWidth"
-        android:gravity="center" />
-
-
-
+            android:id="@+id/grid_for_base_sql"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnWidth="90dp"
+            android:numColumns="4"
+            android:verticalSpacing="15dp"
+            android:horizontalSpacing="15dp"
+            android:stretchMode="columnWidth"
+            android:gravity="center" />
 
 
     <at.markushi.ui.CircleButton

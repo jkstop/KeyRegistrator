@@ -42,7 +42,8 @@
             android:label="Настройки"
             />
         <activity android:name=".activities.Journal"
-            android:label="Журнал"/>
+            android:label="Журнал"
+            />
         <activity android:name=".activities.base_sql_activity"/>
         <activity android:name=".activities.Add_user"
             />

@@ -20,7 +20,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,8 +89,6 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         setContentView(R.layout.launcher);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -107,6 +104,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         isFreeAud = new ArrayList<>(db.readStatusRooms());
         lastVisiters = new ArrayList<>(db.readLastVisiterRoom());
         db.closeDBconnection();
+
 
         int columns = preferences.getInt(Values.COLUMNS_COUNT,1);
 
@@ -193,6 +191,12 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
             }
         });
 
+       // TextView head = (TextView)findViewById(R.id.head);
+        //head.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
+        toolbar.setTitle("Выберите нужную аудиторию нажатием на экран");
+
+        setSupportActionBar(toolbar);
 
         mFrameLayout_Drawer_root = (FrameLayout)findViewById(R.id.main_activity_navigation_drawer_rootLayout);
         mLinearLayout_Settings = (LinearLayout)findViewById(R.id.navigation_drawer_layout_settings);
@@ -219,7 +223,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
 
         mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
 
-        if (getSupportActionBar() != null) {
+       if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
@@ -233,7 +237,8 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
     public void onClick(View v) {
         Resources res = getResources();
         if (v.getTag().equals(res.getString(R.string.nav_drawer_item_settings))){
-            startActivity(new Intent(context, Preferences.class));
+            //startActivity(new Intent(context, Preferences.class));
+
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_statistics))){
             startActivity(new Intent(context, CloseDayDialog.class).putExtra("type", 1).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_journal))){
@@ -243,6 +248,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         }else{
             Toast.makeText(context,"CLick",Toast.LENGTH_SHORT).show();
         }
+
         mDrawerLayout.closeDrawer(mFrameLayout_Drawer_root);
     }
 
