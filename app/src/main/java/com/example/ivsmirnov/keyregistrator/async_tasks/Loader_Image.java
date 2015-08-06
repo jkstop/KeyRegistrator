@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 
 import com.example.ivsmirnov.keyregistrator.activities.Add_user;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
+import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 
 /**
  * Created by IVSmirnov on 27.07.2015.
@@ -20,11 +22,11 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
     private String gender;
 
     private ProgressDialog dialog;
-    private Add_user activity;
+    private Dialog_Fragment activity;
 
-    private OnImageLoaded listener;
+    private UpdateTeachers listener;
 
-    public Loader_Image (Context c,String [] items,Add_user a,OnImageLoaded l){
+    public Loader_Image (Context c,String [] items,Dialog_Fragment a,UpdateTeachers l){
         this.context = c;
         this.surname = items[0];
         this.name = items[1];
@@ -35,7 +37,7 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
         this.activity = a;
         this.listener = l;
 
-        dialog = new ProgressDialog(activity);
+        dialog = new ProgressDialog(activity.getActivity());
     }
 
 
@@ -64,11 +66,9 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
         if (dialog.isShowing()){
             dialog.cancel();
         }
-        listener.doneLoad(true);
+        listener.onFinishEditing();
     }
 
-    public interface OnImageLoaded{
-        void doneLoad(boolean isDone);
-    }
+
 
 }

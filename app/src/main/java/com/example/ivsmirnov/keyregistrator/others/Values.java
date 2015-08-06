@@ -27,6 +27,9 @@ public class Values {
     public static final String DIALOG_TYPE = "dialog_type";
     public static final int DIALOG_EDIT = 108;
     public static final int INPUT_DIALOG = 109;
+    public static final int DELETE_ROOM_DIALOG = 110;
+    public static final int ADD_ROOM_DIALOG = 111;
+    public static final int SELECT_COLUMNS_DIALOG = 112;
 
 
 

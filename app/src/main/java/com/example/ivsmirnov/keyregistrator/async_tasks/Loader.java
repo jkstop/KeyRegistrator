@@ -56,7 +56,9 @@ public class Loader extends AsyncTask <String,Integer,Void> {
         if (dialog.isShowing()){
             dialog.cancel();
         }
+
         fileManagerActivity.finish();
+
         Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
     }
 

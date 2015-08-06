@@ -8,14 +8,18 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+
 
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.databases.DataBasesRegist;
@@ -26,7 +30,7 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import java.util.ArrayList;
 
 
-public class Rooms extends ActionBarActivity {
+public class Rooms extends AppCompatActivity {
 
     private ListView listView;
     private TextView button;
@@ -52,6 +56,14 @@ public class Rooms extends ActionBarActivity {
         setContentView(R.layout.activity_rooms);
 
         context = Rooms.this;
+
+        Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
+        toolbar.setTitle("Аудитории");
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar()!=null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
@@ -173,5 +185,16 @@ public class Rooms extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

@@ -2,7 +2,6 @@
     <string name="app_name">Key Registrator</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Загрузить первоначальную базу</string>
     <string name="aud">Аудитория</string>
     <string name="name">Фамилия</string>
     <string name="okButton">ОК</string>
@@ -66,14 +65,17 @@
     <string name="fragment4">fragment 4</string>
 
     <!-- Toolbar titles -->
-    <string name="toolbar_title_home">Home</string>
-    <string name="toolbar_title_explore">Explore</string>
-    <string name="other_activity">Other Activity</string>
+    <string name="toolbar_title_main">Выберите нужную аудиторию нажатием на экран</string>
+    <string name="toolbar_title_persons">Преподаватели</string>
+    <string name="toolbar_title_journal">Журнал</string>
+    <string name="toolbar_title_auditrooms">Аудитории</string>
 
     <!-- Navigation Drawer -->
-    <string name="nav_drawer_item_settings">Настройки</string>
+    <string name="nav_drawer_item_home">Главная</string>
+    <string name="nav_drawer_item_persons">Преподаватели</string>
     <string name="nav_drawer_item_statistics">Статистика</string>
     <string name="nav_drawer_item_journal">Журнал</string>
+    <string name="nav_drawer_item_rooms">Аудитории</string>
     <string name="nav_drawer_item_about">О приложении</string>
     <string name="navigation_drawer_opened">The navigation drawer is opened</string>
     <string name="navigation_drawer_closed">The navigation drawer is closed</string>
@@ -81,6 +83,17 @@
     <string name="tag_nav_drawer_special_entry">nav_drawer_special_entry</string>
     <string name="tools_text_account_information_username">Центр поддержки "Щербаковская"</string>
     <string name="tools_text_account_information_email">shsupport@fa.ru</string>
+
+    <string name="dialog_delete_room_title">Удаление</string>
+    <string name="dialog_delete_room_message">Удалить аудиторию </string>
+    <string name="dialog_columns_title">Выберите количество колонок</string>
+    <string-array name="dialog_columns_items">
+        <item>2 колонки</item>
+        <item>3 колонки</item>
+        <item>4 колонки</item>
+        <item>5 колонок</item>
+    </string-array>
+    <string name="delete">Удалить</string>
 
     <!-- Typeface names -->
     <string name="typeface_roboto_regular">Roboto-Regular</string>

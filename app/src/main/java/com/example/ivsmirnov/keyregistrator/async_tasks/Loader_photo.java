@@ -15,12 +15,11 @@ public class Loader_photo extends AsyncTask <String,Void,Bitmap> {
 
     private  Context context;
     private String item;
-    private Loader_Image.OnImageLoaded listener;
 
-    public Loader_photo(Context c, String i,Loader_Image.OnImageLoaded l){
+
+    public Loader_photo(Context c, String i){
         this.context = c;
         this.item = i;
-        this.listener = l;
     }
 
     @Override

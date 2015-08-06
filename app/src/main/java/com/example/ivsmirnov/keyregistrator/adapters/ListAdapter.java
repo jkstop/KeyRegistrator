@@ -2,6 +2,8 @@ package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,28 +16,28 @@ import com.example.ivsmirnov.keyregistrator.R;
 import java.sql.Time;
 import java.util.ArrayList;
 
-public class adapter extends ArrayAdapter<String> {
+public class ListAdapter extends ArrayAdapter<SparseArray> {
 
     private final Context context;
-    private final ArrayList<String> aud;
-    private final ArrayList<String> name;
-    private final ArrayList<Long> time;
-    private final ArrayList<Long> timePut;
+    private ArrayList<SparseArray> items;
+    private SparseArray <String> card;
+    private SparseArray<String> aud;
+    private SparseArray<String> name;
+    private SparseArray<Long> time;
+    private SparseArray<Long> timePut;
     TextView textAud,textName,textTime,textTimePut;
 
 
-    public adapter(Context context, ArrayList<String> aud,ArrayList<String> name,ArrayList<Long> time,ArrayList<Long> timePut) {
-        super(context, R.layout.list,aud);
+    public ListAdapter(Context context, ArrayList<SparseArray> i) {
+        super(context, R.layout.list,i);
         this.context = context;
-        this.aud = aud;
-        this.name = name;
-        this.time = time;
-        this.timePut = timePut;
-
+        this.items = i;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
+        card = items.get(position);
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.list,parent,false);
@@ -45,33 +47,36 @@ public class adapter extends ArrayAdapter<String> {
         textTimePut = (TextView)rowView.findViewById(R.id.timePut);
 
 
-            if (aud.get(position)!=null&&aud.get(position).equals("_")){
-                textAud.setText(" ");
-            }else{
-                textAud.setText(aud.get(position));
-            }
+        if (card.get(0)!=null&&card.get(0).equals("_")){
+            textAud.setText(" ");
+        }else{
+            textAud.setText(card.get(0));
+        }
 
 
-        textName.setText(name.get(position));
+        textName.setText(card.get(1));
 
-        if (time.get(position)==1){
+        if (Long.parseLong(card.get(2))==1){
             textTime.setText("");
             textName.setGravity(Gravity.CENTER);
         }else{
-            textTime.setText(String.valueOf(new Time(time.get(position))));
+            textTime.setText(String.valueOf(new Time(Long.parseLong(card.get(2)))));
         }
-        if (timePut.get(position)==0){
+        if (Long.parseLong(card.get(3))==0){
             textTimePut.setText("Не сдал");
-        }else if (timePut.get(position)==1){
+        }else if (Long.parseLong(card.get(3))==1){
             textTimePut.setText("");
         }else{
-            textTimePut.setText(String.valueOf(new Time(timePut.get(position))));
+            textTimePut.setText(String.valueOf(new Time(Long.parseLong(card.get(3)))));
         }
 
         return rowView;
     }
 
-
+    @Override
+    public int getCount() {
+        return items.size();
+    }
 
     public String getString(){
 

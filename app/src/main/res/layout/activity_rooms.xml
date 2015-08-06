@@ -7,6 +7,9 @@
     android:orientation="vertical"
     tools:context="com.example.ivsmirnov.keyregistrator.activities.Rooms">
 
+    <include
+        layout="@layout/toolbar"/>
+
         <ListView
             android:layout_width="match_parent"
             android:layout_height="0dp"

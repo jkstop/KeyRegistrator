@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 
@@ -59,20 +60,20 @@ public class ButtonsAdapter extends BaseAdapter {
         Button button;
         ImageView image;
         TextView textAud,textPerson;
-            if (convertView == null) {
+
+        if (convertView == null) {
                 if (isFree.get(position)){
                     view = inflater.inflate(R.layout.cell_for_grid_is_free, null);
                 }else{
                     view = inflater.inflate(R.layout.cell_for_grid_is_busy,null);
                 }
-
             }else{
                 view = convertView;
             }
 
         int space = (int) context.getResources().getDimension(R.dimen.grid_vertical_spacing);
-        int heightGrid = Launcher.gridView.getHeight();
-        int childCount = Launcher.gridView.getCount();
+        int heightGrid = Main_Fragment.gridView.getHeight();
+        int childCount = Main_Fragment.gridView.getCount();
         int rows;
         rows = (int)Math.ceil((double)childCount/preferences.getInt(Values.COLUMNS_COUNT,1));
         int btnHeight = heightGrid/rows - space;

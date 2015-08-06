@@ -25,13 +25,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class DataBases {
+public class DataBases{
 
     public DataBasesRegist dataBasesRegist;
     public SQLiteDatabase base;
@@ -166,6 +167,22 @@ public class DataBases {
 
         return items;
     }
+
+    public ArrayList<SparseArray> readJournalFromDB(){
+        cursorJournal.moveToPosition(-1);
+        ArrayList <SparseArray> items = new ArrayList<>();
+
+        while (cursorJournal.moveToNext()){
+            SparseArray <String> card = new SparseArray<>();
+            card.put(0,cursorJournal.getString(cursorJournal.getColumnIndex(DataBasesRegist.COLUMN_AUD)));
+            card.put(1,cursorJournal.getString(cursorJournal.getColumnIndex(DataBasesRegist.COLUMN_NAME)));
+            card.put(2,cursorJournal.getString(cursorJournal.getColumnIndex(DataBasesRegist.COLUMN_TIME)));
+            card.put(3,cursorJournal.getString(cursorJournal.getColumnIndex(DataBasesRegist.COLUMN_TIME_PUT)));
+            items.add(card);
+        }
+        return items;
+    }
+
     //удаление из БД преподавателей
     public void deleteFromTeachersDB(String surname, String name,String lastname,String kaf){
 
@@ -195,6 +212,8 @@ public class DataBases {
         base.delete(DataBasesRegist.TABLE_BASE, null, null);
         Log.d("Clear DB", "OK");
     }
+
+
 
     public void writeInDBSQL(String kaf,String surname,String name,String lastname, String photo){
         ContentValues cv = new ContentValues();
@@ -276,7 +295,13 @@ public class DataBases {
                 }
             }
         }else{
-            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_female);
+            Bitmap bitmap;
+            if (filename.substring(filename.length()-1).equalsIgnoreCase("а")){
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_female);
+            }else{
+                bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.person_male);
+            }
+
             FileOutputStream out = null;
             try {
                 out = new FileOutputStream(folder.getAbsolutePath()+"/"+filename+".jpg");

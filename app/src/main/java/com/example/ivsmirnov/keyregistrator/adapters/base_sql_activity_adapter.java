@@ -2,9 +2,11 @@ package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
 import android.util.SparseArray;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -79,11 +81,13 @@ public class base_sql_activity_adapter extends BaseAdapter {
                     imageLoader.init(ImageLoaderConfiguration.createDefault(context));
                 }
                 DataBases db = new DataBases(context);
-                imageLoader.displayImage("file://" + db.getPhotoID(card),image);
+                imageLoader.displayImage("file://" + db.getPhotoID(card), image);
                 db.closeDBconnection();
 
 
-        int gridHeight = base_sql_activity.gridView.getHeight();
+        WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        int gridHeight = display.getHeight();
         int buttonHeight = gridHeight / 6;
         view.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, buttonHeight));
         return view;

@@ -13,7 +13,6 @@
             tools:context=".MainActivity"
             android:orientation="vertical"
             android:id="@+id/mainLayout"
-            tools:showIn="@layout/layout_main_fragment"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:paddingBottom="16dp">
@@ -21,30 +20,11 @@
             <include
                 layout="@layout/toolbar"/>
 
-            <!-- <android.support.v7.widget.Toolbar
-                 android:id="@+id/toolbar"
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
-                 android:background="#ffc8ffc8"
-                 android:elevation="4dp"
-                 android:minHeight="?attr/actionBarSize"
-                 android:transitionName="actionBar" />-->
-            <!--<android.support.v7.widget.Toolbar
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/toolbar"
-                android:layout_height="wrap_content"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:minHeight="?attr/actionBarSize">
-                <TextView
-                    android:text="Выберите нужную аудиторию нажатием на экран"
-                    android:textStyle="italic"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textSize="28sp"
-                    android:textColor="#ff000000" />
-            </android.support.v7.widget.Toolbar>-->
-
+                android:layout_height="match_parent"
+                android:id="@+id/main_frame_for_fragment"/>
+<!--
             <FrameLayout
                 android:id="@+id/frame_for_grid_aud"
                 android:layout_width="match_parent"
@@ -62,7 +42,7 @@
                     android:textStyle="italic" />
 
                 <GridView
-                    android:id="@+id/gridView"
+                    android:id="@+id/mGridView"
                     android:columnWidth="90dp"
                     android:gravity="center"
                     android:horizontalSpacing="20dp"
@@ -184,7 +164,7 @@
                     android:transcriptMode="alwaysScroll"
                     android:layout_width="fill_parent"
                     android:layout_height="match_parent" />
-            </LinearLayout>
+            </LinearLayout>-->
 
 
         </LinearLayout>

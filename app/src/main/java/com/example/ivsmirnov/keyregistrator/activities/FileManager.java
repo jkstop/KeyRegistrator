@@ -32,7 +32,7 @@ import java.util.Locale;
 /**
  * Created by ivsmirnov on 27.04.2015.
  */
-public class FileManager extends ListActivity {
+public class FileManager extends ListActivity{
 
     private List<String> mPathList = null;
     private String root,rootInternal,rootBase;
@@ -41,6 +41,7 @@ public class FileManager extends ListActivity {
 
 
     private static SharedPreferences.Editor editor;
+    private SharedPreferences preferences;
 
 
     @Override
@@ -50,6 +51,7 @@ public class FileManager extends ListActivity {
 
 
         editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         root = Environment.getExternalStorageDirectory().getPath();
         rootInternal = "/";
@@ -60,7 +62,7 @@ public class FileManager extends ListActivity {
         what = getIntent().getIntExtra("what",0);
 
         if (isNeedChoiseButton){
-            getDir(rootInternal);
+            getDir(preferences.getString(Values.PATH_FOR_COPY_ON_PC,rootInternal));
         }else if(isBase){
             getDir(rootBase);
         }else {
@@ -76,12 +78,9 @@ public class FileManager extends ListActivity {
         File file = new File(dirPAth);
         File [] filesArray = file.listFiles();
         List<String> itemList = new ArrayList<>();
-        if (!dirPAth.equals(root)){
-            itemList.add(root);
-            mPathList.add(root);
-            itemList.add("../");
-            mPathList.add(file.getParent());
-        }
+        itemList.add("../");
+        mPathList.add(file.getParent());
+
 
         Arrays.sort(filesArray,fileComparator);
 
@@ -110,6 +109,8 @@ public class FileManager extends ListActivity {
         if (isNeedChoiseButton){
             itemList.add(0,"*** Выбрать эту папку ***");
             mPathList.add(0,file.getParent());
+            itemList.add(1,"Используется:"+preferences.getString(Values.PATH_FOR_COPY_ON_PC,""));
+            mPathList.add(1,preferences.getString(Values.PATH_FOR_COPY_ON_PC,"/"));
         }
 
 
@@ -167,8 +168,13 @@ public class FileManager extends ListActivity {
                     String absPath = file.getAbsolutePath();
 
                     if (what==10){
-                        Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_JOURNAL);
-                        loader.execute();
+                        try {
+                            Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_JOURNAL);
+                            loader.execute();
+                        }finally {
+                            Log.d("done","loading");
+                        }
+
                     }else if (what==11){
                         Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_TEACHERS);
                         loader.execute();
@@ -184,6 +190,12 @@ public class FileManager extends ListActivity {
         }
 
 
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Log.d("onAttach","!!!!!!!!");
     }
 
     public static ArrayList<String> readFile (String path) throws IOException {
@@ -260,4 +272,5 @@ public class FileManager extends ListActivity {
     protected void onStop() {
         super.onStop();
     }
+
 }

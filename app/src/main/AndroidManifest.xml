@@ -34,9 +34,7 @@
             >
         </activity>
         <activity
-            android:name=".activities.Rooms"
-            android:label="@string/title_activity_rooms"
-            android:theme="@style/Base.Theme.AppCompat.Light.DialogWhenLarge">
+            android:name=".activities.Rooms">
         </activity>
         <activity android:name=".activities.Preferences"
             android:label="Настройки"
