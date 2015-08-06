@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    android:padding="15dp">
+
+
+    <GridView
+        android:id="@+id/grid_for_base_sql"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnWidth="90dp"
+        android:numColumns="4"
+        android:verticalSpacing="15dp"
+        android:horizontalSpacing="15dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center" />
+
+
+    <at.markushi.ui.CircleButton
+        android:id="@+id/add_user_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/fab_ic_add"
+        app:cb_color="#99CC00"
+        android:onClick="showAddUserDialog"
+        app:cb_pressedRingWidth="10dip"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

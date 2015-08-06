@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menu_journal_save_to_file"
+        android:title="Сохранить и выгрузить"
+        android:icon="@drawable/ic_save_black_24dp"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/menu_journal_download"
+        android:title="Загрузить"
+        android:icon="@drawable/ic_file_download_black_24dp"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_journal_delete"
+        android:title="Очистить"
+        android:icon="@drawable/ic_delete_black_24dp"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_journal_select_location_for_copy"
+        android:title="Указать путь для копирования на ПК"
+        app:showAsAction="never"/>
+
+
+
+</menu>
