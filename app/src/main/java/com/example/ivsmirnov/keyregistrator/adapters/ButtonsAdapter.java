@@ -16,6 +16,8 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
@@ -25,15 +27,17 @@ public class ButtonsAdapter extends BaseAdapter {
     private ArrayList<Integer> items;
     private ArrayList<Boolean> isFree;
     private ArrayList<String> lastVisiters;
+    private ArrayList<String> photoPaths;
     private LayoutInflater inflater;
     private SharedPreferences preferences;
 
 
-    public ButtonsAdapter(Context c, ArrayList<Integer> i,ArrayList<Boolean> isF,ArrayList<String> sT){
+    public ButtonsAdapter(Context c, ArrayList<Integer> i,ArrayList<Boolean> isF,ArrayList<String> sT,ArrayList<String> pP){
         context = c;
         items = i;
         isFree = isF;
         lastVisiters = sT;
+        photoPaths = pP;
         inflater = (LayoutInflater)this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -93,11 +97,19 @@ public class ButtonsAdapter extends BaseAdapter {
             textAud = (TextView)view.findViewById(R.id.text_aud);
             textPerson = (TextView)view.findViewById(R.id.textButton);
 
-            image.setImageResource(R.drawable.person_key);
+            if (!photoPaths.get(position).equalsIgnoreCase("")){
+                ImageLoader imageLoader = ImageLoader.getInstance();
+                if (!imageLoader.isInited()){
+                    imageLoader.init(ImageLoaderConfiguration.createDefault(context));
+                }
+                imageLoader.displayImage("file://"+photoPaths.get(position),image);
+            }else{
+                image.setImageResource(R.drawable.person_key);
+            }
             textAud.setText(String.valueOf(items.get(position)));
             textPerson.setText(lastVisiters.get(position));
 
-            if (lastVisiters.get(position).equalsIgnoreCase("Центр поддержки")){
+            if (lastVisiters.get(position).contains("Центр")){
                 view.setBackgroundResource(R.drawable.button_background_support);
             }else{
                 view.setBackgroundResource(R.drawable.button_background_selected);

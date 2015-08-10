@@ -3,24 +3,15 @@ package com.example.ivsmirnov.keyregistrator.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.util.SparseArray;
-import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import com.example.ivsmirnov.keyregistrator.custom_views.FloatingActionButton;
-import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -70,6 +61,7 @@ public class base_sql_activity extends ActionBarActivity implements UpdateTeache
                 TextView textSurname = (TextView) rootView.findViewById(R.id.text_familia);
                 TextView textName = (TextView) rootView.findViewById(R.id.text_imya);
                 TextView textLastName = (TextView) rootView.findViewById(R.id.otchestvo);
+                TextView textKaf = (TextView)rootView.findViewById(R.id.kafedra);
 
                 String aud = getIntent().getStringExtra(Values.AUDITROOM);
                 String name = textSurname.getText().toString() + " "
@@ -77,7 +69,11 @@ public class base_sql_activity extends ActionBarActivity implements UpdateTeache
                         textLastName.getText().toString().charAt(0) + ".";
                 final Long time = System.currentTimeMillis();
 
-                writeIt(aud, name, time);
+                openBase();
+                String path = db.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
+                        textLastName.getText().toString(), textKaf.getText().toString()});
+                closeBase();
+                writeIt(aud, name, time, path);
 
                 finish();
             }
@@ -86,7 +82,7 @@ public class base_sql_activity extends ActionBarActivity implements UpdateTeache
 
     }
 
-    private void writeIt (String aud,String name,Long time){
+    private void writeIt (String aud,String name,Long time,String path){
         openBase();
         if (today==lastDate){
             db.writeInDBJournal(aud,name,time,(long)0,false);
@@ -100,6 +96,7 @@ public class base_sql_activity extends ActionBarActivity implements UpdateTeache
         }
         db.updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), 0);
         db.updateLastVisitersRoom(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), name);
+        db.updatePhotoPath(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud,-1),path);
         closeBase();
 
         editor.putLong(Values.DATE, today);

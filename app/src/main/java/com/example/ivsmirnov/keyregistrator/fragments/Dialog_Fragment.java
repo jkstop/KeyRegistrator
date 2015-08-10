@@ -39,6 +39,7 @@ import com.example.ivsmirnov.keyregistrator.activities.Add_user;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
 import com.example.ivsmirnov.keyregistrator.databases.DataBasesRegist;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.adapters.Adapter_SQL_popup;
@@ -49,6 +50,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ivsmirnov on 25.06.2015.
@@ -117,6 +119,8 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                UpdateMainFrame updateMainFrame = (UpdateMainFrame)getTargetFragment();
+                                updateMainFrame.onFinish();
                                 dialog.cancel();
                             }
                         })
@@ -161,6 +165,8 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 DataBases db = new DataBases(context);
                                 db.clearTeachersDB();
                                 db.closeDBconnection();
+                                UpdateTeachers updateTeachers = (UpdateTeachers)getTargetFragment();
+                                updateTeachers.onFinishEditing();
                                 Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
                             }
                         })

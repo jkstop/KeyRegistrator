@@ -57,7 +57,7 @@ public class Fragment_settings_journal extends Fragment {
                         db.closeDBconnection();
                         break;
                     case 1:
-                        String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC, Environment.getExternalStorageDirectory().getPath());
+                        String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, Environment.getExternalStorageDirectory().getPath());
                         String srFileJournal = mPath + "/Journal.txt";
                         String dtFileJournal = path + "/Journal.txt";
                         DataBases.copyfile(context, srFileJournal, dtFileJournal);

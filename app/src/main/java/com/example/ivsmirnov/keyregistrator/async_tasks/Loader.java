@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.activities.FileManager;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
@@ -24,13 +25,15 @@ public class Loader extends AsyncTask <String,Integer,Void> {
     private ProgressDialog dialog;
     private SharedPreferences preferences;
     private FileManager fileManagerActivity;
+    private FinishLoad listener;
     private int LOAD_TYPE;
 
-    public Loader (Context c,FileManager activity,String abs,int load){
+    public Loader (Context c,FileManager activity,String abs,int load,FinishLoad l){
         context = c;
         absPath = abs;
         fileManagerActivity = activity;
         LOAD_TYPE = load;
+        listener = l;
         dialog = new ProgressDialog(fileManagerActivity);
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
@@ -56,8 +59,8 @@ public class Loader extends AsyncTask <String,Integer,Void> {
         if (dialog.isShowing()){
             dialog.cancel();
         }
-
-        fileManagerActivity.finish();
+        listener.onFinish();
+        //fileManagerActivity.finish();
 
         Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
     }
@@ -147,7 +150,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                 for (String s : items){
                     String [] split = s.split(";");
                     try {
-                        db.writeInDBTeachers(split[0],split[1],split[2],split[3],split[4],"null");
+                        db.writeInDBTeachers(split[0],split[1],split[2],split[3],split[4],split[5]);
                     }catch (Exception e){
                         e.printStackTrace();
                     }

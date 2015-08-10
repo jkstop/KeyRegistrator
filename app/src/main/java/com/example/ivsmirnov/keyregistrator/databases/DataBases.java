@@ -92,6 +92,22 @@ public class DataBases{
 
     }
 
+    public String findPhotoPath(String[] items){
+        String path = "";
+        cursorTeachers.moveToPosition(-1);
+        while (cursorTeachers.moveToNext()){
+            if (items[0].equalsIgnoreCase(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE)))&&
+                    items[1].equalsIgnoreCase(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_NAME_FAVORITE)))&&
+                    items[2].equalsIgnoreCase(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_LASTNAME_FAVORITE)))&&
+                    items[3].equalsIgnoreCase(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_KAF_FAVORITE)))){
+                path = cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_PHOTO_FAVORITE));
+            }
+        }
+        return path;
+    }
+
+
+
     public ArrayList<String> readLastVisiterRoom(){
         cursorRoom.moveToPosition(-1);
         ArrayList<String>items = new ArrayList<>();
@@ -109,11 +125,29 @@ public class DataBases{
         Log.d("updateLastVisiters", "OK");
     }
 
+    public void updatePhotoPath(int id, String path){
+        ContentValues cv = new ContentValues();
+        cv.put(DataBasesRegist.COLUMN_PHOTO_PATH,path);
+        base.update(DataBasesRegist.TABLE_ROOMS, cv, DataBasesRegist._ID + "=" + id, null);
+
+        Log.d("UpdatePhotoPath", "OK");
+    }
+
+    public ArrayList<String> readPhotoPath(){
+        ArrayList <String> items = new ArrayList<>();
+        cursorRoom.moveToPosition(-1);
+        while (cursorRoom.moveToNext()){
+            items.add(cursorRoom.getString(cursorRoom.getColumnIndex(DataBasesRegist.COLUMN_PHOTO_PATH)));
+        }
+        return items;
+    }
+
     public void writeInRoomsDB (int room) {
         ContentValues cv = new ContentValues();
         cv.put(DataBasesRegist.COLUMN_ROOM,room);
         cv.put(DataBasesRegist.COLUMN_STATUS,1);
         cv.put(DataBasesRegist.COLUMN_LAST_VISITER, "Аноним");
+        cv.put(DataBasesRegist.COLUMN_PHOTO_PATH,"");
         long id = base.insert(DataBasesRegist.TABLE_ROOMS, null, cv);
 
         editor.putInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + String.valueOf(room), (int) id);
@@ -449,7 +483,8 @@ public class DataBases{
                     +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_NAME_FAVORITE))+";"
                     +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_LASTNAME_FAVORITE))+";"
                     +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_KAF_FAVORITE))+";"
-                    +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_GENDER_FAVORITE)));
+                    +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_GENDER_FAVORITE))+";"
+                    +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_PHOTO_FAVORITE)));
                 }
                 break;
         }

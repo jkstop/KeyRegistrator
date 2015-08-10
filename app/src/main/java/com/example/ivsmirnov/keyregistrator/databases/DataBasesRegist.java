@@ -12,7 +12,7 @@ import android.util.Log;
 public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
 
     private static final String name = "Key_registrator_database.db";
-    private static final int version = 22;
+    private static final int version = 25;
 
     public static final String TABLE_JOURNAL = "Журнал";
     public static final String COLUMN_AUD = "Аудитория";
@@ -41,8 +41,9 @@ public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
     public static final String COLUMN_ROOM = "Помещение";
     public static final String COLUMN_STATUS = "Статус";
     public static final String COLUMN_LAST_VISITER = "Последний";
+    public static final String COLUMN_PHOTO_PATH = "Путь_к_фото";
     public static final String CREATE_ROOMS_BASE = "CREATE TABLE " + TABLE_ROOMS + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            COLUMN_ROOM + " integer, " + COLUMN_STATUS + " integer, "+ COLUMN_LAST_VISITER + " text not null);";
+            COLUMN_ROOM + " integer, " + COLUMN_STATUS + " integer, "+COLUMN_LAST_VISITER + " text not null, "+ COLUMN_PHOTO_PATH + " text not null);";
     public static final String DELETE_ROOMS_BASE = "DROP TABLE IF EXISTS " + TABLE_ROOMS;
 
     public static final String TABLE_BASE = "База";

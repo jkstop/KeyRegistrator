@@ -38,7 +38,7 @@ public class CloseDayService extends Service {
         Toast.makeText(context,"Закрываемся...",Toast.LENGTH_SHORT).show();
 
         String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC, Environment.getExternalStorageDirectory().getPath());
+        String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, Environment.getExternalStorageDirectory().getPath());
         String srFileJournal = mPath + "/Journal.txt";
         String dtFileJournal = path + "/Journal.txt";
         String srFileTeachers = mPath + "/Teachers.txt";

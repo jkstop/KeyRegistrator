@@ -39,7 +39,7 @@ public class Fragment_settings_general extends android.support.v4.app.Fragment {
         context = rootView.getContext();
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        path = preferences.getString(Values.PATH_FOR_COPY_ON_PC, "Не выбрано");
+        path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, "Не выбрано");
         items = context.getResources().getStringArray(R.array.db_share_items);
         listView = (ListView)rootView.findViewById(R.id.fragment_list_general);
         listView.setAdapter(new ArrayAdapter<String>(context,android.R.layout.simple_list_item_2,android.R.id.text1,items){
@@ -94,7 +94,7 @@ public class Fragment_settings_general extends android.support.v4.app.Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        path = preferences.getString(Values.PATH_FOR_COPY_ON_PC, "Не выбрано");
+        path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, "Не выбрано");
         ArrayAdapter<String> adapter = (ArrayAdapter<String>) listView.getAdapter();
         adapter.notifyDataSetChanged();
     }

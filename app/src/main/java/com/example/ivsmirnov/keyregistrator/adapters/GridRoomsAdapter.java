@@ -66,11 +66,11 @@ public class GridRoomsAdapter extends BaseAdapter {
         rootView.setBackgroundResource(R.drawable.button_background);
 
         int space = (int) context.getResources().getDimension(R.dimen.grid_vertical_spacing);
-        int heightGrid = Main_Fragment.gridView.getHeight();
-        int childCount = Main_Fragment.gridView.getCount();
+        //int heightGrid = Main_Fragment.gridView.getHeight();
+        //int childCount = Main_Fragment.gridView.getCount();
         int rows;
-        rows = (int)Math.ceil((double) childCount / sharedPreferences.getInt(Values.COLUMNS_COUNT, 1));
-        int btnHeight = heightGrid/rows - space;
+        //rows = (int)Math.ceil((double) childCount / sharedPreferences.getInt(Values.COLUMNS_COUNT, 1));
+        int btnHeight = /*heightGrid/rows - space*/180;
 
         AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 btnHeight);

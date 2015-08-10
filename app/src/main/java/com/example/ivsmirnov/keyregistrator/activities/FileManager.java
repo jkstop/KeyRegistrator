@@ -2,6 +2,7 @@ package com.example.ivsmirnov.keyregistrator.activities;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader;
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.BufferedReader;
@@ -32,10 +35,10 @@ import java.util.Locale;
 /**
  * Created by ivsmirnov on 27.04.2015.
  */
-public class FileManager extends ListActivity{
+public class FileManager extends ListActivity implements FinishLoad{
 
     private List<String> mPathList = null;
-    private String root,rootInternal,rootBase;
+    private String root,rootInternal,rootBase,pathFor;
     boolean isNeedChoiseButton,isBase;
     int what;
 
@@ -53,18 +56,22 @@ public class FileManager extends ListActivity{
         editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
+
         root = Environment.getExternalStorageDirectory().getPath();
         rootInternal = "/";
-        rootBase = "/data/data/" + getPackageName() + "/databases/";
+        //rootBase = "/data/data/" + getPackageName() + "/databases/";
 
 
         isNeedChoiseButton = getIntent().getBooleanExtra("buttonChoise", false);
-        what = getIntent().getIntExtra("what",0);
+        what = getIntent().getIntExtra("what", 0);
+        pathFor = getIntent().getStringExtra("pathFor");
 
         if (isNeedChoiseButton){
-            getDir(preferences.getString(Values.PATH_FOR_COPY_ON_PC,rootInternal));
-        }else if(isBase){
-            getDir(rootBase);
+            if (pathFor.equalsIgnoreCase("journal")){
+                getDir(preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,rootInternal));
+            }else{
+                getDir(preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS,rootInternal));
+            }
         }else {
             getDir(root);
             }
@@ -109,8 +116,14 @@ public class FileManager extends ListActivity{
         if (isNeedChoiseButton){
             itemList.add(0,"*** Выбрать эту папку ***");
             mPathList.add(0,file.getParent());
-            itemList.add(1,"Используется:"+preferences.getString(Values.PATH_FOR_COPY_ON_PC,""));
-            mPathList.add(1,preferences.getString(Values.PATH_FOR_COPY_ON_PC,"/"));
+            if (pathFor.equalsIgnoreCase("journal")){
+                itemList.add(1,"Используется:"+preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,""));
+                mPathList.add(1,preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,"/"));
+            }else{
+                itemList.add(1,"Используется:"+preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS,""));
+                mPathList.add(1,preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS,"/"));
+            }
+
         }
 
 
@@ -154,7 +167,12 @@ public class FileManager extends ListActivity{
             File file = new File(mPathList.get(0));
             String absPath = file.getAbsolutePath();
 
-            editor.putString(Values.PATH_FOR_COPY_ON_PC,absPath);
+            if (pathFor.equalsIgnoreCase("journal")){
+                editor.putString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,absPath);
+            }else{
+                editor.putString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS,absPath);
+            }
+
             editor.commit();
 
             finish();
@@ -168,34 +186,19 @@ public class FileManager extends ListActivity{
                     String absPath = file.getAbsolutePath();
 
                     if (what==10){
-                        try {
-                            Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_JOURNAL);
-                            loader.execute();
-                        }finally {
-                            Log.d("done","loading");
-                        }
-
+                        Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_JOURNAL,this);
+                        loader.execute();
                     }else if (what==11){
-                        Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_TEACHERS);
+                        Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_TEACHERS,this);
                         loader.execute();
                     }else if(what==66){
-                        Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,66);
+                        Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,66,this);
                         loader.execute();
                     }else{
                         Toast.makeText(getApplicationContext(),"Error",  Toast.LENGTH_SHORT).show();
                     }
-
                 }
-
         }
-
-
-    }
-
-    @Override
-    public void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        Log.d("onAttach","!!!!!!!!");
     }
 
     public static ArrayList<String> readFile (String path) throws IOException {
@@ -246,7 +249,6 @@ public class FileManager extends ListActivity{
                             split[4]);
 
                     i++;
-                    Log.d("lines",String.valueOf(i));
                 }
             }
         }
@@ -273,4 +275,9 @@ public class FileManager extends ListActivity{
         super.onStop();
     }
 
+    @Override
+    public void onFinish() {
+        setResult(RESULT_OK,new Intent());
+        finish();
+    }
 }

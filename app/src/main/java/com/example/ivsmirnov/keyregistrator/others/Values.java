@@ -15,7 +15,8 @@ public class Values {
     public static final int WRITE_JOURNAL = 100;
     public static final int WRITE_TEACHERS = 101;
     public static final String AUTO_CLOSED_COUNT = "auto_closed_count";
-    public static final String PATH_FOR_COPY_ON_PC = "path_for_copy_on_pc";
+    public static final String PATH_FOR_COPY_ON_PC_FOR_JOURNAL = "path_for_copy_on_pc_for_journal";
+    public static final String PATH_FOR_COPY_ON_PC_FOR_TEACHERS = "path_for_copy_on_pc_for_teachers";
     public static final String DISCLAIMER_SIZE = "disclaimer_size";
     public static final int DIALOG_SEEKBAR = 102;
     public static final int DIALOG_LOADING = 103;

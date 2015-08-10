@@ -129,13 +129,20 @@ public class Journal_fragment extends Fragment implements UpdateJournal,Serializ
                 db.closeDBconnection();
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
                 String mPath = Environment.getExternalStorageDirectory().getPath();
-                String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
+                String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
                 String srFileJournal = mPath + "/Journal.txt";
                 String dtFileJournal = path + "/Journal.txt";
                 DataBases.copyfile(mContext, srFileJournal, dtFileJournal);
                 return true;
             case R.id.menu_journal_download:
-                startActivity(new Intent(mContext,FileManager.class).putExtra("what",10));
+                //startActivity(new Intent(mContext,FileManager.class).putExtra("what",10));
+                startActivityForResult(new Intent(mContext,FileManager.class).putExtra("what",10),333);
+                /*Dialog_Fragment fileManager = new Dialog_Fragment();
+                Bundle b = new Bundle();
+                b.putInt(Values.DIALOG_TYPE,456);
+                fileManager.setTargetFragment(this,0);
+                fileManager.setArguments(b);
+                fileManager.show(getFragmentManager(),"showFileManager");*/
                 return true;
             case R.id.menu_journal_delete:
                 Dialog_Fragment dialog = new Dialog_Fragment();
@@ -146,10 +153,18 @@ public class Journal_fragment extends Fragment implements UpdateJournal,Serializ
                 dialog.show(getFragmentManager(),"clearJournal");
                 return true;
             case R.id.menu_journal_select_location_for_copy:
-                startActivity(new Intent(mContext,FileManager.class).putExtra("buttonChoise", true));
+                startActivity(new Intent(mContext,FileManager.class).putExtra("buttonChoise", true).putExtra("pathFor","journal"));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data!=null){
+            onDone();
         }
     }
 

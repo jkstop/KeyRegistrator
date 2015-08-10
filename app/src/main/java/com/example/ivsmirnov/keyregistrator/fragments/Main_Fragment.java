@@ -15,6 +15,7 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import com.example.ivsmirnov.keyregistrator.adapters.ButtonsAdapter;
 import com.example.ivsmirnov.keyregistrator.adapters.ListAdapter;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.databases.DataBasesRegist;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
@@ -38,7 +40,7 @@ import java.util.ArrayList;
 /**
  * Created by IVSmirnov on 03.08.2015.
  */
-public class Main_Fragment extends Fragment {
+public class Main_Fragment extends Fragment implements UpdateMainFrame{
 
     public static GridView gridView;
 
@@ -51,7 +53,7 @@ public class Main_Fragment extends Fragment {
     private ArrayList<Integer> rooms;
     private ArrayList<Boolean> isFreeAud;
     private ArrayList <String> lastVisiters;
-
+    private ArrayList <String> photoPath;
     private LinearLayout disclaimer;
 
     private ListView mListView;
@@ -62,13 +64,13 @@ public class Main_Fragment extends Fragment {
 
     public static Main_Fragment newInstance (){
         Main_Fragment main_fragment = new Main_Fragment();
-
         return main_fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -95,7 +97,6 @@ public class Main_Fragment extends Fragment {
 
                 View viewGridItem = parent.getChildAt(position);
                 TextView textButton = (TextView) viewGridItem.findViewById(R.id.textButton);
-
                 selected_aud = position;
 
                 if (isFreeAud.get(position)) {
@@ -120,15 +121,6 @@ public class Main_Fragment extends Fragment {
                     isFreeAud.set(position, true);
                     gridView.setAdapter(adapter);
                 }
-            }
-        });
-        gridView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    return true;
-                }
-                return false;
             }
         });
 
@@ -186,6 +178,7 @@ public class Main_Fragment extends Fragment {
         rooms = new ArrayList<>(db.readFromRoomsDB());
         isFreeAud = new ArrayList<>(db.readStatusRooms());
         lastVisiters = new ArrayList<>(db.readLastVisiterRoom());
+        photoPath = new ArrayList<>(db.readPhotoPath());
         mItems = db.readJournalFromDB();
         db.closeDBconnection();
 
@@ -194,7 +187,7 @@ public class Main_Fragment extends Fragment {
         mListView.setSelection(mListAdapter.getCount());
 
         int columns = preferences.getInt(Values.COLUMNS_COUNT, 1);
-        adapter = new ButtonsAdapter(context,rooms,isFreeAud,lastVisiters);
+        adapter = new ButtonsAdapter(context,rooms,isFreeAud,lastVisiters,photoPath);
 
         gridView.setAdapter(adapter);
         gridView.setNumColumns(columns);
@@ -212,5 +205,29 @@ public class Main_Fragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_main,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_main_disclaimer_size:
+                Dialog_Fragment dialog = new Dialog_Fragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt(Values.DIALOG_TYPE, Values.DIALOG_SEEKBAR);
+                dialog.setArguments(bundle);
+                dialog.setTargetFragment(this,0);
+                dialog.show(getFragmentManager(), "seek");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+    @Override
+    public void onFinish() {
+        float disclaimer_size = preferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15);
+        disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
     }
 }

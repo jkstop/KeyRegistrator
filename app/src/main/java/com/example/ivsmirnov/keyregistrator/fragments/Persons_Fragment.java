@@ -17,10 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.PopupMenu;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Add_user;
+import com.example.ivsmirnov.keyregistrator.activities.FileManager;
 import com.example.ivsmirnov.keyregistrator.adapters.base_sql_activity_adapter;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -137,21 +136,38 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 db.closeDBconnection();
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
                 String mPath = Environment.getExternalStorageDirectory().getPath();
-                String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
+                String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
                 String srFileTeachers = mPath + "/Teachers.txt";
                 String dtFileTeachers = path + "/Teachers.txt";
                 DataBases.copyfile(mContext, srFileTeachers, dtFileTeachers);
                 return true;
             case R.id.menu_teachers_download_favorite:
+                startActivityForResult(new Intent(mContext, FileManager.class).putExtra("what", 11), 334);
                 return true;
             case R.id.menu_teachers_download_local:
+                startActivity(new Intent(mContext, FileManager.class).putExtra("what", 66));
                 return true;
             case R.id.menu_teachers_delete:
+                Dialog_Fragment dialog = new Dialog_Fragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLEAR_TEACHERS);
+                dialog.setArguments(bundle);
+                dialog.setTargetFragment(Persons_Fragment.this,0);
+                dialog.show(getFragmentManager(),"clearTeachers");
                 return true;
             case R.id.menu_teachers_select_location_for_copy:
+                startActivity(new Intent(mContext,FileManager.class).putExtra("buttonChoise", true).putExtra("pathFor","teachers"));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data!=null){
+            onFinishEditing();
         }
     }
 
