@@ -10,7 +10,7 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.others.Values;
-import com.example.ivsmirnov.keyregistrator.activities.CloseDayDialog;
+import com.example.ivsmirnov.keyregistrator.activities.CloseDay;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 
 public class CloseDayService extends Service {
@@ -53,7 +53,7 @@ public class CloseDayService extends Service {
         DataBases.copyfile(context, srFileJournal, dtFileJournal);
         DataBases.copyfile(context, srFileTeachers, dtFileTeachers);
 
-        Intent startCloseDay = new Intent(getApplicationContext(),CloseDayDialog.class);
+        Intent startCloseDay = new Intent(getApplicationContext(), CloseDay.class);
         startCloseDay.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         startActivity(startCloseDay);

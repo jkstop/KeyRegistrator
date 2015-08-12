@@ -13,17 +13,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.base_sql_activity;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
-/**
- * Created by IVSmirnov on 02.07.2015.
- */
-public class base_sql_activity_adapter extends BaseAdapter {
+public class adapter_persons_grid extends BaseAdapter {
 
     private SparseArray <String> card;
 
@@ -33,7 +29,7 @@ public class base_sql_activity_adapter extends BaseAdapter {
     private LayoutInflater inflater;
 
 
-    public base_sql_activity_adapter(Context c,ArrayList<SparseArray> all){
+    public adapter_persons_grid(Context c, ArrayList<SparseArray> all) {
         allItems = all;
         context = c;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -62,7 +58,7 @@ public class base_sql_activity_adapter extends BaseAdapter {
         if (convertView==null){
             view = inflater.inflate(R.layout.cell_for_base_sql, null);
         }else{
-            view = (View)convertView;
+            view = convertView;
         }
 
         TextView familia = (TextView) view.findViewById(R.id.text_familia);

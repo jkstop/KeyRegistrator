@@ -11,7 +11,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,29 +23,24 @@ import android.widget.ListView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.FileManager;
-import com.example.ivsmirnov.keyregistrator.adapters.ListAdapter;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_journal_list;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-/**
- * Created by IVSmirnov on 04.08.2015.
- */
-public class Journal_fragment extends Fragment implements UpdateJournal,Serializable {
+
+public class Journal_fragment extends Fragment implements UpdateJournal {
 
     private Context mContext;
     private ListView mListView;
 
     private DataBases db;
-    private ListAdapter mListAdapter;
+    private adapter_journal_list mAdapterjournallist;
     private ArrayList <SparseArray> mItems;
 
-    private UpdateJournal listener;
-
-    public static Journal_fragment newInstance(){
+    public static Journal_fragment newInstance() {
         return new Journal_fragment();
     }
 
@@ -64,10 +58,10 @@ public class Journal_fragment extends Fragment implements UpdateJournal,Serializ
         mContext = rootView.getContext();
         readJournalFromDB();
         mListView = (ListView)rootView.findViewById(R.id.list);
-        mListAdapter = new ListAdapter(mContext,mItems);
-        mListView.setAdapter(mListAdapter);
+        mAdapterjournallist = new adapter_journal_list(mContext, mItems);
+        mListView.setAdapter(mAdapterjournallist);
         mListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
-        mListView.setSelection(mListAdapter.getCount());
+        mListView.setSelection(mAdapterjournallist.getCount());
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -84,7 +78,7 @@ public class Journal_fragment extends Fragment implements UpdateJournal,Serializ
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mItems.remove(position);
-                                mListAdapter.notifyDataSetChanged();
+                                mAdapterjournallist.notifyDataSetChanged();
 
                                 openBase();
                                 db.deleteFromDB(position);
@@ -135,14 +129,7 @@ public class Journal_fragment extends Fragment implements UpdateJournal,Serializ
                 DataBases.copyfile(mContext, srFileJournal, dtFileJournal);
                 return true;
             case R.id.menu_journal_download:
-                //startActivity(new Intent(mContext,FileManager.class).putExtra("what",10));
                 startActivityForResult(new Intent(mContext,FileManager.class).putExtra("what",10),333);
-                /*Dialog_Fragment fileManager = new Dialog_Fragment();
-                Bundle b = new Bundle();
-                b.putInt(Values.DIALOG_TYPE,456);
-                fileManager.setTargetFragment(this,0);
-                fileManager.setArguments(b);
-                fileManager.show(getFragmentManager(),"showFileManager");*/
                 return true;
             case R.id.menu_journal_delete:
                 Dialog_Fragment dialog = new Dialog_Fragment();
@@ -170,9 +157,8 @@ public class Journal_fragment extends Fragment implements UpdateJournal,Serializ
 
     @Override
     public void onDone() {
-        Log.d("onDONE","!!!!!!!!!!!!");
         readJournalFromDB();
-        mListAdapter = new ListAdapter(mContext,mItems);
-        mListView.setAdapter(mListAdapter);
+        mAdapterjournallist = new adapter_journal_list(mContext, mItems);
+        mListView.setAdapter(mAdapterjournallist);
     }
 }

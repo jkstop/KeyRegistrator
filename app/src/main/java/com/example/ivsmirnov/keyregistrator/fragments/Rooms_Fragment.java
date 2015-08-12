@@ -14,10 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.PopupMenu;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.adapters.GridRoomsAdapter;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_edit_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -26,15 +25,12 @@ import java.util.ArrayList;
 
 import at.markushi.ui.CircleButton;
 
-/**
- * Created by IVSmirnov on 05.08.2015.
- */
 public class Rooms_Fragment extends Fragment implements UpdateJournal {
 
     private GridView mGridView;
     private CircleButton mCircleButton;
     private ArrayList<Integer> mItems;
-    private GridRoomsAdapter mGridRoomsAdapter;
+    private adapter_edit_auditrooms_grid mAdaptereditauditroomsgrid;
     private Context mContext;
 
 
@@ -68,8 +64,8 @@ public class Rooms_Fragment extends Fragment implements UpdateJournal {
 
         int columns = sharedPreferences.getInt(Values.COLUMNS_COUNT, 1);
 
-        mGridRoomsAdapter = new GridRoomsAdapter(mContext, mItems);
-        mGridView.setAdapter(mGridRoomsAdapter);
+        mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mItems);
+        mGridView.setAdapter(mAdaptereditauditroomsgrid);
         mGridView.setNumColumns(columns);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -122,45 +118,6 @@ public class Rooms_Fragment extends Fragment implements UpdateJournal {
         }
     }
 
-    private void showColumnsCount(View v){
-        PopupMenu popupMenu = new PopupMenu(mContext,v);
-        popupMenu.inflate(R.menu.popup_columns);
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.two:
-                        editor.putInt(Values.COLUMNS_COUNT, 2);
-                        editor.commit();
-                        return true;
-                    case R.id.three:
-                        editor.putInt(Values.COLUMNS_COUNT, 3);
-                        editor.commit();
-                        return true;
-                    case R.id.four:
-                        editor.putInt(Values.COLUMNS_COUNT, 4);
-                        editor.commit();
-                        return true;
-                    case R.id.five:
-                        editor.putInt(Values.COLUMNS_COUNT, 5);
-                        editor.commit();
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-        });
-
-        for (int i = 0;i<popupMenu.getMenu().size();i++){
-            MenuItem menuItem = popupMenu.getMenu().getItem(i);
-            if (menuItem.getTitle().equals(String.valueOf(sharedPreferences.getInt(Values.COLUMNS_COUNT, 1)))){
-                menuItem.setChecked(true);
-            }
-        }
-
-        popupMenu.show();
-    }
-
     @Override
     public void onDone() {
         DataBases db = new DataBases(mContext);
@@ -168,8 +125,8 @@ public class Rooms_Fragment extends Fragment implements UpdateJournal {
         db.closeDBconnection();
 
         int columns = sharedPreferences.getInt(Values.COLUMNS_COUNT, 1);
-        mGridRoomsAdapter = new GridRoomsAdapter(mContext, mItems);
-        mGridView.setAdapter(mGridRoomsAdapter);
+        mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mItems);
+        mGridView.setAdapter(mAdaptereditauditroomsgrid);
         mGridView.setNumColumns(columns);
     }
 }

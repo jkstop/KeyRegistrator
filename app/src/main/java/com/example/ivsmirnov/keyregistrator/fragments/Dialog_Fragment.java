@@ -1,22 +1,17 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Base64;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +21,6 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TableLayout;
@@ -35,26 +29,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Add_user;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
 import com.example.ivsmirnov.keyregistrator.databases.DataBasesRegist;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
-import com.example.ivsmirnov.keyregistrator.adapters.Adapter_SQL_popup;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_autoComplete_teachersBase;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Created by ivsmirnov on 25.06.2015.
- */
 public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
     private Context context;
@@ -86,45 +71,10 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
     }
 
+    @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        //SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        //final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         switch (dialog_id){
-            case Values.DIALOG_SEEKBAR:
-                final SeekBar seekBar = new SeekBar(getActivity());
-                seekBar.setMax(40);
-                seekBar.setProgress((int) (sharedPreferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15)*100));
-                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    float prog = 0;
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        prog = (float) (progress/100.0);
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        editor.putFloat(Values.DISCLAIMER_SIZE,prog);
-                        editor.commit();
-                    }
-                });
-
-                return new AlertDialog.Builder(getActivity())
-                        .setTitle("Размер уведомления")
-                        .setView(seekBar)
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                UpdateMainFrame updateMainFrame = (UpdateMainFrame)getTargetFragment();
-                                updateMainFrame.onFinish();
-                                dialog.cancel();
-                            }
-                        })
-                        .create();
             case Values.DIALOG_CLEAR_JOURNAL:
                 return new AlertDialog.Builder(getActivity())
                         .setTitle("ВНИМАНИЕ!")
@@ -189,7 +139,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                     public void afterTextChanged(Editable s) {
                     }
                 });
-                autoCompleteTextView.setAdapter(new Adapter_SQL_popup(context, items));
+                autoCompleteTextView.setAdapter(new adapter_autoComplete_teachersBase(context, items));
                 autoCompleteTextView.setTextColor(Color.BLACK);
                 autoCompleteTextView.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
                 autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -246,7 +196,9 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                     e.printStackTrace();
                                 }
 
-                                Loader_Image loader_image = new Loader_Image(context,new String[]{surname,name,lastname,kaf,gender},Dialog_Fragment.this,(UpdateTeachers)getTargetFragment());
+                                UpdateTeachers updateTeachers;
+                                updateTeachers = (UpdateTeachers) getTargetFragment();
+                                Loader_Image loader_image = new Loader_Image(context, new String[]{surname, name, lastname, kaf, gender}, Dialog_Fragment.this, updateTeachers);
                                 loader_image.execute();
                                dismiss();
                             }
@@ -270,18 +222,15 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                     textParametr.setText(dbses.cursorTeachers.getColumnName(i));
 
                     EditText editParametr = (EditText)rowLayot.findViewById(R.id.editParemetr);
-                    //String [] values = getArguments().getStringArray("valuesForEdit");
                     if (values!=null){
                         editParametr.setText(values[i-1]);
                     }
-
 
                     tableRow.addView(rowLayot);
                     tableLayout.addView(tableRow);
                 }
 
                 tableLayout.setColumnStretchable(0, true);
-
 
                 AlertDialog.Builder builderEdit = new AlertDialog.Builder(getActivity());
                 builderEdit.setTitle("Редактирование");
@@ -332,40 +281,6 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                 });
                 builderEdit.setCancelable(false);
                 return builderEdit.create();
-            case 67:
-                ImageView imageView = new ImageView(context);
-
-                File sdcard = Environment.getExternalStorageDirectory();
-                File file = new File(sdcard,"str.txt");
-                StringBuilder text = new StringBuilder();
-
-                try {
-                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-                    String line;
-
-
-                    while ((line=bufferedReader.readLine())!= null){
-                        text.append(line);
-                    }
-
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                Log.d("length", String.valueOf(text.toString().length()));
-
-
-
-                byte[] decodedString = Base64.decode(text.toString(), Base64.NO_PADDING);
-                Bitmap image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                imageView.setImageBitmap(image);
-
-
-                return new AlertDialog.Builder(getActivity())
-                        .setTitle("Image")
-                        .setView(imageView)
-                        .create();
             case Values.DELETE_ROOM_DIALOG:
                 final int pos = getArguments().getInt("pos");
                 final int aud = getArguments().getInt("aud");
@@ -447,16 +362,102 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         })
 
                         .create();
+            case Values.DIALOG_SEEKBARS:
 
+                LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                String[] seekItems = getResources().getStringArray(R.array.seek_items);
+                TableLayout tableLayout1 = new TableLayout(context);
+                for (int i = 0; i < seekItems.length; i++) {
+                    TableRow tableRow = new TableRow(context);
+                    View row = layoutInflater.inflate(R.layout.layout_dialog_items_size, null);
+                    TextView textR = (TextView) row.findViewById(R.id.text_seek_row);
+                    textR.setText(seekItems[i]);
+
+                    SeekBar seek = (SeekBar) row.findViewById(R.id.seek_seek_row);
+                    if (i == 0) {
+                        seek.setProgress((int) (sharedPreferences.getFloat(Values.GRID_SIZE, (float) 0.45) * 100));
+                        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                            float prog = 0;
+
+                            @Override
+                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                prog = (float) (progress / 100.0);
+                            }
+
+                            @Override
+                            public void onStartTrackingTouch(SeekBar seekBar) {
+                            }
+
+                            @Override
+                            public void onStopTrackingTouch(SeekBar seekBar) {
+                                editor.putFloat(Values.GRID_SIZE, prog);
+                                editor.commit();
+                            }
+                        });
+                    } else if (i == 1) {
+                        seek.setMax(40);
+                        seek.setProgress((int) (sharedPreferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15) * 100));
+                        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                            float prog = 0;
+
+                            @Override
+                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                prog = (float) (progress / 100.0);
+                            }
+
+                            @Override
+                            public void onStartTrackingTouch(SeekBar seekBar) {
+                            }
+
+                            @Override
+                            public void onStopTrackingTouch(SeekBar seekBar) {
+                                editor.putFloat(Values.DISCLAIMER_SIZE, prog);
+                                editor.commit();
+                            }
+                        });
+                    } else if (i == 2) {
+                        seek.setMax(50);
+                        seek.setProgress((int) (sharedPreferences.getFloat(Values.JOURNAL_SIZE, (float) 0.3) * 100));
+                        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                            float prog = 0;
+
+                            @Override
+                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                prog = (float) (progress / 100.0);
+                            }
+
+                            @Override
+                            public void onStartTrackingTouch(SeekBar seekBar) {
+                            }
+
+                            @Override
+                            public void onStopTrackingTouch(SeekBar seekBar) {
+                                editor.putFloat(Values.JOURNAL_SIZE, prog);
+                                editor.commit();
+                            }
+                        });
+                    }
+                    tableRow.addView(row);
+                    tableLayout1.addView(tableRow);
+                }
+                tableLayout1.setColumnStretchable(0, true);
+
+                return new AlertDialog.Builder(getActivity())
+                        .setView(tableLayout1)
+                        .setTitle("Размер элементов")
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                UpdateMainFrame updateMainFrame = (UpdateMainFrame) getTargetFragment();
+                                updateMainFrame.onFinish();
+                                dialog.cancel();
+                            }
+                        })
+                        .create();
+            default:
+                return null;
         }
 
-        return null;
     }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
-
 }

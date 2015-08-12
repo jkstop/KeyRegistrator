@@ -69,6 +69,7 @@
     <string name="toolbar_title_persons">Преподаватели</string>
     <string name="toolbar_title_journal">Журнал</string>
     <string name="toolbar_title_auditrooms">Аудитории</string>
+    <string name="toolbar_title_persons_select">Выберите преподавателя</string>
 
     <!-- Navigation Drawer -->
     <string name="nav_drawer_item_home">Главная</string>
@@ -94,6 +95,11 @@
         <item>5 колонок</item>
     </string-array>
     <string name="delete">Удалить</string>
+    <string-array name="seek_items">
+        <item>Аудитории</item>
+        <item>Уведомление</item>
+        <item>Журнал</item>
+    </string-array>
 
     <!-- Typeface names -->
     <string name="typeface_roboto_regular">Roboto-Regular</string>

@@ -17,17 +17,15 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
 
-/**
- * Created by IVSmirnov on 05.08.2015.
- */
-public class GridRoomsAdapter extends BaseAdapter {
+
+public class adapter_edit_auditrooms_grid extends BaseAdapter {
 
     private ArrayList<Integer> items;
     private Context context;
     private LayoutInflater inflater;
     private SharedPreferences sharedPreferences;
 
-    public GridRoomsAdapter (Context c,ArrayList<Integer> i){
+    public adapter_edit_auditrooms_grid(Context c, ArrayList<Integer> i) {
         this.context = c;
         this.items = i;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

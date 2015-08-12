@@ -12,7 +12,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 
-public class CloseDayDialog extends FragmentActivity {
+public class CloseDay extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

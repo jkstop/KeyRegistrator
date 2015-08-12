@@ -56,7 +56,8 @@
         android:layout_height="0dp"
         android:layout_weight="0.3"
         android:layout_marginTop="15dp"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/list_layout">
 
         <LinearLayout
             android:id="@+id/textLayout"

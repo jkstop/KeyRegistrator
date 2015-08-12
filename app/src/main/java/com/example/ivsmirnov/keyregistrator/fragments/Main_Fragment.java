@@ -4,22 +4,20 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -27,19 +25,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.base_sql_activity;
-import com.example.ivsmirnov.keyregistrator.adapters.ButtonsAdapter;
-import com.example.ivsmirnov.keyregistrator.adapters.ListAdapter;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_journal_list;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
-import com.example.ivsmirnov.keyregistrator.databases.DataBasesRegist;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
 
-/**
- * Created by IVSmirnov on 03.08.2015.
- */
 public class Main_Fragment extends Fragment implements UpdateMainFrame{
 
     public static GridView gridView;
@@ -55,16 +49,17 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     private ArrayList <String> lastVisiters;
     private ArrayList <String> photoPath;
     private LinearLayout disclaimer;
+    private FrameLayout frameForGrid;
+    private LinearLayout frameForList;
 
     private ListView mListView;
-    private ListAdapter mListAdapter;
+    private adapter_journal_list mAdapterjournallist;
     private ArrayList <SparseArray> mItems;
 
-    ButtonsAdapter adapter;
+    adapter_main_auditrooms_grid adapter;
 
     public static Main_Fragment newInstance (){
-        Main_Fragment main_fragment = new Main_Fragment();
-        return main_fragment;
+        return new Main_Fragment();
     }
 
     @Override
@@ -86,6 +81,9 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         mItems = db.readJournalFromDB();
         closeBase();
 
+        frameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
+        frameForList = (LinearLayout) rootView.findViewById(R.id.list_layout);
+
         preferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int columns = preferences.getInt(Values.COLUMNS_COUNT, 1);
@@ -100,7 +98,12 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 selected_aud = position;
 
                 if (isFreeAud.get(position)) {
-                    startActivity(new Intent(context, base_sql_activity.class).putExtra(Values.AUDITROOM, view.getTag().toString()));
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
+                    bundle.putString(Values.AUDITROOM, view.getTag().toString());
+                    Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+                    persons_fragment.setArguments(bundle);
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment).commit();
                 } else {
                     int pos = preferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + view.getTag().toString(), -1);
 
@@ -113,7 +116,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                     } else {
                         db.updateDB(pos);
                         mItems.get(preferences.getInt(Values.POSITION_IN_LIST_FOR_ROOM+view.getTag(),-1)).put(3,String.valueOf(System.currentTimeMillis()));
-                        mListAdapter.notifyDataSetChanged();
+                        mAdapterjournallist.notifyDataSetChanged();
                     }
 
                     db.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), 1);
@@ -125,10 +128,10 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         });
 
         mListView = (ListView)rootView.findViewById(R.id.list);
-        mListAdapter = new ListAdapter(context,mItems);
-        mListView.setAdapter(mListAdapter);
+        mAdapterjournallist = new adapter_journal_list(context, mItems);
+        mListView.setAdapter(mAdapterjournallist);
         mListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
-        mListView.setSelection(mListAdapter.getCount());
+        mListView.setSelection(mAdapterjournallist.getCount());
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -145,7 +148,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 mItems.remove(position);
-                                mListAdapter.notifyDataSetChanged();
+                                mAdapterjournallist.notifyDataSetChanged();
 
                                 openBase();
                                 db.deleteFromDB(position);
@@ -182,15 +185,19 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         mItems = db.readJournalFromDB();
         db.closeDBconnection();
 
-        mListAdapter = new ListAdapter(context,mItems);
-        mListView.setAdapter(mListAdapter);
-        mListView.setSelection(mListAdapter.getCount());
+        mAdapterjournallist = new adapter_journal_list(context, mItems);
+        mListView.setAdapter(mAdapterjournallist);
+        mListView.setSelection(mAdapterjournallist.getCount());
 
         int columns = preferences.getInt(Values.COLUMNS_COUNT, 1);
-        adapter = new ButtonsAdapter(context,rooms,isFreeAud,lastVisiters,photoPath);
+        float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
+        float list_weight = preferences.getFloat(Values.JOURNAL_SIZE, (float) 0.3);
+        adapter = new adapter_main_auditrooms_grid(context, rooms, isFreeAud, lastVisiters, photoPath);
 
         gridView.setAdapter(adapter);
         gridView.setNumColumns(columns);
+        frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
+        frameForList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, list_weight));
         adapter.notifyDataSetChanged();
 
     }
@@ -211,23 +218,34 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.menu_main_disclaimer_size:
-                Dialog_Fragment dialog = new Dialog_Fragment();
-                Bundle bundle = new Bundle();
-                bundle.putInt(Values.DIALOG_TYPE, Values.DIALOG_SEEKBAR);
-                dialog.setArguments(bundle);
-                dialog.setTargetFragment(this,0);
-                dialog.show(getFragmentManager(), "seek");
-                return true;
+            case R.id.menu_main_items_size:
+                Dialog_Fragment dialog_grid_size = new Dialog_Fragment();
+                Bundle bundle_grid = new Bundle();
+                bundle_grid.putInt(Values.DIALOG_TYPE, Values.DIALOG_SEEKBARS);
+                dialog_grid_size.setArguments(bundle_grid);
+                dialog_grid_size.setTargetFragment(this, 0);
+                dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (((Launcher) getActivity()).getSupportActionBar() != null) {
+            ((Launcher) getActivity()).getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_main));
+        }
     }
 
     @Override
     public void onFinish() {
         float disclaimer_size = preferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15);
+        float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
+        float list_weight = preferences.getFloat(Values.JOURNAL_SIZE, (float) 0.3);
+
         disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
+        frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
+        frameForList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, list_weight));
     }
 }

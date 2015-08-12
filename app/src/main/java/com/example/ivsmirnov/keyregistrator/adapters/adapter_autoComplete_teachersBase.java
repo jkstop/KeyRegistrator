@@ -18,21 +18,18 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Created by IVSmirnov on 03.07.2015.
- */
-public class Adapter_SQL_popup extends ArrayAdapter <String>{
+public class adapter_autoComplete_teachersBase extends ArrayAdapter<String> {
 
     private Context context;
     private ArrayList<String> items;
     private ArrayList<String> suggestions;
     private ArrayList<String> itemsAll;
 
-    public Adapter_SQL_popup(Context c, ArrayList<String> i) {
+    public adapter_autoComplete_teachersBase(Context c, ArrayList<String> i) {
         super(c, R.layout.cell_for_popup_sql,i);
         this.context = c;
         this.items = i;
-        this.suggestions = new ArrayList<String>();
+        this.suggestions = new ArrayList<>();
         this.itemsAll = (ArrayList<String>) items.clone();
     }
 
@@ -66,8 +63,7 @@ public class Adapter_SQL_popup extends ArrayAdapter <String>{
     Filter nameFilter = new Filter() {
         @Override
         public String convertResultToString(Object resultValue) {
-            String str = ((String) (resultValue));
-            return str;
+            return ((String) (resultValue));
         }
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
@@ -89,7 +85,7 @@ public class Adapter_SQL_popup extends ArrayAdapter <String>{
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             ArrayList<String> filteredList = (ArrayList<String>) results.values;
-            if(results != null && results.count > 0) {
+            if (results.count > 0) {
                 clear();
                 try {
                     for (String record : filteredList) {

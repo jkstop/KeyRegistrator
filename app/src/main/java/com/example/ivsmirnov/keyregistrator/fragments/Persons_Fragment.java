@@ -17,23 +17,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.FileManager;
-import com.example.ivsmirnov.keyregistrator.adapters.base_sql_activity_adapter;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 
 import at.markushi.ui.CircleButton;
 
-/**
- * Created by IVSmirnov on 03.08.2015.
- */
 public class Persons_Fragment extends Fragment implements View.OnClickListener,UpdateTeachers{
 
     private Context mContext;
@@ -42,17 +42,46 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     private CircleButton mAddButton;
 
     private ArrayList<SparseArray> mAllItems;
-    public base_sql_activity_adapter mAdapter;
+    public adapter_persons_grid mAdapter;
+
+    private static long today, lastDate;
+
+    private SharedPreferences mPreferences;
+    private SharedPreferences.Editor mPreferencesEditor;
+
+    private int type;
 
     public static Persons_Fragment newInstance(){
-        Persons_Fragment persons_fragment = new Persons_Fragment();
-        return persons_fragment;
+        return new Persons_Fragment();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+
+        Bundle extras = getArguments();
+        if (extras != null) {
+            type = extras.getInt(Values.PERSONS_FRAGMENT_TYPE);
+        }
+
+        if (type == Values.PERSONS_FRAGMENT_EDITOR) {
+            setHasOptionsMenu(true);
+        } else {
+            setHasOptionsMenu(false);
+
+        }
+
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (type == Values.PERSONS_FRAGMENT_SELECTOR) {
+            if (((Launcher) getActivity()).getSupportActionBar() != null) {
+                ((Launcher) getActivity()).getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_persons_select));
+            }
+        }
+
     }
 
     @Nullable
@@ -61,6 +90,8 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         View rootView = inflater.inflate(R.layout.layout_persons_fragment,container,false);
         mContext = rootView.getContext();
 
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
 
         openBase();
         mAllItems = db.readTeachersFromDB();
@@ -71,36 +102,91 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         mAddButton.setOnClickListener(this);
 
         mGridView = (GridView)rootView.findViewById(R.id.grid_for_base_sql);
-        mAdapter = new base_sql_activity_adapter(mContext, mAllItems);
+        mAdapter = new adapter_persons_grid(mContext, mAllItems);
         mGridView.setAdapter(mAdapter);
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String gender = "";
-                String lastname = (String) mAllItems.get(position).get(2);
-                if (lastname.length() != 0) {
-                    if (lastname.substring(lastname.length() - 1).equals("а")) {
-                        gender = "Ж";
-                    } else {
-                        gender = "М";
+
+        if (type == Values.PERSONS_FRAGMENT_EDITOR) {
+            mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String gender = "";
+                    String lastname = (String) mAllItems.get(position).get(2);
+                    if (lastname.length() != 0) {
+                        if (lastname.substring(lastname.length() - 1).equals("а")) {
+                            gender = "Ж";
+                        } else {
+                            gender = "М";
+                        }
                     }
+                    String[] values = new String[]{(String) mAllItems.get(position).get(0),
+                            (String) mAllItems.get(position).get(1),
+                            (String) mAllItems.get(position).get(2),
+                            (String) mAllItems.get(position).get(3),
+                            gender};
+                    Bundle b = new Bundle();
+                    b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
+                    b.putStringArray("valuesForEdit", values);
+                    b.putInt("position", position);
+                    Dialog_Fragment dialog = new Dialog_Fragment();
+                    dialog.setArguments(b);
+                    dialog.setTargetFragment(Persons_Fragment.this, 0);
+                    dialog.show(getChildFragmentManager(), "edit");
                 }
-                String[] values = new String[]{(String) mAllItems.get(position).get(0),
-                        (String) mAllItems.get(position).get(1),
-                        (String) mAllItems.get(position).get(2),
-                        (String) mAllItems.get(position).get(3),
-                        gender};
-                Bundle b = new Bundle();
-                b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
-                b.putStringArray("valuesForEdit", values);
-                b.putInt("position", position);
-                Dialog_Fragment dialog = new Dialog_Fragment();
-                dialog.setArguments(b);
-                dialog.setTargetFragment(Persons_Fragment.this, 0);
-                dialog.show(getChildFragmentManager(), "edit");
-            }
-        });
+            });
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            today = calendar.get(Calendar.DATE);
+            lastDate = mPreferences.getLong(Values.DATE, 0);
+
+            mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    int pos = position - parent.getFirstVisiblePosition();
+                    View rootView = parent.getChildAt(pos);
+                    TextView textSurname = (TextView) rootView.findViewById(R.id.text_familia);
+                    TextView textName = (TextView) rootView.findViewById(R.id.text_imya);
+                    TextView textLastName = (TextView) rootView.findViewById(R.id.otchestvo);
+                    TextView textKaf = (TextView) rootView.findViewById(R.id.kafedra);
+
+                    String aud = getArguments().getString(Values.AUDITROOM);
+                    String name = textSurname.getText().toString() + " "
+                            + textName.getText().toString().charAt(0) + "." +
+                            textLastName.getText().toString().charAt(0) + ".";
+                    final Long time = System.currentTimeMillis();
+
+                    openBase();
+                    String path = db.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
+                            textLastName.getText().toString(), textKaf.getText().toString()});
+                    closeBase();
+                    writeIt(aud, name, time, path);
+
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance()).commit();
+                }
+            });
+        }
+
         return rootView;
+    }
+
+    private void writeIt(String aud, String name, Long time, String path) {
+        openBase();
+        if (today == lastDate) {
+            db.writeInDBJournal(aud, name, time, (long) 0, false);
+            mPreferencesEditor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount());
+        } else {
+            db.writeInDBJournalHeaderDate();
+            mPreferencesEditor.putInt(Values.CURSOR_POSITION, db.cursorJournal.getCount());
+            mPreferencesEditor.commit();
+            db.writeInDBJournal(aud, name, time, (long) 0, false);
+            mPreferencesEditor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount() + 1);
+        }
+        db.updateStatusRooms(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), 0);
+        db.updateLastVisitersRoom(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), name);
+        db.updatePhotoPath(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), path);
+        closeBase();
+
+        mPreferencesEditor.putLong(Values.DATE, today);
+        mPreferencesEditor.commit();
     }
 
 
@@ -178,7 +264,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         closeBase();
 
         sortByABC();
-        mAdapter = new base_sql_activity_adapter(mContext, mAllItems);
+        mAdapter = new adapter_persons_grid(mContext, mAllItems);
         mGridView.setAdapter(mAdapter);
     }
 

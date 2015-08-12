@@ -14,12 +14,9 @@ import android.widget.TextView;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.others.Values;
-import com.example.ivsmirnov.keyregistrator.activities.Teachers_Activity;
 
-/**
- * Created by ivsmirnov on 23.06.2015.
- */
-public class Fragment_closeDay_stat extends Fragment {
+
+public class CloseDay_stat_Fragment extends Fragment {
 
     @Nullable
     @Override
@@ -40,7 +37,7 @@ public class Fragment_closeDay_stat extends Fragment {
         TextView textTotal = (TextView) root.findViewById(R.id.close_dat_total_items);
 
 
-        textDate.setText(preferences.getString(Values.TODAY, Teachers_Activity.showDate()));
+        textDate.setText(preferences.getString(Values.TODAY, DataBases.showDate()));
         textItems.setText(String.valueOf(positionsForToday));
         textClosed.setText(String.valueOf(preferences.getInt(Values.AUTO_CLOSED_COUNT, 0)));
         textTotal.setText(String.valueOf(db.cursorJournal.getCount()));

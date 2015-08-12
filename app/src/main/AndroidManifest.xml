@@ -25,26 +25,10 @@
         <service android:name=".services.CloseDayService" />
 
         <activity
-            android:name=".activities.Teachers_Activity"
-            android:label="@string/title_activity_teachers_" >
-        </activity>
-        <activity
-            android:name=".activities.CloseDayDialog"
+            android:name=".activities.CloseDay"
             android:label="@string/title_activity_close_day_dialog"
             >
         </activity>
-        <activity
-            android:name=".activities.Rooms">
-        </activity>
-        <activity android:name=".activities.Preferences"
-            android:label="Настройки"
-            />
-        <activity android:name=".activities.Journal"
-            android:label="Журнал"
-            />
-        <activity android:name=".activities.base_sql_activity"/>
-        <activity android:name=".activities.Add_user"
-            />
     </application>
 
 </manifest>

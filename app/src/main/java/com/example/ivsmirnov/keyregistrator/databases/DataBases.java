@@ -187,7 +187,7 @@ public class DataBases{
         ArrayList <SparseArray> items = new ArrayList<>();
 
         while (cursorTeachers.moveToNext()){
-            SparseArray <String> card = new SparseArray<String>();
+            SparseArray<String> card = new SparseArray<>();
             card.put(0, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE)));
             card.put(1, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_NAME_FAVORITE)));
             card.put(2, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_LASTNAME_FAVORITE)));
@@ -490,6 +490,7 @@ public class DataBases{
         }
 
         try{
+            assert file != null;
             fileOutputStream = new FileOutputStream(file);
             for (int i=0;i<itemList.size();i++){
                 fileOutputStream.write(itemList.get(i).getBytes());
@@ -524,11 +525,10 @@ public class DataBases{
     }
 
     //дата для заголовка
-    private String showDate(){
+    public static String showDate() {
         Date currentDate =  new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM",new Locale("ru"));
-        String dateForShow = String.valueOf(dateFormat.format(currentDate));
-        return dateForShow;
+        return String.valueOf(dateFormat.format(currentDate));
     }
 
     public static long getTime(){

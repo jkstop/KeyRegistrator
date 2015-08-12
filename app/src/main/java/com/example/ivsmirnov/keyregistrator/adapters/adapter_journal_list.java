@@ -16,7 +16,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import java.sql.Time;
 import java.util.ArrayList;
 
-public class ListAdapter extends ArrayAdapter<SparseArray> {
+public class adapter_journal_list extends ArrayAdapter<SparseArray> {
 
     private final Context context;
     private ArrayList<SparseArray> items;
@@ -28,7 +28,7 @@ public class ListAdapter extends ArrayAdapter<SparseArray> {
     TextView textAud,textName,textTime,textTimePut;
 
 
-    public ListAdapter(Context context, ArrayList<SparseArray> i) {
+    public adapter_journal_list(Context context, ArrayList<SparseArray> i) {
         super(context, R.layout.list,i);
         this.context = context;
         this.items = i;
@@ -79,8 +79,6 @@ public class ListAdapter extends ArrayAdapter<SparseArray> {
     }
 
     public String getString(){
-
-        String string = textAud.getText()+" "+textName.getText()+" "+textTime.getText()+"    "+textTimePut.getText();
-        return string;
+        return textAud.getText() + " " + textName.getText() + " " + textTime.getText() + "    " + textTimePut.getText();
     }
 }

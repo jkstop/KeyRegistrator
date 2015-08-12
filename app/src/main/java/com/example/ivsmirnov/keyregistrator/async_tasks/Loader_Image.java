@@ -4,14 +4,10 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.example.ivsmirnov.keyregistrator.activities.Add_user;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 
-/**
- * Created by IVSmirnov on 27.07.2015.
- */
 public class Loader_Image extends AsyncTask <Void, Void, Void> {
 
     private Context context;

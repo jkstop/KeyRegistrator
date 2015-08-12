@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
 import com.example.ivsmirnov.keyregistrator.fragments.Journal_fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
@@ -29,7 +30,6 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
 import com.example.ivsmirnov.keyregistrator.R;
 
-import java.sql.Time;
 import java.util.Calendar;
 
 public class Launcher extends AppCompatActivity implements View.OnClickListener{
@@ -100,9 +100,6 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         Resources res = getResources();
 
         if (v.getTag().equals(res.getString(R.string.nav_drawer_item_home))){
-            if (getSupportActionBar()!=null){
-                getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_main));
-            }
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance())
                     .commit();
@@ -110,9 +107,13 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
             if (getSupportActionBar()!=null){
                 getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_persons));
             }
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Persons_Fragment.newInstance()).commit();
+            Bundle bundle = new Bundle();
+            bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_EDITOR);
+            Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+            persons_fragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment).commit();
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_statistics))){
-            startActivity(new Intent(mContext, CloseDayDialog.class).putExtra("type", 1).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            startActivity(new Intent(mContext, CloseDay.class).putExtra("type", 1).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_journal))){
             if (getSupportActionBar()!=null){
                 getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_journal));

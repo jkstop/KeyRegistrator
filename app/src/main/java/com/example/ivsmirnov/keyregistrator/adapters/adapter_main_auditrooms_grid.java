@@ -21,7 +21,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
-public class ButtonsAdapter extends BaseAdapter {
+public class adapter_main_auditrooms_grid extends BaseAdapter {
 
     private Context context;
     private ArrayList<Integer> items;
@@ -32,7 +32,7 @@ public class ButtonsAdapter extends BaseAdapter {
     private SharedPreferences preferences;
 
 
-    public ButtonsAdapter(Context c, ArrayList<Integer> i,ArrayList<Boolean> isF,ArrayList<String> sT,ArrayList<String> pP){
+    public adapter_main_auditrooms_grid(Context c, ArrayList<Integer> i, ArrayList<Boolean> isF, ArrayList<String> sT, ArrayList<String> pP) {
         context = c;
         items = i;
         isFree = isF;
@@ -59,7 +59,7 @@ public class ButtonsAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        View view = null;
+        View view;
 
         Button button;
         ImageView image;
