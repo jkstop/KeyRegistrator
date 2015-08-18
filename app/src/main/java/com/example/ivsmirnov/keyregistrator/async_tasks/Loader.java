@@ -60,7 +60,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
             dialog.cancel();
         }
         listener.onFinish();
-        //fileManagerActivity.finish();
+
 
         Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
     }

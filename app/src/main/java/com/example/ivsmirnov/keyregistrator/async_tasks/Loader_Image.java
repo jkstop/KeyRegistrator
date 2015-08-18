@@ -16,6 +16,7 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
     private String lastname;
     private String kaf;
     private String gender;
+    private int pos;
 
     private ProgressDialog dialog;
     private Dialog_Fragment activity;
@@ -29,6 +30,7 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
         this.lastname = items[2];
         this.kaf = items[3];
         this.gender = items[4];
+        this.pos = Integer.parseInt(items[5]);
 
         this.activity = a;
         this.listener = l;
@@ -50,7 +52,7 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         DataBases db = new DataBases(context);
-        db.writeCardInBase(surname, name, lastname, kaf, gender);
+        db.writeCardInBase(surname, name, lastname, kaf, gender, pos);
         db.closeDBconnection();
 
         return null;

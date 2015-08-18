@@ -48,7 +48,6 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
     }
 
     @Nullable

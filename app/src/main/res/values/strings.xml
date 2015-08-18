@@ -65,7 +65,7 @@
     <string name="fragment4">fragment 4</string>
 
     <!-- Toolbar titles -->
-    <string name="toolbar_title_main">Выберите нужную аудиторию нажатием на экран</string>
+    <string name="toolbar_title_main">Выберите нужную аудиторию</string>
     <string name="toolbar_title_persons">Преподаватели</string>
     <string name="toolbar_title_journal">Журнал</string>
     <string name="toolbar_title_auditrooms">Аудитории</string>

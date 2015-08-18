@@ -259,23 +259,13 @@ public class DataBases{
         base.insert(DataBasesRegist.TABLE_BASE, null, cv);
     }
 
-    public void writeCardInBase(String surname, String name, String lastname, String kaf, String gender){
-        cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,new String[]{DataBasesRegist._ID,DataBasesRegist.COLUMN_FAMILIA,DataBasesRegist.COLUMN_IMYA,
-        DataBasesRegist.COLUMN_OTCHESTVO,DataBasesRegist.COLUMN_KAF},null,null,null,null,null);
-        cursorBaseSql.moveToPosition(-1);
+    public void writeCardInBase(String surname, String name, String lastname, String kaf, String gender, int position) {
+        cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE, null, null, null, null, null, null);
         String photo = "null";
-        while (cursorBaseSql.moveToNext()){
-            if (kaf.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_KAF)))&&
-                    surname.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_FAMILIA)))&&
-                    name.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_IMYA)))&&
-                    lastname.equalsIgnoreCase(cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_OTCHESTVO)))){
-                int row = cursorBaseSql.getPosition();
-                cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,null,null,null,null,null,null);
-                cursorBaseSql.moveToPosition(row);
-                photo = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_PHOTO));
-            }
+        if (position != -1) {
+            cursorBaseSql.moveToPosition(position);
+            photo = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_PHOTO));
         }
-
         String photoPath = savePhotoToSD(photo,surname+"_"+name+"_"+lastname);
         writeInDBTeachers(surname, name, lastname, kaf, gender, photoPath);
 
@@ -308,7 +298,7 @@ public class DataBases{
         if (!photo.equalsIgnoreCase("null")){
 
             BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 6;
+            options.inSampleSize = 4;
             byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
             Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length,options);
 
@@ -377,7 +367,8 @@ public class DataBases{
             String name = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_IMYA));
             String lastname = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_OTCHESTVO));
             String kaf = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_KAF));
-            items.add(surname+ ";"+ name + ";" + lastname + ";" + kaf);
+            String position = String.valueOf(cursorBaseSql.getPosition());
+            items.add(surname + ";" + name + ";" + lastname + ";" + kaf + ";" + position);
         }
         return items;
     }

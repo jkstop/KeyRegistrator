@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -123,7 +124,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         .create();
             case Values.INPUT_DIALOG:
                 DataBases db = new DataBases(context);
-                ArrayList <String> items = db.readSQL();
+                final ArrayList<String> items = db.readSQL();
                 db.closeDBconnection();
                 final AutoCompleteTextView autoCompleteTextView =  new AutoCompleteTextView(context);
                 autoCompleteTextView.addTextChangedListener(new TextWatcher() {
@@ -151,6 +152,9 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         String name = split[1];
                         String lastname = split[2];
                         String kaf = split[3];
+                        String pos = split[4];
+
+                        Log.d("position", pos);
 
                         String gender;
                         if (lastname.substring(lastname.length() - 1).equals("а")) {
@@ -160,7 +164,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         }
 
 
-                        Loader_Image loader_image = new Loader_Image(context,new String[]{surname,name,lastname,kaf,gender},Dialog_Fragment.this,(UpdateTeachers)getTargetFragment());
+                        Loader_Image loader_image = new Loader_Image(context, new String[]{surname, name, lastname, kaf, gender, pos}, Dialog_Fragment.this, (UpdateTeachers) getTargetFragment());
                         loader_image.execute();
 
 
@@ -181,6 +185,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 String lastname = "";
                                 String kaf = "";
                                 String gender = "";
+                                String pos = "-1";
                                 try {
                                     surname = split[0];
                                     name = split[1];
@@ -198,7 +203,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
                                 UpdateTeachers updateTeachers;
                                 updateTeachers = (UpdateTeachers) getTargetFragment();
-                                Loader_Image loader_image = new Loader_Image(context, new String[]{surname, name, lastname, kaf, gender}, Dialog_Fragment.this, updateTeachers);
+                                Loader_Image loader_image = new Loader_Image(context, new String[]{surname, name, lastname, kaf, gender, pos}, Dialog_Fragment.this, updateTeachers);
                                 loader_image.execute();
                                dismiss();
                             }
@@ -267,7 +272,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         dbses.updateTeachersDB(source, edited);
                         dbses.closeDBconnection();
 
-                        int position = getArguments().getInt("position");
+                        //int position = getArguments().getInt("position");
                         UpdateTeachers activity;
                         if (getTargetFragment()==null){
                             activity = (UpdateTeachers)getActivity();
