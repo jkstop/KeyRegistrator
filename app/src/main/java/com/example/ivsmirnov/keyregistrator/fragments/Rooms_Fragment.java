@@ -62,7 +62,7 @@ public class Rooms_Fragment extends Fragment implements UpdateJournal {
         mItems = new ArrayList<>(db.readFromRoomsDB());
         db.closeDBconnection();
 
-        int columns = sharedPreferences.getInt(Values.COLUMNS_COUNT, 1);
+        int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
 
         mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mItems);
         mGridView.setAdapter(mAdaptereditauditroomsgrid);
@@ -105,10 +105,10 @@ public class Rooms_Fragment extends Fragment implements UpdateJournal {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_auditrooms_set_columns_number:
-                //showColumnsCount(mGridView);
                 Dialog_Fragment dialog_fragment = new Dialog_Fragment();
                 Bundle bundle = new Bundle();
                 bundle.putInt(Values.DIALOG_TYPE,Values.SELECT_COLUMNS_DIALOG);
+                bundle.putString("AudOrPer", "aud");
                 dialog_fragment.setArguments(bundle);
                 dialog_fragment.setTargetFragment(Rooms_Fragment.this,0);
                 dialog_fragment.show(getFragmentManager(),"columns");
@@ -124,7 +124,7 @@ public class Rooms_Fragment extends Fragment implements UpdateJournal {
         mItems = new ArrayList<>(db.readFromRoomsDB());
         db.closeDBconnection();
 
-        int columns = sharedPreferences.getInt(Values.COLUMNS_COUNT, 1);
+        int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
         mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mItems);
         mGridView.setAdapter(mAdaptereditauditroomsgrid);
         mGridView.setNumColumns(columns);

@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <resources>
-
-    <!--Scrim insets vie that allows the drawer the be behind the status bar and visible -->
-    <declare-styleable name="ScrimInsetsView">
-        <attr name="insetForeground" format="reference|color" />
+    <declare-styleable name="StaggeredGridView">
+        <attr name="drawSelectorOnTop" format="boolean" />
+        <attr name="numColumns" format="integer" />
+        <attr name="itemMargin" format="dimension" />
     </declare-styleable>
-
-    <!-- ColorState to be used in the TinOnImageView view -->
-    <declare-styleable name="TintOnStateImageView">
-        <attr name="colorStateList" format="reference|color" />
-    </declare-styleable>
-
 </resources>

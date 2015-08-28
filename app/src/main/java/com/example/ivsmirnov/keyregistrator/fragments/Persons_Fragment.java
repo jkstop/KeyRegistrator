@@ -104,6 +104,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         mGridView = (GridView)rootView.findViewById(R.id.grid_for_base_sql);
         mAdapter = new adapter_persons_grid(mContext, mAllItems);
         mGridView.setAdapter(mAdapter);
+        mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
 
         if (type == Values.PERSONS_FRAGMENT_EDITOR) {
             mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -149,9 +150,21 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                     TextView textKaf = (TextView) rootView.findViewById(R.id.kafedra);
 
                     String aud = getArguments().getString(Values.AUDITROOM);
-                    String name = textSurname.getText().toString() + " "
-                            + textName.getText().toString().charAt(0) + "." +
-                            textLastName.getText().toString().charAt(0) + ".";
+                    String name = "Аноним";
+                    if (textSurname.getText().toString().length() != 0 && textName.getText().toString().length() != 0 && textLastName.getText().toString().length() != 0) {
+                        name = textSurname.getText().toString() + " "
+                                + textName.getText().toString().charAt(0) + "." +
+                                textLastName.getText().toString().charAt(0) + ".";
+                    } else {
+                        if (textSurname.getText().toString().length() != 0 && textName.getText().toString().length() != 0) {
+                            name = textSurname.getText().toString() + " " + textName.getText().toString();
+                        } else {
+                            if (textSurname.getText().toString().length() != 0) {
+                                name = textSurname.getText().toString();
+                            }
+                        }
+                    }
+
                     final Long time = System.currentTimeMillis();
 
                     openBase();
@@ -244,6 +257,15 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
             case R.id.menu_teachers_select_location_for_copy:
                 startActivity(new Intent(mContext,FileManager.class).putExtra("buttonChoise", true).putExtra("pathFor","teachers"));
                 return true;
+            case R.id.menu_teachers_set_columns_number:
+                Dialog_Fragment dialog_fragment = new Dialog_Fragment();
+                Bundle bundlePersons = new Bundle();
+                bundlePersons.putInt(Values.DIALOG_TYPE, Values.SELECT_COLUMNS_DIALOG);
+                bundlePersons.putString("AudOrPer", "per");
+                dialog_fragment.setArguments(bundlePersons);
+                dialog_fragment.setTargetFragment(this, 0);
+                dialog_fragment.show(getFragmentManager(), "columns");
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -266,6 +288,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         sortByABC();
         mAdapter = new adapter_persons_grid(mContext, mAllItems);
         mGridView.setAdapter(mAdapter);
+        mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
     }
 
     @Override

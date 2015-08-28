@@ -9,9 +9,12 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.activities.CloseDay;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
+
+import java.util.Calendar;
 
 public class CloseDayService extends Service {
 
@@ -38,7 +41,7 @@ public class CloseDayService extends Service {
         Toast.makeText(context,"Закрываемся...",Toast.LENGTH_SHORT).show();
 
         String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, Environment.getExternalStorageDirectory().getPath());
+        String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
         String srFileJournal = mPath + "/Journal.txt";
         String dtFileJournal = path + "/Journal.txt";
         String srFileTeachers = mPath + "/Teachers.txt";
@@ -52,6 +55,16 @@ public class CloseDayService extends Service {
 
         DataBases.copyfile(context, srFileJournal, dtFileJournal);
         DataBases.copyfile(context, srFileTeachers, dtFileTeachers);
+
+        Calendar calendar = Calendar.getInstance();
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+            Send_Email send_email = new Send_Email(new String[]{preferences.getString(Values.EMAIL, ""),
+                    preferences.getString(Values.PASSWORD, ""),
+                    preferences.getString(Values.RECIPIENTS, ""),
+                    preferences.getString(Values.BODY, ""),
+                    preferences.getString(Values.THEME, "")});
+            send_email.execute();
+        }
 
         Intent startCloseDay = new Intent(getApplicationContext(), CloseDay.class);
         startCloseDay.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);

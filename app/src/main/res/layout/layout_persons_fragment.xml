@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:columnWidth="90dp"
-        android:numColumns="4"
+        android:numColumns="3"
         android:verticalSpacing="15dp"
         android:horizontalSpacing="15dp"
         android:stretchMode="columnWidth"
@@ -28,5 +28,15 @@
         app:cb_pressedRingWidth="10dip"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true" />
+
+    <!--<android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_user_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/fab_ic_add" />-->
 
 </RelativeLayout>

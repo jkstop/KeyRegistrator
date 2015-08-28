@@ -101,6 +101,8 @@
         <item>Журнал</item>
     </string-array>
 
+    <string name="email_settings_box_layout_box_prefix">/@gmail.com</string>
+
     <!-- Typeface names -->
     <string name="typeface_roboto_regular">Roboto-Regular</string>
     <string name="typeface_roboto_medium">Roboto-Medium</string>

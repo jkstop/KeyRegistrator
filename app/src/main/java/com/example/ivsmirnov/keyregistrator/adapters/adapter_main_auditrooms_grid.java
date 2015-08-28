@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.others.Values;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -79,7 +78,7 @@ public class adapter_main_auditrooms_grid extends BaseAdapter {
         int heightGrid = Main_Fragment.gridView.getHeight();
         int childCount = Main_Fragment.gridView.getCount();
         int rows;
-        rows = (int)Math.ceil((double)childCount/preferences.getInt(Values.COLUMNS_COUNT,1));
+        rows = (int) Math.ceil((double) childCount / preferences.getInt(Values.COLUMNS_AUD_COUNT, 1));
         int btnHeight = heightGrid/rows - space;
 
         AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

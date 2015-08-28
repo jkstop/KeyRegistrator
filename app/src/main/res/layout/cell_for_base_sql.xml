@@ -27,13 +27,13 @@
         android:layout_marginLeft="10dp">
 
 
-        <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:id="@+id/text_familia"
             android:layout_weight="0.5"
             android:textColor="#ff000000"
-            android:textSize="100dp"
+            android:textSize="32dp"
             android:gravity="left|center_vertical" />
 
         <LinearLayout

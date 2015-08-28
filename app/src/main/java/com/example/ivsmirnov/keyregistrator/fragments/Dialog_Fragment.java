@@ -21,8 +21,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.SeekBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -30,14 +32,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_autoComplete_teachersBase;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
+import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.databases.DataBasesRegist;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_autoComplete_teachersBase;
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 
 import java.util.ArrayList;
 
@@ -48,6 +51,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
     private String cntx;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private LayoutInflater inflater;
 
     DialogInterface.OnDismissListener onDismissListener;
 
@@ -68,6 +72,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
         context = getActivity().getApplicationContext();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
     }
@@ -214,7 +219,6 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                 lp.gravity = Gravity.TOP;
                 return dialog;
             case Values.DIALOG_EDIT:
-                LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
                 final TableLayout tableLayout = new TableLayout(context);
                 final String [] values = getArguments().getStringArray("valuesForEdit");
@@ -350,22 +354,38 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         })
                         .create();
             case Values.SELECT_COLUMNS_DIALOG:
-                final String [] mItems = getResources().getStringArray(R.array.dialog_columns_items);
-                final int mSelectedItem = sharedPreferences.getInt(Values.COLUMNS_COUNT,0)-2;
-                return new AlertDialog.Builder(getActivity())
+                final String ident = getArguments().getString("AudOrPer");
+                final int mSelectedItemAud = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 0);
+                final int mSelectedItemPer = sharedPreferences.getInt(Values.COLUMNS_PER_COUNT, 0);
+                final NumberPicker numberPicker = new NumberPicker(context);
+                numberPicker.setMinValue(2);
+                numberPicker.setMaxValue(5);
+                numberPicker.setGravity(Gravity.CENTER);
+                if (ident != null && ident.equalsIgnoreCase("aud")) {
+                    numberPicker.setValue(mSelectedItemAud);
+                } else if (ident != null && ident.equalsIgnoreCase("per")) {
+                    numberPicker.setValue(mSelectedItemPer);
+                }
+                return new AlertDialog.Builder(getActivity(), R.style.Base_Theme_AppCompat_Dialog_Alert)
                         .setTitle(getResources().getString(R.string.dialog_columns_title))
-                        .setSingleChoiceItems(mItems, mSelectedItem, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                editor.putInt(Values.COLUMNS_COUNT, Integer.parseInt(String.valueOf(mItems[which].charAt(0))));
-                                editor.commit();
-
-                                UpdateJournal updateJournal = (UpdateJournal) getTargetFragment();
-                                updateJournal.onDone();
+                                if (ident != null && ident.equalsIgnoreCase("aud")) {
+                                    editor.putInt(Values.COLUMNS_AUD_COUNT, numberPicker.getValue());
+                                    editor.commit();
+                                    UpdateJournal updateJournal = (UpdateJournal) getTargetFragment();
+                                    updateJournal.onDone();
+                                } else if (ident != null && ident.equalsIgnoreCase("per")) {
+                                    editor.putInt(Values.COLUMNS_PER_COUNT, numberPicker.getValue());
+                                    editor.commit();
+                                    UpdateTeachers updateTeachers = (UpdateTeachers) getTargetFragment();
+                                    updateTeachers.onFinishEditing();
+                                }
                                 dialog.cancel();
                             }
                         })
-
+                        .setView(numberPicker)
                         .create();
             case Values.DIALOG_SEEKBARS:
 
@@ -460,6 +480,72 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                             }
                         })
                         .create();
+            case Values.EMAIL_DIALOG:
+                final String emailText = sharedPreferences.getString(Values.EMAIL, "");
+                String passwordText = sharedPreferences.getString(Values.PASSWORD, "");
+                String recipientsText = sharedPreferences.getString(Values.RECIPIENTS, "");
+                String bodyText = sharedPreferences.getString(Values.BODY, "");
+                String themeText = sharedPreferences.getString(Values.THEME, "");
+                View dialogView = inflater.inflate(R.layout.layout_dialog_email_settings, null);
+                View.OnClickListener listener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        switch (v.getId()) {
+                            case R.id.email_settings_check_button:
+                                //GMailSender auth = new GMailSender("sh38sup@gmail.com","podderzhka");
+                                //auth.checkConnection();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                };
+                Button check = (Button) dialogView.findViewById(R.id.email_settings_check_button);
+                check.setOnClickListener(listener);
+
+                final EditText email = (EditText) dialogView.findViewById(R.id.email_settings_edit_email);
+                final EditText pass = (EditText) dialogView.findViewById(R.id.email_settings_edit_password);
+                final EditText recipient = (EditText) dialogView.findViewById(R.id.email_settings_edit_recipients);
+                final EditText body = (EditText) dialogView.findViewById(R.id.email_settings_edit_body);
+                final EditText theme = (EditText) dialogView.findViewById(R.id.email_settings_edit_email_theme);
+
+                email.setText(emailText);
+                pass.setText(passwordText);
+                recipient.setText(recipientsText);
+                body.setText(bodyText);
+                theme.setText(themeText);
+
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle("E-mail уведомления")
+                        .setView(dialogView)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                editor.putString(Values.EMAIL, email.getText().toString() + "@gmail.com");
+                                editor.putString(Values.PASSWORD, pass.getText().toString());
+                                editor.putString(Values.RECIPIENTS, recipient.getText().toString());
+                                editor.putString(Values.BODY, body.getText().toString());
+                                editor.putString(Values.THEME, theme.getText().toString());
+                                editor.commit();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setNeutralButton("Отправить сейчас", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Send_Email send_email = new Send_Email(new String[]{email.getText().toString() + "@gmail.com",
+                                        pass.getText().toString(), recipient.getText().toString(), body.getText().toString(), theme.getText().toString()});
+                                send_email.execute();
+                            }
+                        })
+                        .create();
+
+
             default:
                 return null;
         }

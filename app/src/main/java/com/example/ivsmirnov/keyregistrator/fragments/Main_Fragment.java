@@ -26,8 +26,8 @@ import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_journal_list;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -86,17 +86,15 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
 
         preferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int columns = preferences.getInt(Values.COLUMNS_COUNT, 1);
+        int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
         gridView = (GridView)rootView.findViewById(R.id.gridView);
         gridView.setNumColumns(columns);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-
                 View viewGridItem = parent.getChildAt(position);
                 TextView textButton = (TextView) viewGridItem.findViewById(R.id.textButton);
                 selected_aud = position;
-
                 if (isFreeAud.get(position)) {
                     Bundle bundle = new Bundle();
                     bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
@@ -189,7 +187,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         mListView.setAdapter(mAdapterjournallist);
         mListView.setSelection(mAdapterjournallist.getCount());
 
-        int columns = preferences.getInt(Values.COLUMNS_COUNT, 1);
+        int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
         float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
         float list_weight = preferences.getFloat(Values.JOURNAL_SIZE, (float) 0.3);
         adapter = new adapter_main_auditrooms_grid(context, rooms, isFreeAud, lastVisiters, photoPath);
@@ -225,6 +223,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 dialog_grid_size.setArguments(bundle_grid);
                 dialog_grid_size.setTargetFragment(this, 0);
                 dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

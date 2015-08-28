@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -144,7 +143,7 @@ public class DataBases{
 
     public void writeInRoomsDB (int room) {
         ContentValues cv = new ContentValues();
-        cv.put(DataBasesRegist.COLUMN_ROOM,room);
+        cv.put(DataBasesRegist.COLUMN_ROOM, room);
         cv.put(DataBasesRegist.COLUMN_STATUS,1);
         cv.put(DataBasesRegist.COLUMN_LAST_VISITER, "Аноним");
         cv.put(DataBasesRegist.COLUMN_PHOTO_PATH,"");
@@ -287,6 +286,28 @@ public class DataBases{
         return photoID;
     }
 
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            // Calculate ratios of height and width to requested height and width
+            final int heightRatio = Math.round((float) height / (float) reqHeight);
+            final int widthRatio = Math.round((float) width / (float) reqWidth);
+
+            // Choose the smallest ratio as inSampleSize value, this will guarantee
+            // a final image with both dimensions larger than or equal to the
+            // requested height and width.
+            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+        }
+
+        return inSampleSize;
+    }
+
     public String savePhotoToSD(String photo, String filename){
 
         File folder = new File(Environment.getExternalStorageDirectory() + "/KeyRegistrator");
@@ -298,14 +319,21 @@ public class DataBases{
         if (!photo.equalsIgnoreCase("null")){
 
             BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 4;
+            options.inJustDecodeBounds = true;
+
             byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length,options);
+            BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
+
+            options.inSampleSize = calculateInSampleSize(options, 120, 160);
+
+            options.inJustDecodeBounds = false;
+
+            Bitmap bitmapPrew = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
 
             FileOutputStream out = null;
             try {
                 out = new FileOutputStream(folder.getAbsolutePath()+"/"+filename+".jpg");
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out);
+                bitmapPrew.compress(Bitmap.CompressFormat.JPEG, 75, out);
 
             } catch (Exception e) {
                 e.printStackTrace();

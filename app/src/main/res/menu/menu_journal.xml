@@ -7,6 +7,12 @@
         android:icon="@drawable/ic_save_black_24dp"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/menu_journal_send"
+        android:title="Отправить на e-mail"
+        android:icon="@drawable/ic_mail_black_24dp"
+        app:showAsAction="never" />
+
     <item android:id="@+id/menu_journal_download"
         android:title="Загрузить"
         android:icon="@drawable/ic_file_download_black_24dp"

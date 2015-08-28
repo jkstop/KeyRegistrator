@@ -3,8 +3,9 @@ apply plugin: 'com.android.application'
 
 
 repositories {
-        mavenCentral()
-    }
+    mavenCentral();
+
+}
 
 
 
@@ -16,8 +17,8 @@ android {
         applicationId "com.example.ivsmirnov.keyregistrator"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 4
-        versionName "2.0"
+        versionCode 5
+        versionName "2.6"
     }
     buildTypes {
         release {
@@ -32,9 +33,12 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.android.support:gridlayout-v7:22.2.0'
     compile 'com.android.support:support-v4:22.2.0'
+    compile 'com.android.support:design:22.2.0'
     compile 'com.github.markushi:circlebutton:1.1'
     compile 'com.github.shell-software:fab:1.1.2'
     compile 'de.hdodenhof:circleimageview:1.2.2'
     compile 'com.mcxiaoke.volley:library:1.0.15'
     compile files('libs/universal-image-loader-1.9.4.jar')
+    compile files('libs/javax.mail.jar')
+    compile files('libs/activation.jar')
 }

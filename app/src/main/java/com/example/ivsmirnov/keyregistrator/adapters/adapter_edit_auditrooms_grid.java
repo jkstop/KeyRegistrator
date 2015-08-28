@@ -67,7 +67,6 @@ public class adapter_edit_auditrooms_grid extends BaseAdapter {
         //int heightGrid = Main_Fragment.gridView.getHeight();
         //int childCount = Main_Fragment.gridView.getCount();
         int rows;
-        //rows = (int)Math.ceil((double) childCount / sharedPreferences.getInt(Values.COLUMNS_COUNT, 1));
         int btnHeight = /*heightGrid/rows - space*/180;
 
         AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

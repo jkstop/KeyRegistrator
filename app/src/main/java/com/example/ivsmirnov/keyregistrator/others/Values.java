@@ -4,7 +4,8 @@ package com.example.ivsmirnov.keyregistrator.others;
 public class Values {
 
     public static final String ALARM_SET = "alarm_set";
-    public static final String COLUMNS_COUNT = "columns_count";
+    public static final String COLUMNS_AUD_COUNT = "columns_count";
+    public static final String COLUMNS_PER_COUNT = "columns_persons_count";
     public static final String AUDITROOM = "auditroom";
     public static final String POSITION_IN_BASE_FOR_ROOM = "position_in_base_for_room";
     public static final String POSITION_IN_LIST_FOR_ROOM = "position_in_list_for_room";
@@ -37,9 +38,11 @@ public class Values {
     public static final String PERSONS_FRAGMENT_TYPE = "persons_fragment_type";
     public static final int PERSONS_FRAGMENT_EDITOR = 115;
     public static final int PERSONS_FRAGMENT_SELECTOR = 116;
-
-
-
-
+    public static final int EMAIL_DIALOG = 117;
+    public static final String EMAIL = "email";
+    public static final String PASSWORD = "password";
+    public static final String RECIPIENTS = "recipients";
+    public static final String BODY = "body";
+    public static final String THEME = "theme";
 
 }
