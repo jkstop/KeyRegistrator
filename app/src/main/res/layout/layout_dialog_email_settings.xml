@@ -7,10 +7,11 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:background="#d1f5ff"
         android:padding="15dp"
-        android:id="@+id/email_settings_box_layout">
+        android:id="@+id/email_settings_box_layout"
+        android:layout_weight="0.3">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -90,16 +91,9 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.6" />
+                android:layout_weight="0.6"
+                android:src="@drawable/mail_logo_rgb_web" />
 
-            <Button
-                android:id="@+id/email_settings_check_button"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.4"
-                style="@style/Text_Email_Settings"
-                android:text="Проверить"
-                android:background="#00ffffff" />
         </LinearLayout>
 
     </LinearLayout>
@@ -107,11 +101,12 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:padding="15dp"
         android:id="@+id/email_settings_mail_content_layout"
         android:background="#f8ffe9"
-        android:layout_marginTop="15dp">
+        android:layout_marginTop="15dp"
+        android:layout_weight="0.5">
 
         <TextView
             android:layout_width="match_parent"
@@ -123,7 +118,8 @@
             android:layout_width="match_parent"
             style="@style/Text_Email_Settings"
             android:layout_height="wrap_content"
-            android:id="@+id/email_settings_edit_recipients" />
+            android:id="@+id/email_settings_edit_recipients"
+            android:layout_marginBottom="15dp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -135,7 +131,8 @@
             android:layout_width="match_parent"
             style="@style/Text_Email_Settings"
             android:layout_height="wrap_content"
-            android:id="@+id/email_settings_edit_body" />
+            android:id="@+id/email_settings_edit_body"
+            android:layout_marginBottom="15dp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -147,7 +144,8 @@
             android:layout_width="match_parent"
             style="@style/Text_Email_Settings"
             android:layout_height="wrap_content"
-            android:id="@+id/email_settings_edit_email_theme" />
+            android:id="@+id/email_settings_edit_email_theme"
+            android:layout_marginBottom="15dp" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -159,17 +157,46 @@
                 android:layout_weight="0.5"
                 android:layout_height="wrap_content"
                 style="@style/Text_Email_Settings"
-                android:text="Журнал" />
+                android:text="Журнал"
+                android:id="@+id/email_settings_mail_content_checkJournal" />
 
             <CheckBox
                 android:layout_width="0dp"
                 android:layout_weight="0.5"
                 android:layout_height="wrap_content"
                 style="@style/Text_Email_Settings"
-                android:text="Преподаватели" />
+                android:text="Преподаватели"
+                android:id="@+id/email_settings_mail_content_checkTeachers" />
 
         </LinearLayout>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/email_settings_mail_buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:showDividers="middle"
+        android:layout_marginTop="15dp">
+
+        <Button
+            android:id="@+id/email_settings_button_send"
+            android:layout_width="0dp"
+            android:layout_weight="0.3"
+            android:layout_height="wrap_content"
+            android:text="Отправить сейчас"
+            android:background="#00ffffff" />
+
+        <Button
+            android:id="@+id/email_settings_button_save"
+            android:layout_width="0dp"
+            android:layout_weight="0.3"
+            android:layout_height="wrap_content"
+            android:text="Сохранить"
+            android:background="#00ffffff" />
+
+    </LinearLayout>
+
 
 </LinearLayout>

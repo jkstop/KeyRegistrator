@@ -38,11 +38,12 @@ public class Values {
     public static final String PERSONS_FRAGMENT_TYPE = "persons_fragment_type";
     public static final int PERSONS_FRAGMENT_EDITOR = 115;
     public static final int PERSONS_FRAGMENT_SELECTOR = 116;
-    public static final int EMAIL_DIALOG = 117;
     public static final String EMAIL = "email";
     public static final String PASSWORD = "password";
     public static final String RECIPIENTS = "recipients";
     public static final String BODY = "body";
     public static final String THEME = "theme";
+    public static final String CHECK_JOURNAL = "check_journal";
+    public static final String CHECK_TEACHERS = "check_teachers";
 
 }

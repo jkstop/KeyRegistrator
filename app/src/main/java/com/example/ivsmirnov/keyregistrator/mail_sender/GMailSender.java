@@ -46,36 +46,49 @@ public class GMailSender extends javax.mail.Authenticator {
     }
 
     protected PasswordAuthentication getPasswordAuthentication() {
-        return new PasswordAuthentication(user, password);
+
+        PasswordAuthentication passwordAuthentication = new PasswordAuthentication(user, password);
+
+        return passwordAuthentication;
     }
 
 
-    public synchronized void sendMail(String subject, String body, String sender, String recipients, File attachment) throws Exception {
+    public synchronized void sendMail(String subject, String body, String sender, String recipients, File[] attachment) throws Exception {
         MimeMessage message = new MimeMessage(session);
         DataHandler handler = new DataHandler(new ByteArrayDataSource(body.getBytes(), "multipart/mixed"));
+
         message.setSender(new InternetAddress(sender));
         message.setSubject(subject);
         message.setDataHandler(handler);
 
-        if (attachment != null) {
             MimeBodyPart mp1 = new MimeBodyPart();
             mp1.setText(body);
 
-            MimeBodyPart mp2 = new MimeBodyPart();
-            mp2.attachFile(attachment);
-            mp2.setHeader("Content-Type", "text/plain; charset=\"us-ascii\"; name=\"mail.txt\"");
-
             Multipart mp = new MimeMultipart();
             mp.addBodyPart(mp1);
-            mp.addBodyPart(mp2);
+        if (attachment != null) {
+            for (File f : attachment) {
+                MimeBodyPart mp2 = new MimeBodyPart();
+                mp2.attachFile(f);
+                mp2.setHeader("Content-Type", "text/plain; charset=\"us-ascii\"; name=\"mail.txt\"");
+                mp.addBodyPart(mp2);
+            }
+        }
 
             message.setContent(mp);
-        }
+
 
         addMailCap();
 
-        message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipients));
+        if (recipients.indexOf(',') > 0)
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipients));
+        else
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipients));
+
+
+
         Transport.send(message);
+
     }
 
     private void addMailCap() {

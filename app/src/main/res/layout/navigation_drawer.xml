@@ -190,6 +190,32 @@
                     layout="@layout/navigation_drawer_divider"/>
 
                 <LinearLayout
+                    android:tag="@string/nav_drawer_item_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:id="@+id/navigation_drawer_layout_email">
+
+                    <ImageView
+                        android:id="@+id/navigation_drawer_items_list_icon_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_mail_black_24dp"
+                        tools:ignore="ContentDescription"
+                        android:layout_marginLeft="24dp"
+                        android:layout_marginRight="24dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nav_drawer_item_email"
+                        style="@style/NavDrawerRowItemText" />
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:tag="@string/nav_drawer_item_statistics"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

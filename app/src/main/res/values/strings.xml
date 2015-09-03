@@ -65,11 +65,12 @@
     <string name="fragment4">fragment 4</string>
 
     <!-- Toolbar titles -->
-    <string name="toolbar_title_main">Выберите нужную аудиторию</string>
+    <string name="toolbar_title_main">Выберите при помощи мыши нужную аудиторию</string>
     <string name="toolbar_title_persons">Преподаватели</string>
     <string name="toolbar_title_journal">Журнал</string>
     <string name="toolbar_title_auditrooms">Аудитории</string>
     <string name="toolbar_title_persons_select">Выберите преподавателя</string>
+    <string name="toolbar_title_email">E-mail рассылка</string>
 
     <!-- Navigation Drawer -->
     <string name="nav_drawer_item_home">Главная</string>
@@ -77,6 +78,7 @@
     <string name="nav_drawer_item_statistics">Статистика</string>
     <string name="nav_drawer_item_journal">Журнал</string>
     <string name="nav_drawer_item_rooms">Аудитории</string>
+    <string name="nav_drawer_item_email">E-mail рассылка</string>
     <string name="nav_drawer_item_about">О приложении</string>
     <string name="navigation_drawer_opened">The navigation drawer is opened</string>
     <string name="navigation_drawer_closed">The navigation drawer is closed</string>

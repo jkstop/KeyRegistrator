@@ -1,1 +1,1 @@
-include ':app', ':javax.mail'
+include ':app'

@@ -58,7 +58,7 @@ public class CloseDayService extends Service {
 
         Calendar calendar = Calendar.getInstance();
         if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-            Send_Email send_email = new Send_Email(new String[]{preferences.getString(Values.EMAIL, ""),
+            Send_Email send_email = new Send_Email(context, new String[]{preferences.getString(Values.EMAIL + "@gmail.com", ""),
                     preferences.getString(Values.PASSWORD, ""),
                     preferences.getString(Values.RECIPIENTS, ""),
                     preferences.getString(Values.BODY, ""),

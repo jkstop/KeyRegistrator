@@ -127,16 +127,6 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
                 String dtFileJournal = path + "/Journal.txt";
                 DataBases.copyfile(mContext, srFileJournal, dtFileJournal);
                 return true;
-            case R.id.menu_journal_send:
-                //Send_Email send_email = new Send_Email();
-                //send_email.execute();
-                Dialog_Fragment dialog_email = new Dialog_Fragment();
-                Bundle bundleEmail = new Bundle();
-                bundleEmail.putInt(Values.DIALOG_TYPE, Values.EMAIL_DIALOG);
-                dialog_email.setArguments(bundleEmail);
-                dialog_email.show(getFragmentManager(), "email_preferences");
-
-                return true;
             case R.id.menu_journal_download:
                 startActivityForResult(new Intent(mContext,FileManager.class).putExtra("what",10),333);
                 return true;

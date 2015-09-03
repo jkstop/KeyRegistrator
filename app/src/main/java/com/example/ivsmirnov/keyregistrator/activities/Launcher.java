@@ -12,8 +12,8 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -22,13 +22,14 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.fragments.Email_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Journal_fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
-import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
+import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
-import com.example.ivsmirnov.keyregistrator.R;
 
 import java.util.Calendar;
 
@@ -37,7 +38,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
     private DrawerLayout mDrawerLayout;
     private FrameLayout mFrameLayout_Drawer_root;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
-    private LinearLayout mLinearLayout_Home, mLinearLayout_Settings, mLinearLayout_Statistics, mLinearLayout_Journal,mLinearLayout_Rooms;
+    private LinearLayout mLinearLayout_Home, mLinearLayout_Settings, mLinearLayout_Statistics, mLinearLayout_Journal, mLinearLayout_Rooms, mLinearLayout_Email;
 
     private Context mContext;
     private SharedPreferences mPreferences;
@@ -58,6 +59,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
         toolbar.setTitle(getResources().getString(R.string.toolbar_title_main));
 
+
         setSupportActionBar(toolbar);
 
         mFrameLayout_Drawer_root = (FrameLayout)findViewById(R.id.main_activity_navigation_drawer_rootLayout);
@@ -66,12 +68,14 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         mLinearLayout_Statistics = (LinearLayout)findViewById(R.id.navigation_drawer_layout_statistics);
         mLinearLayout_Journal = (LinearLayout)findViewById(R.id.navigation_drawer_layout_journal);
         mLinearLayout_Rooms = (LinearLayout)findViewById(R.id.navigation_drawer_layout_rooms);
+        mLinearLayout_Email = (LinearLayout) findViewById(R.id.navigation_drawer_layout_email);
 
         mLinearLayout_Home.setOnClickListener(this);
         mLinearLayout_Settings.setOnClickListener(this);
         mLinearLayout_Statistics.setOnClickListener(this);
         mLinearLayout_Journal.setOnClickListener(this);
         mLinearLayout_Rooms.setOnClickListener(this);
+        mLinearLayout_Email.setOnClickListener(this);
 
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_opened, R.string.navigation_drawer_closed) {
@@ -101,7 +105,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
 
         if (v.getTag().equals(res.getString(R.string.nav_drawer_item_home))){
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance())
+                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance())
                     .commit();
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_persons))){
             if (getSupportActionBar()!=null){
@@ -124,6 +128,11 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
                 getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_auditrooms));
             }
             getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Rooms_Fragment.newInstance()).commit();
+        } else if (v.getTag().equals(getResources().getString(R.string.nav_drawer_item_email))) {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_email));
+            }
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Email_Fragment.newInstance()).commit();
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_about))){
             String version = "";
             try {

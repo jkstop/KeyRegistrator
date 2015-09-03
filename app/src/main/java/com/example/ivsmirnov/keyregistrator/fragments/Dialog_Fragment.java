@@ -21,7 +21,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -34,9 +33,9 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_autoComplete_teachersBase;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.databases.DataBasesRegist;
+import com.example.ivsmirnov.keyregistrator.interfaces.AuthError;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -44,7 +43,7 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
 
-public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
+public class Dialog_Fragment extends android.support.v4.app.DialogFragment implements AuthError {
 
     private Context context;
     private int dialog_id;
@@ -480,75 +479,19 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                             }
                         })
                         .create();
-            case Values.EMAIL_DIALOG:
-                final String emailText = sharedPreferences.getString(Values.EMAIL, "");
-                String passwordText = sharedPreferences.getString(Values.PASSWORD, "");
-                String recipientsText = sharedPreferences.getString(Values.RECIPIENTS, "");
-                String bodyText = sharedPreferences.getString(Values.BODY, "");
-                String themeText = sharedPreferences.getString(Values.THEME, "");
-                View dialogView = inflater.inflate(R.layout.layout_dialog_email_settings, null);
-                View.OnClickListener listener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        switch (v.getId()) {
-                            case R.id.email_settings_check_button:
-                                //GMailSender auth = new GMailSender("sh38sup@gmail.com","podderzhka");
-                                //auth.checkConnection();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                };
-                Button check = (Button) dialogView.findViewById(R.id.email_settings_check_button);
-                check.setOnClickListener(listener);
-
-                final EditText email = (EditText) dialogView.findViewById(R.id.email_settings_edit_email);
-                final EditText pass = (EditText) dialogView.findViewById(R.id.email_settings_edit_password);
-                final EditText recipient = (EditText) dialogView.findViewById(R.id.email_settings_edit_recipients);
-                final EditText body = (EditText) dialogView.findViewById(R.id.email_settings_edit_body);
-                final EditText theme = (EditText) dialogView.findViewById(R.id.email_settings_edit_email_theme);
-
-                email.setText(emailText);
-                pass.setText(passwordText);
-                recipient.setText(recipientsText);
-                body.setText(bodyText);
-                theme.setText(themeText);
-
-                return new AlertDialog.Builder(getActivity())
-                        .setTitle("E-mail уведомления")
-                        .setView(dialogView)
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                editor.putString(Values.EMAIL, email.getText().toString() + "@gmail.com");
-                                editor.putString(Values.PASSWORD, pass.getText().toString());
-                                editor.putString(Values.RECIPIENTS, recipient.getText().toString());
-                                editor.putString(Values.BODY, body.getText().toString());
-                                editor.putString(Values.THEME, theme.getText().toString());
-                                editor.commit();
-                            }
-                        })
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        })
-                        .setNeutralButton("Отправить сейчас", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Send_Email send_email = new Send_Email(new String[]{email.getText().toString() + "@gmail.com",
-                                        pass.getText().toString(), recipient.getText().toString(), body.getText().toString(), theme.getText().toString()});
-                                send_email.execute();
-                            }
-                        })
-                        .create();
-
-
             default:
                 return null;
         }
 
+    }
+
+    @Override
+    public void onError() {
+
+        AlertDialog.Builder errB = new AlertDialog.Builder(getActivity());
+        errB.setTitle("ERROR")
+                .setMessage("Incorrect login/password")
+                .create()
+                .show();
     }
 }
