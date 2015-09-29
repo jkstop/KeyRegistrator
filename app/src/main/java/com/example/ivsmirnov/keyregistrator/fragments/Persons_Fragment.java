@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -50,6 +51,8 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     private SharedPreferences.Editor mPreferencesEditor;
 
     private int type;
+
+    private static long lastClickTime = 0;
 
     public static Persons_Fragment newInstance(){
         return new Persons_Fragment();
@@ -123,7 +126,8 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                             (String) mAllItems.get(position).get(1),
                             (String) mAllItems.get(position).get(2),
                             (String) mAllItems.get(position).get(3),
-                            gender};
+                            gender,
+                            (String) mAllItems.get(position).get(6)};
                     Bundle b = new Bundle();
                     b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
                     b.putStringArray("valuesForEdit", values);
@@ -142,6 +146,9 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
             mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
+                        return;
+                    }
                     int pos = position - parent.getFirstVisiblePosition();
                     View rootView = parent.getChildAt(pos);
                     TextView textSurname = (TextView) rootView.findViewById(R.id.text_familia);
@@ -174,6 +181,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                     writeIt(aud, name, time, path);
 
                     getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance()).commit();
+                    lastClickTime = SystemClock.elapsedRealtime();
                 }
             });
         }
@@ -300,4 +308,5 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         dialogType.setTargetFragment(Persons_Fragment.this,0);
         dialogType.show(getChildFragmentManager(), "type");
     }
+
 }

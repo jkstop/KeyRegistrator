@@ -1,18 +1,15 @@
 package com.example.ivsmirnov.keyregistrator.databases;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQuery;
 import android.provider.BaseColumns;
 import android.util.Log;
 
 public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
 
     private static final String name = "Key_registrator_database.db";
-    private static final int version = 25;
+    private static final int version = 26;
 
     public static final String TABLE_JOURNAL = "Журнал";
     public static final String COLUMN_AUD = "Аудитория";
@@ -31,9 +28,10 @@ public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
     public static final String COLUMN_KAF_FAVORITE = "Кафедра";
     public static final String COLUMN_GENDER_FAVORITE = "Пол";
     public static final String COLUMN_PHOTO_FAVORITE = "Фото";
+    public static final String COLUMN_PHOTO_ORIGINAL_FAVORITE = "Оригинал";
     public static final String SQL_CREATE_TEACHERS_BASE = "create table " + TABLE_TEACHER + " (" + BaseColumns._ID + " integer primary key autoincrement, "
             + COLUMN_SURNAME_FAVORITE + " text not null, " + COLUMN_NAME_FAVORITE + " text not null, " + COLUMN_LASTNAME_FAVORITE + " text not null, " +
-            COLUMN_KAF_FAVORITE + " text not null, "   + COLUMN_GENDER_FAVORITE + " text not null, " + COLUMN_PHOTO_FAVORITE + " text not null);";
+            COLUMN_KAF_FAVORITE + " text not null, " + COLUMN_GENDER_FAVORITE + " text not null, " + COLUMN_PHOTO_FAVORITE + " text not null, " + COLUMN_PHOTO_ORIGINAL_FAVORITE + " text not null);";
     public static final String SQL_DELETE_TEACHERS_BASE = "DROP TABLE IF EXISTS "
             + TABLE_TEACHER;
 

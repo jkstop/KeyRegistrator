@@ -1,6 +1,5 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +10,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;

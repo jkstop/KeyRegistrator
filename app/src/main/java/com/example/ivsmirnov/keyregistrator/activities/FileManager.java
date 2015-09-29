@@ -13,11 +13,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Loader;
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Loader;
+import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.BufferedReader;
@@ -224,7 +223,7 @@ public class FileManager extends ListActivity implements FinishLoad{
         return lines;
     }
 
-    public static void readLine (Context context,String path) throws IOException {
+    public static void readLine(Context context, String path, int type) throws IOException {
         File file = new File(path);
         BufferedReader fin = new BufferedReader(new FileReader(file));
         int count = getStringCount(file);
@@ -236,19 +235,27 @@ public class FileManager extends ListActivity implements FinishLoad{
         String line;
         ArrayList<String> lines = new ArrayList<>(count);
         DataBases db = new DataBases(context);
-        db.clearBaseSQL();
+        if (type == 1) {
+            db.clearBaseSQL();
+        } else if (type == 2) {
+            db.clearTeachersDB();
+        }
         while ((line = fin.readLine())!=null){
             if (i<count){
                 if (!lines.contains(line)){
                     String [] split = line.split(";");
 
-                    db.writeInDBSQL(split[0],
-                            split[1],
-                            split[2],
-                            split[3],
-                            split[4]);
-
-                    i++;
+                    if (type == 1) {
+                        db.writeInDBSQL(split[0],
+                                split[1],
+                                split[2],
+                                split[3],
+                                split[4]);
+                        i++;
+                    } else if (type == 2) {
+                        db.writeCardInBase(split[0], split[1], split[2], split[3], split[4], -1, split[5]);
+                        i++;
+                    }
                 }
             }
         }

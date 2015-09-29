@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +21,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.SeekBar;
 import android.widget.TableLayout;
@@ -35,15 +34,16 @@ import com.example.ivsmirnov.keyregistrator.adapters.adapter_autoComplete_teache
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.databases.DataBasesRegist;
-import com.example.ivsmirnov.keyregistrator.interfaces.AuthError;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
-public class Dialog_Fragment extends android.support.v4.app.DialogFragment implements AuthError {
+public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
     private Context context;
     private int dialog_id;
@@ -158,8 +158,6 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment imple
                         String kaf = split[3];
                         String pos = split[4];
 
-                        Log.d("position", pos);
-
                         String gender;
                         if (lastname.substring(lastname.length() - 1).equals("а")) {
                             gender = "Ж";
@@ -219,30 +217,39 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment imple
                 return dialog;
             case Values.DIALOG_EDIT:
 
-                final TableLayout tableLayout = new TableLayout(context);
+                final View dialogView = inflater.inflate(R.layout.layout_dialog_edit, null);
+                final TableLayout tableLayout = (TableLayout) dialogView.findViewById(R.id.layout_dialog_edit_table);
+                final ImageView imageView = (ImageView) dialogView.findViewById(R.id.layout_dialog_edit_image_person);
                 final String [] values = getArguments().getStringArray("valuesForEdit");
                 final DataBases dbses = new DataBases(context);
-                for (int i=1;i<6;i++){
-                    TableRow tableRow = new TableRow(context);
-                    View rowLayot = inflater.inflate(R.layout.row_for_editor,null);
 
-                    TextView textParametr = (TextView)rowLayot.findViewById(R.id.textEditParametr);
-                    textParametr.setText(dbses.cursorTeachers.getColumnName(i));
+                final EditText editSurname = (EditText) dialogView.findViewById(R.id.editSurname);
+                final EditText editName = (EditText) dialogView.findViewById(R.id.editName);
+                final EditText editLastname = (EditText) dialogView.findViewById(R.id.editLastname);
+                final EditText editKaf = (EditText) dialogView.findViewById(R.id.editKaf);
 
-                    EditText editParametr = (EditText)rowLayot.findViewById(R.id.editParemetr);
-                    if (values!=null){
-                        editParametr.setText(values[i-1]);
-                    }
-
-                    tableRow.addView(rowLayot);
-                    tableLayout.addView(tableRow);
+                try {
+                    assert values != null;
+                    editSurname.setText(values[0]);
+                    editName.setText(values[1]);
+                    editLastname.setText(values[2]);
+                    editKaf.setText(values[3]);
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
                 }
 
-                tableLayout.setColumnStretchable(0, true);
+
+                try {
+                    ImageLoader imageLoader = ImageLoader.getInstance();
+                    imageLoader.init(ImageLoaderConfiguration.createDefault(context));
+                    imageLoader.displayImage("file://" + values[5], imageView);
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
 
                 AlertDialog.Builder builderEdit = new AlertDialog.Builder(getActivity());
                 builderEdit.setTitle("Редактирование");
-                builderEdit.setView(tableLayout);
+                builderEdit.setView(dialogView);
                 builderEdit.setNeutralButton(getResources().getString(R.string.delete), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -265,17 +272,17 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment imple
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String [] source = getArguments().getStringArray("valuesForEdit");
-                        String [] edited = new String[5];
-                        for (int i = 0; i < tableLayout.getChildCount(); i++) {
-                            LinearLayout linearLayout = (LinearLayout)tableLayout.getChildAt(i);
-                            EditText editText = (EditText)linearLayout.findViewById(R.id.editParemetr);
-                            String text = editText.getText().toString();
-                            edited[i] = text;
-                        }
+                        String[] edited = new String[4];
+
+                        edited[0] = editSurname.getText().toString();
+                        edited[1] = editName.getText().toString();
+                        edited[2] = editLastname.getText().toString();
+                        edited[3] = editKaf.getText().toString();
+
                         dbses.updateTeachersDB(source, edited);
                         dbses.closeDBconnection();
 
-                        //int position = getArguments().getInt("position");
+
                         UpdateTeachers activity;
                         if (getTargetFragment()==null){
                             activity = (UpdateTeachers)getActivity();
@@ -420,7 +427,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment imple
                             }
                         });
                     } else if (i == 1) {
-                        seek.setMax(40);
+                        seek.setMax(50);
                         seek.setProgress((int) (sharedPreferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15) * 100));
                         seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                             float prog = 0;
@@ -485,13 +492,4 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment imple
 
     }
 
-    @Override
-    public void onError() {
-
-        AlertDialog.Builder errB = new AlertDialog.Builder(getActivity());
-        errB.setTitle("ERROR")
-                .setMessage("Incorrect login/password")
-                .create()
-                .show();
-    }
 }

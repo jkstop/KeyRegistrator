@@ -186,6 +186,32 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:tag="@string/nav_drawer_item_shedule"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:id="@+id/navigation_drawer_layout_shedule">
+
+                    <ImageView
+                        android:id="@+id/navigation_drawer_items_list_icon_shedule"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_grid_on_black_24dp"
+                        tools:ignore="ContentDescription"
+                        android:layout_marginLeft="24dp"
+                        android:layout_marginRight="24dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nav_drawer_item_shedule"
+                        style="@style/NavDrawerRowItemText" />
+
+                </LinearLayout>
+
                 <include
                     layout="@layout/navigation_drawer_divider"/>
 

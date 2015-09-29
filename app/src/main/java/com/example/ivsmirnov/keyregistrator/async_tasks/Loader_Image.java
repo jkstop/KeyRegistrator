@@ -52,7 +52,7 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         DataBases db = new DataBases(context);
-        db.writeCardInBase(surname, name, lastname, kaf, gender, pos);
+        db.writeCardInBase(surname, name, lastname, kaf, gender, pos, "null");
         db.closeDBconnection();
 
         return null;

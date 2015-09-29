@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -54,8 +55,7 @@ public class DataBases{
         dataBasesRegist = new DataBasesRegist(context);
         base = dataBasesRegist.getWritableDatabase();
         cursorJournal = base.query(DataBasesRegist.TABLE_JOURNAL, null, null, null, null, null, null);
-        cursorTeachers = base.query(DataBasesRegist.TABLE_TEACHER,new String[]{DataBasesRegist._ID,DataBasesRegist.COLUMN_SURNAME_FAVORITE,DataBasesRegist.COLUMN_NAME_FAVORITE,
-                DataBasesRegist.COLUMN_LASTNAME_FAVORITE,DataBasesRegist.COLUMN_KAF_FAVORITE,DataBasesRegist.COLUMN_GENDER_FAVORITE,DataBasesRegist.COLUMN_PHOTO_FAVORITE},null,null,null,null,null);
+        cursorTeachers = base.query(DataBasesRegist.TABLE_TEACHER, null, null, null, null, null, null);
         cursorRoom = base.query(DataBasesRegist.TABLE_ROOMS,null,null,null,null,null,null);
         cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,null,null,null,null,null,null);
         Log.d("DB connection is", "OPEN");
@@ -118,7 +118,7 @@ public class DataBases{
 
     public void updateLastVisitersRoom(int id,String name){
         ContentValues cv = new ContentValues();
-        cv.put(DataBasesRegist.COLUMN_LAST_VISITER,name);
+        cv.put(DataBasesRegist.COLUMN_LAST_VISITER, name);
         base.update(DataBasesRegist.TABLE_ROOMS, cv, DataBasesRegist._ID + "=" + id, null);
 
         Log.d("updateLastVisiters", "OK");
@@ -166,7 +166,7 @@ public class DataBases{
     }
 
     //запись в БД преподавателей
-    public void writeInDBTeachers(String surname, String name, String lastname, String kaf,String gender,String photo){
+    public void writeInDBTeachers(String surname, String name, String lastname, String kaf, String gender, String photo, String oroginalPhoto) {
         ContentValues cv = new ContentValues();
         cv.put(DataBasesRegist.COLUMN_SURNAME_FAVORITE,surname);
         cv.put(DataBasesRegist.COLUMN_NAME_FAVORITE, name);
@@ -174,6 +174,7 @@ public class DataBases{
         cv.put(DataBasesRegist.COLUMN_KAF_FAVORITE, kaf);
         cv.put(DataBasesRegist.COLUMN_GENDER_FAVORITE, gender);
         cv.put(DataBasesRegist.COLUMN_PHOTO_FAVORITE, photo);
+        cv.put(DataBasesRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE, oroginalPhoto);
         long id = base.insert(DataBasesRegist.TABLE_TEACHER, null, cv);
         editor.putLong("id",id);
         editor.commit();
@@ -193,6 +194,7 @@ public class DataBases{
             card.put(3, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_KAF_FAVORITE)));
             card.put(4, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_GENDER_FAVORITE)));
             card.put(5,cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_PHOTO_FAVORITE)));
+            card.put(6, cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
 
             items.add(card);
 
@@ -258,15 +260,17 @@ public class DataBases{
         base.insert(DataBasesRegist.TABLE_BASE, null, cv);
     }
 
-    public void writeCardInBase(String surname, String name, String lastname, String kaf, String gender, int position) {
+    public void writeCardInBase(String surname, String name, String lastname, String kaf, String gender, int position, String photo) {
         cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE, null, null, null, null, null, null);
-        String photo = "null";
+        //String photo = "null";
         if (position != -1) {
             cursorBaseSql.moveToPosition(position);
             photo = cursorBaseSql.getString(cursorBaseSql.getColumnIndex(DataBasesRegist.COLUMN_PHOTO));
         }
+
         String photoPath = savePhotoToSD(photo,surname+"_"+name+"_"+lastname);
-        writeInDBTeachers(surname, name, lastname, kaf, gender, photoPath);
+        String originalPath = saveOriginalPhoto(photo, surname + "_" + name + "_" + lastname);
+        writeInDBTeachers(surname, name, lastname, kaf, gender, photoPath, originalPath);
 
     }
 
@@ -308,6 +312,63 @@ public class DataBases{
         return inSampleSize;
     }
 
+    public String saveOriginalPhoto(String photo, String filename) {
+        File folder = new File(Environment.getExternalStorageDirectory() + "/KeyRegistrator/Sources_photo");
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+        String photoPath = folder.getAbsolutePath() + "/" + filename + ".png";
+        if (!photo.equalsIgnoreCase("null")) {
+            byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
+            Bitmap bitmapOrigin = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            FileOutputStream out = null;
+            try {
+                out = new FileOutputStream(photoPath);
+                bitmapOrigin.compress(Bitmap.CompressFormat.PNG, 100, out);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (out != null) {
+                        out.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            Bitmap bitmap;
+            if (filename.substring(filename.length() - 1).equalsIgnoreCase("а")) {
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_female_colored);
+            } else {
+                String[] splitted = filename.split("_");
+                if (splitted[0].substring(splitted[0].length() - 1).equalsIgnoreCase("а")) {
+                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_female_colored);
+                } else {
+                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_male_colored);
+                }
+            }
+
+            FileOutputStream out = null;
+            try {
+                out = new FileOutputStream(photoPath);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                // PNG is a lossless format, the compression factor (100) is ignored
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (out != null) {
+                        out.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return photoPath;
+    }
+
     public String savePhotoToSD(String photo, String filename){
 
         File folder = new File(Environment.getExternalStorageDirectory() + "/KeyRegistrator");
@@ -315,6 +376,8 @@ public class DataBases{
         if (!folder.exists()){
             folder.mkdir();
         }
+
+        String photoPath = folder.getAbsolutePath() + "/" + filename + ".webp";
 
         if (!photo.equalsIgnoreCase("null")){
 
@@ -325,16 +388,13 @@ public class DataBases{
             BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
 
             options.inSampleSize = calculateInSampleSize(options, 120, 160);
-
             options.inJustDecodeBounds = false;
 
             Bitmap bitmapPrew = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
-
             FileOutputStream out = null;
             try {
-                out = new FileOutputStream(folder.getAbsolutePath()+"/"+filename+".jpg");
-                bitmapPrew.compress(Bitmap.CompressFormat.JPEG, 75, out);
-
+                out = new FileOutputStream(photoPath);
+                bitmapPrew.compress(Bitmap.CompressFormat.WEBP, 100, out);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -349,15 +409,20 @@ public class DataBases{
         }else{
             Bitmap bitmap;
             if (filename.substring(filename.length()-1).equalsIgnoreCase("а")){
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_female);
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_female_colored);
             }else{
-                bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.person_male);
+                String[] splitted = filename.split("_");
+                if (splitted[0].substring(splitted[0].length() - 1).equalsIgnoreCase("а")) {
+                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_female_colored);
+                } else {
+                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_male_colored);
+                }
             }
 
             FileOutputStream out = null;
             try {
-                out = new FileOutputStream(folder.getAbsolutePath()+"/"+filename+".jpg");
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                out = new FileOutputStream(photoPath);
+                bitmap.compress(Bitmap.CompressFormat.WEBP, 100, out); // bmp is your Bitmap instance
                 // PNG is a lossless format, the compression factor (100) is ignored
             } catch (Exception e) {
                 e.printStackTrace();
@@ -371,8 +436,7 @@ public class DataBases{
                 }
             }
             }
-        return folder.getAbsolutePath()+"/"+filename+".jpg";
-
+        return photoPath;
     }
 
     public ArrayList <String> readFromBaseSQL(String column){
@@ -417,7 +481,6 @@ public class DataBases{
                 cv.put(DataBasesRegist.COLUMN_NAME_FAVORITE,edited[1]);
                 cv.put(DataBasesRegist.COLUMN_LASTNAME_FAVORITE,edited[2]);
                 cv.put(DataBasesRegist.COLUMN_KAF_FAVORITE,edited[3]);
-                cv.put(DataBasesRegist.COLUMN_GENDER_FAVORITE,edited[4]);
                 base.update(DataBasesRegist.TABLE_TEACHER, cv, DataBasesRegist._ID + "=" + row, null);
             }
         }
@@ -495,15 +558,21 @@ public class DataBases{
                 }
                 break;
             case Values.WRITE_TEACHERS:
-                file = new File(mPath + "/Teachers.txt");
+                file = new File(mPath + "/Teachers.csv");
                 cursorTeachers.moveToPosition(-1);
                 while (cursorTeachers.moveToNext()){
+                    File f = new File(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
+                    Bitmap bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                    byte[] bytes = byteArrayOutputStream.toByteArray();
+                    String encoded = Base64.encodeToString(bytes, Base64.NO_WRAP);
                     itemList.add(cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_SURNAME_FAVORITE))+";"
                     +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_NAME_FAVORITE))+";"
                     +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_LASTNAME_FAVORITE))+";"
                     +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_KAF_FAVORITE))+";"
                     +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_GENDER_FAVORITE))+";"
-                    +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBasesRegist.COLUMN_PHOTO_FAVORITE)));
+                            + encoded);
                 }
                 break;
         }

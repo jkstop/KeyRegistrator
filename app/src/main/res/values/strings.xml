@@ -78,6 +78,7 @@
     <string name="nav_drawer_item_statistics">Статистика</string>
     <string name="nav_drawer_item_journal">Журнал</string>
     <string name="nav_drawer_item_rooms">Аудитории</string>
+    <string name="nav_drawer_item_shedule">Расписание</string>
     <string name="nav_drawer_item_email">E-mail рассылка</string>
     <string name="nav_drawer_item_about">О приложении</string>
     <string name="navigation_drawer_opened">The navigation drawer is opened</string>
@@ -100,7 +101,6 @@
     <string-array name="seek_items">
         <item>Аудитории</item>
         <item>Уведомление</item>
-        <item>Журнал</item>
     </string-array>
 
     <string name="email_settings_box_layout_box_prefix">/@gmail.com</string>

@@ -31,6 +31,8 @@
             android:label="@string/title_activity_close_day_dialog"
             >
         </activity>
+
+        <activity android:name=".activities.TestNewPersons" />
     </application>
 
 </manifest>

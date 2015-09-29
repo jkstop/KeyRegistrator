@@ -1,15 +1,12 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,13 +17,11 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_journal_list;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
@@ -50,13 +45,12 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     private ArrayList <String> photoPath;
     private LinearLayout disclaimer;
     private FrameLayout frameForGrid;
-    private LinearLayout frameForList;
 
-    private ListView mListView;
-    private adapter_journal_list mAdapterjournallist;
-    private ArrayList <SparseArray> mItems;
+    //private ArrayList <SparseArray> mItems;
 
     adapter_main_auditrooms_grid adapter;
+
+    private static long lastClickTime = 0;
 
     public static Main_Fragment newInstance (){
         return new Main_Fragment();
@@ -78,11 +72,10 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         rooms = new ArrayList<>(db.readFromRoomsDB());
         isFreeAud = new ArrayList<>(db.readStatusRooms());
         lastVisiters = new ArrayList<>(db.readLastVisiterRoom());
-        mItems = db.readJournalFromDB();
+        //mItems = db.readJournalFromDB();
         closeBase();
 
         frameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
-        frameForList = (LinearLayout) rootView.findViewById(R.id.list_layout);
 
         preferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -92,6 +85,9 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
+                    return;
+                }
                 View viewGridItem = parent.getChildAt(position);
                 TextView textButton = (TextView) viewGridItem.findViewById(R.id.textButton);
                 selected_aud = position;
@@ -113,8 +109,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                         Toast.makeText(context, "Был какой-то глюк...", Toast.LENGTH_SHORT).show();
                     } else {
                         db.updateDB(pos);
-                        mItems.get(preferences.getInt(Values.POSITION_IN_LIST_FOR_ROOM+view.getTag(),-1)).put(3,String.valueOf(System.currentTimeMillis()));
-                        mAdapterjournallist.notifyDataSetChanged();
+                        //mItems.get(preferences.getInt(Values.POSITION_IN_LIST_FOR_ROOM+view.getTag(),-1)).put(3,String.valueOf(System.currentTimeMillis()));
                     }
 
                     db.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), 1);
@@ -122,10 +117,11 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                     isFreeAud.set(position, true);
                     gridView.setAdapter(adapter);
                 }
-            }
+                lastClickTime = SystemClock.elapsedRealtime();
+                }
         });
 
-        mListView = (ListView)rootView.findViewById(R.id.list);
+        /*mListView = (ListView)rootView.findViewById(R.id.list);
         mAdapterjournallist = new adapter_journal_list(context, mItems);
         mListView.setAdapter(mAdapterjournallist);
         mListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
@@ -133,7 +129,8 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                Toast.makeText(context,"Функция удаления временно отключена. Потом исправлю.",Toast.LENGTH_SHORT).show();
+                /*AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Удаление элемента")
                         .setMessage("Удалить выбранный элемент из списка?")
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -159,6 +156,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 return true;
             }
         });
+        */
         TextView textEmptyAud = (TextView)rootView.findViewById(R.id.text_empty_aud_list);
         if (rooms.isEmpty()){
             textEmptyAud.setVisibility(View.VISIBLE);
@@ -180,22 +178,16 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         isFreeAud = new ArrayList<>(db.readStatusRooms());
         lastVisiters = new ArrayList<>(db.readLastVisiterRoom());
         photoPath = new ArrayList<>(db.readPhotoPath());
-        mItems = db.readJournalFromDB();
+        //mItems = db.readJournalFromDB();
         db.closeDBconnection();
-
-        mAdapterjournallist = new adapter_journal_list(context, mItems);
-        mListView.setAdapter(mAdapterjournallist);
-        mListView.setSelection(mAdapterjournallist.getCount());
 
         int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
         float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
-        float list_weight = preferences.getFloat(Values.JOURNAL_SIZE, (float) 0.3);
         adapter = new adapter_main_auditrooms_grid(context, rooms, isFreeAud, lastVisiters, photoPath);
 
         gridView.setAdapter(adapter);
         gridView.setNumColumns(columns);
         frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
-        frameForList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, list_weight));
         adapter.notifyDataSetChanged();
 
     }
@@ -224,6 +216,10 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 dialog_grid_size.setTargetFragment(this, 0);
                 dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
                 return true;
+            case R.id.menu_main_test:
+                //startActivity(new Intent(context, TestNewPersons.class));
+                //сделать recycleView with cardView
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -241,10 +237,8 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     public void onFinish() {
         float disclaimer_size = preferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15);
         float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
-        float list_weight = preferences.getFloat(Values.JOURNAL_SIZE, (float) 0.3);
 
         disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
         frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
-        frameForList.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, list_weight));
     }
 }

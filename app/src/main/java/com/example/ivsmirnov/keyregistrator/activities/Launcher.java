@@ -28,6 +28,7 @@ import com.example.ivsmirnov.keyregistrator.fragments.Journal_fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
+import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
 
@@ -38,11 +39,13 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
     private DrawerLayout mDrawerLayout;
     private FrameLayout mFrameLayout_Drawer_root;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
-    private LinearLayout mLinearLayout_Home, mLinearLayout_Settings, mLinearLayout_Statistics, mLinearLayout_Journal, mLinearLayout_Rooms, mLinearLayout_Email;
+    private LinearLayout mLinearLayout_Home, mLinearLayout_Settings, mLinearLayout_Statistics, mLinearLayout_Journal, mLinearLayout_Rooms, mLinearLayout_Email, mLinearLayout_Shedule;
 
     private Context mContext;
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mPreferencesEditor;
+
+    private static long back_pressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +62,6 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
         toolbar.setTitle(getResources().getString(R.string.toolbar_title_main));
 
-
         setSupportActionBar(toolbar);
 
         mFrameLayout_Drawer_root = (FrameLayout)findViewById(R.id.main_activity_navigation_drawer_rootLayout);
@@ -69,6 +71,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         mLinearLayout_Journal = (LinearLayout)findViewById(R.id.navigation_drawer_layout_journal);
         mLinearLayout_Rooms = (LinearLayout)findViewById(R.id.navigation_drawer_layout_rooms);
         mLinearLayout_Email = (LinearLayout) findViewById(R.id.navigation_drawer_layout_email);
+        mLinearLayout_Shedule = (LinearLayout) findViewById(R.id.navigation_drawer_layout_shedule);
 
         mLinearLayout_Home.setOnClickListener(this);
         mLinearLayout_Settings.setOnClickListener(this);
@@ -76,6 +79,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         mLinearLayout_Journal.setOnClickListener(this);
         mLinearLayout_Rooms.setOnClickListener(this);
         mLinearLayout_Email.setOnClickListener(this);
+        mLinearLayout_Shedule.setOnClickListener(this);
 
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_opened, R.string.navigation_drawer_closed) {
@@ -133,6 +137,11 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
                 getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_email));
             }
             getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Email_Fragment.newInstance()).commit();
+        } else if (v.getTag().equals(getResources().getString(R.string.nav_drawer_item_shedule))) {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(res.getString(R.string.nav_drawer_item_shedule));
+            }
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Shedule_Fragment.newInstance()).commit();
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_about))){
             String version = "";
             try {
@@ -163,7 +172,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
 
         mPreferencesEditor.putBoolean(Values.ALARM_SET, true);
         mPreferencesEditor.commit();
-        Log.d("alarmSet","ok");
+        Log.d("alarmSet", "ok");
     }
 
     private Calendar closingTime(){
@@ -195,6 +204,19 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         super.onDestroy();
         mPreferencesEditor.remove(Values.ALARM_SET);
         mPreferencesEditor.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (back_pressed + 2000 > System.currentTimeMillis()) {
+            super.onBackPressed();
+        } else {
+            Toast.makeText(getBaseContext(), "Нажмите еще раз для выхода", Toast.LENGTH_SHORT).show();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance())
+                    .commit();
+            back_pressed = System.currentTimeMillis();
+        }
     }
 
 }

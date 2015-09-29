@@ -28,6 +28,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
     private FinishLoad listener;
     private int LOAD_TYPE;
 
+
     public Loader (Context c,FileManager activity,String abs,int load,FinishLoad l){
         context = c;
         absPath = abs;
@@ -41,7 +42,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(false);
         dialog.setMessage("Загрузка...");
         dialog.show();
@@ -50,7 +51,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
     @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
-        dialog.setProgress(values[0]);
+        //dialog.setProgress(values[0]);
     }
 
     @Override
@@ -132,8 +133,8 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                             timePut = (long)1;
                         }
                     }
-                    db.writeInDBJournal(aud,name,time,timePut,true);
-                    publishProgress(count++);
+                    db.writeInDBJournal(aud, name, time, timePut, true);
+                    //publishProgress(count++);
 
                 }
             }
@@ -141,26 +142,28 @@ public class Loader extends AsyncTask <String,Integer,Void> {
         }else if (LOAD_TYPE == Values.LOAD_TEACHERS){
             db.clearTeachersDB();
             try {
-                items = FileManager.readFile(absPath);
-                dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
+                FileManager.readLine(context, absPath, 2);
+                //items = FileManager.readFile(absPath);
+                //dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }/*
             if (items != null) {
                 for (String s : items){
                     String [] split = s.split(";");
                     try {
-                        db.writeInDBTeachers(split[0],split[1],split[2],split[3],split[4],split[5]);
+                        //db.writeInDBTeachers(split[0],split[1],split[2],split[3],split[4],split[5]);
+                        db.writeCardInBase(split[0],split[1],split[2],split[3],split[4],-1,split[5]);
                     }catch (Exception e){
                         e.printStackTrace();
                     }
                     publishProgress(count++);
                 }
-            }
+            }*/
         }else if (LOAD_TYPE ==66){
 
             try {
-                FileManager.readLine(context, absPath);
+                FileManager.readLine(context, absPath, 1);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -202,4 +205,6 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                 new Locale("ru"));
         return dateFormat.parse(text).getTime();
     }
+
+
 }
