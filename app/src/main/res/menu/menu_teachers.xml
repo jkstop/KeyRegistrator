@@ -2,10 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/menu_teachers_selector_add"
+        android:title="Добавить нового пользователя"
+        android:icon="@drawable/ic_add_black_24dp"
+        app:showAsAction="ifRoom"/>
+
     <item android:id="@+id/menu_teachers_save_to_file"
         android:title="Сохранить и выгрузить"
         android:icon="@drawable/ic_save_black_24dp"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
     <item android:id="@+id/menu_teachers_download_favorite"
         android:title="Загрузить избранное"

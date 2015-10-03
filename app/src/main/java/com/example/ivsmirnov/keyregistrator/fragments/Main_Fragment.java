@@ -46,8 +46,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     private LinearLayout disclaimer;
     private FrameLayout frameForGrid;
 
-    //private ArrayList <SparseArray> mItems;
-
     adapter_main_auditrooms_grid adapter;
 
     private static long lastClickTime = 0;
@@ -72,7 +70,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         rooms = new ArrayList<>(db.readFromRoomsDB());
         isFreeAud = new ArrayList<>(db.readStatusRooms());
         lastVisiters = new ArrayList<>(db.readLastVisiterRoom());
-        //mItems = db.readJournalFromDB();
         closeBase();
 
         frameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
@@ -97,7 +94,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                     bundle.putString(Values.AUDITROOM, view.getTag().toString());
                     Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
                     persons_fragment.setArguments(bundle);
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.tag_persons_fragment)).commit();
                 } else {
                     int pos = preferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + view.getTag().toString(), -1);
 
@@ -109,7 +106,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                         Toast.makeText(context, "Был какой-то глюк...", Toast.LENGTH_SHORT).show();
                     } else {
                         db.updateDB(pos);
-                        //mItems.get(preferences.getInt(Values.POSITION_IN_LIST_FOR_ROOM+view.getTag(),-1)).put(3,String.valueOf(System.currentTimeMillis()));
                     }
 
                     db.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), 1);
@@ -121,42 +117,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 }
         });
 
-        /*mListView = (ListView)rootView.findViewById(R.id.list);
-        mAdapterjournallist = new adapter_journal_list(context, mItems);
-        mListView.setAdapter(mAdapterjournallist);
-        mListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
-        mListView.setSelection(mAdapterjournallist.getCount());
-        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                Toast.makeText(context,"Функция удаления временно отключена. Потом исправлю.",Toast.LENGTH_SHORT).show();
-                /*AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Удаление элемента")
-                        .setMessage("Удалить выбранный элемент из списка?")
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        })
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mItems.remove(position);
-                                mAdapterjournallist.notifyDataSetChanged();
-
-                                openBase();
-                                db.deleteFromDB(position);
-                                closeBase();
-                            }
-                        })
-                        .setCancelable(true);
-                Dialog dialog = builder.create();
-                dialog.show();
-                return true;
-            }
-        });
-        */
         TextView textEmptyAud = (TextView)rootView.findViewById(R.id.text_empty_aud_list);
         if (rooms.isEmpty()){
             textEmptyAud.setVisibility(View.VISIBLE);
@@ -178,7 +138,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         isFreeAud = new ArrayList<>(db.readStatusRooms());
         lastVisiters = new ArrayList<>(db.readLastVisiterRoom());
         photoPath = new ArrayList<>(db.readPhotoPath());
-        //mItems = db.readJournalFromDB();
         db.closeDBconnection();
 
         int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);

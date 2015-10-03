@@ -3,26 +3,35 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.SparseArray;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.FileManager;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -38,12 +47,15 @@ import at.markushi.ui.CircleButton;
 public class Persons_Fragment extends Fragment implements View.OnClickListener,UpdateTeachers{
 
     private Context mContext;
-    private GridView mGridView;
+    private static GridView mGridView;
+    private ListView mListView;
     private DataBases db;
-    private CircleButton mAddButton;
 
-    private ArrayList<SparseArray> mAllItems;
+    private static ArrayList<SparseArray> mAllItems;
     public adapter_persons_grid mAdapter;
+    private adapter_list_characters mListAdapter;
+
+    private ArrayList<String> mListCharacters;
 
     private static long today, lastDate;
 
@@ -83,6 +95,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
             if (((Launcher) getActivity()).getSupportActionBar() != null) {
                 ((Launcher) getActivity()).getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_persons_select));
             }
+            setHasOptionsMenu(true);
         }
 
     }
@@ -101,8 +114,27 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         closeBase();
         sortByABC();
 
-        mAddButton = (CircleButton)rootView.findViewById(R.id.add_user_button);
-        mAddButton.setOnClickListener(this);
+        mListView = (ListView)rootView.findViewById(R.id.list_for_base_sql);
+        mListCharacters = new ArrayList<>();
+
+        for (int i=0;i<mAllItems.size();i++){
+            String lastname = (String) mAllItems.get(i).get(0);
+            String startChar = lastname.substring(0,1);
+            if (!mListCharacters.contains(startChar)){
+                mListCharacters.add(startChar);
+            }
+        }
+
+
+        mListAdapter = new adapter_list_characters(mContext,mListCharacters);
+        mListView.setAdapter(mListAdapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String character = mListCharacters.get(i);
+                move(character);
+            }
+        });
 
         mGridView = (GridView)rootView.findViewById(R.id.grid_for_base_sql);
         mAdapter = new adapter_persons_grid(mContext, mAllItems);
@@ -189,6 +221,19 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         return rootView;
     }
 
+    public static void move (String symbol){
+
+        for (int i=0;i<mAllItems.size();i++){
+            String lastname = (String) mAllItems.get(i).get(0);
+            String startChar = lastname.substring(0,1);
+            if (symbol.equalsIgnoreCase(startChar)){
+                mGridView.setSelection(i);
+                break;
+            }
+        }
+
+    }
+
     private void writeIt(String aud, String name, Long time, String path) {
         openBase();
         if (today == lastDate) {
@@ -232,6 +277,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_teachers, menu);
+
     }
 
     @Override
@@ -274,6 +320,14 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 dialog_fragment.setTargetFragment(this, 0);
                 dialog_fragment.show(getFragmentManager(), "columns");
                 return true;
+            case R.id.menu_teachers_selector_add:
+                Dialog_Fragment dialogType = new Dialog_Fragment();
+                Bundle bundle1 = new Bundle();
+                bundle1.putInt(Values.DIALOG_TYPE,Values.INPUT_DIALOG);
+                dialogType.setArguments(bundle1);
+                dialogType.setTargetFragment(Persons_Fragment.this,0);
+                dialogType.show(getChildFragmentManager(), "type");
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -297,6 +351,18 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         mAdapter = new adapter_persons_grid(mContext, mAllItems);
         mGridView.setAdapter(mAdapter);
         mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
+
+        mListCharacters = new ArrayList<>();
+        for (int i=0;i<mAllItems.size();i++){
+            String lastname = (String) mAllItems.get(i).get(0);
+            String startChar = lastname.substring(0,1);
+            if (!mListCharacters.contains(startChar)){
+                mListCharacters.add(startChar);
+            }
+        }
+
+        mListAdapter = new adapter_list_characters(mContext,mListCharacters);
+        mListView.setAdapter(mListAdapter);
     }
 
     @Override

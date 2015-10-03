@@ -17,6 +17,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -46,6 +47,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
     private SharedPreferences.Editor mPreferencesEditor;
 
     private static long back_pressed;
+    private static long symbol_pressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +121,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
             bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_EDITOR);
             Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
             persons_fragment.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.tag_persons_fragment)).commit();
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_statistics))){
             startActivity(new Intent(mContext, CloseDay.class).putExtra("type", 1).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_journal))){
@@ -219,4 +221,22 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         }
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (symbol_pressed + 2000 > System.currentTimeMillis()){
+            super.onKeyDown(keyCode,event);
+        }else{
+            char key = (char)event.getUnicodeChar();
+            try{
+                if (getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment)).isVisible()){
+                    Persons_Fragment.move(String.valueOf(key));
+                }
+            }catch (Exception e){
+                Log.d("persons"," NOT visible");
+            }
+            symbol_pressed = System.currentTimeMillis();
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
 }
