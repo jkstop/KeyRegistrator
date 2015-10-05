@@ -175,10 +175,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 dialog_grid_size.setTargetFragment(this, 0);
                 dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
                 return true;
-            case R.id.menu_main_test:
-                //startActivity(new Intent(context, TestNewPersons.class));
-                //сделать recycleView with cardView
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

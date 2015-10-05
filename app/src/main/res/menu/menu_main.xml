@@ -7,9 +7,4 @@
         android:title="Размер элеметов"
         app:showAsAction="never"/>
 
-    <item
-        android:id="@+id/menu_main_test"
-        android:title="test"
-        app:showAsAction="never" />
-
 </menu>

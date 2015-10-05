@@ -1,6 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
+import android.provider.ContactsContract;
 import android.util.SparseArray;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -27,11 +28,13 @@ public class adapter_persons_grid extends BaseAdapter {
 
     private Context context;
     private LayoutInflater inflater;
+    private DataBases db;
 
 
-    public adapter_persons_grid(Context c, ArrayList<SparseArray> all) {
+    public adapter_persons_grid(Context c, ArrayList<SparseArray> all, DataBases d) {
         allItems = all;
         context = c;
+        db = d;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
@@ -76,9 +79,8 @@ public class adapter_persons_grid extends BaseAdapter {
                 if (!imageLoader.isInited()){
                     imageLoader.init(ImageLoaderConfiguration.createDefault(context));
                 }
-                DataBases db = new DataBases(context);
                 imageLoader.displayImage("file://" + db.getPhotoID(card), image);
-                db.closeDBconnection();
+
 
 
         WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);

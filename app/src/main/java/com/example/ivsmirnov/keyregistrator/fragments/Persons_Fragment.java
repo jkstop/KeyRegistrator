@@ -111,7 +111,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
 
         openBase();
         mAllItems = db.readTeachersFromDB();
-        closeBase();
+
         sortByABC();
 
         mListView = (ListView)rootView.findViewById(R.id.list_for_base_sql);
@@ -137,7 +137,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         });
 
         mGridView = (GridView)rootView.findViewById(R.id.grid_for_base_sql);
-        mAdapter = new adapter_persons_grid(mContext, mAllItems);
+        mAdapter = new adapter_persons_grid(mContext, mAllItems, db);
         mGridView.setAdapter(mAdapter);
         mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
 
@@ -206,10 +206,10 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
 
                     final Long time = System.currentTimeMillis();
 
-                    openBase();
+
                     String path = db.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
                             textLastName.getText().toString(), textKaf.getText().toString()});
-                    closeBase();
+
                     writeIt(aud, name, time, path);
 
                     getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance()).commit();
@@ -235,7 +235,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     }
 
     private void writeIt(String aud, String name, Long time, String path) {
-        openBase();
+
         if (today == lastDate) {
             db.writeInDBJournal(aud, name, time, (long) 0, false);
             mPreferencesEditor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount());
@@ -249,7 +249,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         db.updateStatusRooms(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), 0);
         db.updateLastVisitersRoom(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), name);
         db.updatePhotoPath(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), path);
-        closeBase();
+
 
         mPreferencesEditor.putLong(Values.DATE, today);
         mPreferencesEditor.commit();
@@ -345,10 +345,10 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     public void onFinishEditing() {
         openBase();
         mAllItems = db.readTeachersFromDB();
-        closeBase();
+
 
         sortByABC();
-        mAdapter = new adapter_persons_grid(mContext, mAllItems);
+        mAdapter = new adapter_persons_grid(mContext, mAllItems,db);
         mGridView.setAdapter(mAdapter);
         mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
 
@@ -363,6 +363,12 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
 
         mListAdapter = new adapter_list_characters(mContext,mListCharacters);
         mListView.setAdapter(mListAdapter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        closeBase();
     }
 
     @Override
