@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menu_teachers_selector_add"
+        android:title="Добавить нового пользователя"
+        android:icon="@drawable/ic_add_black_24dp"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/menu_teachers_save_to_file"
+        android:title="Сохранить и выгрузить"
+        android:icon="@drawable/ic_save_black_24dp"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_teachers_download_favorite"
+        android:title="Загрузить избранное"
+        android:icon="@drawable/ic_add_black_24dp"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_teachers_download_local"
+        android:title="Загрузить локальную базу из CSV"
+        android:icon="@drawable/ic_file_download_black_24dp"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_teachers_delete"
+        android:title="Очистить"
+        android:icon="@drawable/ic_delete_black_24dp"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_teachers_select_location_for_copy"
+        android:title="Указать путь для копирования на ПК"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_teachers_set_columns_number"
+        android:title="Количество колонок"
+        android:icon="@drawable/ic_view_column_black_24dp"
+        app:showAsAction="never" />
+
+</menu>

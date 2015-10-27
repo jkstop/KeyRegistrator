@@ -1,0 +1,69 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_horizontal_margin"
+    tools:context="com.example.ivsmirnov.keyregistrator.activities.CloseDay"
+    android:background="#fcfbfa">
+
+    <TextView
+        android:id="@+id/text_close"
+        android:text="Занятия завершены!"
+        android:textSize="50dp"
+        android:gravity="center"
+        android:layout_gravity="top"
+        android:paddingTop="20dp"
+        android:paddingBottom="100dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#ffff1c12"
+        android:layout_alignParentTop="true" />
+
+    <LinearLayout
+        android:layout_below="@+id/text_close"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <fragment
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
+            android:layout_height="wrap_content"
+            android:name="com.example.ivsmirnov.keyregistrator.fragments.CloseDay_stat_Fragment"
+            tools:layout="@layout/fragment_close_day_stat"/>
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_weight="0.4"
+            android:layout_height="match_parent"
+            android:src="@drawable/fa_logo"/>
+    </LinearLayout>
+
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="OK"
+            android:onClick="okClick"
+            android:textSize="30dp"
+            android:textColor="#ff000000"
+            android:background="@drawable/button_background"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp" />
+    </LinearLayout>
+
+
+</RelativeLayout>
