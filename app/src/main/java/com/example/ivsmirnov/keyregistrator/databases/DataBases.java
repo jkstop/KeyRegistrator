@@ -43,8 +43,6 @@ public class DataBases{
     private String mPath;
     private Context context;
 
-
-
     public DataBases(Context context){
 
         this.context = context;
@@ -88,7 +86,16 @@ public class DataBases{
         ContentValues cv = new ContentValues();
         cv.put(DataBasesRegist.COLUMN_STATUS, status);
         base.update(DataBasesRegist.TABLE_ROOMS, cv, DataBasesRegist._ID + "=" + id, null);
+    }
 
+    public ArrayList<String> readAudirtoomsFromDB(){
+        ArrayList<String>items = new ArrayList<>();
+        cursorRoom.moveToPosition(-1);
+        while (cursorRoom.moveToNext()){
+            String aud = cursorRoom.getString(cursorRoom.getColumnIndex(DataBasesRegist.COLUMN_ROOM));
+            items.add(aud);
+        }
+        return items;
     }
 
     public String findPhotoPath(String[] items){

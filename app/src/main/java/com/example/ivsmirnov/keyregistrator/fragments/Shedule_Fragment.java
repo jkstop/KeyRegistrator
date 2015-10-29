@@ -42,7 +42,7 @@ public class Shedule_Fragment extends Fragment implements Shedule_Load{
     @Override
     public void onFinish(ArrayList<String> items) {
         for (String s : items){
-            //Log.d("itemFromJSON",s);
+            Log.d("itemFromJSON",s);
         }
     }
 }
