@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseShedule;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.Shedule_Load;
 
@@ -26,7 +27,7 @@ import java.util.Date;
 /**
  * Created by IVSmirnov on 08.09.2015.
  */
-public class Load_shedule extends AsyncTask<Void, ArrayList<String>, ArrayList<String>> {
+public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
 
     HttpURLConnection urlConnection = null;
     BufferedReader bufferedReader = null;
@@ -37,7 +38,10 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, ArrayList<S
     private Context mContext;
     private Shedule_Load shedule_load;
 
+    private int result;
+
     private DataBases db;
+    private DataBaseShedule dbShedule;
 
     public Load_shedule (Context c, Shedule_Load s){
         this.mContext = c;
@@ -45,9 +49,10 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, ArrayList<S
     }
 
     @Override
-    protected ArrayList<String> doInBackground(Void... params) {
+    protected Integer doInBackground(Void... params) {
 
         db = new DataBases(mContext);
+        dbShedule = new DataBaseShedule(mContext);
 
         JSONObject jsonObject = null;
         String facultyName = "";
@@ -58,6 +63,7 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, ArrayList<S
         ArrayList<String> groupsNames = new ArrayList<>();
         ArrayList<String> groupsIDs = new ArrayList<>();
         ArrayList<String> auditroomsList = db.readAudirtoomsFromDB();
+        result = 0;
 
         Calendar calendar = Calendar.getInstance();
         int today = calendar.get(Calendar.DAY_OF_WEEK)-1;
@@ -71,6 +77,17 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, ArrayList<S
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+        Calendar weekCalendar = Calendar.getInstance();
+        weekCalendar.set(Calendar.DAY_OF_MONTH,1);
+        weekCalendar.set(Calendar.MONTH,Calendar.SEPTEMBER);
+        weekCalendar.set(Calendar.YEAR,2015);
+        int weekOf1stSeptember = weekCalendar.get(Calendar.WEEK_OF_YEAR);
+        int todayWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+        int weekFromStartStudy = todayWeek - weekOf1stSeptember + 1;
+        Log.d("week",String.valueOf(weekFromStartStudy));
+
+        dbShedule.clearBaseShedule();
 
 
         //список факультетов и их ID
@@ -205,13 +222,16 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, ArrayList<S
                                         String subject = jsonObjectLessons.getString("subject");
 
                                         JSONArray jsonArrayTeachers = jsonObjectLessons.getJSONArray("teachers");
-                                        String teacher = " ";
+                                        String teacher = "";
                                         for (int l=0;l<jsonArrayTeachers.length();l++){
                                             JSONObject jsonObjectTeachers = jsonArrayTeachers.getJSONObject(l);
-                                            teacher += jsonObjectTeachers.getString("teacher_name");
+                                            teacher += jsonObjectTeachers.getString("teacher_name")+"\n";
                                         }
 
                                         String timeStart = jsonObjectLessons.getString("time_start");
+                                        if (timeStart.length()==4){
+                                            timeStart = "0"+timeStart;
+                                        }
                                         String timeEnd = jsonObjectLessons.getString("time_end");
                                         String group_name = jsonSchedule.getString("group_name");
 
@@ -229,7 +249,19 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, ArrayList<S
                                         }
 
                                         if (dayOfLessonStart.before(todayDate)&&dayOfLessonEnd.after(todayDate)){
-                                            Log.d("item",audn+teacher+timeStart+timeEnd+group_name+subject+"d"+weekday+"p"+String.valueOf(parity)+"s"+dateStart+"e"+dateEnd);
+                                            if (parity!=0&&weekFromStartStudy%2==0){ //неделя четная
+                                                if (parity == 2 || parity ==0){
+                                                    dbShedule.writeInBaseShedule(timeStart,timeEnd,group_name,teacher,audn,subject,String.valueOf(parity));
+                                                }
+                                            } else if (parity==0){
+                                                dbShedule.writeInBaseShedule(timeStart, timeEnd, group_name, teacher, audn, subject, String.valueOf(parity));
+                                            }else{//неделя нечетная
+                                                if (parity == 1 || parity == 0){
+                                                    dbShedule.writeInBaseShedule(timeStart, timeEnd, group_name, teacher, audn, subject, String.valueOf(parity));
+                                                }
+
+                                            }
+                                            result = 1;
                                         }
                                     }
                                 }
@@ -242,13 +274,13 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, ArrayList<S
             }
         }
 
-        return groupsNames;
+        return result;
     }
 
         @Override
-        protected void onPostExecute (ArrayList<String> s){
-            super.onPostExecute(s);
-            shedule_load.onFinish(s);
+        protected void onPostExecute (Integer r){
+            super.onPostExecute(r);
+            shedule_load.onFinish(r);
         }
 
         @Override

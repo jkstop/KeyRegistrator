@@ -12,7 +12,7 @@ import android.util.Log;
 public class DataBasesSheduleRegist extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String name = "Shedule.db";
-    private static final int version = 1;
+    private static final int version = 10;
 
     public static final String TABLE_SHEDULE = "Расписание";
     public static final String COLUMN_TIME_START = "Начало";

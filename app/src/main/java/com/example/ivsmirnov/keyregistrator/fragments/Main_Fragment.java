@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Write_File;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -174,6 +175,9 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 dialog_grid_size.setArguments(bundle_grid);
                 dialog_grid_size.setTargetFragment(this, 0);
                 dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
+                return true;
+            case R.id.menu_main_test:
+                new Write_File(context).execute();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

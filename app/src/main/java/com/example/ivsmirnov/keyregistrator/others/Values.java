@@ -45,5 +45,6 @@ public class Values {
     public static final String THEME = "theme";
     public static final String CHECK_JOURNAL = "check_journal";
     public static final String CHECK_TEACHERS = "check_teachers";
+    public static final String DATE_SHEDULE_UPDATE = "date_shedule_update";
 
 }

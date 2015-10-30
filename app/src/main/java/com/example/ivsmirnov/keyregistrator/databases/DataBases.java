@@ -599,7 +599,7 @@ public class DataBases{
             e.printStackTrace();
         }
         itemList.clear();
-        Toast.makeText(context, "В файл " + file.getAbsolutePath() + " записано " + String.valueOf(count) + " строк", Toast.LENGTH_LONG).show();
+        //Toast.makeText(context, "В файл " + file.getAbsolutePath() + " записано " + String.valueOf(count) + " строк", Toast.LENGTH_LONG).show();
     }
 
     public void closeDay(){
@@ -657,7 +657,7 @@ public class DataBases{
             in.close();
             out.close();
 
-            Toast.makeText(context,"Файл "+srFile+" скопирован в "+dtFile,Toast.LENGTH_LONG).show();
+//            Toast.makeText(context,"Файл "+srFile+" скопирован в "+dtFile,Toast.LENGTH_LONG).show();
         }
         catch(FileNotFoundException ex){
             System.out.println(ex.getMessage() + " in the specified directory.");

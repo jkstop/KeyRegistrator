@@ -117,15 +117,22 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_journal_save_to_file:
-                DataBases db = new DataBases(mContext);
-                db.writeFile(Values.WRITE_JOURNAL);
-                db.closeDBconnection();
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-                String mPath = Environment.getExternalStorageDirectory().getPath();
-                String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
-                String srFileJournal = mPath + "/Journal.txt";
-                String dtFileJournal = path + "/Journal.txt";
-                DataBases.copyfile(mContext, srFileJournal, dtFileJournal);
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DataBases db = new DataBases(mContext);
+                        db.writeFile(Values.WRITE_JOURNAL);
+                        db.closeDBconnection();
+                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+                        String mPath = Environment.getExternalStorageDirectory().getPath();
+                        String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
+                        String srFileJournal = mPath + "/Journal.txt";
+                        String dtFileJournal = path + "/Journal.txt";
+                        DataBases.copyfile(mContext, srFileJournal, dtFileJournal);
+                    }
+                });
+                thread.start();
+
                 return true;
             case R.id.menu_journal_download:
                 startActivityForResult(new Intent(mContext,FileManager.class).putExtra("what",10),333);

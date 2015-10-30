@@ -41,13 +41,13 @@ public class Send_Email extends AsyncTask<Void, Void, Void> {
         if (mSharedPreferences.getBoolean(Values.CHECK_JOURNAL, false) && mSharedPreferences.getBoolean(Values.CHECK_TEACHERS, false)) {
             attachments = new File[2];
             attachments[0] = new File(Environment.getExternalStorageDirectory().getPath() + "/Journal.txt");
-            attachments[1] = new File(Environment.getExternalStorageDirectory().getPath() + "/Teachers.txt");
+            attachments[1] = new File(Environment.getExternalStorageDirectory().getPath() + "/Teachers.csv");
         } else if (mSharedPreferences.getBoolean(Values.CHECK_JOURNAL, false) && !mSharedPreferences.getBoolean(Values.CHECK_TEACHERS, false)) {
             attachments = new File[1];
             attachments[0] = new File(Environment.getExternalStorageDirectory().getPath() + "/Journal.txt");
         } else if (!mSharedPreferences.getBoolean(Values.CHECK_JOURNAL, false) && mSharedPreferences.getBoolean(Values.CHECK_TEACHERS, false)) {
             attachments = new File[1];
-            attachments[0] = new File(Environment.getExternalStorageDirectory().getPath() + "/Teachers.txt");
+            attachments[0] = new File(Environment.getExternalStorageDirectory().getPath() + "/Teachers.csv");
         } else {
             attachments = new File[0];
         }

@@ -284,15 +284,21 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_teachers_save_to_file:
-                DataBases db = new DataBases(mContext);
-                db.writeFile(Values.WRITE_TEACHERS);
-                db.closeDBconnection();
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-                String mPath = Environment.getExternalStorageDirectory().getPath();
-                String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
-                String srFileTeachers = mPath + "/Teachers.txt";
-                String dtFileTeachers = path + "/Teachers.txt";
-                DataBases.copyfile(mContext, srFileTeachers, dtFileTeachers);
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DataBases db = new DataBases(mContext);
+                        db.writeFile(Values.WRITE_TEACHERS);
+                        db.closeDBconnection();
+                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+                        String mPath = Environment.getExternalStorageDirectory().getPath();
+                        String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
+                        String srFileTeachers = mPath + "/Teachers.csv";
+                        String dtFileTeachers = path + "/Teachers.csv";
+                        DataBases.copyfile(mContext, srFileTeachers, dtFileTeachers);
+                    }
+                });
+                thread.start();
                 return true;
             case R.id.menu_teachers_download_favorite:
                 startActivityForResult(new Intent(mContext, FileManager.class).putExtra("what", 11), 334);
