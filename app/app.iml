@@ -112,6 +112,7 @@
     <orderEntry type="library" exported="" name="slf4j-api-1.7.9" level="project" />
     <orderEntry type="library" exported="" name="javax.mail" level="project" />
     <orderEntry type="library" exported="" name="uitools-1.1.0" level="project" />
+    <orderEntry type="library" exported="" name="acssmc-1.1.2" level="project" />
     <orderEntry type="library" exported="" name="circleimageview-1.2.2" level="project" />
     <orderEntry type="library" exported="" name="viewmover-1.1.0" level="project" />
     <orderEntry type="library" exported="" name="fab-1.1.2" level="project" />

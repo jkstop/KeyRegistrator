@@ -2,13 +2,17 @@ package com.example.ivsmirnov.keyregistrator.activities;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -23,7 +27,12 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Open_Reader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
 import com.example.ivsmirnov.keyregistrator.fragments.Email_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Journal_fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
@@ -49,6 +58,13 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
     private static long back_pressed;
     private static long symbol_pressed;
 
+    private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+    private static final String[] stateStrings = { "Unknown", "Absent",
+            "Present", "Swallowed", "Powered", "Negotiable", "Specific" };
+    private UsbManager mManager;
+    private Reader mReader;
+    private PendingIntent mPermissionIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +74,48 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         mContext = this;
         mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+
+        //init reader
+        mManager = (UsbManager)getSystemService(Context.USB_SERVICE);
+        mReader = new Reader(mManager);
+        mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(
+                ACTION_USB_PERMISSION), 0);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_USB_PERMISSION);
+        filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        registerReceiver(mReceiver, filter);
+        for (UsbDevice device : mManager.getDeviceList().values()) {
+            mManager.requestPermission(device,mPermissionIntent);
+        }
+        mReader.setOnStateChangeListener(new Reader.OnStateChangeListener() {
+            @Override
+            public void onStateChange(int i, int prevState, int currState) {
+
+                if (currState < Reader.CARD_UNKNOWN
+                        || currState > Reader.CARD_SPECIFIC) {
+                    currState = Reader.CARD_UNKNOWN;
+                }
+
+                final int finalCurrState = currState;
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (stateStrings[finalCurrState].equals("Present")){
+                            try {
+                                if (getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment)).isVisible()){
+                                    powerReader();
+                                    setProtocol();
+                                    getTag();
+                                }
+                            }catch (Exception e){
+                                Toast.makeText(mContext,"Не тут прикладывать",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                });
+            }
+        });
 
         getSupportFragmentManager().beginTransaction().add(R.id.main_frame_for_fragment, Main_Fragment.newInstance()).commit();
 
@@ -104,6 +162,91 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         }
         mActionBarDrawerToggle.syncState();
     }
+
+    private void powerReader (){
+        int slotNum = 0;
+        int actionNum = 2;
+
+        PowerParams params = new PowerParams();
+        params.slotNum = slotNum;
+        params.action = actionNum;
+
+        Power_Reader powerTask = new Power_Reader(mReader);
+        powerTask.execute(params);
+    }
+    public static class PowerParams {
+        public int slotNum;
+        public int action;
+    }
+    public static class PowerResult {
+        public byte[] atr;
+        public Exception e;
+    }
+
+    private void setProtocol(){
+        int slotNum = 0;
+        int prefferedProtocol = Reader.PROTOCOL_UNDEFINED;
+        String prefferedProtocolString = "";
+        prefferedProtocol |= Reader.PROTOCOL_T0;
+        prefferedProtocolString = "T0";
+        prefferedProtocol |= Reader.PROTOCOL_T1;
+        prefferedProtocolString +="/T1";
+        if (prefferedProtocolString==""){
+            prefferedProtocolString="None";
+        }
+        SetProtocolParams params = new SetProtocolParams();
+        params.slotNum = slotNum;
+        params.preferredProtocols = prefferedProtocol;
+        Protocol_Reader protocol_task = new Protocol_Reader(mReader);
+        protocol_task.execute(params);
+    }
+    public static class SetProtocolParams {
+        public int slotNum;
+        public int preferredProtocols;
+    }
+    public static class SetProtocolResult {
+        public int activeProtocol;
+        public Exception e;
+    }
+
+    private void getTag(){
+        int slotNum = 0;
+        TransmitParams transmitParams = new TransmitParams();
+        transmitParams.slotNum = slotNum;
+        transmitParams.controlCode = -1;
+        transmitParams.command = new byte[]{(byte) 0xFF, (byte) 0xCA, (byte) 0x00, (byte) 0x00, (byte) 0x04};
+        Tag_Reader transmit_task = new Tag_Reader(mContext,mReader);
+        transmit_task.execute(transmitParams);
+    }
+    public static class TransmitParams {
+        public int slotNum;
+        public int controlCode;
+        public byte [] command;
+    }
+    public static class TransmitResult {
+        public byte[] response;
+        public int responseLength;
+        public Exception e;
+    }
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (ACTION_USB_PERMISSION.equals(action)){
+                synchronized (this){
+                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED,false)){
+                        if (device!=null){
+                            Log.d("opening","reader...");
+                            Open_Reader open_reader = new Open_Reader(mReader);
+                            open_reader.execute(device);
+                        }
+                    }
+                }
+            }
+        }
+    };
 
     @Override
     public void onClick(View v) {
@@ -206,6 +349,8 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         super.onDestroy();
         mPreferencesEditor.remove(Values.ALARM_SET);
         mPreferencesEditor.commit();
+        mReader.close();
+        unregisterReceiver(mReceiver);
     }
 
     @Override

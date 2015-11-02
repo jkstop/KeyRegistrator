@@ -46,4 +46,5 @@ dependencies {
     compile files('E:/KeyRegistrator-jkstop/libs/activation.jar')
     compile files('E:/KeyRegistrator-jkstop/libs/mail.jar')
     compile files('E:/KeyRegistrator-jkstop/libs/additionnal.jar')
+    compile files('E:/KeyRegistrator-jkstop/libs/acssmc-1.1.2.jar')
 }
