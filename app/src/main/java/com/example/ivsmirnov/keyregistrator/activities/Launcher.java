@@ -21,6 +21,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -33,18 +34,20 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Open_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
+import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Email_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Journal_fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
+import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
 
 import java.util.Calendar;
 
-public class Launcher extends AppCompatActivity implements View.OnClickListener{
+public class Launcher extends AppCompatActivity implements View.OnClickListener,GetUserByTag{
 
     private DrawerLayout mDrawerLayout;
     private FrameLayout mFrameLayout_Drawer_root;
@@ -64,6 +67,8 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
     private UsbManager mManager;
     private Reader mReader;
     private PendingIntent mPermissionIntent;
+
+    String aud = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,12 +109,16 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
                         if (stateStrings[finalCurrState].equals("Present")){
                             try {
                                 if (getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment)).isVisible()){
+                                    aud = getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment)).getArguments().getString(Values.AUDITROOM);
                                     powerReader();
                                     setProtocol();
                                     getTag();
                                 }
                             }catch (Exception e){
-                                Toast.makeText(mContext,"Не тут прикладывать",Toast.LENGTH_SHORT).show();
+                                if(getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_main_fragment)).isVisible()){
+                                    Toast.makeText(mContext,"OK",Toast.LENGTH_SHORT).show();
+                                }
+                                //Toast.makeText(mContext,"Не тут прикладывать",Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -117,7 +126,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
             }
         });
 
-        getSupportFragmentManager().beginTransaction().add(R.id.main_frame_for_fragment, Main_Fragment.newInstance()).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
         toolbar.setTitle(getResources().getString(R.string.toolbar_title_main));
@@ -174,6 +183,27 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         Power_Reader powerTask = new Power_Reader(mReader);
         powerTask.execute(params);
     }
+
+    @Override
+    public void onGetSparse(SparseArray<String> items) {
+
+        if (aud!=null){
+            String name  = items.get(2) + " "
+                        + items.get(3).charAt(0) + "." +
+                        items.get(4).charAt(0) + ".";
+            Persons_Fragment.writeIt(mContext,aud,name,System.currentTimeMillis(),items.get(6));
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
+        }else{
+        String [] values = new String[]{items.get(2),items.get(3),items.get(4),items.get(0),items.get(5),items.get(6)};
+        Bundle b = new Bundle();
+        b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
+        b.putStringArray("valuesForEdit", values);
+        Dialog_Fragment dialog = new Dialog_Fragment();
+        dialog.setArguments(b);
+        dialog.show(getSupportFragmentManager(),"edit");
+        }
+    }
+
     public static class PowerParams {
         public int slotNum;
         public int action;
@@ -215,7 +245,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
         transmitParams.slotNum = slotNum;
         transmitParams.controlCode = -1;
         transmitParams.command = new byte[]{(byte) 0xFF, (byte) 0xCA, (byte) 0x00, (byte) 0x00, (byte) 0x04};
-        Tag_Reader transmit_task = new Tag_Reader(mContext,mReader);
+        Tag_Reader transmit_task = new Tag_Reader(mContext,mReader,this);
         transmit_task.execute(transmitParams);
     }
     public static class TransmitParams {
@@ -254,7 +284,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener{
 
         if (v.getTag().equals(res.getString(R.string.nav_drawer_item_home))){
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance())
+                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment))
                     .commit();
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_persons))){
             if (getSupportActionBar()!=null){

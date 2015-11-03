@@ -34,6 +34,7 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
+import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -210,7 +211,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                     String path = db.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
                             textLastName.getText().toString(), textKaf.getText().toString()});
 
-                    writeIt(aud, name, time, path);
+                    writeIt(mContext,aud, name, time, path);
 
                     getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance()).commit();
                     lastClickTime = SystemClock.elapsedRealtime();
@@ -234,25 +235,28 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
 
     }
 
-    private void writeIt(String aud, String name, Long time, String path) {
+    public static void writeIt(Context context,String aud, String name, Long time, String path) {
 
+        DataBases db = new DataBases(context);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         if (today == lastDate) {
             db.writeInDBJournal(aud, name, time, (long) 0, false);
-            mPreferencesEditor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount());
+            editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount());
         } else {
             db.writeInDBJournalHeaderDate();
-            mPreferencesEditor.putInt(Values.CURSOR_POSITION, db.cursorJournal.getCount());
-            mPreferencesEditor.commit();
+            editor.putInt(Values.CURSOR_POSITION, db.cursorJournal.getCount());
+            editor.apply();
             db.writeInDBJournal(aud, name, time, (long) 0, false);
-            mPreferencesEditor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount() + 1);
+            editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount() + 1);
         }
-        db.updateStatusRooms(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), 0);
-        db.updateLastVisitersRoom(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), name);
-        db.updatePhotoPath(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), path);
+        db.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), 0);
+        db.updateLastVisitersRoom(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), name);
+        db.updatePhotoPath(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), path);
 
 
-        mPreferencesEditor.putLong(Values.DATE, today);
-        mPreferencesEditor.commit();
+        editor.putLong(Values.DATE, today);
+        editor.apply();
     }
 
 
@@ -305,6 +309,9 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 return true;
             case R.id.menu_teachers_download_local:
                 startActivity(new Intent(mContext, FileManager.class).putExtra("what", 66));
+                return true;
+            case R.id.menu_teachers_download_local_staff:
+                startActivity(new Intent(mContext,FileManager.class).putExtra("what",67));
                 return true;
             case R.id.menu_teachers_delete:
                 Dialog_Fragment dialog = new Dialog_Fragment();
@@ -383,7 +390,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         Bundle bundle1 = new Bundle();
         bundle1.putInt(Values.DIALOG_TYPE,Values.INPUT_DIALOG);
         dialogType.setArguments(bundle1);
-        dialogType.setTargetFragment(Persons_Fragment.this,0);
+        dialogType.setTargetFragment(Persons_Fragment.this, 0);
         dialogType.show(getChildFragmentManager(), "type");
     }
 

@@ -603,7 +603,6 @@ public class DataBases{
     }
 
     public void closeDay(){
-
         int count = 0;
         cursorJournal.moveToPosition(-1);
         while (cursorJournal.moveToNext()){
@@ -616,7 +615,6 @@ public class DataBases{
         }
         editor.putInt(Values.AUTO_CLOSED_COUNT, count);
         editor.commit();
-
     }
 
     //дата для заголовка

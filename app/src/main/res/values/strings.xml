@@ -64,6 +64,7 @@
     <string name="fragment3">fragment 3</string>
     <string name="fragment4">fragment 4</string>
     <string name="tag_persons_fragment">Persons_fragment</string>
+    <string name="tag_main_fragment">Main_fragment</string>
 
     <!-- Toolbar titles -->
     <string name="toolbar_title_main">Выберите при помощи мыши нужную аудиторию</string>

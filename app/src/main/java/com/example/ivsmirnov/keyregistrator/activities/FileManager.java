@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -193,6 +194,9 @@ public class FileManager extends ListActivity implements FinishLoad{
                     }else if(what==66){
                         Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,66,this);
                         loader.execute();
+                    }else if(what==67){
+                        Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,67,this);
+                        loader.execute();
                     }else{
                         Toast.makeText(getApplicationContext(),"Error",  Toast.LENGTH_SHORT).show();
                     }
@@ -235,10 +239,13 @@ public class FileManager extends ListActivity implements FinishLoad{
         String line;
         ArrayList<String> lines = new ArrayList<>(count);
         DataBases db = new DataBases(context);
+        DataBaseStaff dbStaff= new DataBaseStaff(context);
         if (type == 1) {
             db.clearBaseSQL();
         } else if (type == 2) {
             db.clearTeachersDB();
+        }else if(type==3){
+            dbStaff.clearBaseStaff();
         }
         while ((line = fin.readLine())!=null){
             if (i<count){
@@ -255,11 +262,15 @@ public class FileManager extends ListActivity implements FinishLoad{
                     } else if (type == 2) {
                         db.writeCardInBase(split[0], split[1], split[2], split[3], split[4], -1, split[5]);
                         i++;
+                    }else if(type==3){
+                        dbStaff.writeInBaseStaff(split[0],split[1],split[2],split[3],split[4],split[5],split[6],split[7]);
+                        i++;
                     }
                 }
             }
         }
         db.closeDBconnection();
+        dbStaff.closeDB();
     }
 
 

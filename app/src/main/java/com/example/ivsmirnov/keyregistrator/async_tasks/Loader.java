@@ -189,6 +189,12 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                    publishProgress(count++);
                 }
             }*/
+        }else if(LOAD_TYPE==67){
+            try {
+                FileManager.readLine(context,absPath,3);
+            }catch (IOException e){
+                e.printStackTrace();
+            }
         }else{
             Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show();
         }

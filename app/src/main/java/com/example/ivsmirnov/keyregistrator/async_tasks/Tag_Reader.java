@@ -3,10 +3,13 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
+import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 
 /**
  * Created by ivsmirnov on 02.11.2015.
@@ -15,10 +18,12 @@ public class Tag_Reader extends AsyncTask <Launcher.TransmitParams,Void,Launcher
 
     private Reader mReader;
     private Context mContext;
+    private GetUserByTag mListener;
 
-    public Tag_Reader (Context context,Reader reader){
+    public Tag_Reader (Context context,Reader reader,GetUserByTag l){
         this.mContext = context;
         this.mReader = reader;
+        this.mListener = l;
     }
     @Override
     protected Launcher.TransmitResult doInBackground(Launcher.TransmitParams... params) {
@@ -44,7 +49,10 @@ public class Tag_Reader extends AsyncTask <Launcher.TransmitParams,Void,Launcher
             Log.d("Exception", transmitResult.e.toString());
         }else{
             String tag = getStringFromByte(transmitResult.response,transmitResult.responseLength-2);
-            Toast.makeText(mContext, tag + "00 00", Toast.LENGTH_SHORT).show();
+            DataBaseStaff dbStaff = new DataBaseStaff(mContext);
+            SparseArray<String> items = dbStaff.findUserByTag(tag + "00 00");
+            dbStaff.closeDB();
+            mListener.onGetSparse(items);
         }
     }
 
