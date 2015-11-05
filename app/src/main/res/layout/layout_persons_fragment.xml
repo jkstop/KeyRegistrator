@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_height="fill_parent"
     android:layout_width="fill_parent">
+
+    <TextView
+        android:id="@+id/layout_head_persons_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0"
+        android:gravity="center"
+        android:textColor="#ba0000"
+        android:textSize="32dp">
+    </TextView>
 
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
         <GridView
             android:id="@+id/grid_for_base_sql"
             android:layout_width="0dp"
@@ -53,4 +64,4 @@
         android:layout_alignParentEnd="true"
         android:src="@drawable/fab_ic_add" />-->
 
-</FrameLayout>
+</LinearLayout>

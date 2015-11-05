@@ -93,9 +93,12 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                     Bundle bundle = new Bundle();
                     bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
                     bundle.putString(Values.AUDITROOM, view.getTag().toString());
-                    Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
-                    persons_fragment.setArguments(bundle);
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.tag_persons_fragment)).commit();
+                    //Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+                    //persons_fragment.setArguments(bundle);
+                    //getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.tag_persons_fragment)).commit();
+                    Nfc_Fragment nfc_fragment = Nfc_Fragment.newInstance();
+                    nfc_fragment.setArguments(bundle);
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,nfc_fragment,getResources().getString(R.string.tag_nfc_fragment)).commit();
                 } else {
                     int pos = preferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + view.getTag().toString(), -1);
 

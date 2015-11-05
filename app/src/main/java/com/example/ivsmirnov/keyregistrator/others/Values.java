@@ -36,8 +36,10 @@ public class Values {
     public static final int SELECT_COLUMNS_DIALOG = 112;
     public static final int DIALOG_SEEKBARS = 113;
     public static final String PERSONS_FRAGMENT_TYPE = "persons_fragment_type";
+    public static final String PERSONS_FRAGMENT_HEAD = "persons_fragment_head";
     public static final int PERSONS_FRAGMENT_EDITOR = 115;
     public static final int PERSONS_FRAGMENT_SELECTOR = 116;
+    public static final int PERSONS_FRAGMENT_HEAD_NOT_FOUND_USER = 117;
     public static final String EMAIL = "email";
     public static final String PASSWORD = "password";
     public static final String RECIPIENTS = "recipients";

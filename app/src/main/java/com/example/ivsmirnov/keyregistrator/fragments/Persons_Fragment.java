@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -64,6 +65,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     private SharedPreferences.Editor mPreferencesEditor;
 
     private int type;
+    private int head;
 
     private static long lastClickTime = 0;
 
@@ -78,6 +80,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         Bundle extras = getArguments();
         if (extras != null) {
             type = extras.getInt(Values.PERSONS_FRAGMENT_TYPE);
+            head = extras.getInt(Values.PERSONS_FRAGMENT_HEAD);
         }
 
         if (type == Values.PERSONS_FRAGMENT_EDITOR) {
@@ -172,6 +175,12 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 }
             });
         } else {
+            if (head==Values.PERSONS_FRAGMENT_HEAD_NOT_FOUND_USER){
+                TextView textHead = (TextView)rootView.findViewById(R.id.layout_head_persons_fragment);
+                textHead.setText("Не удалось распознать карту. Выберите себя вручную.");
+                float weight = 0.1f;
+                textHead.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0,weight));
+            }
             Calendar calendar = Calendar.getInstance();
             today = calendar.get(Calendar.DATE);
             lastDate = mPreferences.getLong(Values.DATE, 0);

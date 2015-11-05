@@ -241,7 +241,9 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
                 try {
                     ImageLoader imageLoader = ImageLoader.getInstance();
-                    imageLoader.init(ImageLoaderConfiguration.createDefault(context));
+                    if (!imageLoader.isInited()){
+                        imageLoader.init(ImageLoaderConfiguration.createDefault(context));
+                    }
                     imageLoader.displayImage("file://" + values[5], imageView);
                 } catch (NullPointerException e) {
                     e.printStackTrace();

@@ -38,6 +38,7 @@ import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Email_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Journal_fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
+import com.example.ivsmirnov.keyregistrator.fragments.Nfc_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
@@ -103,22 +104,24 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
 
                 final int finalCurrState = currState;
                 runOnUiThread(new Runnable() {
-
                     @Override
                     public void run() {
                         if (stateStrings[finalCurrState].equals("Present")){
-                            try {
-                                if (getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment)).isVisible()){
-                                    aud = getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment)).getArguments().getString(Values.AUDITROOM);
-                                    powerReader();
-                                    setProtocol();
-                                    getTag();
-                                }
-                            }catch (Exception e){
-                                if(getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_main_fragment)).isVisible()){
-                                    Toast.makeText(mContext,"OK",Toast.LENGTH_SHORT).show();
-                                }
-                                //Toast.makeText(mContext,"Не тут прикладывать",Toast.LENGTH_SHORT).show();
+                            Persons_Fragment persons_fragment = (Persons_Fragment)getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment));
+                            Nfc_Fragment nfc_fragment = (Nfc_Fragment)getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_nfc_fragment));
+                            if (persons_fragment!=null&&persons_fragment.isVisible()){
+                                Log.d("persons_fragment","visible");
+                                aud = null;
+                                powerReader();
+                                setProtocol();
+                                getTag();
+                            }else if (nfc_fragment!=null&&nfc_fragment.isVisible()){
+                                aud = getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_nfc_fragment)).getArguments().getString(Values.AUDITROOM);
+                                powerReader();
+                                setProtocol();
+                                getTag();
+                            }else{
+                                Toast.makeText(mContext,"Not one of yet",Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -188,11 +191,21 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
     public void onGetSparse(SparseArray<String> items) {
 
         if (aud!=null){
-            String name  = items.get(2) + " "
+            if (items.get(2).equals("Аноним")){
+                Bundle bundle = new Bundle();
+                bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
+                bundle.putInt(Values.PERSONS_FRAGMENT_HEAD,Values.PERSONS_FRAGMENT_HEAD_NOT_FOUND_USER);
+                bundle.putString(Values.AUDITROOM, aud);
+                Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+                persons_fragment.setArguments(bundle);
+                getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment, getResources().getString(R.string.tag_persons_fragment)).commit();
+            }else{
+                String name  = items.get(2) + " "
                         + items.get(3).charAt(0) + "." +
                         items.get(4).charAt(0) + ".";
-            Persons_Fragment.writeIt(mContext,aud,name,System.currentTimeMillis(),items.get(6));
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
+                Persons_Fragment.writeIt(mContext,aud,name,System.currentTimeMillis(),items.get(6));
+                getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
+            }
         }else{
         String [] values = new String[]{items.get(2),items.get(3),items.get(4),items.get(0),items.get(5),items.get(6)};
         Bundle b = new Bundle();
