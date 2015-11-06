@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -28,13 +29,13 @@ public class adapter_persons_grid extends BaseAdapter {
 
     private Context context;
     private LayoutInflater inflater;
-    private DataBases db;
+    private DataBaseFavorite dbFavorite;
 
 
-    public adapter_persons_grid(Context c, ArrayList<SparseArray> all, DataBases d) {
+    public adapter_persons_grid(Context c, ArrayList<SparseArray> all, DataBaseFavorite d) {
         allItems = all;
         context = c;
-        db = d;
+        dbFavorite = d;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
@@ -79,7 +80,7 @@ public class adapter_persons_grid extends BaseAdapter {
                 if (!imageLoader.isInited()){
                     imageLoader.init(ImageLoaderConfiguration.createDefault(context));
                 }
-                imageLoader.displayImage("file://" + db.getPhotoID(card), image);
+                imageLoader.displayImage("file://" + dbFavorite.getPhotoID(card), image);
 
 
 

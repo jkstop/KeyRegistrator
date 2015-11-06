@@ -17,13 +17,8 @@
         android:icon="@drawable/ic_add_black_24dp"
         app:showAsAction="never"/>
 
-    <item android:id="@+id/menu_teachers_download_local"
-        android:title="Загрузить локальную базу преподавателей из CSV"
-        android:icon="@drawable/ic_file_download_black_24dp"
-        app:showAsAction="never"/>
-
     <item android:id="@+id/menu_teachers_download_local_staff"
-        android:title="Загрузить локальную базу сотрудников из CSV"
+        android:title="Загрузить локальную базу из CSV"
         android:icon="@drawable/ic_file_download_black_24dp"
         app:showAsAction="never"/>
 

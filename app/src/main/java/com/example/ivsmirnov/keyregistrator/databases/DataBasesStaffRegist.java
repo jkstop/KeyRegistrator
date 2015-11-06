@@ -12,7 +12,7 @@ import android.util.Log;
 public class DataBasesStaffRegist extends SQLiteOpenHelper implements BaseColumns {
 
     public static final String name = "Staff.db";
-    public static final int version = 2;
+    public static final int version = 3;
 
     public static final String TABLE_STAFF = "Сотрудники";
     public static final String COLUMN_NAME_DIVISION = "Подразделение";

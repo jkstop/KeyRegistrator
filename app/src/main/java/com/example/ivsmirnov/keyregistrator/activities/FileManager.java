@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
@@ -239,11 +240,10 @@ public class FileManager extends ListActivity implements FinishLoad{
         String line;
         ArrayList<String> lines = new ArrayList<>(count);
         DataBases db = new DataBases(context);
+        DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
         DataBaseStaff dbStaff= new DataBaseStaff(context);
-        if (type == 1) {
-            db.clearBaseSQL();
-        } else if (type == 2) {
-            db.clearTeachersDB();
+        if (type == 2) {
+            dbFavorite.clearTeachersDB();
         }else if(type==3){
             dbStaff.clearBaseStaff();
         }
@@ -252,18 +252,13 @@ public class FileManager extends ListActivity implements FinishLoad{
                 if (!lines.contains(line)){
                     String [] split = line.split(";");
 
-                    if (type == 1) {
-                        db.writeInDBSQL(split[0],
-                                split[1],
-                                split[2],
-                                split[3],
-                                split[4]);
-                        i++;
-                    } else if (type == 2) {
-                        db.writeCardInBase(split[0], split[1], split[2], split[3], split[4], -1, split[5]);
+                    if (type == 2) {
+                        dbFavorite.writeCardInBase(split[0], split[1], split[2], split[3], "tag", split[4], split[5]);
                         i++;
                     }else if(type==3){
-                        dbStaff.writeInBaseStaff(split[0],split[1],split[2],split[3],split[4],split[5],split[6],split[7]);
+                        if (split.length==8){
+                            dbStaff.writeInBaseStaff(split[0],split[1],split[2],split[3],split[4],split[5],split[6],split[7]);
+                        }
                         i++;
                     }
                 }
@@ -271,6 +266,7 @@ public class FileManager extends ListActivity implements FinishLoad{
         }
         db.closeDBconnection();
         dbStaff.closeDB();
+        dbFavorite.closeDB();
     }
 
 

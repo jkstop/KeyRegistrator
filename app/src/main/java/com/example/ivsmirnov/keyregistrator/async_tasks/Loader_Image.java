@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -52,7 +53,9 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         DataBases db = new DataBases(context);
-        db.writeCardInBase(surname, name, lastname, kaf, gender, pos, "null");
+        DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
+        //String photo = db.findPhotoByPosition(pos);
+        //dbFavorite.writeCardInBase(surname,name,lastname,kaf,"null",gender,photo);
         db.closeDBconnection();
 
         return null;

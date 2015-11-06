@@ -54,13 +54,14 @@ public class DataBaseStaff {
         SparseArray<String> items = new SparseArray<>();
         cursor = sqLiteDatabase.query(DataBasesStaffRegist.TABLE_STAFF,new String[]{DataBasesStaffRegist.COLUMN_RADIO_LABEL},null,null,null,null,null);
         cursor.moveToPosition(-1);
+        DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
+        String originalPath = "null";
         while (cursor.moveToNext()){
             if (tag.equals(cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_RADIO_LABEL)))){
                 int position = cursor.getPosition();
                 cursor = sqLiteDatabase.query(DataBasesStaffRegist.TABLE_STAFF,null,null,null,null,null,null);
                 cursor.moveToPosition(position);
-                DataBases db = new DataBases(mContext);
-                String photoPath = db.saveOriginalPhoto(cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_PHOTO)),
+                originalPath = dbFavorite.saveOriginalPhoto(cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_PHOTO)),
                         cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_LASTNAME)) + "_" + cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_FIRSTNAME))
                                 + "_" + cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_MIDNAME)));
                 items.put(0, cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_NAME_DIVISION)));
@@ -69,23 +70,36 @@ public class DataBaseStaff {
                 items.put(3,cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_FIRSTNAME)));
                 items.put(4,cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_MIDNAME)));
                 items.put(5, cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_SEX)));
-                items.put(6, photoPath);
+                items.put(6, originalPath);
                 items.put(7, cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_RADIO_LABEL)));
+
+                String photoPath = dbFavorite.savePhotoToSD(cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_PHOTO)),
+                        cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_LASTNAME)) + "_" + cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_FIRSTNAME)));
+
+                dbFavorite.writeInDBTeachers(cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_LASTNAME)),
+                        cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_FIRSTNAME)),
+                        cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_MIDNAME)),
+                        cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_NAME_DIVISION)),
+                        cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_RADIO_LABEL)),
+                        cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_SEX)),photoPath,originalPath);
+
                 break;
             }
         }
         if (items.size()==0){
-            DataBases db = new DataBases(mContext);
-            String photoPath = db.saveOriginalPhoto("null", tag);
+            originalPath = dbFavorite.saveOriginalPhoto("null", tag);
             items.put(0, "-");
             items.put(1,"-");
             items.put(2,"Аноним");
             items.put(3,"Аноним");
             items.put(4,"Аноним");
             items.put(5, "-");
-            items.put(6, photoPath);
+            items.put(6, originalPath);
             items.put(7, tag);
         }
+
+
+        dbFavorite.closeDB();
         return items;
     }
 }

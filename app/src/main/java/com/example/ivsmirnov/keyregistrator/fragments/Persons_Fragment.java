@@ -34,6 +34,7 @@ import com.example.ivsmirnov.keyregistrator.activities.FileManager;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -51,7 +52,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     private Context mContext;
     private static GridView mGridView;
     private ListView mListView;
-    private DataBases db;
+    private DataBaseFavorite dbFavorite;
 
     private static ArrayList<SparseArray> mAllItems;
     public adapter_persons_grid mAdapter;
@@ -114,7 +115,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
 
         openBase();
-        mAllItems = db.readTeachersFromDB();
+        mAllItems = dbFavorite.readTeachersFromDB();
 
         sortByABC();
 
@@ -141,7 +142,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         });
 
         mGridView = (GridView)rootView.findViewById(R.id.grid_for_base_sql);
-        mAdapter = new adapter_persons_grid(mContext, mAllItems, db);
+        mAdapter = new adapter_persons_grid(mContext, mAllItems, dbFavorite);
         mGridView.setAdapter(mAdapter);
         mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
 
@@ -217,7 +218,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                     final Long time = System.currentTimeMillis();
 
 
-                    String path = db.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
+                    String path = dbFavorite.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
                             textLastName.getText().toString(), textKaf.getText().toString()});
 
                     writeIt(mContext,aud, name, time, path);
@@ -270,10 +271,10 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
 
 
     private void openBase(){
-        db = new DataBases(mContext);
+        dbFavorite = new DataBaseFavorite(mContext);
     }
     private void closeBase(){
-        db.closeDBconnection();
+        dbFavorite.closeDB();
     }
     private void sortByABC(){
         Collections.sort(mAllItems, new Comparator<SparseArray>() {
@@ -315,9 +316,6 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 return true;
             case R.id.menu_teachers_download_favorite:
                 startActivityForResult(new Intent(mContext, FileManager.class).putExtra("what", 11), 334);
-                return true;
-            case R.id.menu_teachers_download_local:
-                startActivity(new Intent(mContext, FileManager.class).putExtra("what", 66));
                 return true;
             case R.id.menu_teachers_download_local_staff:
                 startActivity(new Intent(mContext,FileManager.class).putExtra("what",67));
@@ -366,11 +364,11 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     @Override
     public void onFinishEditing() {
         openBase();
-        mAllItems = db.readTeachersFromDB();
+        mAllItems = dbFavorite.readTeachersFromDB();
 
 
         sortByABC();
-        mAdapter = new adapter_persons_grid(mContext, mAllItems,db);
+        mAdapter = new adapter_persons_grid(mContext, mAllItems,dbFavorite);
         mGridView.setAdapter(mAdapter);
         mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
 

@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 
@@ -49,9 +50,11 @@ public class Tag_Reader extends AsyncTask <Launcher.TransmitParams,Void,Launcher
             Log.d("Exception", transmitResult.e.toString());
         }else{
             String tag = getStringFromByte(transmitResult.response,transmitResult.responseLength-2);
-            DataBaseStaff dbStaff = new DataBaseStaff(mContext);
-            SparseArray<String> items = dbStaff.findUserByTag(tag + "00 00");
-            dbStaff.closeDB();
+            //DataBaseStaff dbStaff = new DataBaseStaff(mContext);
+            DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
+            SparseArray<String> items = dbFavorite.findUserByTag(tag + "00 00");
+            dbFavorite.closeDB();
+            //dbStaff.closeDB();
             mListener.onGetSparse(items);
         }
     }

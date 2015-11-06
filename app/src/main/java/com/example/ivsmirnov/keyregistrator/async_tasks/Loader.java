@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.activities.FileManager;
@@ -70,6 +71,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
     protected Void doInBackground(String... params) {
 
         DataBases db = new DataBases(context);
+        DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
         ArrayList<String> items = null;
         int count = 0;
 
@@ -140,7 +142,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
             }
 
         }else if (LOAD_TYPE == Values.LOAD_TEACHERS){
-            db.clearTeachersDB();
+            dbFavorite.clearTeachersDB();
             try {
                 FileManager.readLine(context, absPath, 2);
                 //items = FileManager.readFile(absPath);
@@ -199,6 +201,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
             Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show();
         }
         db.closeDBconnection();
+        dbFavorite.closeDB();
 
         return null;
     }

@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_autoComplete_teachersBase;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.databases.DataBasesRegist;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
@@ -117,9 +118,9 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                DataBases db = new DataBases(context);
-                                db.clearTeachersDB();
-                                db.closeDBconnection();
+                                DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
+                                dbFavorite.clearTeachersDB();
+                                dbFavorite.closeDB();
                                 UpdateTeachers updateTeachers = (UpdateTeachers)getTargetFragment();
                                 updateTeachers.onFinishEditing();
                                 Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
@@ -128,7 +129,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         .create();
             case Values.INPUT_DIALOG:
                 DataBases db = new DataBases(context);
-                final ArrayList<String> items = db.readSQL();
+                final ArrayList<String> items = new ArrayList<>();//null сделать поиск по staff
                 db.closeDBconnection();
                 final AutoCompleteTextView autoCompleteTextView =  new AutoCompleteTextView(context);
                 autoCompleteTextView.addTextChangedListener(new TextWatcher() {
@@ -221,7 +222,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                 final TableLayout tableLayout = (TableLayout) dialogView.findViewById(R.id.layout_dialog_edit_table);
                 final ImageView imageView = (ImageView) dialogView.findViewById(R.id.layout_dialog_edit_image_person);
                 final String [] values = getArguments().getStringArray("valuesForEdit");
-                final DataBases dbses = new DataBases(context);
+                final DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
 
                 final EditText editSurname = (EditText) dialogView.findViewById(R.id.editSurname);
                 final EditText editName = (EditText) dialogView.findViewById(R.id.editName);
@@ -256,8 +257,8 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (values!=null){
-                            dbses.deleteFromTeachersDB(values[0], values[1], values[2], values[3]);
-                            dbses.closeDBconnection();
+                            dbFavorite.deleteFromTeachersDB(values[0], values[1], values[2], values[3]);
+                            dbFavorite.closeDB();
                         }
                         UpdateTeachers updateTeachers = (UpdateTeachers)getTargetFragment();
                         updateTeachers.onFinishEditing();
@@ -267,7 +268,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        dbses.closeDBconnection();
+                        dbFavorite.closeDB();
                     }
                 });
                 builderEdit.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -281,8 +282,8 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         edited[2] = editLastname.getText().toString();
                         edited[3] = editKaf.getText().toString();
 
-                        dbses.updateTeachersDB(source, edited);
-                        dbses.closeDBconnection();
+                        dbFavorite.updateTeachersDB(source, edited);
+                        dbFavorite.closeDB();
 
 
                         UpdateTeachers activity;
