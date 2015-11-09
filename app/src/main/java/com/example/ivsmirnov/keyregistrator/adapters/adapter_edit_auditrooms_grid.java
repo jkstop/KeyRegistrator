@@ -20,12 +20,12 @@ import java.util.ArrayList;
 
 public class adapter_edit_auditrooms_grid extends BaseAdapter {
 
-    private ArrayList<Integer> items;
+    private ArrayList<String> items;
     private Context context;
     private LayoutInflater inflater;
     private SharedPreferences sharedPreferences;
 
-    public adapter_edit_auditrooms_grid(Context c, ArrayList<Integer> i) {
+    public adapter_edit_auditrooms_grid(Context c, ArrayList<String> i) {
         this.context = c;
         this.items = i;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -56,7 +56,7 @@ public class adapter_edit_auditrooms_grid extends BaseAdapter {
         }
 
         TextView text = (TextView)rootView.findViewById(R.id.textButton);
-        text.setText(items.get(position).toString());
+        text.setText(items.get(position));
 
         ImageView imageView = (ImageView)rootView.findViewById(R.id.imageButton);
         imageView.setImageResource(R.drawable.key_colored);

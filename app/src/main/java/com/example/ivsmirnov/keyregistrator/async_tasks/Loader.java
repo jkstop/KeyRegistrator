@@ -149,19 +149,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                 //dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
             } catch (IOException e) {
                 e.printStackTrace();
-            }/*
-            if (items != null) {
-                for (String s : items){
-                    String [] split = s.split(";");
-                    try {
-                        //db.writeInDBTeachers(split[0],split[1],split[2],split[3],split[4],split[5]);
-                        db.writeCardInBase(split[0],split[1],split[2],split[3],split[4],-1,split[5]);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                    publishProgress(count++);
-                }
-            }*/
+            }
         }else if (LOAD_TYPE ==66){
 
             try {

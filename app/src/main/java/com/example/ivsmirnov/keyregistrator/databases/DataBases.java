@@ -35,7 +35,7 @@ public class DataBases{
 
     public DataBasesRegist dataBasesRegist;
     public SQLiteDatabase base;
-    public Cursor cursorJournal, cursorTeachers, cursorRoom;
+    public Cursor cursorJournal;
 
     private SharedPreferences.Editor editor;
     private SharedPreferences sharedPreferences;
@@ -52,12 +52,12 @@ public class DataBases{
         dataBasesRegist = new DataBasesRegist(context);
         base = dataBasesRegist.getWritableDatabase();
         cursorJournal = base.query(DataBasesRegist.TABLE_JOURNAL, null, null, null, null, null, null);
-        cursorTeachers = base.query(DataBaseFavoriteRegist.TABLE_TEACHER, null, null, null, null, null, null);
-        cursorRoom = base.query(DataBasesRegist.TABLE_ROOMS,null,null,null,null,null,null);
+        //cursorTeachers = base.query(DataBaseFavoriteRegist.TABLE_TEACHER, null, null, null, null, null, null);
+        //cursorRoom = base.query(DataBasesRegist.TABLE_ROOMS,null,null,null,null,null,null);
         //cursorBaseSql = base.query(DataBasesRegist.TABLE_BASE,null,null,null,null,null,null);
         Log.d("DB connection is", "OPEN");
     }
-
+/*
     public ArrayList<Integer> readFromRoomsDB (){
         cursorRoom.moveToPosition(-1);
         ArrayList<Integer> items = new ArrayList<>();
@@ -113,7 +113,7 @@ public class DataBases{
 */
 
 
-    public ArrayList<String> readLastVisiterRoom(){
+ /*   public ArrayList<String> readLastVisiterRoom(){
         cursorRoom.moveToPosition(-1);
         ArrayList<String>items = new ArrayList<>();
         while (cursorRoom.moveToNext()){
@@ -146,7 +146,7 @@ public class DataBases{
         }
         return items;
     }
-
+/*
     public void writeInRoomsDB (int room) {
         ContentValues cv = new ContentValues();
         cv.put(DataBasesRegist.COLUMN_ROOM, room);
@@ -162,7 +162,7 @@ public class DataBases{
     public void deleteFromRoomsDB(int id){
         base.delete(DataBasesRegist.TABLE_ROOMS, DataBasesRegist._ID + "=" + id, null);
     }
-
+*/
     public void deleteFromDB(int id){
 
         cursorJournal.moveToPosition(id);
@@ -572,7 +572,7 @@ public class DataBases{
                     itemList.add(stroke);
                 }
                 break;
-            case Values.WRITE_TEACHERS:
+            /*case Values.WRITE_TEACHERS:
                 file = new File(mPath + "/Teachers.csv");
                 cursorTeachers.moveToPosition(-1);
                 while (cursorTeachers.moveToNext()){
@@ -589,38 +589,40 @@ public class DataBases{
                     +cursorTeachers.getString(cursorTeachers.getColumnIndex(DataBaseFavoriteRegist.COLUMN_GENDER_FAVORITE))+";"
                             + encoded);
                 }
-                break;
+                break;*/
         }
 
         try{
-            assert file != null;
-            fileOutputStream = new FileOutputStream(file);
-            for (int i=0;i<itemList.size();i++){
-                fileOutputStream.write(itemList.get(i).getBytes());
-                fileOutputStream.write("\n".getBytes());
-                count++;
-            }
+            if (file!=null){
+                fileOutputStream = new FileOutputStream(file);
+                for (int i=0;i<itemList.size();i++){
+                    fileOutputStream.write(itemList.get(i).getBytes());
+                    fileOutputStream.write("\n".getBytes());
+                    count++;
+                }
 
-            fileOutputStream.close();
+                fileOutputStream.close();
+            }
         }
         catch (IOException e) {
             e.printStackTrace();
         }
         itemList.clear();
-        //Toast.makeText(context, "В файл " + file.getAbsolutePath() + " записано " + String.valueOf(count) + " строк", Toast.LENGTH_LONG).show();
     }
 
     public void closeDay(){
         int count = 0;
+        DataBaseRooms dbRooms = new DataBaseRooms(context);
         cursorJournal.moveToPosition(-1);
         while (cursorJournal.moveToNext()){
             if (cursorJournal.getLong(cursorJournal.getColumnIndex(DataBasesRegist.COLUMN_TIME_PUT)) == 0) {
                 updateDB(cursorJournal.getInt(cursorJournal.getColumnIndex(DataBasesRegist._ID)));
                 String aud = cursorJournal.getString(cursorJournal.getColumnIndex(DataBasesRegist.COLUMN_AUD));
-                updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud,-1),1);
+                dbRooms.updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud,-1),"true");
                 count++;
             }
         }
+        dbRooms.closeDB();
         editor.putInt(Values.AUTO_CLOSED_COUNT, count);
         editor.commit();
     }
@@ -641,8 +643,8 @@ public class DataBases{
         base.close();
         dataBasesRegist.close();
         cursorJournal.close();
-        cursorTeachers.close();
-        cursorRoom.close();
+        //cursorTeachers.close();
+        //cursorRoom.close();
 //        cursorBaseSql.close();
         Log.d("DB connection is", "CLOSE");
     }

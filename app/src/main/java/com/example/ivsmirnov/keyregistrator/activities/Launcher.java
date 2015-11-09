@@ -34,6 +34,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Open_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Email_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Journal_fragment;
@@ -46,6 +47,7 @@ import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class Launcher extends AppCompatActivity implements View.OnClickListener,GetUserByTag{
@@ -70,6 +72,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
     private PendingIntent mPermissionIntent;
 
     String aud = null;
+    Boolean isOpened = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +112,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                         if (stateStrings[finalCurrState].equals("Present")){
                             Persons_Fragment persons_fragment = (Persons_Fragment)getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment));
                             Nfc_Fragment nfc_fragment = (Nfc_Fragment)getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_nfc_fragment));
+                            Main_Fragment main_fragment = (Main_Fragment)getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_main_fragment));
                             if (persons_fragment!=null&&persons_fragment.isVisible()){
                                 Log.d("persons_fragment","visible");
                                 aud = null;
@@ -117,6 +121,11 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                                 getTag();
                             }else if (nfc_fragment!=null&&nfc_fragment.isVisible()){
                                 aud = getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_nfc_fragment)).getArguments().getString(Values.AUDITROOM);
+                                powerReader();
+                                setProtocol();
+                                getTag();
+                            }else if (main_fragment!=null&&main_fragment.isVisible()){
+                                isOpened = true;
                                 powerReader();
                                 setProtocol();
                                 getTag();
@@ -190,31 +199,45 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
     @Override
     public void onGetSparse(SparseArray<String> items) {
 
-        if (aud!=null){
-            if (items.get(2).equals("Аноним")){
-                Bundle bundle = new Bundle();
-                bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
-                bundle.putInt(Values.PERSONS_FRAGMENT_HEAD,Values.PERSONS_FRAGMENT_HEAD_NOT_FOUND_USER);
-                bundle.putString(Values.AUDITROOM, aud);
-                Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
-                persons_fragment.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment, getResources().getString(R.string.tag_persons_fragment)).commit();
-            }else{
-                String name  = items.get(2) + " "
-                        + items.get(3).charAt(0) + "." +
-                        items.get(4).charAt(0) + ".";
-                Persons_Fragment.writeIt(mContext,aud,name,System.currentTimeMillis(),items.get(6));
-                getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
+        if (isOpened){
+
+            DataBaseRooms dbRooms = new DataBaseRooms(mContext);
+            ArrayList <SparseArray<String>> rms = dbRooms.readRoomsDB();
+            for (int i=0;i<rms.size();i++){
+                if (items.get(7).equalsIgnoreCase(rms.get(i).get(4))){
+                    dbRooms.updateStatusRooms(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + rms.get(i).get(0), -1), "true");
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
+                }
             }
+            isOpened = false;
         }else{
-        String [] values = new String[]{items.get(2),items.get(3),items.get(4),items.get(0),items.get(5),items.get(6)};
-        Bundle b = new Bundle();
-        b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
-        b.putStringArray("valuesForEdit", values);
-        Dialog_Fragment dialog = new Dialog_Fragment();
-        dialog.setArguments(b);
-        dialog.show(getSupportFragmentManager(),"edit");
+            if (aud!=null){
+                if (items.get(2).equals("Аноним")){
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
+                    bundle.putInt(Values.PERSONS_FRAGMENT_HEAD,Values.PERSONS_FRAGMENT_HEAD_NOT_FOUND_USER);
+                    bundle.putString(Values.AUDITROOM, aud);
+                    Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+                    persons_fragment.setArguments(bundle);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment, getResources().getString(R.string.tag_persons_fragment)).commit();
+                }else{
+                    String name  = items.get(2) + " "
+                            + items.get(3).charAt(0) + "." +
+                            items.get(4).charAt(0) + ".";
+                    Persons_Fragment.writeIt(mContext,aud,name,System.currentTimeMillis(),items.get(6),items.get(7));
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
+                }
+            }else{
+                String [] values = new String[]{items.get(2),items.get(3),items.get(4),items.get(0),items.get(5),items.get(6)};
+                Bundle b = new Bundle();
+                b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
+                b.putStringArray("valuesForEdit", values);
+                Dialog_Fragment dialog = new Dialog_Fragment();
+                dialog.setArguments(b);
+                dialog.show(getSupportFragmentManager(),"edit");
+            }
         }
+
     }
 
     public static class PowerParams {

@@ -18,7 +18,9 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Loader;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
+import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.BufferedReader;
@@ -239,7 +241,7 @@ public class FileManager extends ListActivity implements FinishLoad{
         int i = 0;
         String line;
         ArrayList<String> lines = new ArrayList<>(count);
-        DataBases db = new DataBases(context);
+
         DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
         DataBaseStaff dbStaff= new DataBaseStaff(context);
         if (type == 2) {
@@ -253,8 +255,10 @@ public class FileManager extends ListActivity implements FinishLoad{
                     String [] split = line.split(";");
 
                     if (type == 2) {
-                        dbFavorite.writeCardInBase(split[0], split[1], split[2], split[3], "tag", split[4], split[5]);
-                        i++;
+                        if (split.length==7){
+                            dbFavorite.writeCardInBase(split[0], split[1], split[2], split[3], split[4], split[5], split[6]);
+                            i++;
+                        }
                     }else if(type==3){
                         if (split.length==8){
                             dbStaff.writeInBaseStaff(split[0],split[1],split[2],split[3],split[4],split[5],split[6],split[7]);
@@ -264,7 +268,6 @@ public class FileManager extends ListActivity implements FinishLoad{
                 }
             }
         }
-        db.closeDBconnection();
         dbStaff.closeDB();
         dbFavorite.closeDB();
     }

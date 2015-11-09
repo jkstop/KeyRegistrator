@@ -35,6 +35,7 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -142,7 +143,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         });
 
         mGridView = (GridView)rootView.findViewById(R.id.grid_for_base_sql);
-        mAdapter = new adapter_persons_grid(mContext, mAllItems, dbFavorite);
+        mAdapter = new adapter_persons_grid(mContext, mAllItems);
         mGridView.setAdapter(mAdapter);
         mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
 
@@ -182,9 +183,9 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 float weight = 0.1f;
                 textHead.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0,weight));
             }
-            Calendar calendar = Calendar.getInstance();
-            today = calendar.get(Calendar.DATE);
-            lastDate = mPreferences.getLong(Values.DATE, 0);
+            //Calendar calendar = Calendar.getInstance();
+            ///today = calendar.get(Calendar.DATE);
+            //lastDate = mPreferences.getLong(Values.DATE, 0);
 
             mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -221,9 +222,9 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                     String path = dbFavorite.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
                             textLastName.getText().toString(), textKaf.getText().toString()});
 
-                    writeIt(mContext,aud, name, time, path);
+                    writeIt(mContext,aud, name, time, path,"null");
 
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance()).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
             });
@@ -245,11 +246,17 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
 
     }
 
-    public static void writeIt(Context context,String aud, String name, Long time, String path) {
+    public static void writeIt(Context context,String aud, String name, Long time, String path, String tag) {
 
         DataBases db = new DataBases(context);
+        DataBaseRooms dbRooms = new DataBaseRooms(context);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        Calendar calendar = Calendar.getInstance();
+        today = calendar.get(Calendar.DATE);
+        lastDate = preferences.getLong(Values.DATE, 0);
+        Log.d("today", String.valueOf(today));
+        Log.d("lastdate", String.valueOf(lastDate));
         if (today == lastDate) {
             db.writeInDBJournal(aud, name, time, (long) 0, false);
             editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount());
@@ -260,10 +267,10 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
             db.writeInDBJournal(aud, name, time, (long) 0, false);
             editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount() + 1);
         }
-        db.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), 0);
-        db.updateLastVisitersRoom(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), name);
-        db.updatePhotoPath(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), path);
-
+        dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1),"false");
+        dbRooms.updateLastVisitersRoom(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), name);
+        dbRooms.updatePhotoPath(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), path);
+        dbRooms.updateTagRoom(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1),tag);
 
         editor.putLong(Values.DATE, today);
         editor.apply();
@@ -301,9 +308,9 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        DataBases db = new DataBases(mContext);
-                        db.writeFile(Values.WRITE_TEACHERS);
-                        db.closeDBconnection();
+                        DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
+                        dbFavorite.backupFavoriteStaffToFile();
+                        dbFavorite.closeDB();
                         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
                         String mPath = Environment.getExternalStorageDirectory().getPath();
                         String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
@@ -365,10 +372,10 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     public void onFinishEditing() {
         openBase();
         mAllItems = dbFavorite.readTeachersFromDB();
-
+        closeBase();
 
         sortByABC();
-        mAdapter = new adapter_persons_grid(mContext, mAllItems,dbFavorite);
+        mAdapter = new adapter_persons_grid(mContext, mAllItems);
         mGridView.setAdapter(mAdapter);
         mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
 
@@ -388,7 +395,6 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     @Override
     public void onPause() {
         super.onPause();
-        closeBase();
     }
 
     @Override

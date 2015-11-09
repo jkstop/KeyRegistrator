@@ -29,13 +29,10 @@ public class adapter_persons_grid extends BaseAdapter {
 
     private Context context;
     private LayoutInflater inflater;
-    private DataBaseFavorite dbFavorite;
 
-
-    public adapter_persons_grid(Context c, ArrayList<SparseArray> all, DataBaseFavorite d) {
+    public adapter_persons_grid(Context c, ArrayList<SparseArray> all) {
         allItems = all;
         context = c;
-        dbFavorite = d;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
@@ -76,13 +73,12 @@ public class adapter_persons_grid extends BaseAdapter {
         otchestvo.setText(card.get(2));
         kafedra.setText(card.get(3));
 
-                ImageLoader imageLoader = ImageLoader.getInstance();
-                if (!imageLoader.isInited()){
-                    imageLoader.init(ImageLoaderConfiguration.createDefault(context));
-                }
-                imageLoader.displayImage("file://" + dbFavorite.getPhotoID(card), image);
-
-
+        ImageLoader imageLoader = ImageLoader.getInstance();
+        if (!imageLoader.isInited()){
+            imageLoader.init(ImageLoaderConfiguration.createDefault(context));
+        }
+        imageLoader.displayImage("file://"+card.get(5),image);
+        //imageLoader.displayImage("file://" + dbFavorite.getPhotoID(card), image);
 
         WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();

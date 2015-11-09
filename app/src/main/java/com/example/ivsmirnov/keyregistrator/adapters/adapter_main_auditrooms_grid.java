@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public class adapter_main_auditrooms_grid extends BaseAdapter {
 
     private Context context;
-    private ArrayList<Integer> items;
+    private ArrayList<String> items;
     private ArrayList<Boolean> isFree;
     private ArrayList<String> lastVisiters;
     private ArrayList<String> photoPaths;
@@ -31,7 +31,7 @@ public class adapter_main_auditrooms_grid extends BaseAdapter {
     private SharedPreferences preferences;
 
 
-    public adapter_main_auditrooms_grid(Context c, ArrayList<Integer> i, ArrayList<Boolean> isF, ArrayList<String> sT, ArrayList<String> pP) {
+    public adapter_main_auditrooms_grid(Context c, ArrayList<String> i, ArrayList<Boolean> isF, ArrayList<String> sT, ArrayList<String> pP) {
         context = c;
         items = i;
         isFree = isF;
@@ -88,7 +88,7 @@ public class adapter_main_auditrooms_grid extends BaseAdapter {
         if (isFree.get(position)){
             image = (ImageView)view.findViewById(R.id.imageButton);
             textAud = (TextView)view.findViewById(R.id.textButton);
-            textAud.setText(String.valueOf(items.get(position)));
+            textAud.setText(items.get(position));
             view.setBackgroundResource(R.drawable.button_background);
             image.setImageResource(R.drawable.key_colored);
         }else{

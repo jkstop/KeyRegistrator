@@ -62,7 +62,7 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
         ArrayList<String> dataFromJson = new ArrayList<>();
         ArrayList<String> groupsNames = new ArrayList<>();
         ArrayList<String> groupsIDs = new ArrayList<>();
-        ArrayList<String> auditroomsList = db.readAudirtoomsFromDB();
+        ArrayList<String> auditroomsList = new ArrayList<>();/////null
         result = 0;
 
         Calendar calendar = Calendar.getInstance();

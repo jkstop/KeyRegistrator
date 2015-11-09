@@ -7,6 +7,8 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +26,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Write_File;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -40,7 +43,8 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     static int selected_aud;
     private DataBases db;
 
-    private ArrayList<Integer> rooms;
+    private ArrayList <SparseArray<String>> mItems;
+    private ArrayList<String> rooms;
     private ArrayList<Boolean> isFreeAud;
     private ArrayList <String> lastVisiters;
     private ArrayList <String> photoPath;
@@ -67,11 +71,20 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         View rootView = inflater.inflate(R.layout.layout_main_fragment,container,false);
         context = rootView.getContext();
 
-        openBase();
-        rooms = new ArrayList<>(db.readFromRoomsDB());
-        isFreeAud = new ArrayList<>(db.readStatusRooms());
-        lastVisiters = new ArrayList<>(db.readLastVisiterRoom());
-        closeBase();
+        rooms = new ArrayList<>();
+        isFreeAud = new ArrayList<>();
+        lastVisiters = new ArrayList<>();
+        photoPath = new ArrayList<>();
+
+        final DataBaseRooms dbRooms = new DataBaseRooms(context);
+        mItems = dbRooms.readRoomsDB();
+
+        for (int i=0;i<mItems.size();i++){
+            rooms.add(mItems.get(i).get(0));
+            isFreeAud.add(Boolean.parseBoolean(mItems.get(i).get(1)));
+            lastVisiters.add(mItems.get(i).get(3));
+            photoPath.add(mItems.get(i).get(5));
+        }
 
         frameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
 
@@ -80,6 +93,8 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
         gridView = (GridView)rootView.findViewById(R.id.gridView);
         gridView.setNumColumns(columns);
+        adapter = new adapter_main_auditrooms_grid(context,rooms,isFreeAud,lastVisiters,photoPath);
+        gridView.setAdapter(adapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -102,20 +117,19 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 } else {
                     int pos = preferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + view.getTag().toString(), -1);
 
-                    textButton.setText(String.valueOf(view.getTag()));
+                    //textButton.setText(String.valueOf(view.getTag()));
 
-                    viewGridItem.setBackgroundResource(R.drawable.button_background);
+                    //viewGridItem.setBackgroundResource(R.drawable.button_background);
                     db = new DataBases(context);
-                    if (pos == -1) {
-                        Toast.makeText(context, "Был какой-то глюк...", Toast.LENGTH_SHORT).show();
-                    } else {
+                    if (pos != -1) {
                         db.updateDB(pos);
                     }
 
-                    db.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), 1);
-                    db.closeDBconnection();
-                    isFreeAud.set(position, true);
-                    gridView.setAdapter(adapter);
+                    dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), "true");
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
+                    //db.closeDBconnection();
+                    //isFreeAud.set(position, true);
+                    //gridView.setAdapter(adapter);
                 }
                 lastClickTime = SystemClock.elapsedRealtime();
                 }
@@ -137,12 +151,21 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     public void onResume() {
         super.onResume();
 
-        db = new DataBases(context);
-        rooms = new ArrayList<>(db.readFromRoomsDB());
-        isFreeAud = new ArrayList<>(db.readStatusRooms());
-        lastVisiters = new ArrayList<>(db.readLastVisiterRoom());
-        photoPath = new ArrayList<>(db.readPhotoPath());
-        db.closeDBconnection();
+        rooms = new ArrayList<>();
+        isFreeAud = new ArrayList<>();
+        lastVisiters = new ArrayList<>();
+        photoPath = new ArrayList<>();
+
+        DataBaseRooms dbRooms = new DataBaseRooms(context);
+        mItems = dbRooms.readRoomsDB();
+        dbRooms.closeDB();
+
+        for (int i=0;i<mItems.size();i++){
+            rooms.add(mItems.get(i).get(0));
+            isFreeAud.add(Boolean.parseBoolean(mItems.get(i).get(1)));
+            lastVisiters.add(mItems.get(i).get(3));
+            photoPath.add(mItems.get(i).get(5));
+        }
 
         int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
         float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
@@ -178,9 +201,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 dialog_grid_size.setArguments(bundle_grid);
                 dialog_grid_size.setTargetFragment(this, 0);
                 dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
-                return true;
-            case R.id.menu_main_test:
-                new Write_File(context).execute();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

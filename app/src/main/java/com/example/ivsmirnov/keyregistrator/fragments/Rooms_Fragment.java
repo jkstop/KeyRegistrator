@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,19 +19,22 @@ import android.widget.GridView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_edit_auditrooms_grid;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
 
 import at.markushi.ui.CircleButton;
 
-public class Rooms_Fragment extends Fragment implements UpdateJournal {
+public class Rooms_Fragment extends Fragment implements UpdateTeachers {
 
     private GridView mGridView;
     private CircleButton mCircleButton;
-    private ArrayList<Integer> mItems;
+    private ArrayList<SparseArray<String>> mItems;
+    private ArrayList<String> mRooms;
     private adapter_edit_auditrooms_grid mAdaptereditauditroomsgrid;
     private Context mContext;
 
@@ -58,13 +63,18 @@ public class Rooms_Fragment extends Fragment implements UpdateJournal {
         mGridView = (GridView)rootView.findViewById(R.id.grid_rooms);
         mCircleButton = (CircleButton)rootView.findViewById(R.id.buttonAddRoom);
 
-        DataBases db = new DataBases(mContext);
-        mItems = new ArrayList<>(db.readFromRoomsDB());
-        db.closeDBconnection();
+        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
+        mItems = dbRooms.readRoomsDB();
+        dbRooms.closeDB();
+
+        mRooms = new ArrayList<>();
+        for (int i=0;i<mItems.size();i++){
+            mRooms.add(mItems.get(i).get(0));
+        }
 
         int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
 
-        mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mItems);
+        mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mRooms);
         mGridView.setAdapter(mAdaptereditauditroomsgrid);
         mGridView.setNumColumns(columns);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -72,8 +82,7 @@ public class Rooms_Fragment extends Fragment implements UpdateJournal {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Dialog_Fragment dialog = new Dialog_Fragment();
                 Bundle b = new Bundle();
-                b.putInt("aud", mItems.get(position));
-                b.putInt("pos", position);
+                b.putString("aud", mRooms.get(position));
                 b.putInt(Values.DIALOG_TYPE,Values.DELETE_ROOM_DIALOG);
                 dialog.setArguments(b);
                 dialog.setTargetFragment(Rooms_Fragment.this,0);
@@ -119,13 +128,18 @@ public class Rooms_Fragment extends Fragment implements UpdateJournal {
     }
 
     @Override
-    public void onDone() {
-        DataBases db = new DataBases(mContext);
-        mItems = new ArrayList<>(db.readFromRoomsDB());
-        db.closeDBconnection();
+    public void onFinishEditing() {
+        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
+        mItems = dbRooms.readRoomsDB();
+        dbRooms.closeDB();
+
+        mRooms = new ArrayList<>();
+        for (int i=0;i<mItems.size();i++){
+            mRooms.add(mItems.get(i).get(0));
+        }
 
         int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
-        mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mItems);
+        mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mRooms);
         mGridView.setAdapter(mAdaptereditauditroomsgrid);
         mGridView.setNumColumns(columns);
     }

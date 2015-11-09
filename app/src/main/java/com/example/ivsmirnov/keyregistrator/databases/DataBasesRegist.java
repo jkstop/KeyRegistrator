@@ -34,7 +34,7 @@ public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
             COLUMN_KAF_FAVORITE + " text not null, " + COLUMN_GENDER_FAVORITE + " text not null, " + COLUMN_PHOTO_FAVORITE + " text not null, " + COLUMN_PHOTO_ORIGINAL_FAVORITE + " text not null);";
     public static final String SQL_DELETE_TEACHERS_BASE = "DROP TABLE IF EXISTS "
             + TABLE_TEACHER;
-*/
+*/ /*
     public static final String TABLE_ROOMS = "Аудитории";
     public static final String COLUMN_ROOM = "Помещение";
     public static final String COLUMN_STATUS = "Статус";
@@ -63,7 +63,7 @@ public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(SQL_CREATE_BASE_JOURNAL);
         //sqLiteDatabase.execSQL(SQL_CREATE_TEACHERS_BASE);
-        sqLiteDatabase.execSQL(CREATE_ROOMS_BASE);
+        //sqLiteDatabase.execSQL(CREATE_ROOMS_BASE);
         //sqLiteDatabase.execSQL(CREATE_BASE_SQL);
     }
 
@@ -71,7 +71,7 @@ public class DataBasesRegist extends SQLiteOpenHelper implements BaseColumns{
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         sqLiteDatabase.execSQL(SQL_DELETE_BASE_JOURNAL);
         //sqLiteDatabase.execSQL(SQL_DELETE_TEACHERS_BASE);
-        sqLiteDatabase.execSQL(DELETE_ROOMS_BASE);
+        //sqLiteDatabase.execSQL(DELETE_ROOMS_BASE);
         //sqLiteDatabase.execSQL(DELETE_BASE_SQL);
         onCreate(sqLiteDatabase);
 

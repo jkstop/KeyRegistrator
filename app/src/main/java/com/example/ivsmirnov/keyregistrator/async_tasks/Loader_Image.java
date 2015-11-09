@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -18,6 +19,7 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
     private String kaf;
     private String gender;
     private int pos;
+    private String tag;
 
     private ProgressDialog dialog;
     private Dialog_Fragment activity;
@@ -32,6 +34,7 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
         this.kaf = items[3];
         this.gender = items[4];
         this.pos = Integer.parseInt(items[5]);
+        this.tag = items[6];
 
         this.activity = a;
         this.listener = l;
@@ -52,11 +55,13 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        DataBases db = new DataBases(context);
+
+        DataBaseStaff dbStaff = new DataBaseStaff(context);
         DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
-        //String photo = db.findPhotoByPosition(pos);
-        //dbFavorite.writeCardInBase(surname,name,lastname,kaf,"null",gender,photo);
-        db.closeDBconnection();
+        String photo = dbStaff.findPhotoByPosition(pos);
+        dbFavorite.writeCardInBase(surname,name,lastname,kaf,tag,gender,photo);
+        dbStaff.closeDB();
+        dbFavorite.closeDB();
 
         return null;
     }
@@ -64,6 +69,7 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+
         if (dialog.isShowing()){
             dialog.cancel();
         }

@@ -9,6 +9,8 @@ import android.util.SparseArray;
 
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader;
 
+import java.util.ArrayList;
+
 /**
  * Created by ivsmirnov on 03.11.2015.
  */
@@ -37,7 +39,37 @@ public class DataBaseStaff {
         cv.put(DataBasesStaffRegist.COLUMN_SEX,sex);
         cv.put(DataBasesStaffRegist.COLUMN_PHOTO,photo);
         cv.put(DataBasesStaffRegist.COLUMN_RADIO_LABEL,radiolabel);
-        sqLiteDatabase.insert(DataBasesStaffRegist.TABLE_STAFF,null,cv);
+        sqLiteDatabase.insert(DataBasesStaffRegist.TABLE_STAFF, null, cv);
+    }
+
+    public ArrayList<String> getListStaffForSearch(){
+        ArrayList<String> items = new ArrayList<>();
+        cursor = sqLiteDatabase.query(DataBasesStaffRegist.TABLE_STAFF,
+                new String[]{DataBasesStaffRegist.COLUMN_LASTNAME,DataBasesStaffRegist.COLUMN_FIRSTNAME,
+                        DataBasesStaffRegist.COLUMN_MIDNAME,DataBasesStaffRegist.COLUMN_NAME_DIVISION,DataBasesStaffRegist.COLUMN_SEX,DataBasesStaffRegist.COLUMN_RADIO_LABEL},
+                null,null,null,null,null);
+        cursor.moveToPosition(-1);
+        while (cursor.moveToNext()){
+            String lastname = cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_LASTNAME));
+            String firstname = cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_FIRSTNAME));
+            String midname = cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_MIDNAME));
+            String division = cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_NAME_DIVISION));
+            String sex = cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_SEX));
+            String position = String.valueOf(cursor.getPosition());
+            String tag = cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_RADIO_LABEL));
+            items.add(lastname+";"+firstname+";"+midname+";"+division+";"+sex+";"+position+";"+tag);
+        }
+        return items;
+    }
+
+    public String findPhotoByPosition(int position){
+        String photo = "null";
+        if (position !=-1){
+            cursor = sqLiteDatabase.query(DataBasesStaffRegist.TABLE_STAFF,new String[]{DataBasesStaffRegist.COLUMN_PHOTO},null,null,null,null,null);
+            cursor.moveToPosition(position);
+            photo = cursor.getString(cursor.getColumnIndex(DataBasesStaffRegist.COLUMN_PHOTO));
+        }
+        return photo;
     }
 
     public void clearBaseStaff(){

@@ -33,6 +33,8 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_autoComplete_teachersBase;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
 import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.databases.DataBasesRegist;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
@@ -128,9 +130,9 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         })
                         .create();
             case Values.INPUT_DIALOG:
-                DataBases db = new DataBases(context);
-                final ArrayList<String> items = new ArrayList<>();//null сделать поиск по staff
-                db.closeDBconnection();
+                DataBaseStaff dbStaff = new DataBaseStaff(context);
+                final ArrayList<String> items = dbStaff.getListStaffForSearch();
+                dbStaff.closeDB();
                 final AutoCompleteTextView autoCompleteTextView =  new AutoCompleteTextView(context);
                 autoCompleteTextView.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -157,19 +159,12 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         String name = split[1];
                         String lastname = split[2];
                         String kaf = split[3];
-                        String pos = split[4];
+                        String gender = split[4];
+                        String pos = split[5];
+                        String tag = split[6];
 
-                        String gender;
-                        if (lastname.substring(lastname.length() - 1).equals("а")) {
-                            gender = "Ж";
-                        } else {
-                            gender = "М";
-                        }
-
-
-                        Loader_Image loader_image = new Loader_Image(context, new String[]{surname, name, lastname, kaf, gender, pos}, Dialog_Fragment.this, (UpdateTeachers) getTargetFragment());
+                        Loader_Image loader_image = new Loader_Image(context, new String[]{surname, name, lastname, kaf, gender, pos, tag}, Dialog_Fragment.this, (UpdateTeachers) getTargetFragment());
                         loader_image.execute();
-
 
                         dismiss();
 
@@ -300,27 +295,24 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                 builderEdit.setCancelable(false);
                 return builderEdit.create();
             case Values.DELETE_ROOM_DIALOG:
-                final int pos = getArguments().getInt("pos");
-                final int aud = getArguments().getInt("aud");
+                final String aud = getArguments().getString("aud");
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(getResources().getString(R.string.dialog_delete_room_title))
                         .setMessage(getResources().getString(R.string.dialog_delete_room_message) + " "+ aud + "?")
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                DataBases db = new DataBases(context);
-                                db.cursorRoom.moveToPosition(pos);
-                                db.deleteFromRoomsDB(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud,
-                                        db.cursorRoom.getInt(db.cursorRoom.getColumnIndex(DataBasesRegist._ID))));
-                                db.closeDBconnection();
+                                DataBaseRooms dbRooms = new DataBaseRooms(context);
+                                dbRooms.deleteFromRoomsDB(aud);
+                                dbRooms.closeDB();
 
                                 editor.remove(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud);
                                 editor.remove(Values.POSITION_IN_BASE_FOR_ROOM + aud);
                                 editor.remove(Values.POSITION_IN_LIST_FOR_ROOM + aud);
                                 editor.commit();
 
-                                UpdateJournal updateJournal = (UpdateJournal) getTargetFragment();
-                                updateJournal.onDone();
+                                UpdateTeachers updateTeachers = (UpdateTeachers)getTargetFragment();
+                                updateTeachers.onFinishEditing();
                                 dialog.cancel();
                             }
                         })
@@ -349,14 +341,14 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                int item = Integer.parseInt(editText.getText().toString());
-                                DataBases db = new DataBases(context);
-                                db.writeInRoomsDB(item);
-                                db.closeDBconnection();
+                                String item = editText.getText().toString();
+                                DataBaseRooms dbRooms = new DataBaseRooms(context);
+                                dbRooms.writeInRoomsDB(item);
+                                dbRooms.closeDB();
                                 editText.setText("");
 
-                                UpdateJournal updateJournal = (UpdateJournal) getTargetFragment();
-                                updateJournal.onDone();
+                                UpdateTeachers updateTeachers = (UpdateTeachers) getTargetFragment();
+                                updateTeachers.onFinishEditing();
 
                                 dialog.cancel();
                             }
@@ -383,8 +375,8 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 if (ident != null && ident.equalsIgnoreCase("aud")) {
                                     editor.putInt(Values.COLUMNS_AUD_COUNT, numberPicker.getValue());
                                     editor.commit();
-                                    UpdateJournal updateJournal = (UpdateJournal) getTargetFragment();
-                                    updateJournal.onDone();
+                                    UpdateTeachers updateTeachers = (UpdateTeachers) getTargetFragment();
+                                    updateTeachers.onFinishEditing();
                                 } else if (ident != null && ident.equalsIgnoreCase("per")) {
                                     editor.putInt(Values.COLUMNS_PER_COUNT, numberPicker.getValue());
                                     editor.commit();
