@@ -7,13 +7,10 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.mail_sender.GMailSender;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.File;
-
-import javax.mail.AuthenticationFailedException;
 
 import javax.mail.AuthenticationFailedException;
 
@@ -55,7 +52,7 @@ public class Send_Email extends AsyncTask<Void, Void, Void> {
         GMailSender sender = new GMailSender(items[0], items[1]);
         try {
             sender.sendMail(items[4],
-                    items[3] + DataBases.showDate(),
+                    items[3] + Values.showDate(),
                     items[1],
                     items[2],
                     attachments);

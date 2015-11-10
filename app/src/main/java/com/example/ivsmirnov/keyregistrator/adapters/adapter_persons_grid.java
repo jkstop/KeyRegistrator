@@ -1,7 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
-import android.provider.ContactsContract;
 import android.util.SparseArray;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -14,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 

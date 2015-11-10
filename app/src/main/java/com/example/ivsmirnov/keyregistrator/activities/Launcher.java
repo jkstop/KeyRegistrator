@@ -34,6 +34,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Open_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Email_Fragment;
@@ -200,15 +201,22 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
     public void onGetSparse(SparseArray<String> items) {
 
         if (isOpened){
-
             DataBaseRooms dbRooms = new DataBaseRooms(mContext);
             ArrayList <SparseArray<String>> rms = dbRooms.readRoomsDB();
+            DataBaseJournal dbJournal = new DataBaseJournal(mContext);
             for (int i=0;i<rms.size();i++){
-                if (items.get(7).equalsIgnoreCase(rms.get(i).get(4))){
-                    dbRooms.updateStatusRooms(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + rms.get(i).get(0), -1), "true");
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
+                if (rms.get(i).get(1).equalsIgnoreCase("false")){
+                    if (items.get(7).equalsIgnoreCase(rms.get(i).get(4))){
+                        int pos = mPreferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + rms.get(i).get(0), -1);
+                        if (pos != -1) {
+                            dbJournal.updateDB(pos);
+                        }
+                        dbRooms.updateStatusRooms(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + rms.get(i).get(0), -1), "true");
+                        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
+                    }
                 }
             }
+            dbJournal.closeDB();
             isOpened = false;
         }else{
             if (aud!=null){
@@ -224,7 +232,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                     String name  = items.get(2) + " "
                             + items.get(3).charAt(0) + "." +
                             items.get(4).charAt(0) + ".";
-                    Persons_Fragment.writeIt(mContext,aud,name,System.currentTimeMillis(),items.get(6),items.get(7));
+                    Persons_Fragment.writeIt(mContext,aud,name,System.currentTimeMillis(),items.get(6),items.get(7),"card");
                     getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
                 }
             }else{
@@ -234,6 +242,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                 b.putStringArray("valuesForEdit", values);
                 Dialog_Fragment dialog = new Dialog_Fragment();
                 dialog.setArguments(b);
+                dialog.setTargetFragment(getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment)), 0);
                 dialog.show(getSupportFragmentManager(),"edit");
             }
         }

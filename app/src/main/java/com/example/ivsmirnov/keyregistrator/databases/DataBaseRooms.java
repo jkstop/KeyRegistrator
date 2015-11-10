@@ -41,7 +41,7 @@ public class DataBaseRooms {
         cv.put(DataBaseRoomsRegist.COLUMN_STATUS, "true");
         cv.put(DataBaseRoomsRegist.COLUMN_LAST_VISITER, "Аноним");
         cv.put(DataBaseRoomsRegist.COLUMN_TAG,"null");
-        cv.put(DataBaseRoomsRegist.COLUMN_CARD_OR_HANDLE,1);
+        cv.put(DataBaseRoomsRegist.COLUMN_CARD_OR_HANDLE,"null");
         cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, "");
         long id = sqLiteDatabase.insert(DataBaseRoomsRegist.TABLE_ROOMS, null, cv);
 
@@ -52,6 +52,12 @@ public class DataBaseRooms {
     public void updateStatusRooms(int id, String status){
         ContentValues cv = new ContentValues();
         cv.put(DataBaseRoomsRegist.COLUMN_STATUS, status);
+        sqLiteDatabase.update(DataBaseRoomsRegist.TABLE_ROOMS, cv, DataBaseRoomsRegist._ID + "=" + id, null);
+    }
+
+    public void updateCardOrHandle(int id, String cardOrHandle){
+        ContentValues cv = new ContentValues();
+        cv.put(DataBaseRoomsRegist.COLUMN_CARD_OR_HANDLE, cardOrHandle);
         sqLiteDatabase.update(DataBaseRoomsRegist.TABLE_ROOMS, cv, DataBaseRoomsRegist._ID + "=" + id, null);
     }
 

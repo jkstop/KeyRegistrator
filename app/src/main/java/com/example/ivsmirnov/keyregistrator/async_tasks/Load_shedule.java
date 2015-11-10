@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseShedule;
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.Shedule_Load;
 
 import org.json.JSONArray;
@@ -40,7 +39,6 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
 
     private int result;
 
-    private DataBases db;
     private DataBaseShedule dbShedule;
 
     public Load_shedule (Context c, Shedule_Load s){
@@ -51,7 +49,6 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
     @Override
     protected Integer doInBackground(Void... params) {
 
-        db = new DataBases(mContext);
         dbShedule = new DataBaseShedule(mContext);
 
         JSONObject jsonObject = null;

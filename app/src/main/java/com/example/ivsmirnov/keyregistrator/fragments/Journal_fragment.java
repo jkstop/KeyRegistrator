@@ -24,7 +24,7 @@ import android.widget.ListView;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.FileManager;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_journal_list;
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -36,7 +36,7 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
     private Context mContext;
     private ListView mListView;
 
-    private DataBases db;
+    private DataBaseJournal dbJournal;
     private adapter_journal_list mAdapterjournallist;
     private ArrayList <SparseArray> mItems;
 
@@ -55,7 +55,10 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_journal_fragment,container,false);
         mContext = rootView.getContext();
-        readJournalFromDB();
+
+        dbJournal = new DataBaseJournal(mContext);
+        mItems = dbJournal.readJournalFromDB();
+
         mListView = (ListView)rootView.findViewById(R.id.list);
         mAdapterjournallist = new adapter_journal_list(mContext, mItems);
         mListView.setAdapter(mAdapterjournallist);
@@ -78,10 +81,7 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
                             public void onClick(DialogInterface dialog, int which) {
                                 mItems.remove(position);
                                 mAdapterjournallist.notifyDataSetChanged();
-
-                                openBase();
-                                db.deleteFromDB(position);
-                                closeBase();
+                                dbJournal.deleteFromDB(position);
                             }
                         })
                         .setCancelable(true);
@@ -92,19 +92,6 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
         });
         return rootView;
 
-    }
-
-    private void readJournalFromDB(){
-        openBase();
-        mItems = db.readJournalFromDB();
-        closeBase();
-    }
-
-    private void openBase(){
-        db = new DataBases(mContext);
-    }
-    private void closeBase(){
-        db.closeDBconnection();
     }
 
     @Override
@@ -120,19 +107,16 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        DataBases db = new DataBases(mContext);
-                        db.writeFile(Values.WRITE_JOURNAL);
-                        db.closeDBconnection();
+                        dbJournal.backupJournalToFile();
                         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
                         String mPath = Environment.getExternalStorageDirectory().getPath();
                         String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
                         String srFileJournal = mPath + "/Journal.txt";
                         String dtFileJournal = path + "/Journal.txt";
-                        DataBases.copyfile(mContext, srFileJournal, dtFileJournal);
+                        Values.copyfile(mContext, srFileJournal, dtFileJournal);
                     }
                 });
                 thread.start();
-
                 return true;
             case R.id.menu_journal_download:
                 startActivityForResult(new Intent(mContext,FileManager.class).putExtra("what",10),333);
@@ -163,8 +147,21 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
 
     @Override
     public void onDone() {
-        readJournalFromDB();
+        dbJournal = new DataBaseJournal(mContext);
+        mItems = dbJournal.readJournalFromDB();
         mAdapterjournallist = new adapter_journal_list(mContext, mItems);
         mListView.setAdapter(mAdapterjournallist);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        dbJournal.closeDB();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        dbJournal = new DataBaseJournal(mContext);
     }
 }

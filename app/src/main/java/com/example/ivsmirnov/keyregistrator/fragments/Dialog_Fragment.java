@@ -33,10 +33,9 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_autoComplete_teachersBase;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
-import com.example.ivsmirnov.keyregistrator.databases.DataBasesRegist;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -54,6 +53,8 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private LayoutInflater inflater;
+
+    private boolean pin_verify;
 
     DialogInterface.OnDismissListener onDismissListener;
 
@@ -96,9 +97,9 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                DataBases db = new DataBases(context);
-                                db.clearJournalDB();
-                                db.closeDBconnection();
+                                DataBaseJournal dbJournal = new DataBaseJournal(context);
+                                dbJournal.clearJournalDB();
+                                dbJournal.closeDB();
                                 UpdateJournal listen = (UpdateJournal)getTargetFragment();
                                 listen.onDone();
 
@@ -481,10 +482,55 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                             }
                         })
                         .create();
+            case Values.DIALOG_CLOSE_ROOM:
+                LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View rootView = inflater.inflate(R.layout.view_enter_password,null);
+                final EditText passwordInput = (EditText)rootView.findViewById(R.id.view_enter_password_editText);
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle("Сдать без карты")
+                        .setView(rootView)
+                        .setCancelable(false)
+                        .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (passwordInput.getText().toString().equalsIgnoreCase("1212")) {
+                                    pin_verify = true;
+                                } else {
+                                    pin_verify = false;
+                                }
+                            }
+                        })
+                        .create();
             default:
                 return null;
         }
-
     }
 
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        switch (dialog_id){
+            case Values.DIALOG_CLOSE_ROOM:
+                if (pin_verify){
+                    DataBaseJournal dbJournal = new DataBaseJournal(context);
+                    DataBaseRooms dbRooms = new DataBaseRooms(context);
+                    String aud = getArguments().getString("aud");
+                    int pos = sharedPreferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + aud, -1);
+                    if (pos != -1) {
+                        dbJournal.updateDB(pos);
+                    }
+                    dbRooms.updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), "true");
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
+                    dbJournal.closeDB();
+                    dbRooms.closeDB();
+                }else{
+                    Toast.makeText(context,"НЕВЕРНЫЙ ПАРОЛЬ!",Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }
+
+/**/

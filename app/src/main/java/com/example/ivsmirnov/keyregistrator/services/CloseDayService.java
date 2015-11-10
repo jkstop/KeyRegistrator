@@ -11,9 +11,9 @@ import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Write_File;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.activities.CloseDay;
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 
 import java.util.Calendar;
 
@@ -48,14 +48,14 @@ public class CloseDayService extends Service {
         String srFileTeachers = mPath + "/Teachers.txt";
         String dtFileTeachers = path + "/Teachers.txt";
 
-        DataBases db = new DataBases(context);
-        db.closeDay();
-        db.closeDBconnection();
+        DataBaseJournal dbJournal = new DataBaseJournal(context);
+        dbJournal.closeDay();
+        dbJournal.closeDB();
 
         new Write_File(context).execute();
 
-        DataBases.copyfile(context, srFileJournal, dtFileJournal);
-        DataBases.copyfile(context, srFileTeachers, dtFileTeachers);
+        Values.copyfile(context, srFileJournal, dtFileJournal);
+        Values.copyfile(context, srFileTeachers, dtFileTeachers);
 
         Calendar calendar = Calendar.getInstance();
         if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {

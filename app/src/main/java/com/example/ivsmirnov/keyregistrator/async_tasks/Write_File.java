@@ -2,10 +2,10 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 public class Write_File extends AsyncTask<Void,Void,Void> {
@@ -18,10 +18,15 @@ public class Write_File extends AsyncTask<Void,Void,Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        DataBases db = new DataBases(mContext);
-        db.writeFile(Values.WRITE_JOURNAL);
-        db.writeFile(Values.WRITE_TEACHERS);
-        db.closeDBconnection();
+        DataBaseJournal dbJournal = new DataBaseJournal(mContext);
+        DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
+
+        dbJournal.backupJournalToFile();
+        dbFavorite.backupFavoriteStaffToFile();
+
+        dbJournal.closeDB();
+        dbFavorite.closeDB();
+
         return null;
     }
 

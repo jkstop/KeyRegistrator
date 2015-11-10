@@ -102,7 +102,7 @@ public class DataBaseFavorite {
         writeInDBTeachers(surname, name, lastname, kaf, tag, gender, photoPath, originalPath);
     }
 
-    public void writeInDBTeachers(String surname, String name, String lastname, String kaf, String tag, String gender, String photo, String oroginalPhoto) {
+    public void writeInDBTeachers(String surname, String name, String lastname, String kaf, String tag, String gender, String photo, String originalPhoto) {
         ContentValues cv = new ContentValues();
         cv.put(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE, surname);
         cv.put(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE, name);
@@ -111,7 +111,7 @@ public class DataBaseFavorite {
         cv.put(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE,tag);
         cv.put(DataBaseFavoriteRegist.COLUMN_GENDER_FAVORITE, gender);
         cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_FAVORITE, photo);
-        cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE, oroginalPhoto);
+        cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE, originalPhoto);
         long id = sqLiteDatabase.insert(DataBaseFavoriteRegist.TABLE_TEACHER, null, cv);
         mEditor.putLong("id",id);
         mEditor.apply();
@@ -119,12 +119,10 @@ public class DataBaseFavorite {
     }
 
     public void backupFavoriteStaffToFile(){
-        int count = 0;
         File file = null;
         ArrayList <String> itemList = new ArrayList<>();
         FileOutputStream fileOutputStream;
         String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-
         file = new File(mPath + "/Teachers.csv");
         cursor.moveToPosition(-1);
         while (cursor.moveToNext()){
@@ -144,16 +142,17 @@ public class DataBaseFavorite {
                     + encoded);
         }
 
-        try{
-            assert file != null;
-            fileOutputStream = new FileOutputStream(file);
-            for (int i=0;i<itemList.size();i++){
-                fileOutputStream.write(itemList.get(i).getBytes());
-                fileOutputStream.write("\n".getBytes());
-                count++;
-            }
+        try {
+            if (file != null) {
+                fileOutputStream = new FileOutputStream(file);
+                for (int i = 0; i < itemList.size(); i++) {
+                    fileOutputStream.write(itemList.get(i).getBytes());
+                    fileOutputStream.write("\n".getBytes());
 
-            fileOutputStream.close();
+                }
+
+                fileOutputStream.close();
+            }
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -226,7 +225,7 @@ public class DataBaseFavorite {
                 cv.put(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE,edited[1]);
                 cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,edited[2]);
                 cv.put(DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE,edited[3]);
-                sqLiteDatabase.update(DataBaseFavoriteRegist.TABLE_TEACHER, cv, DataBasesRegist._ID + "=" + row, null);
+                sqLiteDatabase.update(DataBaseFavoriteRegist.TABLE_TEACHER, cv, DataBaseFavoriteRegist._ID + "=" + row, null);
             }
         }
     }

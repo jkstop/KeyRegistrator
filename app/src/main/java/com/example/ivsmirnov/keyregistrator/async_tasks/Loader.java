@@ -8,10 +8,10 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.activities.FileManager;
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -70,13 +70,13 @@ public class Loader extends AsyncTask <String,Integer,Void> {
     @Override
     protected Void doInBackground(String... params) {
 
-        DataBases db = new DataBases(context);
+        DataBaseJournal dbJournal = new DataBaseJournal(context);
         DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
         ArrayList<String> items = null;
         int count = 0;
 
         if (LOAD_TYPE == Values.LOAD_JOURNAL){
-            db.clearJournalDB();
+            dbJournal.clearJournalDB();
             try {
                 items = FileManager.readFile(absPath);
                 dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
@@ -135,7 +135,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                             timePut = (long)1;
                         }
                     }
-                    db.writeInDBJournal(aud, name, time, timePut, true);
+                    dbJournal.writeInDBJournal(aud, name, time, timePut, true);
                     //publishProgress(count++);
 
                 }
@@ -188,7 +188,7 @@ public class Loader extends AsyncTask <String,Integer,Void> {
         }else{
             Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show();
         }
-        db.closeDBconnection();
+        dbJournal.closeDB();
         dbFavorite.closeDB();
 
         return null;

@@ -7,7 +7,6 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,9 +24,8 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Write_File;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -41,15 +39,17 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     private SharedPreferences preferences;
     private Context context;
     static int selected_aud;
-    private DataBases db;
 
     private ArrayList <SparseArray<String>> mItems;
     private ArrayList<String> rooms;
     private ArrayList<Boolean> isFreeAud;
+    private ArrayList<String> handOrCard;
     private ArrayList <String> lastVisiters;
     private ArrayList <String> photoPath;
     private LinearLayout disclaimer;
     private FrameLayout frameForGrid;
+
+    private DataBaseRooms dbRooms;
 
     adapter_main_auditrooms_grid adapter;
 
@@ -75,13 +75,15 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         isFreeAud = new ArrayList<>();
         lastVisiters = new ArrayList<>();
         photoPath = new ArrayList<>();
+        handOrCard = new ArrayList<>();
 
-        final DataBaseRooms dbRooms = new DataBaseRooms(context);
+        dbRooms = new DataBaseRooms(context);
         mItems = dbRooms.readRoomsDB();
 
         for (int i=0;i<mItems.size();i++){
             rooms.add(mItems.get(i).get(0));
             isFreeAud.add(Boolean.parseBoolean(mItems.get(i).get(1)));
+            handOrCard.add(mItems.get(i).get(2));
             lastVisiters.add(mItems.get(i).get(3));
             photoPath.add(mItems.get(i).get(5));
         }
@@ -108,31 +110,40 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                     Bundle bundle = new Bundle();
                     bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
                     bundle.putString(Values.AUDITROOM, view.getTag().toString());
-                    //Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
-                    //persons_fragment.setArguments(bundle);
-                    //getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.tag_persons_fragment)).commit();
+
                     Nfc_Fragment nfc_fragment = Nfc_Fragment.newInstance();
                     nfc_fragment.setArguments(bundle);
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,nfc_fragment,getResources().getString(R.string.tag_nfc_fragment)).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, nfc_fragment, getResources().getString(R.string.tag_nfc_fragment)).commit();
                 } else {
-                    int pos = preferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + view.getTag().toString(), -1);
+                    if (handOrCard.get(position).equalsIgnoreCase("hand")) {
+                        int pos = preferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + view.getTag().toString(), -1);
 
-                    //textButton.setText(String.valueOf(view.getTag()));
+                        if (pos != -1) {
+                            DataBaseJournal dbJournal = new DataBaseJournal(context);
+                            dbJournal.updateDB(pos);
+                            dbJournal.closeDB();
+                        }
 
-                    //viewGridItem.setBackgroundResource(R.drawable.button_background);
-                    db = new DataBases(context);
-                    if (pos != -1) {
-                        db.updateDB(pos);
+                        dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), "true");
+                        getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
                     }
-
-                    dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), "true");
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
-                    //db.closeDBconnection();
-                    //isFreeAud.set(position, true);
-                    //gridView.setAdapter(adapter);
                 }
                 lastClickTime = SystemClock.elapsedRealtime();
+            }
+        });
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if (handOrCard.get(position).equalsIgnoreCase("card")){
+                    Dialog_Fragment dialog_fragment = new Dialog_Fragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("aud",view.getTag().toString());
+                    bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLOSE_ROOM);
+                    dialog_fragment.setArguments(bundle);
+                    dialog_fragment.show(getFragmentManager(),"enter_pin");
                 }
+                return false;
+            }
         });
 
         TextView textEmptyAud = (TextView)rootView.findViewById(R.id.text_empty_aud_list);
@@ -151,14 +162,14 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     public void onResume() {
         super.onResume();
 
+        dbRooms = new DataBaseRooms(context);
+
         rooms = new ArrayList<>();
         isFreeAud = new ArrayList<>();
         lastVisiters = new ArrayList<>();
         photoPath = new ArrayList<>();
 
-        DataBaseRooms dbRooms = new DataBaseRooms(context);
         mItems = dbRooms.readRoomsDB();
-        dbRooms.closeDB();
 
         for (int i=0;i<mItems.size();i++){
             rooms.add(mItems.get(i).get(0));
@@ -176,13 +187,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
         adapter.notifyDataSetChanged();
 
-    }
-
-    private void openBase(){
-        db = new DataBases(context);
-    }
-    private void closeBase(){
-        db.closeDBconnection();
     }
 
     @Override
@@ -222,5 +226,11 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
 
         disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
         frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        dbRooms.closeDB();
     }
 }

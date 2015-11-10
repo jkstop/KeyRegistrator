@@ -3,7 +3,6 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -12,19 +11,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.GridView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -35,9 +29,8 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
-import com.example.ivsmirnov.keyregistrator.databases.DataBases;
-import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -45,8 +38,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-
-import at.markushi.ui.CircleButton;
 
 public class Persons_Fragment extends Fragment implements View.OnClickListener,UpdateTeachers{
 
@@ -222,7 +213,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                     String path = dbFavorite.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
                             textLastName.getText().toString(), textKaf.getText().toString()});
 
-                    writeIt(mContext,aud, name, time, path,"null");
+                    writeIt(mContext,aud, name, time, path,"null","hand");
 
                     getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
                     lastClickTime = SystemClock.elapsedRealtime();
@@ -246,31 +237,30 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
 
     }
 
-    public static void writeIt(Context context,String aud, String name, Long time, String path, String tag) {
+    public static void writeIt(Context context,String aud, String name, Long time, String path, String tag, String cardOrHandle) {
 
-        DataBases db = new DataBases(context);
+        DataBaseJournal dbJournal = new DataBaseJournal(context);
         DataBaseRooms dbRooms = new DataBaseRooms(context);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         Calendar calendar = Calendar.getInstance();
         today = calendar.get(Calendar.DATE);
         lastDate = preferences.getLong(Values.DATE, 0);
-        Log.d("today", String.valueOf(today));
-        Log.d("lastdate", String.valueOf(lastDate));
         if (today == lastDate) {
-            db.writeInDBJournal(aud, name, time, (long) 0, false);
-            editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount());
+            dbJournal.writeInDBJournal(aud, name, time, (long) 0, false);
+            editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, dbJournal.cursor.getCount());
         } else {
-            db.writeInDBJournalHeaderDate();
-            editor.putInt(Values.CURSOR_POSITION, db.cursorJournal.getCount());
+            dbJournal.writeInDBJournalHeaderDate();
+            editor.putInt(Values.CURSOR_POSITION, dbJournal.cursor.getCount());
             editor.apply();
-            db.writeInDBJournal(aud, name, time, (long) 0, false);
-            editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, db.cursorJournal.getCount() + 1);
+            dbJournal.writeInDBJournal(aud, name, time, (long) 0, false);
+            editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, dbJournal.cursor.getCount() + 1);
         }
-        dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1),"false");
+        dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), "false");
         dbRooms.updateLastVisitersRoom(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), name);
         dbRooms.updatePhotoPath(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), path);
-        dbRooms.updateTagRoom(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1),tag);
+        dbRooms.updateTagRoom(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), tag);
+        dbRooms.updateCardOrHandle(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), cardOrHandle);
 
         editor.putLong(Values.DATE, today);
         editor.apply();
@@ -316,7 +306,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                         String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
                         String srFileTeachers = mPath + "/Teachers.csv";
                         String dtFileTeachers = path + "/Teachers.csv";
-                        DataBases.copyfile(mContext, srFileTeachers, dtFileTeachers);
+                        Values.copyfile(mContext, srFileTeachers, dtFileTeachers);
                     }
                 });
                 thread.start();
