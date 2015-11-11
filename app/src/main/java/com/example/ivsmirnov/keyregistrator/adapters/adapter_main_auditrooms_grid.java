@@ -27,16 +27,18 @@ public class adapter_main_auditrooms_grid extends BaseAdapter {
     private ArrayList<Boolean> isFree;
     private ArrayList<String> lastVisiters;
     private ArrayList<String> photoPaths;
+    private ArrayList<String> tags;
     private LayoutInflater inflater;
     private SharedPreferences preferences;
 
 
-    public adapter_main_auditrooms_grid(Context c, ArrayList<String> i, ArrayList<Boolean> isF, ArrayList<String> sT, ArrayList<String> pP) {
+    public adapter_main_auditrooms_grid(Context c, ArrayList<String> i, ArrayList<Boolean> isF, ArrayList<String> sT, ArrayList<String> pP, ArrayList<String> t) {
         context = c;
         items = i;
         isFree = isF;
         lastVisiters = sT;
         photoPaths = pP;
+        tags = t;
         inflater = (LayoutInflater)this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -108,7 +110,10 @@ public class adapter_main_auditrooms_grid extends BaseAdapter {
             textAud.setText(String.valueOf(items.get(position)));
             textPerson.setText(lastVisiters.get(position));
 
-            if (lastVisiters.get(position).contains("Центр")){
+            if (tags.get(position).equalsIgnoreCase("99 80 DC 1A 00 00")
+                    ||tags.get(position).equalsIgnoreCase("EF 36 83 D9 00 00")
+                    ||tags.get(position).equalsIgnoreCase("0F 4B 7C D9 00 00")
+                    ||tags.get(position).equalsIgnoreCase("69 B1 D2 29 00 00")){
                 view.setBackgroundResource(R.drawable.button_background_support);
             }else{
                 view.setBackgroundResource(R.drawable.button_background_selected);

@@ -36,7 +36,6 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
     private Context mContext;
     private ListView mListView;
 
-    private DataBaseJournal dbJournal;
     private adapter_journal_list mAdapterjournallist;
     private ArrayList <SparseArray> mItems;
 
@@ -56,8 +55,9 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
         View rootView = inflater.inflate(R.layout.layout_journal_fragment,container,false);
         mContext = rootView.getContext();
 
-        dbJournal = new DataBaseJournal(mContext);
+        DataBaseJournal dbJournal = new DataBaseJournal(mContext);
         mItems = dbJournal.readJournalFromDB();
+        dbJournal.closeDB();
 
         mListView = (ListView)rootView.findViewById(R.id.list);
         mAdapterjournallist = new adapter_journal_list(mContext, mItems);
@@ -81,7 +81,10 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
                             public void onClick(DialogInterface dialog, int which) {
                                 mItems.remove(position);
                                 mAdapterjournallist.notifyDataSetChanged();
+
+                                DataBaseJournal dbJournal = new DataBaseJournal(mContext);
                                 dbJournal.deleteFromDB(position);
+                                dbJournal.closeDB();
                             }
                         })
                         .setCancelable(true);
@@ -90,6 +93,7 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
                 return true;
             }
         });
+
         return rootView;
 
     }
@@ -107,7 +111,10 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        DataBaseJournal dbJournal = new DataBaseJournal(mContext);
                         dbJournal.backupJournalToFile();
+                        dbJournal.closeDB();
+
                         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
                         String mPath = Environment.getExternalStorageDirectory().getPath();
                         String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
@@ -119,7 +126,7 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
                 thread.start();
                 return true;
             case R.id.menu_journal_download:
-                startActivityForResult(new Intent(mContext,FileManager.class).putExtra("what",10),333);
+                startActivityForResult(new Intent(mContext,FileManager.class).putExtra("what",Values.LOAD_JOURNAL),333);
                 return true;
             case R.id.menu_journal_delete:
                 Dialog_Fragment dialog = new Dialog_Fragment();
@@ -147,21 +154,11 @@ public class Journal_fragment extends Fragment implements UpdateJournal {
 
     @Override
     public void onDone() {
+        DataBaseJournal dbJournal = new DataBaseJournal(mContext);
         dbJournal = new DataBaseJournal(mContext);
         mItems = dbJournal.readJournalFromDB();
         mAdapterjournallist = new adapter_journal_list(mContext, mItems);
         mListView.setAdapter(mAdapterjournallist);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
         dbJournal.closeDB();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        dbJournal = new DataBaseJournal(mContext);
     }
 }

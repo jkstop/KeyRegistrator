@@ -17,8 +17,8 @@ android {
         applicationId "com.example.ivsmirnov.keyregistrator"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 5
-        versionName "2.7"
+        versionCode 6
+        versionName "3.0"
     }
     buildTypes {
         release {

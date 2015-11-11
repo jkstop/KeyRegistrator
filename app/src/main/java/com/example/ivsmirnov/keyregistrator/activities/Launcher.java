@@ -202,8 +202,9 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
 
         if (isOpened){
             DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-            ArrayList <SparseArray<String>> rms = dbRooms.readRoomsDB();
             DataBaseJournal dbJournal = new DataBaseJournal(mContext);
+            ArrayList <SparseArray<String>> rms = dbRooms.readRoomsDB();
+
             for (int i=0;i<rms.size();i++){
                 if (rms.get(i).get(1).equalsIgnoreCase("false")){
                     if (items.get(7).equalsIgnoreCase(rms.get(i).get(4))){
@@ -216,6 +217,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                     }
                 }
             }
+            dbRooms.closeDB();
             dbJournal.closeDB();
             isOpened = false;
         }else{

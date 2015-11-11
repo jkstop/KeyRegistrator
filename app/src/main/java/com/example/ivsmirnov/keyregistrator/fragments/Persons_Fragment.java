@@ -44,7 +44,6 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     private Context mContext;
     private static GridView mGridView;
     private ListView mListView;
-    private DataBaseFavorite dbFavorite;
 
     private static ArrayList<SparseArray> mAllItems;
     public adapter_persons_grid mAdapter;
@@ -82,7 +81,6 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
             setHasOptionsMenu(false);
 
         }
-
     }
 
     @Override
@@ -100,14 +98,15 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.layout_persons_fragment,container,false);
+        View rootView = inflater.inflate(R.layout.layout_persons_fragment, container, false);
         mContext = rootView.getContext();
 
         mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
 
-        openBase();
+        DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
         mAllItems = dbFavorite.readTeachersFromDB();
+        dbFavorite.closeDB();
 
         sortByABC();
 
@@ -121,7 +120,6 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 mListCharacters.add(startChar);
             }
         }
-
 
         mListAdapter = new adapter_list_characters(mContext,mListCharacters);
         mListView.setAdapter(mListAdapter);
@@ -209,9 +207,10 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
 
                     final Long time = System.currentTimeMillis();
 
-
+                    DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
                     String path = dbFavorite.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
                             textLastName.getText().toString(), textKaf.getText().toString()});
+                    dbFavorite.closeDB();
 
                     writeIt(mContext,aud, name, time, path,"null","hand");
 
@@ -239,13 +238,13 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
 
     public static void writeIt(Context context,String aud, String name, Long time, String path, String tag, String cardOrHandle) {
 
-        DataBaseJournal dbJournal = new DataBaseJournal(context);
-        DataBaseRooms dbRooms = new DataBaseRooms(context);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         Calendar calendar = Calendar.getInstance();
         today = calendar.get(Calendar.DATE);
         lastDate = preferences.getLong(Values.DATE, 0);
+
+        DataBaseJournal dbJournal = new DataBaseJournal(context);
         if (today == lastDate) {
             dbJournal.writeInDBJournal(aud, name, time, (long) 0, false);
             editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, dbJournal.cursor.getCount());
@@ -256,23 +255,20 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
             dbJournal.writeInDBJournal(aud, name, time, (long) 0, false);
             editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, dbJournal.cursor.getCount() + 1);
         }
+        dbJournal.closeDB();
+
+        DataBaseRooms dbRooms = new DataBaseRooms(context);
         dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), "false");
         dbRooms.updateLastVisitersRoom(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), name);
         dbRooms.updatePhotoPath(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), path);
         dbRooms.updateTagRoom(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), tag);
         dbRooms.updateCardOrHandle(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), cardOrHandle);
+        dbRooms.closeDB();
 
         editor.putLong(Values.DATE, today);
         editor.apply();
     }
 
-
-    private void openBase(){
-        dbFavorite = new DataBaseFavorite(mContext);
-    }
-    private void closeBase(){
-        dbFavorite.closeDB();
-    }
     private void sortByABC(){
         Collections.sort(mAllItems, new Comparator<SparseArray>() {
             @Override
@@ -312,7 +308,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 thread.start();
                 return true;
             case R.id.menu_teachers_download_favorite:
-                startActivityForResult(new Intent(mContext, FileManager.class).putExtra("what", 11), 334);
+                startActivityForResult(new Intent(mContext, FileManager.class).putExtra("what", Values.LOAD_TEACHERS), 334);
                 return true;
             case R.id.menu_teachers_download_local_staff:
                 startActivity(new Intent(mContext,FileManager.class).putExtra("what",67));
@@ -360,9 +356,10 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
 
     @Override
     public void onFinishEditing() {
-        openBase();
+
+        DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
         mAllItems = dbFavorite.readTeachersFromDB();
-        closeBase();
+        dbFavorite.closeDB();
 
         sortByABC();
         mAdapter = new adapter_persons_grid(mContext, mAllItems);

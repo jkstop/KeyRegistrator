@@ -7,4 +7,15 @@
         android:icon="@drawable/ic_view_column_black_24dp"
         app:showAsAction="always"/>
 
+    <item android:id="@+id/menu_auditrooms_save_to_file"
+        android:title="Сохранить"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_auditrooms_load_from_file"
+        android:title="Загрузить"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_auditrooms_clear"
+        android:title="Очистить"
+        app:showAsAction="never"/>
 </menu>

@@ -9,7 +9,7 @@ import android.util.Log;
 /**
  * Created by ivsmirnov on 03.11.2015.
  */
-public class DataBasesStaffRegist extends SQLiteOpenHelper implements BaseColumns {
+public class DataBaseStaffRegist extends SQLiteOpenHelper implements BaseColumns {
 
     public static final String name = "Staff.db";
     public static final int version = 3;
@@ -33,7 +33,7 @@ public class DataBasesStaffRegist extends SQLiteOpenHelper implements BaseColumn
     private static final String SQL_DELETE_BASE_STAFF= "DROP TABLE IF EXISTS "
             + TABLE_STAFF;
 
-    public DataBasesStaffRegist(Context context) {
+    public DataBaseStaffRegist(Context context) {
         super(context, name, null, version);
     }
 

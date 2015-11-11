@@ -9,7 +9,7 @@ import android.util.Log;
 /**
  * Created by ivsmirnov on 29.10.2015.
  */
-public class DataBasesSheduleRegist extends SQLiteOpenHelper implements BaseColumns {
+public class DataBaseSheduleRegist extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String name = "Shedule.db";
     private static final int version = 10;
@@ -31,7 +31,7 @@ public class DataBasesSheduleRegist extends SQLiteOpenHelper implements BaseColu
     private static final String SQL_DELETE_BASE_SHEDULE= "DROP TABLE IF EXISTS "
             + TABLE_SHEDULE;
 
-    public DataBasesSheduleRegist(Context context) {
+    public DataBaseSheduleRegist(Context context) {
         super(context, name, null, version);
     }
 

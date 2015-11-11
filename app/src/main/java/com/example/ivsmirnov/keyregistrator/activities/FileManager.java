@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -185,11 +186,14 @@ public class FileManager extends ListActivity implements FinishLoad{
                 }else{
                     String absPath = file.getAbsolutePath();
 
-                    if (what==10){
+                    if (what==Values.LOAD_JOURNAL){
                         Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_JOURNAL,this);
                         loader.execute();
-                    }else if (what==11){
+                    }else if (what==Values.LOAD_TEACHERS){
                         Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_TEACHERS,this);
+                        loader.execute();
+                    }else if(what==Values.LOAD_ROOMS){
+                        Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,Values.LOAD_ROOMS,this);
                         loader.execute();
                     }else if(what==66){
                         Loader loader = new Loader(getApplicationContext(),FileManager.this,absPath,66,this);
@@ -241,10 +245,13 @@ public class FileManager extends ListActivity implements FinishLoad{
 
         DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
         DataBaseStaff dbStaff= new DataBaseStaff(context);
+        DataBaseRooms dbRooms = new DataBaseRooms(context);
         if (type == 2) {
             dbFavorite.clearTeachersDB();
         }else if(type==3){
             dbStaff.clearBaseStaff();
+        }else if(type ==4){
+            dbRooms.clearRoomsDB();
         }
         while ((line = fin.readLine())!=null){
             if (i<count){
@@ -261,12 +268,18 @@ public class FileManager extends ListActivity implements FinishLoad{
                             dbStaff.writeInBaseStaff(split[0],split[1],split[2],split[3],split[4],split[5],split[6],split[7]);
                         }
                         i++;
+                    }else if(type==4){
+                        if(split.length==6){
+                            dbRooms.writeInRoomsDB(split[0],split[1],split[2],split[3],split[4],split[5]);
+                        }
+                        i++;
                     }
                 }
             }
         }
         dbStaff.closeDB();
         dbFavorite.closeDB();
+        dbRooms.closeDB();
     }
 
 

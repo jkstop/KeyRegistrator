@@ -1,5 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -7,9 +8,13 @@ import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.acs.smartcard.Reader;
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
+import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
+import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
+import com.example.ivsmirnov.keyregistrator.fragments.Nfc_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 
 /**
@@ -20,14 +25,28 @@ public class Tag_Reader extends AsyncTask <Launcher.TransmitParams,Void,Launcher
     private Reader mReader;
     private Context mContext;
     private GetUserByTag mListener;
+    private ProgressDialog progressDialog;
+
 
     public Tag_Reader (Context context,Reader reader,GetUserByTag l){
         this.mContext = context;
         this.mReader = reader;
         this.mListener = l;
+        progressDialog = new ProgressDialog(mContext);
     }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage("Подождите, идет загрузка...");
+        progressDialog.show();
+    }
+
     @Override
     protected Launcher.TransmitResult doInBackground(Launcher.TransmitParams... params) {
+
         Launcher.TransmitResult result = new Launcher.TransmitResult();
         byte[] command = params[0].command;
         byte[] response = null;
@@ -49,12 +68,17 @@ public class Tag_Reader extends AsyncTask <Launcher.TransmitParams,Void,Launcher
         if (transmitResult.e!=null){
             Log.d("Exception", transmitResult.e.toString());
         }else{
+
             String tag = getStringFromByte(transmitResult.response,transmitResult.responseLength-2);
-            //DataBaseStaff dbStaff = new DataBaseStaff(mContext);
+
             DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
             SparseArray<String> items = dbFavorite.findUserByTag(tag + "00 00");
             dbFavorite.closeDB();
-            //dbStaff.closeDB();
+
+            if (progressDialog.isShowing()){
+                progressDialog.cancel();
+            }
+
             mListener.onGetSparse(items);
         }
     }

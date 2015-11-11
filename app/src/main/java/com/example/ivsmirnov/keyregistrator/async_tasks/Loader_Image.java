@@ -41,7 +41,6 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
         dialog = new ProgressDialog(activity.getActivity());
     }
 
-
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -49,7 +48,6 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
         dialog.setCancelable(false);
         dialog.setMessage("Подождите, идет загрузка...");
         dialog.show();
-
     }
 
     @Override
@@ -74,7 +72,5 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
         }
         listener.onFinishEditing();
     }
-
-
 
 }

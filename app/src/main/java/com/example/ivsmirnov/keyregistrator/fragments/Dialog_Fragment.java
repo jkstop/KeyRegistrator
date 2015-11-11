@@ -36,6 +36,7 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
+import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -61,11 +62,6 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
     public Dialog_Fragment(){
     }
-/*
-    public Dialog_Fragment(Context c,int id){
-        context = c;
-        dialog_id = id;
-    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,9 +96,9 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 DataBaseJournal dbJournal = new DataBaseJournal(context);
                                 dbJournal.clearJournalDB();
                                 dbJournal.closeDB();
+
                                 UpdateJournal listen = (UpdateJournal)getTargetFragment();
                                 listen.onDone();
-
 
                                 Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
                             }
@@ -124,6 +120,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
                                 dbFavorite.clearTeachersDB();
                                 dbFavorite.closeDB();
+
                                 UpdateTeachers updateTeachers = (UpdateTeachers)getTargetFragment();
                                 updateTeachers.onFinishEditing();
                                 Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
@@ -185,6 +182,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 String kaf = "";
                                 String gender = "";
                                 String pos = "-1";
+                                String tag = "null";
                                 try {
                                     surname = split[0];
                                     name = split[1];
@@ -202,7 +200,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
                                 UpdateTeachers updateTeachers;
                                 updateTeachers = (UpdateTeachers) getTargetFragment();
-                                Loader_Image loader_image = new Loader_Image(context, new String[]{surname, name, lastname, kaf, gender, pos}, Dialog_Fragment.this, updateTeachers);
+                                Loader_Image loader_image = new Loader_Image(context, new String[]{surname, name, lastname, kaf, gender, pos,tag}, Dialog_Fragment.this, updateTeachers);
                                 loader_image.execute();
                                dismiss();
                             }
@@ -324,6 +322,29 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                             }
                         })
                         .create();
+            case Values.DIALOG_CLEAR_ROOMS:
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle("ВНИМАНИЕ!")
+                        .setMessage("Из базы  будут удалены все записи. Продолжить?")
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                DataBaseRooms dbRooms = new DataBaseRooms(context);
+                                dbRooms.clearRoomsDB();
+                                dbRooms.closeDB();
+
+                                FinishLoad finishLoad = (FinishLoad)getTargetFragment();
+                                finishLoad.onFinish();
+                                Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .create();
             case Values.ADD_ROOM_DIALOG:
                 final EditText editText = new EditText(context);
                 editText.setGravity(Gravity.CENTER);
@@ -344,8 +365,9 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 String item = editText.getText().toString();
                                 DataBaseRooms dbRooms = new DataBaseRooms(context);
-                                dbRooms.writeInRoomsDB(item);
+                                dbRooms.writeInRoomsDB(item,"true","null","Аноним","null","");
                                 dbRooms.closeDB();
+
                                 editText.setText("");
 
                                 UpdateTeachers updateTeachers = (UpdateTeachers) getTargetFragment();
@@ -532,5 +554,3 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
         }
     }
 }
-
-/**/

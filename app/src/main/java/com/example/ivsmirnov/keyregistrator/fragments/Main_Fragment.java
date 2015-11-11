@@ -46,10 +46,9 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     private ArrayList<String> handOrCard;
     private ArrayList <String> lastVisiters;
     private ArrayList <String> photoPath;
+    private ArrayList <String> tags;
     private LinearLayout disclaimer;
     private FrameLayout frameForGrid;
-
-    private DataBaseRooms dbRooms;
 
     adapter_main_auditrooms_grid adapter;
 
@@ -76,9 +75,11 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         lastVisiters = new ArrayList<>();
         photoPath = new ArrayList<>();
         handOrCard = new ArrayList<>();
+        tags = new ArrayList<>();
 
-        dbRooms = new DataBaseRooms(context);
+        DataBaseRooms dbRooms = new DataBaseRooms(context);
         mItems = dbRooms.readRoomsDB();
+        dbRooms.closeDB();
 
         for (int i=0;i<mItems.size();i++){
             rooms.add(mItems.get(i).get(0));
@@ -86,6 +87,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
             handOrCard.add(mItems.get(i).get(2));
             lastVisiters.add(mItems.get(i).get(3));
             photoPath.add(mItems.get(i).get(5));
+            tags.add(mItems.get(i).get(4));
         }
 
         frameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
@@ -95,7 +97,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
         gridView = (GridView)rootView.findViewById(R.id.gridView);
         gridView.setNumColumns(columns);
-        adapter = new adapter_main_auditrooms_grid(context,rooms,isFreeAud,lastVisiters,photoPath);
+        adapter = new adapter_main_auditrooms_grid(context,rooms,isFreeAud,lastVisiters,photoPath,tags);
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -103,8 +105,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
                     return;
                 }
-                View viewGridItem = parent.getChildAt(position);
-                TextView textButton = (TextView) viewGridItem.findViewById(R.id.textButton);
                 selected_aud = position;
                 if (isFreeAud.get(position)) {
                     Bundle bundle = new Bundle();
@@ -123,8 +123,10 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                             dbJournal.updateDB(pos);
                             dbJournal.closeDB();
                         }
-
+                        DataBaseRooms dbRooms = new DataBaseRooms(context);
                         dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), "true");
+                        dbRooms.closeDB();
+
                         getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
                     }
                 }
@@ -162,25 +164,26 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     public void onResume() {
         super.onResume();
 
-        dbRooms = new DataBaseRooms(context);
+        DataBaseRooms dbRooms = new DataBaseRooms(context);
+        mItems = dbRooms.readRoomsDB();
+        dbRooms.closeDB();
 
         rooms = new ArrayList<>();
         isFreeAud = new ArrayList<>();
         lastVisiters = new ArrayList<>();
         photoPath = new ArrayList<>();
 
-        mItems = dbRooms.readRoomsDB();
-
         for (int i=0;i<mItems.size();i++){
             rooms.add(mItems.get(i).get(0));
             isFreeAud.add(Boolean.parseBoolean(mItems.get(i).get(1)));
             lastVisiters.add(mItems.get(i).get(3));
             photoPath.add(mItems.get(i).get(5));
+            tags.add(mItems.get(i).get(4));
         }
 
         int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
         float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
-        adapter = new adapter_main_auditrooms_grid(context, rooms, isFreeAud, lastVisiters, photoPath);
+        adapter = new adapter_main_auditrooms_grid(context, rooms, isFreeAud, lastVisiters, photoPath,tags);
 
         gridView.setAdapter(adapter);
         gridView.setNumColumns(columns);
@@ -226,11 +229,5 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
 
         disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
         frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        dbRooms.closeDB();
     }
 }

@@ -5,12 +5,17 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
 
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.sql.Time;
 import java.util.ArrayList;
 
 /**
@@ -35,14 +40,14 @@ public class DataBaseRooms {
         mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
     }
 
-    public void writeInRoomsDB (String room) {
+    public void writeInRoomsDB (String room, String status,String cardOrHand, String lastVisiter, String tag,  String photoPath) {
         ContentValues cv = new ContentValues();
         cv.put(DataBaseRoomsRegist.COLUMN_ROOM, room);
-        cv.put(DataBaseRoomsRegist.COLUMN_STATUS, "true");
-        cv.put(DataBaseRoomsRegist.COLUMN_LAST_VISITER, "Аноним");
-        cv.put(DataBaseRoomsRegist.COLUMN_TAG,"null");
-        cv.put(DataBaseRoomsRegist.COLUMN_CARD_OR_HANDLE,"null");
-        cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, "");
+        cv.put(DataBaseRoomsRegist.COLUMN_STATUS, status);
+        cv.put(DataBaseRoomsRegist.COLUMN_CARD_OR_HANDLE,cardOrHand);
+        cv.put(DataBaseRoomsRegist.COLUMN_LAST_VISITER, lastVisiter);
+        cv.put(DataBaseRoomsRegist.COLUMN_TAG,tag);
+        cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, photoPath);
         long id = sqLiteDatabase.insert(DataBaseRoomsRegist.TABLE_ROOMS, null, cv);
 
         mSharedPreferencesEditor.putInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + room, (int) id);
@@ -106,6 +111,43 @@ public class DataBaseRooms {
             items.add(card);
         }
         return items;
+    }
+
+    public void backupRoomsToFile(){
+        File file = null;
+        ArrayList <String> itemList = new ArrayList<>();
+        FileOutputStream fileOutputStream;
+        String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        file = new File(mPath + "/Rooms.txt");
+        cursor.moveToPosition(-1);
+        while (cursor.moveToNext()){
+            String room = cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM));
+            String status = cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_STATUS));
+            String cardOrHand = cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_CARD_OR_HANDLE));
+            String lastVisiter = cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_LAST_VISITER));
+            String tag = cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_TAG));
+            String photoPath = cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_PHOTO_PATH));
+            String stroke = room+";"+status+";"+cardOrHand+";"+lastVisiter+";"+tag+";"+photoPath;
+            itemList.add(stroke);
+        }
+        try{
+            if (file!=null){
+                fileOutputStream = new FileOutputStream(file);
+                for (int i=0;i<itemList.size();i++){
+                    fileOutputStream.write(itemList.get(i).getBytes());
+                    fileOutputStream.write("\n".getBytes());
+                }
+                fileOutputStream.close();
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        itemList.clear();
+    }
+
+    public void clearRoomsDB(){
+        sqLiteDatabase.delete(DataBaseRoomsRegist.TABLE_ROOMS,null,null);
     }
 
     public void closeDB(){

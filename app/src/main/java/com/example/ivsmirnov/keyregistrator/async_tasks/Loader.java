@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.activities.FileManager;
@@ -62,7 +63,6 @@ public class Loader extends AsyncTask <String,Integer,Void> {
             dialog.cancel();
         }
         listener.onFinish();
-
 
         Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
     }
@@ -136,8 +136,6 @@ public class Loader extends AsyncTask <String,Integer,Void> {
                         }
                     }
                     dbJournal.writeInDBJournal(aud, name, time, timePut, true);
-                    //publishProgress(count++);
-
                 }
             }
 
@@ -145,40 +143,25 @@ public class Loader extends AsyncTask <String,Integer,Void> {
             dbFavorite.clearTeachersDB();
             try {
                 FileManager.readLine(context, absPath, 2);
-                //items = FileManager.readFile(absPath);
-                //dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }else if(LOAD_TYPE == Values.LOAD_ROOMS){
+            DataBaseRooms dbRooms = new DataBaseRooms(context);
+            try {
+                FileManager.readLine(context,absPath,4);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            dbRooms.closeDB();
         }else if (LOAD_TYPE ==66){
-
             try {
                 FileManager.readLine(context, absPath, 1);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            /*try {
-                items = FileManager.readFile(absPath);
-                dialog.setMax(preferences.getInt(Values.LINES_COUNT_IN_FILE,0));
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-            db.clearBaseSQL();
 
-            String delims = ";";
-            if (items != null) {
-                for (String s : items){
-                    String [] split = s.split(delims);
-                    String kaf = split[0];
-                    String name = split[1];
-                    String surname = split[2];
-                    String lastname = split[3];
-                    String photo = split[4];
-                    db.writeInDBSQL(kaf,name,surname,lastname,photo);
-                   publishProgress(count++);
-                }
-            }*/
         }else if(LOAD_TYPE==67){
             try {
                 FileManager.readLine(context,absPath,3);
