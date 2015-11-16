@@ -1,15 +1,16 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,15 +25,17 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.FileManager;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
+import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -218,6 +221,48 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
             });
+
+            mGridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    int pos = position - parent.getFirstVisiblePosition();
+                    View rootView = parent.getChildAt(pos);
+                    TextView textSurname = (TextView) rootView.findViewById(R.id.text_familia);
+                    TextView textName = (TextView) rootView.findViewById(R.id.text_imya);
+                    TextView textLastName = (TextView) rootView.findViewById(R.id.otchestvo);
+                    TextView textKaf = (TextView) rootView.findViewById(R.id.kafedra);
+
+                    String aud = getArguments().getString(Values.AUDITROOM);
+                    String name = "Аноним";
+                    if (textSurname.getText().toString().length() != 0 && textName.getText().toString().length() != 0 && textLastName.getText().toString().length() != 0) {
+                        name = textSurname.getText().toString() + " "
+                                + textName.getText().toString().charAt(0) + "." +
+                                textLastName.getText().toString().charAt(0) + ".";
+                    } else {
+                        if (textSurname.getText().toString().length() != 0 && textName.getText().toString().length() != 0) {
+                            name = textSurname.getText().toString() + " " + textName.getText().toString();
+                        } else {
+                            if (textSurname.getText().toString().length() != 0) {
+                                name = textSurname.getText().toString();
+                            }
+                        }
+                    }
+
+                    final Long time = System.currentTimeMillis();
+
+                    DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
+                    String path = dbFavorite.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
+                            textLastName.getText().toString(), textKaf.getText().toString()});
+                    String tag = dbFavorite.findTagUser(new String[]{textSurname.getText().toString(), textName.getText().toString(),
+                            textLastName.getText().toString()});
+
+                    dbFavorite.closeDB();
+                    writeIt(mContext,aud, name, time, path,tag,"card");
+
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
+                    return false;
+                }
+            });
         }
 
         return rootView;
@@ -291,27 +336,20 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_teachers_save_to_file:
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
-                        dbFavorite.backupFavoriteStaffToFile();
-                        dbFavorite.closeDB();
-                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-                        String mPath = Environment.getExternalStorageDirectory().getPath();
-                        String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
-                        String srFileTeachers = mPath + "/Teachers.csv";
-                        String dtFileTeachers = path + "/Teachers.csv";
-                        Values.copyfile(mContext, srFileTeachers, dtFileTeachers);
-                    }
-                });
-                thread.start();
+                Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_TEACHERS);
+                saveToFile.execute();
                 return true;
             case R.id.menu_teachers_download_favorite:
-                startActivityForResult(new Intent(mContext, FileManager.class).putExtra("what", Values.LOAD_TEACHERS), 334);
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+                i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+                startActivityForResult(i,Values.LOAD_TEACHERS);
                 return true;
             case R.id.menu_teachers_download_local_staff:
-                startActivity(new Intent(mContext,FileManager.class).putExtra("what",67));
+                Intent iS = new Intent(Intent.ACTION_GET_CONTENT);
+                iS.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+                iS.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+                startActivityForResult(iS,Values.LOAD_LOCAL_STAFF);
                 return true;
             case R.id.menu_teachers_delete:
                 Dialog_Fragment dialog = new Dialog_Fragment();
@@ -322,7 +360,12 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 dialog.show(getFragmentManager(),"clearTeachers");
                 return true;
             case R.id.menu_teachers_select_location_for_copy:
-                startActivity(new Intent(mContext,FileManager.class).putExtra("buttonChoise", true).putExtra("pathFor","teachers"));
+                Intent iLC = new Intent(Intent.ACTION_GET_CONTENT);
+                iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
+                iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
+                iLC.putExtra(FilePickerActivity.EXTRA_START_PATH,
+                        mPreferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS, Environment.getExternalStorageDirectory().getPath()));
+                startActivityForResult(iLC,Values.SELECT_LOCATION_TEACHERS);
                 return true;
             case R.id.menu_teachers_set_columns_number:
                 Dialog_Fragment dialog_fragment = new Dialog_Fragment();
@@ -350,6 +393,28 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data!=null){
+            if (requestCode==Values.LOAD_TEACHERS){
+                if (resultCode== Activity.RESULT_OK){
+                    Uri uri = data.getData();
+                    String path = uri.getPath();
+                    Loader_intent loader_intent = new Loader_intent(mContext,path,this,Values.LOAD_TEACHERS);
+                    loader_intent.execute();
+                }
+            }else if (requestCode==Values.LOAD_LOCAL_STAFF){
+                if (resultCode==Activity.RESULT_OK){
+                    Uri uri = data.getData();
+                    String path = uri.getPath();
+                    Loader_intent loader_intent = new Loader_intent(mContext,path,this,Values.LOAD_LOCAL_STAFF);
+                    loader_intent.execute();
+                }
+            }else if (requestCode == Values.SELECT_LOCATION_TEACHERS){
+                if (resultCode == Activity.RESULT_OK){
+                    Uri uri = data.getData();
+                    String path = uri.getPath();
+                    mPreferencesEditor.putString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS,path);
+                    mPreferencesEditor.apply();
+                }
+            }
             onFinishEditing();
         }
     }

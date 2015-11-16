@@ -1,13 +1,15 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,12 +21,14 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.FileManager;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_edit_auditrooms_grid;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
+import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
 
@@ -124,18 +128,14 @@ public class Rooms_Fragment extends Fragment implements UpdateTeachers,FinishLoa
                 dialog_fragment.show(getFragmentManager(),"columns");
                 return true;
             case R.id.menu_auditrooms_save_to_file:
-                Thread backupThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                        dbRooms.backupRoomsToFile();
-                        dbRooms.closeDB();
-                    }
-                });
-                backupThread.start();
+                Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_ROOMS);
+                saveToFile.execute();
                 return true;
             case R.id.menu_auditrooms_load_from_file:
-                startActivityForResult(new Intent(mContext,FileManager.class).putExtra("what",Values.LOAD_ROOMS),335);
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+                i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+                startActivityForResult(i,Values.LOAD_ROOMS);
                 return true;
             case R.id.menu_auditrooms_clear:
                 Dialog_Fragment dialog = new Dialog_Fragment();
@@ -171,7 +171,16 @@ public class Rooms_Fragment extends Fragment implements UpdateTeachers,FinishLoa
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data!=null){
-            onFinish();
+            if (requestCode == Values.LOAD_ROOMS){
+                if (resultCode == Activity.RESULT_OK){
+                    Uri uri = data.getData();
+                    String path = uri.getPath();
+                    Loader_intent loader_intent = new Loader_intent(mContext,path,this,Values.LOAD_ROOMS);
+                    loader_intent.execute();
+                }
+            }
+            onFinishEditing();
+
         }
     }
 

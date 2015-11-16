@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
@@ -30,6 +32,7 @@ public class Nfc_Fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_nfc_fragment,container,false);
         mContext = rootView.getContext();
+
         mSelectButton = (Button)rootView.findViewById(R.id.nfc_fragment_handle_select_button);
         mSelectButton.setOnClickListener(new View.OnClickListener() {
             @Override

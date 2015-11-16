@@ -59,6 +59,8 @@
     Брать и сдавать ключи по завершении занятий необходимо ЛИЧНО ВАМ!\n
     Категорически запрещается передавать ключи другому преподавателю и оставлять компьютерный класс открытым в ваше отсутствие в нём!</string>
     <string name="title_activity_rooms">Список аудиторий: </string>
+    <string name="text_nfc_head_card_incorrect">Не удалось распознать вашу карту.\n
+        Попробуйте приложить её еще раз.</string>
     <string name="fragment1">fragment 1</string>
     <string name="fragment2">fragment 2</string>
     <string name="fragment3">fragment 3</string>

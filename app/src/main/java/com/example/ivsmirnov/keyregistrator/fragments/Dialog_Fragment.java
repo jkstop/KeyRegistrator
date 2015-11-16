@@ -365,7 +365,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 String item = editText.getText().toString();
                                 DataBaseRooms dbRooms = new DataBaseRooms(context);
-                                dbRooms.writeInRoomsDB(item,"true","null","Аноним","null","");
+                                dbRooms.writeInRoomsDB(item,"true","null","Аноним","null","null");
                                 dbRooms.closeDB();
 
                                 editText.setText("");

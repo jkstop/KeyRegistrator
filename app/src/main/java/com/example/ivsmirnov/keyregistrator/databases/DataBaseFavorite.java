@@ -118,6 +118,19 @@ public class DataBaseFavorite {
         Log.d("Write in Teachers DB", "OK");
     }
 
+    public String findTagUser(String[]FIO){
+        String tag = "null";
+        cursor.moveToPosition(-1);
+        while (cursor.moveToNext()){
+            if (FIO[0].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE)))&&
+                    FIO[1].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE)))&&
+                    FIO[2].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))){
+                tag = cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE));
+            }
+        }
+        return tag;
+    }
+
     public void backupFavoriteStaffToFile(){
         File file = null;
         ArrayList <String> itemList = new ArrayList<>();
@@ -173,6 +186,7 @@ public class DataBaseFavorite {
             card.put(4, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_GENDER_FAVORITE)));
             card.put(5, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_FAVORITE)));
             card.put(6, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
+            card.put(7,cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE)));
             items.add(card);
         }
         return items;

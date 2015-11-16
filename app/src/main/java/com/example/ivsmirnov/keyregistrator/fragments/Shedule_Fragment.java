@@ -67,6 +67,7 @@ public class Shedule_Fragment extends Fragment implements Shedule_Load{
 
         dbShedule = new DataBaseShedule(mContext);
         mItems = dbShedule.readShedule();
+        dbShedule.closeDB();
         sortByABC(mItems);
 
         list = (ListView)rootView.findViewById(R.id.shedule_fragment_list);
@@ -110,7 +111,9 @@ public class Shedule_Fragment extends Fragment implements Shedule_Load{
     @Override
     public void onFinish(Integer result) {
         if (result==1){
+            dbShedule = new DataBaseShedule(mContext);
             mItems = dbShedule.readShedule();
+            dbShedule.closeDB();
             sortByABC(mItems);
 
             list.setAdapter(new adapter_shedule_list(mContext, mItems));
@@ -130,9 +133,4 @@ public class Shedule_Fragment extends Fragment implements Shedule_Load{
     }
 
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        dbShedule.closeDB();
-    }
 }

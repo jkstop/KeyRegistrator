@@ -1,12 +1,17 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +33,7 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.others.Values;
+import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
 
@@ -209,8 +215,23 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 dialog_grid_size.setTargetFragment(this, 0);
                 dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==1){
+            if (resultCode==Activity.RESULT_OK){
+                Uri uri = data.getData();
+                String path = uri.getPath();
+                Log.d("result",path);
+            }else {
+                Log.d("result","canceled");
+            }
         }
     }
 

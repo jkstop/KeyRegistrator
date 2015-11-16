@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Build;
@@ -23,9 +24,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.acs.smartcard.Reader;
@@ -223,13 +227,13 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         }else{
             if (aud!=null){
                 if (items.get(2).equals("Аноним")){
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
-                    bundle.putInt(Values.PERSONS_FRAGMENT_HEAD,Values.PERSONS_FRAGMENT_HEAD_NOT_FOUND_USER);
-                    bundle.putString(Values.AUDITROOM, aud);
-                    Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
-                    persons_fragment.setArguments(bundle);
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment, getResources().getString(R.string.tag_persons_fragment)).commit();
+                    LayoutInflater inflater = getLayoutInflater();
+                    View toastLayout = inflater.inflate(R.layout.layout_toast_incorrect_card,
+                            (ViewGroup)findViewById(R.id.toast_nfc_incorrect_root));
+                    Toast toast = new Toast(mContext);
+                    toast.setDuration(Toast.LENGTH_LONG);
+                    toast.setView(toastLayout);
+                    toast.show();
                 }else{
                     String name  = items.get(2) + " "
                             + items.get(3).charAt(0) + "." +
@@ -248,7 +252,6 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                 dialog.show(getSupportFragmentManager(),"edit");
             }
         }
-
     }
 
     public static class PowerParams {
@@ -437,7 +440,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         } else {
             Toast.makeText(getBaseContext(), "Нажмите еще раз для выхода", Toast.LENGTH_SHORT).show();
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance())
+                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment))
                     .commit();
             back_pressed = System.currentTimeMillis();
         }

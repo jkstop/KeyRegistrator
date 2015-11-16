@@ -25,23 +25,18 @@ public class Tag_Reader extends AsyncTask <Launcher.TransmitParams,Void,Launcher
     private Reader mReader;
     private Context mContext;
     private GetUserByTag mListener;
-    private ProgressDialog progressDialog;
 
 
     public Tag_Reader (Context context,Reader reader,GetUserByTag l){
         this.mContext = context;
         this.mReader = reader;
         this.mListener = l;
-        progressDialog = new ProgressDialog(mContext);
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setCancelable(false);
-        progressDialog.setMessage("Подождите, идет загрузка...");
-        progressDialog.show();
+
     }
 
     @Override
@@ -74,10 +69,6 @@ public class Tag_Reader extends AsyncTask <Launcher.TransmitParams,Void,Launcher
             DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
             SparseArray<String> items = dbFavorite.findUserByTag(tag + "00 00");
             dbFavorite.closeDB();
-
-            if (progressDialog.isShowing()){
-                progressDialog.cancel();
-            }
 
             mListener.onGetSparse(items);
         }

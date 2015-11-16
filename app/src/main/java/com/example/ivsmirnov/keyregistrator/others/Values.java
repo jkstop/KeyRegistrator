@@ -28,6 +28,7 @@ public class Values {
     public static final String TODAY = "today";
     public static final int WRITE_JOURNAL = 100;
     public static final int WRITE_TEACHERS = 101;
+    public static final int WRITE_ROOMS = 123;
     public static final String AUTO_CLOSED_COUNT = "auto_closed_count";
     public static final String PATH_FOR_COPY_ON_PC_FOR_JOURNAL = "path_for_copy_on_pc_for_journal";
     public static final String PATH_FOR_COPY_ON_PC_FOR_TEACHERS = "path_for_copy_on_pc_for_teachers";
@@ -42,6 +43,9 @@ public class Values {
     public static final int LOAD_JOURNAL = 106;
     public static final int LOAD_TEACHERS = 107;
     public static final int LOAD_ROOMS = 119;
+    public static final int LOAD_LOCAL_STAFF = 120;
+    public static final int SELECT_LOCATION_JOURNAL = 121;
+    public static final int SELECT_LOCATION_TEACHERS = 122;
     public static final String LINES_COUNT_IN_FILE = "lines_count";
     public static final String DIALOG_TYPE = "dialog_type";
     public static final int DIALOG_EDIT = 108;
