@@ -105,7 +105,7 @@ public class adapter_main_auditrooms_grid extends BaseAdapter {
                 }
                 imageLoader.displayImage("file://"+photoPaths.get(position),image);
             }else{
-                image.setImageResource(R.drawable.person_key);
+                image.setImageResource(R.drawable.person_male_colored);
             }
             textAud.setText(String.valueOf(items.get(position)));
             textPerson.setText(lastVisiters.get(position));

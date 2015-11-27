@@ -1,20 +1,13 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.SparseArray;
-import android.widget.Toast;
 
 import com.acs.smartcard.Reader;
-import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
-import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
-import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
-import com.example.ivsmirnov.keyregistrator.fragments.Nfc_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 
 /**

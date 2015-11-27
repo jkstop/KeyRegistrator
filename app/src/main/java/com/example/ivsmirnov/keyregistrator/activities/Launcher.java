@@ -11,11 +11,11 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -29,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.acs.smartcard.Reader;
@@ -52,6 +51,9 @@ import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -60,7 +62,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
     private DrawerLayout mDrawerLayout;
     private FrameLayout mFrameLayout_Drawer_root;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
-    private LinearLayout mLinearLayout_Home, mLinearLayout_Settings, mLinearLayout_Statistics, mLinearLayout_Journal, mLinearLayout_Rooms, mLinearLayout_Email, mLinearLayout_Shedule;
+    private LinearLayout mLinearLayout_Home, mLinearLayout_Settings, mLinearLayout_Statistics, mLinearLayout_Journal,mLinearLayout_Rooms, mLinearLayout_Email, mLinearLayout_Shedule,mLinearLayout_Sql;
 
     private Context mContext;
     private SharedPreferences mPreferences;
@@ -89,6 +91,8 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
 
+        checkSQlConnect();
+
         //init reader
         mManager = (UsbManager)getSystemService(Context.USB_SERVICE);
         mReader = new Reader(mManager);
@@ -114,28 +118,28 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (stateStrings[finalCurrState].equals("Present")){
-                            Persons_Fragment persons_fragment = (Persons_Fragment)getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment));
-                            Nfc_Fragment nfc_fragment = (Nfc_Fragment)getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_nfc_fragment));
-                            Main_Fragment main_fragment = (Main_Fragment)getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_main_fragment));
-                            if (persons_fragment!=null&&persons_fragment.isVisible()){
-                                Log.d("persons_fragment","visible");
+                        if (stateStrings[finalCurrState].equals("Present")) {
+                            Persons_Fragment persons_fragment = (Persons_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment));
+                            Nfc_Fragment nfc_fragment = (Nfc_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_nfc_fragment));
+                            Main_Fragment main_fragment = (Main_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_main_fragment));
+                            if (persons_fragment != null && persons_fragment.isVisible()) {
+                                Log.d("persons_fragment", "visible");
                                 aud = null;
                                 powerReader();
                                 setProtocol();
                                 getTag();
-                            }else if (nfc_fragment!=null&&nfc_fragment.isVisible()){
+                            } else if (nfc_fragment != null && nfc_fragment.isVisible()) {
                                 aud = getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_nfc_fragment)).getArguments().getString(Values.AUDITROOM);
                                 powerReader();
                                 setProtocol();
                                 getTag();
-                            }else if (main_fragment!=null&&main_fragment.isVisible()){
+                            } else if (main_fragment != null && main_fragment.isVisible()) {
                                 isOpened = true;
                                 powerReader();
                                 setProtocol();
                                 getTag();
-                            }else{
-                                Toast.makeText(mContext,"Not one of yet",Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(mContext, "Not one of yet", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -158,6 +162,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         mLinearLayout_Rooms = (LinearLayout)findViewById(R.id.navigation_drawer_layout_rooms);
         mLinearLayout_Email = (LinearLayout) findViewById(R.id.navigation_drawer_layout_email);
         mLinearLayout_Shedule = (LinearLayout) findViewById(R.id.navigation_drawer_layout_shedule);
+        mLinearLayout_Sql = (LinearLayout)findViewById(R.id.navigation_drawer_layout_sql);
 
         mLinearLayout_Home.setOnClickListener(this);
         mLinearLayout_Settings.setOnClickListener(this);
@@ -166,6 +171,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         mLinearLayout_Rooms.setOnClickListener(this);
         mLinearLayout_Email.setOnClickListener(this);
         mLinearLayout_Shedule.setOnClickListener(this);
+        mLinearLayout_Sql.setOnClickListener(this);
 
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_opened, R.string.navigation_drawer_closed) {
@@ -189,6 +195,38 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         mActionBarDrawerToggle.syncState();
     }
 
+    private void checkSQlConnect(){
+        String ip = mPreferences.getString(Values.SQL_SERVER,"");
+        String classs = "net.sourceforge.jtds.jdbc.Driver";
+        String db = "KeyRegistratorBase";
+        String user = mPreferences.getString(Values.SQL_USER,"");
+        String password = mPreferences.getString(Values.SQL_PASSWORD,"");
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        Connection conn = null;
+        String ConnURL = null;
+
+        try {
+            Class.forName(classs);
+            ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"
+                    + "database=" + db +";user=" + user + ";password="
+                    + password + ";";
+            conn = DriverManager.getConnection(ConnURL);
+            mPreferencesEditor.putInt(Values.SQL_STATUS,Values.SQL_STATUS_CONNECT);
+            mPreferencesEditor.apply();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            mPreferencesEditor.putInt(Values.SQL_STATUS,Values.SQL_STATUS_DISCONNECT);
+            mPreferencesEditor.apply();
+        }
+    }
+
+
     private void powerReader (){
         int slotNum = 0;
         int actionNum = 2;
@@ -209,17 +247,29 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
             DataBaseJournal dbJournal = new DataBaseJournal(mContext);
             ArrayList <SparseArray<String>> rms = dbRooms.readRoomsDB();
 
+            int closedRooms = 0;
+
             for (int i=0;i<rms.size();i++){
                 if (rms.get(i).get(1).equalsIgnoreCase("false")){
                     if (items.get(7).equalsIgnoreCase(rms.get(i).get(4))){
                         int pos = mPreferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + rms.get(i).get(0), -1);
                         if (pos != -1) {
                             dbJournal.updateDB(pos);
+                            closedRooms++;
                         }
                         dbRooms.updateStatusRooms(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + rms.get(i).get(0), -1), "true");
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
                     }
                 }
+            }
+            if (closedRooms==0){
+                LayoutInflater inflater = getLayoutInflater();
+                View toastLayout = inflater.inflate(R.layout.layout_toast_choise_room_in_first,
+                        (ViewGroup)findViewById(R.id.toast_choise_room_first_root));
+                Toast toast = new Toast(mContext);
+                toast.setDuration(Toast.LENGTH_LONG);
+                toast.setView(toastLayout);
+                toast.show();
             }
             dbRooms.closeDB();
             dbJournal.closeDB();
@@ -367,6 +417,12 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                 getSupportActionBar().setTitle(res.getString(R.string.nav_drawer_item_shedule));
             }
             getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Shedule_Fragment.newInstance()).commit();
+        }else if(v.getTag().equals(res.getString(R.string.nav_drawer_item_sql))){
+            Dialog_Fragment dialog_sql = new Dialog_Fragment();
+            Bundle bundle_sql = new Bundle();
+            bundle_sql.putInt(Values.DIALOG_TYPE,Values.DIALOG_SQL_CONNECT);
+            dialog_sql.setArguments(bundle_sql);
+            dialog_sql.show(getSupportFragmentManager(),"sql");
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_about))){
             String version = "";
             try {
@@ -422,6 +478,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         if (!isAlarmSet){
             setAlarm(closingTime());
         }
+
     }
 
     @Override

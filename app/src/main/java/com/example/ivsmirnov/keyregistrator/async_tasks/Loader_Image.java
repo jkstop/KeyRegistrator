@@ -2,12 +2,21 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.StrictMode;
+import android.preference.PreferenceManager;
 
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
+import com.example.ivsmirnov.keyregistrator.others.Values;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Loader_Image extends AsyncTask <Void, Void, Void> {
 
@@ -25,6 +34,8 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
 
     private UpdateTeachers listener;
 
+    private SharedPreferences mPreferences;
+
     public Loader_Image (Context c,String [] items,Dialog_Fragment a,UpdateTeachers l){
         this.context = c;
         this.surname = items[0];
@@ -39,6 +50,8 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
         this.listener = l;
 
         dialog = new ProgressDialog(activity.getActivity());
+
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Override
@@ -53,13 +66,40 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
 
-        DataBaseStaff dbStaff = new DataBaseStaff(context);
-        DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
-        String photo = dbStaff.findPhotoByPosition(pos);
-        dbFavorite.writeCardInBase(surname,name,lastname,kaf,tag,gender,photo);
-        dbStaff.closeDB();
-        dbFavorite.closeDB();
+        String ip = mPreferences.getString(Values.SQL_SERVER,"");
+        String classs = "net.sourceforge.jtds.jdbc.Driver";
+        String db = "KeyRegistratorBase";
+        String user = mPreferences.getString(Values.SQL_USER,"");
+        String password = mPreferences.getString(Values.SQL_PASSWORD,"");
 
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        Connection conn = null;
+        String ConnURL = null;
+
+        try {
+            Class.forName(classs);
+            ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"
+                    + "database=" + db +";user=" + user + ";password="
+                    + password + ";";
+            conn = DriverManager.getConnection(ConnURL);
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery("select * from STAFF where [NAME_DIVISION] ='"+kaf+"' and [LASTNAME] ='"+surname+"' and [FIRSTNAME] ='"+name+"' and [MIDNAME] ='"+lastname+"'");
+            String photo = "null";
+            while (resultSet.next()){
+                photo = resultSet.getString("PHOTO");
+            }
+
+            DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
+            dbFavorite.writeCardInBase(surname,name,lastname,kaf,tag,gender,photo);
+            dbFavorite.closeDB();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 

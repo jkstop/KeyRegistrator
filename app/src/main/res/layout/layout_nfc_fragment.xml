@@ -19,13 +19,35 @@
         android:layout_weight="0.6"
         android:src="@drawable/ic_nfc_acs_resize" />
 
-    <Button
+    <!--<Button
         android:id="@+id/nfc_fragment_handle_select_button"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:text="Нажмите тут, если забыли карту"
         android:layout_weight="0.1"
         android:layout_gravity="center_horizontal|right"
-        android:layout_margin="10dp" />
+        android:layout_margin="10dp" />-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.08"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/nfc_fragment_button_dekanat_pmit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Деканат ПМиИТ"
+            android:layout_gravity="center_horizontal|right"
+            android:layout_margin="5dp" />
+        <Button
+            android:id="@+id/nfc_fragment_button_dekanat_ar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Деканат АРиЭБ"
+            android:layout_gravity="center_horizontal|right"
+            android:layout_margin="5dp" />
+    </LinearLayout>
 
 </LinearLayout>

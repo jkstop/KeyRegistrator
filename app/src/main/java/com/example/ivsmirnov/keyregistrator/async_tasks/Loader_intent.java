@@ -8,7 +8,6 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -52,24 +51,27 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        File file = new File(mPath);
+        File file;
+        int count = 0;
         BufferedReader fin = null;
-        try {
-            fin = new BufferedReader(new FileReader(file));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        int count = getStringCount(file);
-
-        progressDialog.setMax(count);
-
-        //SharedPreferences.Editor mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-        //mSharedPreferencesEditor.putInt(Values.LINES_COUNT_IN_FILE,count);
-        //mSharedPreferencesEditor.apply();
-
         int i = 0;
         String line;
-        ArrayList<String> lines = new ArrayList<>(count);
+        ArrayList<String> lines = new ArrayList<>();
+        if (mPath!=null){
+             file = new File(mPath);
+            try {
+                fin = new BufferedReader(new FileReader(file));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            count = getStringCount(file);
+
+            progressDialog.setMax(count);
+
+             lines = new ArrayList<>(count);
+        }
+
+
 
         switch (mLoadType){
             case Values.LOAD_TEACHERS:
@@ -89,27 +91,6 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                         }
                     }
                     dbFavorite.closeDB();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case Values.LOAD_LOCAL_STAFF:
-                DataBaseStaff dbStaff = new DataBaseStaff(mContext);
-                dbStaff.clearBaseStaff();
-                try {
-                    while ((line = fin.readLine())!=null){
-                        if (i<count){
-                            if (!lines.contains(line)){
-                                String [] split = line.split(";");
-                                if (split.length==8){
-                                    dbStaff.writeInBaseStaff(split[0],split[1],split[2],split[3],split[4],split[5],split[6],split[7]);
-                                    publishProgress(i);
-                                    i++;
-                                }
-                            }
-                        }
-                    }
-                    dbStaff.closeDB();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

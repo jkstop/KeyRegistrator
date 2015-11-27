@@ -17,11 +17,6 @@
         android:icon="@drawable/ic_add_black_24dp"
         app:showAsAction="never"/>
 
-    <item android:id="@+id/menu_teachers_download_local_staff"
-        android:title="Загрузить локальную базу из CSV"
-        android:icon="@drawable/ic_file_download_black_24dp"
-        app:showAsAction="never"/>
-
     <item android:id="@+id/menu_teachers_delete"
         android:title="Очистить"
         android:icon="@drawable/ic_delete_black_24dp"

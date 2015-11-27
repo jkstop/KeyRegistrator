@@ -30,6 +30,7 @@
         android:layout_height="wrap_content">
 
         <fragment
+            android:id="@+id/layout_fragment_stat"
             android:layout_width="0dp"
             android:layout_weight="0.6"
             android:layout_height="wrap_content"

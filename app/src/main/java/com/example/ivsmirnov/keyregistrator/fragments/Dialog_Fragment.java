@@ -7,11 +7,13 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
@@ -35,7 +38,6 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseStaff;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
@@ -44,6 +46,11 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
@@ -128,9 +135,8 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         })
                         .create();
             case Values.INPUT_DIALOG:
-                DataBaseStaff dbStaff = new DataBaseStaff(context);
-                final ArrayList<String> items = dbStaff.getListStaffForSearch();
-                dbStaff.closeDB();
+
+                final ArrayList<String> items = Values.getListStaffForSearchFromServer(context);
                 final AutoCompleteTextView autoCompleteTextView =  new AutoCompleteTextView(context);
                 autoCompleteTextView.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -522,6 +528,65 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 }
                             }
                         })
+                        .create();
+            case Values.DIALOG_SQL_CONNECT:
+                LayoutInflater inflater_sql = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View sqlDialogView = inflater_sql.inflate(R.layout.layout_dialog_sql_connect,null);
+                final EditText inputServer = (EditText)sqlDialogView.findViewById(R.id.dialog_sql_connect_input_server);
+                final EditText inputUser = (EditText)sqlDialogView.findViewById(R.id.dialog_sql_connect_input_user);
+                final EditText inputPassowrd = (EditText)sqlDialogView.findViewById(R.id.dialog_sql_connect_input_password);
+                final TextView connectionStatus = (TextView)sqlDialogView.findViewById(R.id.dialog_sql_connect_connection_status);
+                Button checkConnect = (Button)sqlDialogView.findViewById(R.id.dialog_sql_connect_check_button);
+
+                inputServer.setText(sharedPreferences.getString(Values.SQL_SERVER,""));
+                inputUser.setText(sharedPreferences.getString(Values.SQL_USER,""));
+                inputPassowrd.setText(sharedPreferences.getString(Values.SQL_PASSWORD,""));
+                if (sharedPreferences.getInt(Values.SQL_STATUS,0)==Values.SQL_STATUS_CONNECT){
+                    connectionStatus.setText("Подключено!");
+                    connectionStatus.setTextColor(Color.GREEN);
+                }else{
+                    connectionStatus.setText("Ошибка соединения");
+                    connectionStatus.setTextColor(Color.RED);
+                }
+                checkConnect.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String ip = inputServer.getText().toString();
+                        String classs = "net.sourceforge.jtds.jdbc.Driver";
+                        String db = "KeyRegistratorBase";
+                        String user = inputUser.getText().toString();
+                        String password = inputPassowrd.getText().toString();
+
+                        editor.putString(Values.SQL_SERVER,ip);
+                        editor.putString(Values.SQL_USER,user);
+                        editor.putString(Values.SQL_PASSWORD,password);
+                        editor.apply();
+                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                                .permitAll().build();
+                        StrictMode.setThreadPolicy(policy);
+                        Connection conn = null;
+                        String ConnURL = null;
+                        try {
+                            Class.forName(classs);
+                            ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"
+                                    + "database=" + db + ";user=" + user + ";password="
+                                    + password + ";";
+                            conn = DriverManager.getConnection(ConnURL);
+                            connectionStatus.setText("Подключено!");
+                            connectionStatus.setTextColor(Color.GREEN);
+
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            connectionStatus.setText("Ошибка соединения");
+                            connectionStatus.setTextColor(Color.RED);
+                        }
+                    }
+                });
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle("Проверка подключения к SQL - серверу")
+                        .setView(sqlDialogView)
                         .create();
             default:
                 return null;

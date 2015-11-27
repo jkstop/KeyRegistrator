@@ -45,8 +45,8 @@ public class CloseDayService extends Service {
         String path = preferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
         String srFileJournal = mPath + "/Journal.txt";
         String dtFileJournal = path + "/Journal.txt";
-        String srFileTeachers = mPath + "/Teachers.txt";
-        String dtFileTeachers = path + "/Teachers.txt";
+        String srFileTeachers = mPath + "/Teachers.csv";
+        String dtFileTeachers = path + "/Teachers.csv";
 
         DataBaseJournal dbJournal = new DataBaseJournal(context);
         dbJournal.closeDay();
@@ -54,8 +54,12 @@ public class CloseDayService extends Service {
 
         new Write_File(context).execute();
 
-        Values.copyfile(context, srFileJournal, dtFileJournal);
-        Values.copyfile(context, srFileTeachers, dtFileTeachers);
+        try {
+            Values.copyfile(context, srFileJournal, dtFileJournal);
+            Values.copyfile(context, srFileTeachers, dtFileTeachers);
+        }catch (Exception e){
+            Toast.makeText(context,e.toString(),Toast.LENGTH_SHORT).show();
+        }
 
         Calendar calendar = Calendar.getInstance();
         if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {

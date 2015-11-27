@@ -27,7 +27,7 @@ public class CloseDay extends FragmentActivity {
             textHead.setText("Статистика");
             textHead.setTextColor(Color.BLACK);
             editor.remove(Values.AUTO_CLOSED_COUNT);
-            editor.commit();
+            editor.apply();
         }
     }
 

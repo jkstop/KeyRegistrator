@@ -21,7 +21,7 @@ public class CloseDay_stat_Fragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_close_day_stat, container, false);
+        View root = inflater.inflate(R.layout.fragment_close_day_stat, container,false);
         Context context = root.getContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 

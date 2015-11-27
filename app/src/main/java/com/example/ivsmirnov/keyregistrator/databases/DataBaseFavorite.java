@@ -7,7 +7,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
@@ -20,6 +22,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Time;
 import java.util.ArrayList;
 
@@ -67,9 +74,70 @@ public class DataBaseFavorite {
             }
         }
         if (items.size()==0){
-            DataBaseStaff dbStaff = new DataBaseStaff(mContext);
-            items = dbStaff.findUserByTag(tag);
-            dbStaff.closeDB();
+            //DataBaseStaff dbStaff = new DataBaseStaff(mContext);
+            //items = dbStaff.findUserByTag(tag);
+            //dbStaff.closeDB();
+            String ip = mSharedPreferences.getString(Values.SQL_SERVER,"");
+            String classs = "net.sourceforge.jtds.jdbc.Driver";
+            String db = "KeyRegistratorBase";
+            String user = mSharedPreferences.getString(Values.SQL_USER,"");
+            String password = mSharedPreferences.getString(Values.SQL_PASSWORD,"");
+
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+
+            Connection conn = null;
+            String ConnURL = null;
+            try {
+                Class.forName(classs);
+                ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"
+                        + "database=" + db + ";user=" + user + ";password="
+                        + password + ";";
+                conn = DriverManager.getConnection(ConnURL);
+                Statement statement = conn.createStatement();
+                ResultSet resultSet = statement.executeQuery("select * from STAFF where [RADIO_LABEL] = '"+tag+"'");
+                while (resultSet.next()){
+
+                    String nameDivision = resultSet.getString("NAME_DIVISION");
+                    String namePosition = resultSet.getString("NAME_POSITION");
+                    String lastname = resultSet.getString("LASTNAME");
+                    String firstname = resultSet.getString("FIRSTNAME");
+                    String midname = resultSet.getString("MIDNAME");
+                    String sex = resultSet.getString("SEX");
+                    String photo = saveOriginalPhoto(resultSet.getString("PHOTO"),resultSet.getString("LASTNAME")+"_"+resultSet.getString("FIRSTNAME")+"_"+resultSet.getString("MIDNAME"));
+                    String radioLabel = resultSet.getString("RADIO_LABEL");
+
+                    items.put(0,nameDivision);
+                    items.put(1,namePosition);
+                    items.put(2,lastname);
+                    items.put(3,firstname);
+                    items.put(4,midname);
+                    items.put(5,sex);
+                    items.put(6,photo);
+                    items.put(7,radioLabel);
+
+                    writeInDBTeachers(lastname,firstname,midname,nameDivision,radioLabel,sex,photo,photo);
+                }
+                if (items.size()==0){
+                    String originalPath = dbFavorite.saveOriginalPhoto("null", tag);
+                    items.put(0, "-");
+                    items.put(1,"-");
+                    items.put(2,"Аноним");
+                    items.put(3,"Аноним");
+                    items.put(4,"Аноним");
+                    items.put(5, "-");
+                    items.put(6, originalPath);
+                    items.put(7, tag);
+                }
+
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                //connectionStatus.setText("Ошибка соединения");
+                //connectionStatus.setTextColor(Color.RED);
+            }
         }
         dbFavorite.closeDB();
 

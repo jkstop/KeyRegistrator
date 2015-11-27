@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.2">
+        <LinearLayout
+        android:id="@+id/sql_fragment_layout_server"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/sql_fragment_layout_server_choises"
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Сервер для подключения (IP-адресс или DNS)"
+                    android:textSize="24dp" />
+                <Spinner
+                    android:id="@+id/sql_fragment_layout_server_spinner_server"
+                    android:entries="@array/sql_servers_names"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                </Spinner>
+
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/sql_fragment_layout_server_checks"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            >
+            <Button
+                android:id="@+id/sql_fragment_layout_server_check_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Проверить"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:textSize="24dp" />
+        </FrameLayout>
+
+    </LinearLayout></FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.8"></FrameLayout>
+
+
+
+</LinearLayout>

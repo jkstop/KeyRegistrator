@@ -46,6 +46,11 @@
         <item>Список аудиторий</item>
         <item>Количество колонок</item>
     </string-array>
+
+    <string-array name="sql_servers_names">
+        <item>SH-503-C10</item>
+        <item>Другой сервер</item>
+    </string-array>
     <string name="fragment_tag">fragment_list_journal</string>
     <string name="grid_tag">fragment_grid</string>
     <string name="drawer_open">Open navigation drawer</string>
@@ -85,6 +90,7 @@
     <string name="nav_drawer_item_rooms">Аудитории</string>
     <string name="nav_drawer_item_shedule">Расписание</string>
     <string name="nav_drawer_item_email">E-mail рассылка</string>
+    <string name="nav_drawer_item_sql">SQL</string>
     <string name="nav_drawer_item_about">О приложении</string>
     <string name="navigation_drawer_opened">The navigation drawer is opened</string>
     <string name="navigation_drawer_closed">The navigation drawer is closed</string>
@@ -113,4 +119,6 @@
     <!-- Typeface names -->
     <string name="typeface_roboto_regular">Roboto-Regular</string>
     <string name="typeface_roboto_medium">Roboto-Medium</string>
+    <string name="text_toast_put_card">Приложите карту!</string>
+    <string name="text_toast_choise_room_in_first">Сначала выберите аудиторию!</string>
 </resources>

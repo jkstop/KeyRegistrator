@@ -6,13 +6,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,7 +33,6 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.others.Values;
-import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
 
@@ -63,6 +62,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     public static Main_Fragment newInstance (){
         return new Main_Fragment();
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -100,7 +100,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
 
         preferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
+        final int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
         gridView = (GridView)rootView.findViewById(R.id.gridView);
         gridView.setNumColumns(columns);
         adapter = new adapter_main_auditrooms_grid(context,rooms,isFreeAud,lastVisiters,photoPath,tags);
@@ -134,6 +134,14 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                         dbRooms.closeDB();
 
                         getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
+                    }else{
+                        LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        View toastLayout = layoutInflater.inflate(R.layout.layout_toast_put_card,null);
+                        Toast toast = new Toast(context);
+                        toast.setDuration(Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER,0,0);
+                        toast.setView(toastLayout);
+                        toast.show();
                     }
                 }
                 lastClickTime = SystemClock.elapsedRealtime();
@@ -215,7 +223,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 dialog_grid_size.setTargetFragment(this, 0);
                 dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }

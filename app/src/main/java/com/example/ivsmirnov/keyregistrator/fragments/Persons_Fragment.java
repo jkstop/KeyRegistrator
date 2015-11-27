@@ -345,12 +345,6 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
                 startActivityForResult(i,Values.LOAD_TEACHERS);
                 return true;
-            case R.id.menu_teachers_download_local_staff:
-                Intent iS = new Intent(Intent.ACTION_GET_CONTENT);
-                iS.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
-                iS.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(iS,Values.LOAD_LOCAL_STAFF);
-                return true;
             case R.id.menu_teachers_delete:
                 Dialog_Fragment dialog = new Dialog_Fragment();
                 Bundle bundle = new Bundle();
@@ -398,13 +392,6 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                     Uri uri = data.getData();
                     String path = uri.getPath();
                     Loader_intent loader_intent = new Loader_intent(mContext,path,this,Values.LOAD_TEACHERS);
-                    loader_intent.execute();
-                }
-            }else if (requestCode==Values.LOAD_LOCAL_STAFF){
-                if (resultCode==Activity.RESULT_OK){
-                    Uri uri = data.getData();
-                    String path = uri.getPath();
-                    Loader_intent loader_intent = new Loader_intent(mContext,path,this,Values.LOAD_LOCAL_STAFF);
                     loader_intent.execute();
                 }
             }else if (requestCode == Values.SELECT_LOCATION_TEACHERS){

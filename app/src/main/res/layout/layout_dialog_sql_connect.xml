@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.2">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:text="Сервер"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:gravity="left|bottom"
+            android:layout_margin="5dp" />
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:textStyle="italic"
+            android:textColor="#000000"
+            android:id="@+id/dialog_sql_connect_input_server" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.2">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:text="Пользователь"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:gravity="left|bottom"
+            android:layout_margin="5dp" />
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:textStyle="italic"
+            android:textColor="#000000"
+            android:id="@+id/dialog_sql_connect_input_user" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.2">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:text="Пароль"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:gravity="left|bottom"
+            android:layout_margin="5dp" />
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:inputType="textPassword"
+            android:textStyle="italic"
+            android:textColor="#000000"
+            android:id="@+id/dialog_sql_connect_input_password" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/dialog_sql_connect_connection_status"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.2"
+        android:gravity="center"
+        android:textSize="24dp" />
+
+    <Button
+        android:id="@+id/dialog_sql_connect_check_button"
+        android:text="Проверить"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:background="#00ffffff"
+        android:textColor="#000000" />
+
+</LinearLayout>
