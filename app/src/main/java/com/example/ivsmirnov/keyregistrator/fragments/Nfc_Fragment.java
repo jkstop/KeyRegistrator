@@ -2,7 +2,6 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,13 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 /**
@@ -53,7 +48,7 @@ public class Nfc_Fragment extends Fragment {
             String path = "";
             String tag = "";
             Persons_Fragment.writeIt(mContext,aud, ((Button) v).getText().toString(), System.currentTimeMillis(), path,tag,"hand");
-            getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
+            getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
         }
     };
 
@@ -81,12 +76,19 @@ public class Nfc_Fragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_nfc_all_persons:
+                Dialog_Fragment dialog_fragment = new Dialog_Fragment();
                 Bundle bundle = new Bundle();
+                bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
+                bundle.putInt(Values.DIALOG_CLOSE_ROOM_TYPE,Values.DIALOG_CLOSE_ROOM_TYPE_PERSONS);
+                bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLOSE_ROOM);
+                dialog_fragment.setArguments(bundle);
+                dialog_fragment.show(getFragmentManager(),"enter_pin");
+                /*Bundle bundle = new Bundle();
                 bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
                 bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
                 Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
                 persons_fragment.setArguments(bundle);
-                getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.tag_persons_fragment)).commit();
+                getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.tag_persons_fragment)).commit();*/
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

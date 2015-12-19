@@ -9,8 +9,9 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Write_File;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Close_day_task;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.activities.CloseDay;
@@ -52,7 +53,7 @@ public class CloseDayService extends Service {
         dbJournal.closeDay();
         dbJournal.closeDB();
 
-        new Write_File(context).execute();
+        new Close_day_task(context).execute();
 
         try {
             Values.copyfile(context, srFileJournal, dtFileJournal);

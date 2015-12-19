@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,8 +26,10 @@ import android.widget.ListView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_journal_list;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Load_from_server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -121,6 +124,12 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
             case R.id.menu_journal_save_to_file:
                 Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_JOURNAL);
                 saveToFile.execute();
+                Save_to_server save_to_server = new Save_to_server(mContext);
+                save_to_server.execute();
+                return true;
+            case R.id.menu_journal_download_from_server:
+                Load_from_server loadFromServer = new Load_from_server(mContext,this);
+                loadFromServer.execute();
                 return true;
             case R.id.menu_journal_download:
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);

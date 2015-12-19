@@ -17,7 +17,8 @@
             android:id="@+id/text_empty_aud_list"
             android:gravity="center"
             android:textColor="#ff000000"
-            android:textStyle="italic" />
+            android:textStyle="italic"
+            android:textSize="@dimen/text_empty_auditrooms" />
 
         <GridView
             android:id="@+id/gridView"

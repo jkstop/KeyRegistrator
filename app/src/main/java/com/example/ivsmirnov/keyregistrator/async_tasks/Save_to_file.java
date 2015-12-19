@@ -86,6 +86,5 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
         if (mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }
-        Toast.makeText(mContext,"Готово!",Toast.LENGTH_SHORT).show();
     }
 }

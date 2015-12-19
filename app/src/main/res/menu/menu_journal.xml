@@ -8,7 +8,12 @@
         app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/menu_journal_download"
-        android:title="Загрузить"
+        android:title="Загрузить из файла"
+        android:icon="@drawable/ic_file_download_black_24dp"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_journal_download_from_server"
+        android:title="Загрузить с сервера"
         android:icon="@drawable/ic_file_download_black_24dp"
         app:showAsAction="never"/>
 

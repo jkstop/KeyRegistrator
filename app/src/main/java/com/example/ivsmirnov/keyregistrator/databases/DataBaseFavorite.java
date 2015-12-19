@@ -11,9 +11,11 @@ import android.graphics.Color;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.util.Base64;
 import android.util.Log;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -135,8 +137,7 @@ public class DataBaseFavorite {
                 e.printStackTrace();
             } catch (SQLException e) {
                 e.printStackTrace();
-                //connectionStatus.setText("Ошибка соединения");
-                //connectionStatus.setTextColor(Color.RED);
+                Toast.makeText(mContext,"Нет подключения к серверу",Toast.LENGTH_SHORT).show();
             }
         }
         dbFavorite.closeDB();

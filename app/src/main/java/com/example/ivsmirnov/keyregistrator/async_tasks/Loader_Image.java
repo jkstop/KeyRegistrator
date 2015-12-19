@@ -6,9 +6,12 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
+import com.example.ivsmirnov.keyregistrator.fragments.Search_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -30,24 +33,19 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
     private String tag;
 
     private ProgressDialog dialog;
-    private Dialog_Fragment activity;
-
-    private UpdateTeachers listener;
+    private Search_Fragment activity;
 
     private SharedPreferences mPreferences;
 
-    public Loader_Image (Context c,String [] items,Dialog_Fragment a,UpdateTeachers l){
+    public Loader_Image (Context c,String [] items,Search_Fragment a){
         this.context = c;
         this.surname = items[0];
         this.name = items[1];
         this.lastname = items[2];
         this.kaf = items[3];
         this.gender = items[4];
-        this.pos = Integer.parseInt(items[5]);
-        this.tag = items[6];
-
+        this.tag = items[5];
         this.activity = a;
-        this.listener = l;
 
         dialog = new ProgressDialog(activity.getActivity());
 
@@ -91,7 +89,6 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
             while (resultSet.next()){
                 photo = resultSet.getString("PHOTO");
             }
-
             DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
             dbFavorite.writeCardInBase(surname,name,lastname,kaf,tag,gender,photo);
             dbFavorite.closeDB();
@@ -110,7 +107,8 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
         if (dialog.isShowing()){
             dialog.cancel();
         }
-        listener.onFinishEditing();
+        Snackbar snackbar = Snackbar.make(activity.getView(), R.string.added,Snackbar.LENGTH_SHORT);
+        snackbar.show();
     }
 
 }

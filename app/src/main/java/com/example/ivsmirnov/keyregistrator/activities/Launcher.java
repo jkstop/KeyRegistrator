@@ -8,35 +8,39 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_navigation_drawer_list;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Open_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
+import com.example.ivsmirnov.keyregistrator.custom_views.NavigationItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
@@ -48,25 +52,26 @@ import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
+import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class Launcher extends AppCompatActivity implements View.OnClickListener,GetUserByTag{
+public class Launcher extends AppCompatActivity implements GetUserByTag{
 
     private DrawerLayout mDrawerLayout;
     private FrameLayout mFrameLayout_Drawer_root;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
+    private ListView mNavigationDrawerList;
+    private adapter_navigation_drawer_list mNavigationDrawerListAdapter;
     private LinearLayout mLinearLayout_Home, mLinearLayout_Settings, mLinearLayout_Statistics, mLinearLayout_Journal,mLinearLayout_Rooms, mLinearLayout_Email, mLinearLayout_Shedule,mLinearLayout_Sql;
 
     private Context mContext;
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mPreferencesEditor;
+    private Resources mResources;
 
     private static long back_pressed;
     private static long symbol_pressed;
@@ -85,13 +90,14 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.launcher);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         mContext = this;
         mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        mResources = getResources();
 
-        checkSQlConnect();
+        SQL_Connector.check_sql_connection(mContext,null,null,null);
 
         //init reader
         mManager = (UsbManager)getSystemService(Context.USB_SERVICE);
@@ -119,9 +125,9 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                     @Override
                     public void run() {
                         if (stateStrings[finalCurrState].equals("Present")) {
-                            Persons_Fragment persons_fragment = (Persons_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment));
-                            Nfc_Fragment nfc_fragment = (Nfc_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_nfc_fragment));
-                            Main_Fragment main_fragment = (Main_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_main_fragment));
+                            Persons_Fragment persons_fragment = (Persons_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_persons));
+                            Nfc_Fragment nfc_fragment = (Nfc_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_nfc));
+                            Main_Fragment main_fragment = (Main_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_main));
                             if (persons_fragment != null && persons_fragment.isVisible()) {
                                 Log.d("persons_fragment", "visible");
                                 aud = null;
@@ -129,10 +135,11 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                                 setProtocol();
                                 getTag();
                             } else if (nfc_fragment != null && nfc_fragment.isVisible()) {
-                                aud = getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_nfc_fragment)).getArguments().getString(Values.AUDITROOM);
+                                aud = getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_nfc)).getArguments().getString(Values.AUDITROOM);
                                 powerReader();
                                 setProtocol();
                                 getTag();
+
                             } else if (main_fragment != null && main_fragment.isVisible()) {
                                 isOpened = true;
                                 powerReader();
@@ -147,7 +154,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
             }
         });
 
-        getSupportFragmentManager().beginTransaction().add(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
         toolbar.setTitle(getResources().getString(R.string.toolbar_title_main));
@@ -155,23 +162,76 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         setSupportActionBar(toolbar);
 
         mFrameLayout_Drawer_root = (FrameLayout)findViewById(R.id.main_activity_navigation_drawer_rootLayout);
-        mLinearLayout_Home = (LinearLayout)findViewById(R.id.navigation_drawer_layout_home);
-        mLinearLayout_Settings = (LinearLayout)findViewById(R.id.navigation_drawer_layout_settings);
-        mLinearLayout_Statistics = (LinearLayout)findViewById(R.id.navigation_drawer_layout_statistics);
-        mLinearLayout_Journal = (LinearLayout)findViewById(R.id.navigation_drawer_layout_journal);
-        mLinearLayout_Rooms = (LinearLayout)findViewById(R.id.navigation_drawer_layout_rooms);
-        mLinearLayout_Email = (LinearLayout) findViewById(R.id.navigation_drawer_layout_email);
-        mLinearLayout_Shedule = (LinearLayout) findViewById(R.id.navigation_drawer_layout_shedule);
-        mLinearLayout_Sql = (LinearLayout)findViewById(R.id.navigation_drawer_layout_sql);
+        mNavigationDrawerList = (ListView)findViewById(R.id.left_navigation_drawer_list);
 
-        mLinearLayout_Home.setOnClickListener(this);
-        mLinearLayout_Settings.setOnClickListener(this);
-        mLinearLayout_Statistics.setOnClickListener(this);
-        mLinearLayout_Journal.setOnClickListener(this);
-        mLinearLayout_Rooms.setOnClickListener(this);
-        mLinearLayout_Email.setOnClickListener(this);
-        mLinearLayout_Shedule.setOnClickListener(this);
-        mLinearLayout_Sql.setOnClickListener(this);
+
+        ArrayList<NavigationItem> mNavigationItems = new ArrayList<>();
+        mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_home)).setIcon(R.drawable.ic_home_black_24dp));
+        mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_persons)).setIcon(R.drawable.ic_person_black_24dp));
+        mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_journal)).setIcon(R.drawable.ic_format_list_bulleted_black_24dp));
+        mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_rooms)).setIcon(R.drawable.ic_room_black_24dp));
+        mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_shedule)).setIcon(R.drawable.ic_grid_on_black_24dp));
+        mNavigationItems.add(new NavigationItem().setSeparator(true));
+        mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_mail)).setIcon(R.drawable.ic_attachment_black_24dp));
+        mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_sql)).setIcon(R.drawable.ic_backup_black_24dp));
+        mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_stat)).setIcon(R.drawable.ic_info_outline_black_24dp));
+        mNavigationDrawerListAdapter = new adapter_navigation_drawer_list(mContext,mNavigationItems);
+        mNavigationDrawerList.setAdapter(mNavigationDrawerListAdapter);
+        mNavigationDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem  = mNavigationDrawerListAdapter.getItemText(position);
+                if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_home))){
+                    showFragment(Main_Fragment.newInstance(),R.string.fragment_tag_main);
+                }else if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_persons))){
+                    setToolbarTitle(R.string.toolbar_title_persons);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_EDITOR);
+                    Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+                    persons_fragment.setArguments(bundle);
+                    showFragment(persons_fragment,R.string.fragment_tag_persons);
+                }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_journal))){
+                    setToolbarTitle(R.string.toolbar_title_journal);
+                    showFragment(Journal_fragment.newInstance(),R.string.fragment_tag_journal);
+                }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_rooms))){
+                    setToolbarTitle(R.string.toolbar_title_auditrooms);
+                    showFragment(Rooms_Fragment.newInstance(),R.string.fragment_tag_rooms);
+                }else if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_shedule))){
+                    setToolbarTitle(R.string.toolbar_title_shedule);
+                    showFragment(Shedule_Fragment.newInstance(),R.string.fragment_tag_shedule);
+                }else if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_mail))){
+                    setToolbarTitle(R.string.toolbar_title_email);
+                    showFragment(Email_Fragment.newInstance(),R.string.fragment_tag_email);
+                }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_sql))){
+                    Dialog_Fragment dialog_sql = new Dialog_Fragment();
+                    Bundle bundle_sql = new Bundle();
+                    bundle_sql.putInt(Values.DIALOG_TYPE,Values.DIALOG_SQL_CONNECT);
+                    dialog_sql.setArguments(bundle_sql);
+                    dialog_sql.show(getSupportFragmentManager(),"sql");
+                }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_stat))) {
+                    startActivity(new Intent(mContext, CloseDay.class).putExtra("type", 1).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                }
+
+                mDrawerLayout.closeDrawer(mFrameLayout_Drawer_root);
+            }
+        });
+        //mLinearLayout_Home = (LinearLayout)findViewById(R.id.navigation_drawer_layout_home);
+        //mLinearLayout_Settings = (LinearLayout)findViewById(R.id.navigation_drawer_layout_settings);
+        //mLinearLayout_Statistics = (LinearLayout)findViewById(R.id.navigation_drawer_layout_statistics);
+        //mLinearLayout_Journal = (LinearLayout)findViewById(R.id.navigation_drawer_layout_journal);
+        //mLinearLayout_Rooms = (LinearLayout)findViewById(R.id.navigation_drawer_layout_rooms);
+        //mLinearLayout_Email = (LinearLayout) findViewById(R.id.navigation_drawer_layout_email);
+        //mLinearLayout_Shedule = (LinearLayout) findViewById(R.id.navigation_drawer_layout_shedule);
+        //mLinearLayout_Sql = (LinearLayout)findViewById(R.id.navigation_drawer_layout_sql);
+
+        //mLinearLayout_Home.setOnClickListener(this);
+        //mLinearLayout_Settings.setOnClickListener(this);
+        //mLinearLayout_Statistics.setOnClickListener(this);
+        //mLinearLayout_Journal.setOnClickListener(this);
+        //mLinearLayout_Rooms.setOnClickListener(this);
+        //mLinearLayout_Email.setOnClickListener(this);
+        //mLinearLayout_Shedule.setOnClickListener(this);
+        //mLinearLayout_Sql.setOnClickListener(this);
 
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_opened, R.string.navigation_drawer_closed) {
@@ -195,35 +255,18 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         mActionBarDrawerToggle.syncState();
     }
 
-    private void checkSQlConnect(){
-        String ip = mPreferences.getString(Values.SQL_SERVER,"");
-        String classs = "net.sourceforge.jtds.jdbc.Driver";
-        String db = "KeyRegistratorBase";
-        String user = mPreferences.getString(Values.SQL_USER,"");
-        String password = mPreferences.getString(Values.SQL_PASSWORD,"");
+    private String getStringFromResources(int resId){
+        return mResources.getString(resId);
+    }
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        Connection conn = null;
-        String ConnURL = null;
-
-        try {
-            Class.forName(classs);
-            ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"
-                    + "database=" + db +";user=" + user + ";password="
-                    + password + ";";
-            conn = DriverManager.getConnection(ConnURL);
-            mPreferencesEditor.putInt(Values.SQL_STATUS,Values.SQL_STATUS_CONNECT);
-            mPreferencesEditor.apply();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            mPreferencesEditor.putInt(Values.SQL_STATUS,Values.SQL_STATUS_DISCONNECT);
-            mPreferencesEditor.apply();
+    private void setToolbarTitle (int resId){
+        if (getSupportActionBar()!=null){
+            getSupportActionBar().setTitle(mResources.getString(resId));
         }
+    }
+
+    private void showFragment(Fragment fragment, int fragmentTagId){
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,fragment,getResources().getString(fragmentTagId)).commit();
     }
 
 
@@ -258,7 +301,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                             closedRooms++;
                         }
                         dbRooms.updateStatusRooms(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + rms.get(i).get(0), -1), "true");
-                        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
                     }
                 }
             }
@@ -269,6 +312,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                 Toast toast = new Toast(mContext);
                 toast.setDuration(Toast.LENGTH_LONG);
                 toast.setView(toastLayout);
+                toast.setGravity(Gravity.CENTER,0,0);
                 toast.show();
             }
             dbRooms.closeDB();
@@ -289,7 +333,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                             + items.get(3).charAt(0) + "." +
                             items.get(4).charAt(0) + ".";
                     Persons_Fragment.writeIt(mContext,aud,name,System.currentTimeMillis(),items.get(6),items.get(7),"card");
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
                 }
             }else{
                 String [] values = new String[]{items.get(2),items.get(3),items.get(4),items.get(0),items.get(5),items.get(6)};
@@ -298,7 +342,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
                 b.putStringArray("valuesForEdit", values);
                 Dialog_Fragment dialog = new Dialog_Fragment();
                 dialog.setArguments(b);
-                dialog.setTargetFragment(getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment)), 0);
+                dialog.setTargetFragment(getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_persons)), 0);
                 dialog.show(getSupportFragmentManager(),"edit");
             }
         }
@@ -377,14 +421,14 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
             }
         }
     };
-
+/*
     @Override
     public void onClick(View v) {
         Resources res = getResources();
 
         if (v.getTag().equals(res.getString(R.string.nav_drawer_item_home))){
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment))
+                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main))
                     .commit();
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_persons))){
             if (getSupportActionBar()!=null){
@@ -394,7 +438,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
             bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_EDITOR);
             Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
             persons_fragment.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.tag_persons_fragment)).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_statistics))){
             startActivity(new Intent(mContext, CloseDay.class).putExtra("type", 1).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_journal))){
@@ -438,7 +482,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         }
         mDrawerLayout.closeDrawer(mFrameLayout_Drawer_root);
     }
-
+*/
     //закрытие всех позиций в 22.01
     public void setAlarm(Calendar calendar){
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
@@ -497,7 +541,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         } else {
             Toast.makeText(getBaseContext(), "Нажмите еще раз для выхода", Toast.LENGTH_SHORT).show();
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment))
+                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main))
                     .commit();
             back_pressed = System.currentTimeMillis();
         }
@@ -510,7 +554,7 @@ public class Launcher extends AppCompatActivity implements View.OnClickListener,
         }else{
             char key = (char)event.getUnicodeChar();
             try{
-                if (getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.tag_persons_fragment)).isVisible()){
+                if (getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_persons)).isVisible()){
                     Persons_Fragment.move(String.valueOf(key));
                 }
             }catch (Exception e){

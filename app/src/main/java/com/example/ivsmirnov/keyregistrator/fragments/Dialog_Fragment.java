@@ -5,15 +5,16 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,25 +43,25 @@ import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
+import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
     private Context context;
     private int dialog_id;
-    private String cntx;
+    //private String cntx;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private LayoutInflater inflater;
+    private Resources mResources;
 
     private boolean pin_verify;
 
@@ -74,12 +75,12 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dialog_id = getArguments().getInt(Values.DIALOG_TYPE,0);
-        cntx = getArguments().getString("cntx", "nicht");
+        //cntx = getArguments().getString("cntx", "nicht");
         context = getActivity().getApplicationContext();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
+        mResources = context.getResources();
 
     }
 
@@ -89,8 +90,8 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
         switch (dialog_id){
             case Values.DIALOG_CLEAR_JOURNAL:
                 return new AlertDialog.Builder(getActivity())
-                        .setTitle("ВНИМАНИЕ!")
-                        .setMessage("Из журнала будут удалены все записи. Продолжить?")
+                        .setTitle(mResources.getString(R.string.dialog_clear_journal_title))
+                        .setMessage(mResources.getString(R.string.dialog_clear_journal_message))
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -107,14 +108,14 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 UpdateJournal listen = (UpdateJournal)getTargetFragment();
                                 listen.onDone();
 
-                                Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }
                         })
                         .create();
             case Values.DIALOG_CLEAR_TEACHERS:
                 return new AlertDialog.Builder(getActivity())
-                        .setTitle("ВНИМАНИЕ!")
-                        .setMessage("Из базы данных преподавателей будут удалены все записи. Продолжить?")
+                        .setTitle(mResources.getString(R.string.dialog_clear_teachers_title))
+                        .setMessage(mResources.getString(R.string.dialog_clear_teachers_message))
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -130,96 +131,13 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
                                 UpdateTeachers updateTeachers = (UpdateTeachers)getTargetFragment();
                                 updateTeachers.onFinishEditing();
-                                Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }
                         })
                         .create();
-            case Values.INPUT_DIALOG:
-
-                final ArrayList<String> items = Values.getListStaffForSearchFromServer(context);
-                final AutoCompleteTextView autoCompleteTextView =  new AutoCompleteTextView(context);
-                autoCompleteTextView.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                    }
-                });
-                autoCompleteTextView.setAdapter(new adapter_autoComplete_teachersBase(context, items));
-                autoCompleteTextView.setTextColor(Color.BLACK);
-                autoCompleteTextView.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-                autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        String source = autoCompleteTextView.getText().toString();
-                        String[] split = source.split(";");
-                        String surname = split[0];
-                        String name = split[1];
-                        String lastname = split[2];
-                        String kaf = split[3];
-                        String gender = split[4];
-                        String pos = split[5];
-                        String tag = split[6];
-
-                        Loader_Image loader_image = new Loader_Image(context, new String[]{surname, name, lastname, kaf, gender, pos, tag}, Dialog_Fragment.this, (UpdateTeachers) getTargetFragment());
-                        loader_image.execute();
-
-                        dismiss();
-
-                    }
-                });
-                AlertDialog.Builder builder =  new AlertDialog.Builder(getActivity());
-                        builder.setTitle("Ввод")
-                        .setView(autoCompleteTextView)
-                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String source = autoCompleteTextView.getText().toString();
-                                String[] split = source.split("\\s+");
-                                String surname = "";
-                                String name = "";
-                                String lastname = "";
-                                String kaf = "";
-                                String gender = "";
-                                String pos = "-1";
-                                String tag = "null";
-                                try {
-                                    surname = split[0];
-                                    name = split[1];
-                                    if (split.length > 2) {
-                                        lastname = split[2];
-                                        if (lastname.substring(lastname.length() - 1).equals("а")) {
-                                            gender = "Ж";
-                                        } else {
-                                            gender = "М";
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-                                UpdateTeachers updateTeachers;
-                                updateTeachers = (UpdateTeachers) getTargetFragment();
-                                Loader_Image loader_image = new Loader_Image(context, new String[]{surname, name, lastname, kaf, gender, pos,tag}, Dialog_Fragment.this, updateTeachers);
-                                loader_image.execute();
-                               dismiss();
-                            }
-                        });
-                AlertDialog dialog = builder.create();
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
-                lp.gravity = Gravity.TOP;
-                return dialog;
             case Values.DIALOG_EDIT:
 
                 final View dialogView = inflater.inflate(R.layout.layout_dialog_edit, null);
-                final TableLayout tableLayout = (TableLayout) dialogView.findViewById(R.id.layout_dialog_edit_table);
                 final ImageView imageView = (ImageView) dialogView.findViewById(R.id.layout_dialog_edit_image_person);
                 final String [] values = getArguments().getStringArray("valuesForEdit");
                 final DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
@@ -302,7 +220,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
             case Values.DELETE_ROOM_DIALOG:
                 final String aud = getArguments().getString("aud");
                 return new AlertDialog.Builder(getActivity())
-                        .setTitle(getResources().getString(R.string.dialog_delete_room_title))
+                        .setTitle(getResources().getString(R.string.title_delete_room_dialog))
                         .setMessage(getResources().getString(R.string.dialog_delete_room_message) + " "+ aud + "?")
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
@@ -318,6 +236,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
                                 UpdateTeachers updateTeachers = (UpdateTeachers)getTargetFragment();
                                 updateTeachers.onFinishEditing();
+                                Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                                 dialog.cancel();
                             }
                         })
@@ -330,8 +249,8 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         .create();
             case Values.DIALOG_CLEAR_ROOMS:
                 return new AlertDialog.Builder(getActivity())
-                        .setTitle("ВНИМАНИЕ!")
-                        .setMessage("Из базы  будут удалены все записи. Продолжить?")
+                        .setTitle(R.string.dialog_clear_rooms_title)
+                        .setMessage(R.string.dialog_clear_rooms_message)
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -347,7 +266,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
                                 FinishLoad finishLoad = (FinishLoad)getTargetFragment();
                                 finishLoad.onFinish();
-                                Toast.makeText(context,"Готово!",Toast.LENGTH_SHORT).show();
+                                Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                             }
                         })
                         .create();
@@ -378,6 +297,8 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
 
                                 UpdateTeachers updateTeachers = (UpdateTeachers) getTargetFragment();
                                 updateTeachers.onFinishEditing();
+
+                                Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
 
                                 dialog.cancel();
                             }
@@ -515,7 +436,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                 View rootView = inflater.inflate(R.layout.view_enter_password,null);
                 final EditText passwordInput = (EditText)rootView.findViewById(R.id.view_enter_password_editText);
                 return new AlertDialog.Builder(getActivity())
-                        .setTitle("Сдать без карты")
+                        .setTitle("Введите пароль")
                         .setView(rootView)
                         .setCancelable(false)
                         .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -536,56 +457,32 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                 final EditText inputUser = (EditText)sqlDialogView.findViewById(R.id.dialog_sql_connect_input_user);
                 final EditText inputPassowrd = (EditText)sqlDialogView.findViewById(R.id.dialog_sql_connect_input_password);
                 final TextView connectionStatus = (TextView)sqlDialogView.findViewById(R.id.dialog_sql_connect_connection_status);
-                Button checkConnect = (Button)sqlDialogView.findViewById(R.id.dialog_sql_connect_check_button);
+                Button mCheckButton = (Button)sqlDialogView.findViewById(R.id.dialog_sql_connect_check_button);
 
                 inputServer.setText(sharedPreferences.getString(Values.SQL_SERVER,""));
                 inputUser.setText(sharedPreferences.getString(Values.SQL_USER,""));
                 inputPassowrd.setText(sharedPreferences.getString(Values.SQL_PASSWORD,""));
                 if (sharedPreferences.getInt(Values.SQL_STATUS,0)==Values.SQL_STATUS_CONNECT){
-                    connectionStatus.setText("Подключено!");
+                    connectionStatus.setText(R.string.connected);
                     connectionStatus.setTextColor(Color.GREEN);
                 }else{
-                    connectionStatus.setText("Ошибка соединения");
+                    connectionStatus.setText(R.string.disconnected);
                     connectionStatus.setTextColor(Color.RED);
                 }
-                checkConnect.setOnClickListener(new View.OnClickListener() {
+                mCheckButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String ip = inputServer.getText().toString();
-                        String classs = "net.sourceforge.jtds.jdbc.Driver";
-                        String db = "KeyRegistratorBase";
-                        String user = inputUser.getText().toString();
-                        String password = inputPassowrd.getText().toString();
-
-                        editor.putString(Values.SQL_SERVER,ip);
-                        editor.putString(Values.SQL_USER,user);
-                        editor.putString(Values.SQL_PASSWORD,password);
-                        editor.apply();
-                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                                .permitAll().build();
-                        StrictMode.setThreadPolicy(policy);
-                        Connection conn = null;
-                        String ConnURL = null;
-                        try {
-                            Class.forName(classs);
-                            ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"
-                                    + "database=" + db + ";user=" + user + ";password="
-                                    + password + ";";
-                            conn = DriverManager.getConnection(ConnURL);
-                            connectionStatus.setText("Подключено!");
+                        if (SQL_Connector.check_sql_connection(context,inputServer.getText().toString(),inputUser.getText().toString(),inputPassowrd.getText().toString())){
+                            connectionStatus.setText(R.string.connected);
                             connectionStatus.setTextColor(Color.GREEN);
-
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                            connectionStatus.setText("Ошибка соединения");
+                        }else{
+                            connectionStatus.setText(R.string.disconnected);
                             connectionStatus.setTextColor(Color.RED);
                         }
                     }
                 });
                 return new AlertDialog.Builder(getActivity())
-                        .setTitle("Проверка подключения к SQL - серверу")
+                        .setTitle(R.string.title_check_sql_server_connect)
                         .setView(sqlDialogView)
                         .create();
             default:
@@ -593,23 +490,34 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
         }
     }
 
+
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
         switch (dialog_id){
             case Values.DIALOG_CLOSE_ROOM:
                 if (pin_verify){
-                    DataBaseJournal dbJournal = new DataBaseJournal(context);
-                    DataBaseRooms dbRooms = new DataBaseRooms(context);
-                    String aud = getArguments().getString("aud");
-                    int pos = sharedPreferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + aud, -1);
-                    if (pos != -1) {
-                        dbJournal.updateDB(pos);
+                    if (getArguments().getInt(Values.DIALOG_CLOSE_ROOM_TYPE)==Values.DIALOG_CLOSE_ROOM_TYPE_ROOMS){
+                        DataBaseJournal dbJournal = new DataBaseJournal(context);
+                        DataBaseRooms dbRooms = new DataBaseRooms(context);
+                        String aud = getArguments().getString("aud");
+                        int pos = sharedPreferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + aud, -1);
+                        if (pos != -1) {
+                            dbJournal.updateDB(pos);
+                        }
+                        dbRooms.updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), "true");
+                        getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
+                        dbJournal.closeDB();
+                        dbRooms.closeDB();
+                    }else{
+                        Bundle bundle = new Bundle();
+                        bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
+                        bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
+                        Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+                        persons_fragment.setArguments(bundle);
+                        getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
                     }
-                    dbRooms.updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), "true");
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
-                    dbJournal.closeDB();
-                    dbRooms.closeDB();
+
                 }else{
                     Toast.makeText(context,"НЕВЕРНЫЙ ПАРОЛЬ!",Toast.LENGTH_LONG).show();
                 }

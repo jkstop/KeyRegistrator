@@ -85,6 +85,11 @@ public class Values{
     public static final int SQL_STATUS_CONNECT = 126;
     public static final int SQL_STATUS_DISCONNECT = 127;
     public static final int DIALOG_CLOSE_ROOM = 118;
+    public static final String DIALOG_CLOSE_ROOM_TYPE = "close_room_type";
+    public static final int DIALOG_CLOSE_ROOM_TYPE_PERSONS = 127;
+    public static final int DIALOG_CLOSE_ROOM_TYPE_ROOMS = 128;
+    public static final int TYPE_GRID_PERSONS = 129;
+    public static final int TAG_LASTNAME= 129;
 
     public static void copyfile(Context context, String srFile, String dtFile){
         try{

@@ -1,113 +1,81 @@
 <resources>
     <string name="app_name">Key Registrator</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="aud">Аудитория</string>
-    <string name="name">Фамилия</string>
-    <string name="okButton">ОК</string>
-    <string name="cancelButton">Отмена</string>
-    <string name="time">Время</string>
-    <string name="timeGet">Взял</string>
-    <string name="timePut">Сдал</string>
-    <string-array name="aud">
-        <item>401</item>
-        <item>402</item>
-        <item>407</item>
-        <item>408</item>
-        <item>409</item>
-        <item>507</item>
-        <item>508</item>
-        <item>509</item>
-    </string-array>
-    <string-array name="drawer_list">
-        <item>Настройки</item>
-        <item>Статистика</item>
-        <item>Журнал</item>
-    </string-array>
-    <string-array name="db_journal_items">
-        <item>Выгрузить базу в файл</item>
-        <item>Скопировать на ПК</item>
-        <item>Загрузить из файла</item>
-        <item>Очистить</item>
-    </string-array>
-    <string-array name="db_teacher_items">
-        <item>Выгрузить базу в файл</item>
-        <item>Скопировать на ПК</item>
-        <item>Загрузить избранное из файла</item>
-        <item>Загрузить глобальную базу из CSV</item>
-        <item>Очистить</item>
-    </string-array>
-    <string-array name="db_share_items">
-        <item>Место хранения баз на ПК</item>
-        <item>Размер уведомления</item>
-        <item>convert image</item>
-    </string-array>
-    <string-array name="db_rooms_items">
-        <item>Список аудиторий</item>
-        <item>Количество колонок</item>
-    </string-array>
+    <!-- Journal -->
+    <string name="journal_auditroom">Аудитория</string>
+    <string name="journal_lastname">Фамилия</string>
+    <string name="journal_time">Время</string>
+    <string name="journal_time_get">Взял</string>
+    <string name="journal_time_put">Сдал</string>
 
-    <string-array name="sql_servers_names">
-        <item>SH-503-C10</item>
-        <item>Другой сервер</item>
-    </string-array>
-    <string name="fragment_tag">fragment_list_journal</string>
-    <string name="grid_tag">fragment_grid</string>
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
-    <string name="title_activity_archive">archive</string>
-    <string name="title_activity_base">base</string>
-    <string name="title_activity_teachers_">Teachers_Activity</string>
-    <string name="title_activity_teachers__activity_v2">Teachers_Activity_v2</string>
-    <string name="title_activity_close_day_dialog"> </string>
-    <string name="text_warning">Уважаемые преподаватели!\n
-    Брать и сдавать ключи по завершении занятий необходимо ЛИЧНО ВАМ!\n
-    Категорически запрещается передавать ключи другому преподавателю и оставлять компьютерный класс открытым в ваше отсутствие в нём!</string>
-    <string name="title_activity_rooms">Список аудиторий: </string>
-    <string name="text_nfc_head_card_incorrect">Не удалось распознать вашу карту.\n
-        Попробуйте приложить её еще раз.</string>
-    <string name="fragment1">fragment 1</string>
-    <string name="fragment2">fragment 2</string>
-    <string name="fragment3">fragment 3</string>
-    <string name="fragment4">fragment 4</string>
-    <string name="tag_persons_fragment">Persons_fragment</string>
-    <string name="tag_main_fragment">Main_fragment</string>
-    <string name="tag_nfc_fragment">nfc_fragment</string>
+    <!-- Fragment tags -->
+    <string name="fragment_tag_journal">fragment_tag_journal</string>
+    <string name="fragment_tag_rooms">fragment_tag_rooms</string>
+    <string name="fragment_tag_shedule">fragment_tag_shedule</string>
+    <string name="fragment_tag_email">fragment_tag_email</string>
+    <string name="fragment_tag_persons">fragment_tag_persons</string>
+    <string name="fragment_tag_main">fragment_tag_main</string>
+    <string name="fragment_tag_nfc">fragment_tag_nfc</string>
+    <string name="fragment_tag_search">fragment_tag_search</string>
 
-    <!-- Toolbar titles -->
+    <string name="grid_item_tag_lastname">1</string>
+    <string name="grid_item_tag_firstname">2</string>
+    <string name="grid_item_tag_midname">3</string>
+    <string name="grid_item_tag_division">4</string>
+    <string name="grid_item_tag_sex">5</string>
+    <string name="grid_item_tag_radio_label">6</string>
+
+    <!-- Titles -->
     <string name="toolbar_title_main">Выберите при помощи мыши нужную аудиторию</string>
     <string name="toolbar_title_persons">Преподаватели</string>
     <string name="toolbar_title_journal">Журнал</string>
     <string name="toolbar_title_auditrooms">Аудитории</string>
+    <string name="toolbar_title_shedule">Расписание</string>
     <string name="toolbar_title_persons_select">Выберите преподавателя</string>
     <string name="toolbar_title_email">E-mail рассылка</string>
+    <string name="title_activity_close_day_dialog"> </string>
+    <string name="title_activity_rooms">Список аудиторий: </string>
+    <string name="title_delete_room_dialog">Удаление</string>
+    <string name="title_add_new_staff">Добавление нового пользователя</string>
+
+    <string name="label_add_button">Добавить</string>
+
+
+    <string name="text_warning">Уважаемые преподаватели!\n
+    Брать и сдавать ключи по завершении занятий необходимо ЛИЧНО ВАМ!\n
+    Категорически запрещается передавать ключи другому преподавателю и оставлять компьютерный класс открытым в ваше отсутствие в нём!</string>
+
 
     <!-- Navigation Drawer -->
-    <string name="nav_drawer_item_home">Главная</string>
-    <string name="nav_drawer_item_persons">Преподаватели</string>
-    <string name="nav_drawer_item_statistics">Статистика</string>
-    <string name="nav_drawer_item_journal">Журнал</string>
-    <string name="nav_drawer_item_rooms">Аудитории</string>
-    <string name="nav_drawer_item_shedule">Расписание</string>
-    <string name="nav_drawer_item_email">E-mail рассылка</string>
-    <string name="nav_drawer_item_sql">SQL</string>
-    <string name="nav_drawer_item_about">О приложении</string>
+
     <string name="navigation_drawer_opened">The navigation drawer is opened</string>
     <string name="navigation_drawer_closed">The navigation drawer is closed</string>
     <string name="tag_nav_drawer_main_entry">nav_drawer_main_entry</string>
     <string name="tag_nav_drawer_special_entry">nav_drawer_special_entry</string>
-    <string name="tools_text_account_information_username">Центр поддержки "Щербаковская"</string>
-    <string name="tools_text_account_information_email">shsupport@fa.ru</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 
-    <string name="dialog_delete_room_title">Удаление</string>
+    <!-- Dialogs -->
+    <string name="dialog_clear_journal_title">ВНИМАНИЕ!</string>
+    <string name="dialog_clear_journal_message">Из журнала будут удалены все записи. Продолжить?</string>
+
+    <string name="dialog_clear_teachers_title">ВНИМАНИЕ!</string>
+    <string name="dialog_clear_teachers_message">Из базы данных преподавателей будут удалены все записи. Продолжить?</string>
+
+    <string name="dialog_clear_rooms_title">ВНИМАНИЕ!</string>
+    <string name="dialog_clear_rooms_message">Из базы  будут удалены все записи. Продолжить?</string>
+
+    <string name="fragment_add_new_staff_edit_hint">Начните вводить здесь фамилию</string>
+
+    <string name="done">Готово!</string>
+    <string name="added">Добавлено!</string>
+
+    <string name="title_check_sql_server_connect">Проверка подключения к SQL - серверу</string>
+    <string name="connected">Подключено</string>
+    <string name="disconnected">Отключено</string>
+
     <string name="dialog_delete_room_message">Удалить аудиторию </string>
     <string name="dialog_columns_title">Выберите количество колонок</string>
-    <string-array name="dialog_columns_items">
-        <item>2 колонки</item>
-        <item>3 колонки</item>
-        <item>4 колонки</item>
-        <item>5 колонок</item>
-    </string-array>
     <string name="delete">Удалить</string>
     <string-array name="seek_items">
         <item>Аудитории</item>
@@ -119,6 +87,24 @@
     <!-- Typeface names -->
     <string name="typeface_roboto_regular">Roboto-Regular</string>
     <string name="typeface_roboto_medium">Roboto-Medium</string>
+
+    <!-- Toasts -->
     <string name="text_toast_put_card">Приложите карту!</string>
     <string name="text_toast_choise_room_in_first">Сначала выберите аудиторию!</string>
+    <string name="text_nfc_head_card_incorrect">Не удалось распознать вашу карту.\n
+        Попробуйте приложить её еще раз.</string>
+    
+    <!-- Navigation drawer -->
+    <string name="navigation_drawer_list_item_content_description_image">navigation_drawer_list_item_content_description</string>
+    <string name="navigation_drawer_account_info_text_user">ЦП "Щербаковская"</string>
+    <string name="navigation_drawer_account_info_text_email">shsupport@fa.ru</string>
+    <string name="navigation_drawer_item_home">Главная</string>
+    <string name="navigation_drawer_item_persons">Преподаватели</string>
+    <string name="navigation_drawer_item_journal">Журнал</string>
+    <string name="navigation_drawer_item_rooms">Аудитории</string>
+    <string name="navigation_drawer_item_shedule">Расписание</string>
+    <string name="navigation_drawer_item_mail">E-mail</string>
+    <string name="navigation_drawer_item_sql">SQL-сервер</string>
+    <string name="navigation_drawer_item_stat">Статистика</string>
+
 </resources>

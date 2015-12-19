@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
@@ -119,7 +120,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
 
                     Nfc_Fragment nfc_fragment = Nfc_Fragment.newInstance();
                     nfc_fragment.setArguments(bundle);
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, nfc_fragment, getResources().getString(R.string.tag_nfc_fragment)).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, nfc_fragment, getResources().getString(R.string.fragment_tag_nfc)).commit();
                 } else {
                     if (handOrCard.get(position).equalsIgnoreCase("hand")) {
                         int pos = preferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + view.getTag().toString(), -1);
@@ -133,7 +134,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                         dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), "true");
                         dbRooms.closeDB();
 
-                        getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.tag_main_fragment)).commit();
+                        getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
                     }else{
                         LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                         View toastLayout = layoutInflater.inflate(R.layout.layout_toast_put_card,null);
@@ -154,6 +155,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                     Dialog_Fragment dialog_fragment = new Dialog_Fragment();
                     Bundle bundle = new Bundle();
                     bundle.putString("aud",view.getTag().toString());
+                    bundle.putInt(Values.DIALOG_CLOSE_ROOM_TYPE,Values.DIALOG_CLOSE_ROOM_TYPE_ROOMS);
                     bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLOSE_ROOM);
                     dialog_fragment.setArguments(bundle);
                     dialog_fragment.show(getFragmentManager(),"enter_pin");
@@ -223,6 +225,10 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 dialog_grid_size.setTargetFragment(this, 0);
                 dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
                 return true;
+            case R.id.test:
+                Save_to_server save_to_server = new Save_to_server(context);
+                save_to_server.execute();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -247,6 +253,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         super.onActivityCreated(savedInstanceState);
         if (((Launcher) getActivity()).getSupportActionBar() != null) {
             ((Launcher) getActivity()).getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_main));
+            Log.d("toolbar", String.valueOf(((Launcher) getActivity()).getSupportActionBar().getHeight()));
         }
     }
 

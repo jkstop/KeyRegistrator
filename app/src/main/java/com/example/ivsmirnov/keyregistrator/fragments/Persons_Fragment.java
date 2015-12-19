@@ -42,7 +42,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class Persons_Fragment extends Fragment implements View.OnClickListener,UpdateTeachers{
+public class Persons_Fragment extends Fragment implements UpdateTeachers{
 
     private Context mContext;
     private static GridView mGridView;
@@ -135,7 +135,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         });
 
         mGridView = (GridView)rootView.findViewById(R.id.grid_for_base_sql);
-        mAdapter = new adapter_persons_grid(mContext, mAllItems);
+        mAdapter = new adapter_persons_grid(mContext, mAllItems,1);
         mGridView.setAdapter(mAdapter);
         mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
 
@@ -217,7 +217,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
 
                     writeIt(mContext,aud, name, time, path,"null","hand");
 
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
             });
@@ -259,7 +259,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                     dbFavorite.closeDB();
                     writeIt(mContext,aud, name, time, path,tag,"card");
 
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.tag_main_fragment)).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
                     return false;
                 }
             });
@@ -371,12 +371,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
                 dialog_fragment.show(getFragmentManager(), "columns");
                 return true;
             case R.id.menu_teachers_selector_add:
-                Dialog_Fragment dialogType = new Dialog_Fragment();
-                Bundle bundle1 = new Bundle();
-                bundle1.putInt(Values.DIALOG_TYPE,Values.INPUT_DIALOG);
-                dialogType.setArguments(bundle1);
-                dialogType.setTargetFragment(Persons_Fragment.this,0);
-                dialogType.show(getChildFragmentManager(), "type");
+                getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Search_Fragment.new_Instance(), getResources().getString(R.string.fragment_tag_search)).commit();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -414,7 +409,7 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
         dbFavorite.closeDB();
 
         sortByABC();
-        mAdapter = new adapter_persons_grid(mContext, mAllItems);
+        mAdapter = new adapter_persons_grid(mContext, mAllItems,1);
         mGridView.setAdapter(mAdapter);
         mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
 
@@ -434,16 +429,6 @@ public class Persons_Fragment extends Fragment implements View.OnClickListener,U
     @Override
     public void onPause() {
         super.onPause();
-    }
-
-    @Override
-    public void onClick(View v) {
-        Dialog_Fragment dialogType = new Dialog_Fragment();
-        Bundle bundle1 = new Bundle();
-        bundle1.putInt(Values.DIALOG_TYPE,Values.INPUT_DIALOG);
-        dialogType.setArguments(bundle1);
-        dialogType.setTargetFragment(Persons_Fragment.this, 0);
-        dialogType.show(getChildFragmentManager(), "type");
     }
 
 }
