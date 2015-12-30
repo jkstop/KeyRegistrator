@@ -1,37 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_height="fill_parent"
     android:layout_width="fill_parent">
 
-    <TextView
-        android:id="@+id/layout_head_persons_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0"
-        android:gravity="center"
-        android:textColor="#ba0000"
-        android:textSize="32dp">
-    </TextView>
-
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-        <GridView
-            android:id="@+id/grid_for_base_sql"
+        <android.support.v7.widget.RecyclerView
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:columnWidth="90dp"
-            android:numColumns="3"
-            android:verticalSpacing="15dp"
-            android:horizontalSpacing="15dp"
-            android:stretchMode="columnWidth"
-            android:gravity="center"
-            android:layout_weight="0.95" />
+            android:layout_height="wrap_content"
+            android:layout_weight="0.95"
+            android:id="@+id/recycler_view_for_base_sql"
+            android:scrollbars="vertical" />
 
         <ListView
             android:id="@+id/list_for_base_sql"
@@ -40,28 +19,5 @@
             android:layout_weight="0.05"
             android:divider="#00ffffff"
             android:dividerHeight="5dp" />
-    </LinearLayout>
-
-
-
-    <!--<at.markushi.ui.CircleButton
-        android:id="@+id/add_user_button"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@drawable/fab_ic_add"
-        app:cb_color="#99CC00"
-        android:onClick="showAddUserDialog"
-        app:cb_pressedRingWidth="10dip"
-        android:layout_gravity="bottom" />-->
-
-    <!--<android.support.design.widget.FloatingActionButton
-        android:id="@+id/add_user_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:src="@drawable/fab_ic_add" />-->
 
 </LinearLayout>

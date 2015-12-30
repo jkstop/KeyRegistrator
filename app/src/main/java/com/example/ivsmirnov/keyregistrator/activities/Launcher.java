@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
@@ -15,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +26,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -62,7 +59,7 @@ import java.util.Calendar;
 public class Launcher extends AppCompatActivity implements GetUserByTag{
 
     private DrawerLayout mDrawerLayout;
-    private FrameLayout mFrameLayout_Drawer_root;
+    private LinearLayout mLayout_Drawer_root;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
     private ListView mNavigationDrawerList;
     private adapter_navigation_drawer_list mNavigationDrawerListAdapter;
@@ -124,31 +121,36 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (stateStrings[finalCurrState].equals("Present")) {
-                            Persons_Fragment persons_fragment = (Persons_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_persons));
-                            Nfc_Fragment nfc_fragment = (Nfc_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_nfc));
-                            Main_Fragment main_fragment = (Main_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_main));
-                            if (persons_fragment != null && persons_fragment.isVisible()) {
-                                Log.d("persons_fragment", "visible");
-                                aud = null;
-                                powerReader();
-                                setProtocol();
-                                getTag();
-                            } else if (nfc_fragment != null && nfc_fragment.isVisible()) {
-                                aud = getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_nfc)).getArguments().getString(Values.AUDITROOM);
-                                powerReader();
-                                setProtocol();
-                                getTag();
+                        try {
+                            if (stateStrings[finalCurrState].equals("Present")) {
+                                Persons_Fragment persons_fragment = (Persons_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_persons));
+                                Nfc_Fragment nfc_fragment = (Nfc_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_nfc));
+                                Main_Fragment main_fragment = (Main_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_main));
+                                if (persons_fragment != null && persons_fragment.isVisible()) {
+                                    Log.d("persons_fragment", "visible");
+                                    aud = null;
+                                    powerReader();
+                                    setProtocol();
+                                    getTag();
+                                } else if (nfc_fragment != null && nfc_fragment.isVisible()) {
+                                    aud = getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_nfc)).getArguments().getString(Values.AUDITROOM);
+                                    powerReader();
+                                    setProtocol();
+                                    getTag();
 
-                            } else if (main_fragment != null && main_fragment.isVisible()) {
-                                isOpened = true;
-                                powerReader();
-                                setProtocol();
-                                getTag();
-                            } else {
-                                Toast.makeText(mContext, "Not one of yet", Toast.LENGTH_SHORT).show();
+                                } else if (main_fragment != null && main_fragment.isVisible()) {
+                                    isOpened = true;
+                                    powerReader();
+                                    setProtocol();
+                                    getTag();
+                                } else {
+                                    Toast.makeText(mContext, "Not one of yet", Toast.LENGTH_SHORT).show();
+                                }
                             }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
+
                     }
                 });
             }
@@ -161,9 +163,8 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
 
         setSupportActionBar(toolbar);
 
-        mFrameLayout_Drawer_root = (FrameLayout)findViewById(R.id.main_activity_navigation_drawer_rootLayout);
+        mLayout_Drawer_root = (LinearLayout)findViewById(R.id.main_activity_navigation_drawer_rootLayout);
         mNavigationDrawerList = (ListView)findViewById(R.id.left_navigation_drawer_list);
-
 
         ArrayList<NavigationItem> mNavigationItems = new ArrayList<>();
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_home)).setIcon(R.drawable.ic_home_black_24dp));
@@ -212,7 +213,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
                     startActivity(new Intent(mContext, CloseDay.class).putExtra("type", 1).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 }
 
-                mDrawerLayout.closeDrawer(mFrameLayout_Drawer_root);
+                mDrawerLayout.closeDrawer(mLayout_Drawer_root);
             }
         });
         //mLinearLayout_Home = (LinearLayout)findViewById(R.id.navigation_drawer_layout_home);
@@ -306,15 +307,9 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
                 }
             }
             if (closedRooms==0){
-                LayoutInflater inflater = getLayoutInflater();
-                View toastLayout = inflater.inflate(R.layout.layout_toast_choise_room_in_first,
-                        (ViewGroup)findViewById(R.id.toast_choise_room_first_root));
-                Toast toast = new Toast(mContext);
-                toast.setDuration(Toast.LENGTH_LONG);
-                toast.setView(toastLayout);
-                toast.setGravity(Gravity.CENTER,0,0);
-                toast.show();
+                Values.showFullscreenToast(mContext,getResources().getString(R.string.text_toast_choise_room_in_first));
             }
+
             dbRooms.closeDB();
             dbJournal.closeDB();
             isOpened = false;
@@ -480,7 +475,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
         }else{
             Toast.makeText(mContext,"CLick",Toast.LENGTH_SHORT).show();
         }
-        mDrawerLayout.closeDrawer(mFrameLayout_Drawer_root);
+        mDrawerLayout.closeDrawer(mLayout_Drawer_root);
     }
 */
     //закрытие всех позиций в 22.01
@@ -547,7 +542,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
         }
     }
 
-    @Override
+  /*  @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (symbol_pressed + 2000 > System.currentTimeMillis()){
             super.onKeyDown(keyCode,event);
@@ -564,5 +559,5 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
         }
 
         return super.onKeyDown(keyCode, event);
-    }
+    }*/
 }

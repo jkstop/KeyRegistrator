@@ -89,8 +89,8 @@
     <string name="typeface_roboto_medium">Roboto-Medium</string>
 
     <!-- Toasts -->
-    <string name="text_toast_put_card">Приложите карту!</string>
-    <string name="text_toast_choise_room_in_first">Сначала выберите аудиторию!</string>
+    <string name="text_toast_put_card">Для сдачи ключей просто приложите карту</string>
+    <string name="text_toast_choise_room_in_first">Чтобы взять ключ сначала выберите аудиторию</string>
     <string name="text_nfc_head_card_incorrect">Не удалось распознать вашу карту.\n
         Попробуйте приложить её еще раз.</string>
     
@@ -106,5 +106,11 @@
     <string name="navigation_drawer_item_mail">E-mail</string>
     <string name="navigation_drawer_item_sql">SQL-сервер</string>
     <string name="navigation_drawer_item_stat">Статистика</string>
+
+    <string name="person_card_icon_division_descryption">person_card_icon_division_descryption</string>
+
+    <string name="view_enter_password_hint_password">Пароль</string>
+    <string name="view_enter_password_title">Введите пароль</string>
+    <string name="view_enter_password_entered_incorrect">Неверный пароль!</string>
 
 </resources>

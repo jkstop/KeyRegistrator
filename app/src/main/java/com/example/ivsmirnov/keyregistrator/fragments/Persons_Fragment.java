@@ -11,7 +11,10 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.SparseArray;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,9 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ListView;
-import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -30,9 +31,11 @@ import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
+import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
+import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
@@ -45,10 +48,11 @@ import java.util.Comparator;
 public class Persons_Fragment extends Fragment implements UpdateTeachers{
 
     private Context mContext;
-    private static GridView mGridView;
+   // private static GridView mGridView;
+    private static RecyclerView mRecyclerView;
     private ListView mListView;
 
-    private static ArrayList<SparseArray> mAllItems;
+    private static ArrayList<PersonItem> mAllItems;
     public adapter_persons_grid mAdapter;
     private adapter_list_characters mListAdapter;
 
@@ -60,7 +64,6 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
     private SharedPreferences.Editor mPreferencesEditor;
 
     private int type;
-    private int head;
 
     private static long lastClickTime = 0;
 
@@ -75,7 +78,6 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
         Bundle extras = getArguments();
         if (extras != null) {
             type = extras.getInt(Values.PERSONS_FRAGMENT_TYPE);
-            head = extras.getInt(Values.PERSONS_FRAGMENT_HEAD);
         }
 
         if (type == Values.PERSONS_FRAGMENT_EDITOR) {
@@ -98,6 +100,123 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
 
     }
 
+    private void initializeRecyclerAdapter(){
+        if (type==Values.PERSONS_FRAGMENT_EDITOR){
+            mAdapter = new adapter_persons_grid(mContext, mAllItems, 1, new RecycleItemClickListener() {
+                @Override
+                public void onItemClick(View v, int position) {
+                    String gender = "";
+                    String lastname = mAllItems.get(position).Midname;
+                    if (lastname.length() != 0) {
+                        if (lastname.substring(lastname.length() - 1).equals("а")) {
+                            gender = "Ж";
+                        } else {
+                            gender = "М";
+                        }
+                    }
+
+                    Bundle b = new Bundle();
+                    b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
+                    b.putStringArray("valuesForEdit", new String[]{
+                            mAllItems.get(position).Lastname,
+                            mAllItems.get(position).Firstname,
+                            mAllItems.get(position).Midname,
+                            mAllItems.get(position).Division,
+                            gender,
+                            mAllItems.get(position).PhotoOriginal});
+                    b.putInt("position", position);
+                    Dialog_Fragment dialog = new Dialog_Fragment();
+                    dialog.setArguments(b);
+                    dialog.setTargetFragment(Persons_Fragment.this, 0);
+                    dialog.show(getChildFragmentManager(), "edit");
+                }
+
+                @Override
+                public void onItemLongClick(View v, int position) {
+                }
+            });
+        }else if (type==Values.PERSONS_FRAGMENT_SELECTOR){
+            mAdapter = new adapter_persons_grid(mContext, mAllItems, 1, new RecycleItemClickListener() {
+                @Override
+                public void onItemClick(View v, int position) {
+                    if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
+                        return;
+                    }
+
+                    String lastname = mAllItems.get(position).Lastname;
+                    String firstname = mAllItems.get(position).Firstname;
+                    String midname = mAllItems.get(position).Midname;
+                    String division = mAllItems.get(position).Division;
+
+                    String aud = getArguments().getString(Values.AUDITROOM);
+                    String name = "Аноним";
+                    if (lastname.length() != 0 && firstname.length() != 0 && midname.length() != 0) {
+                        name = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";
+                    } else {
+                        if (lastname.length() != 0 && firstname.length() != 0) {
+                            name = lastname + " " + firstname;
+                        } else {
+                            if (lastname.length() != 0) {
+                                name = lastname;
+                            }
+                        }
+                    }
+
+                    final Long time = System.currentTimeMillis();
+
+                    DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
+                    String path = dbFavorite.findPhotoPath(new String[]{lastname, firstname, midname, division});
+                    dbFavorite.closeDB();
+
+                    writeIt(mContext,aud, name, time, path,"null","hand");
+
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
+                    lastClickTime = SystemClock.elapsedRealtime();
+                }
+
+                @Override
+                public void onItemLongClick(View v, int position) {
+                    if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
+                        return;
+                    }
+
+                    String lastname = mAllItems.get(position).Lastname;
+                    String firstname = mAllItems.get(position).Firstname;
+                    String midname = mAllItems.get(position).Midname;
+                    String division = mAllItems.get(position).Division;
+
+                    String aud = getArguments().getString(Values.AUDITROOM);
+                    String name = "Аноним";
+                    if (lastname.length() != 0 && firstname.length() != 0 && midname.length() != 0) {
+                        name = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";
+                    } else {
+                        if (lastname.length() != 0 && firstname.length() != 0) {
+                            name = lastname + " " + firstname;
+                        } else {
+                            if (lastname.length() != 0) {
+                                name = lastname;
+                            }
+                        }
+                    }
+
+                    final Long time = System.currentTimeMillis();
+
+                    DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
+                    String path = dbFavorite.findPhotoPath(new String[]{lastname, firstname, midname, division});
+                    String tag = dbFavorite.findTagUser(new String[]{lastname,firstname,midname});
+                    dbFavorite.closeDB();
+                    writeIt(mContext,aud, name, time, path,tag,"card");
+
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
+                    lastClickTime = SystemClock.elapsedRealtime();
+                }
+            });
+        }
+
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -117,8 +236,8 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
         mListCharacters = new ArrayList<>();
 
         for (int i=0;i<mAllItems.size();i++){
-            String lastname = (String) mAllItems.get(i).get(0);
-            String startChar = lastname.substring(0,1);
+            String surname = mAllItems.get(i).Lastname;
+            String startChar = surname.substring(0,1);
             if (!mListCharacters.contains(startChar)){
                 mListCharacters.add(startChar);
             }
@@ -134,147 +253,25 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
             }
         });
 
-        mGridView = (GridView)rootView.findViewById(R.id.grid_for_base_sql);
-        mAdapter = new adapter_persons_grid(mContext, mAllItems,1);
-        mGridView.setAdapter(mAdapter);
-        mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
+        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
 
-        if (type == Values.PERSONS_FRAGMENT_EDITOR) {
-            mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    String gender = "";
-                    String lastname = (String) mAllItems.get(position).get(2);
-                    if (lastname.length() != 0) {
-                        if (lastname.substring(lastname.length() - 1).equals("а")) {
-                            gender = "Ж";
-                        } else {
-                            gender = "М";
-                        }
-                    }
-                    String[] values = new String[]{(String) mAllItems.get(position).get(0),
-                            (String) mAllItems.get(position).get(1),
-                            (String) mAllItems.get(position).get(2),
-                            (String) mAllItems.get(position).get(3),
-                            gender,
-                            (String) mAllItems.get(position).get(6)};
-                    Bundle b = new Bundle();
-                    b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
-                    b.putStringArray("valuesForEdit", values);
-                    b.putInt("position", position);
-                    Dialog_Fragment dialog = new Dialog_Fragment();
-                    dialog.setArguments(b);
-                    dialog.setTargetFragment(Persons_Fragment.this, 0);
-                    dialog.show(getChildFragmentManager(), "edit");
-                }
-            });
-        } else {
-            if (head==Values.PERSONS_FRAGMENT_HEAD_NOT_FOUND_USER){
-                TextView textHead = (TextView)rootView.findViewById(R.id.layout_head_persons_fragment);
-                textHead.setText("Не удалось распознать карту. Выберите себя вручную.");
-                float weight = 0.1f;
-                textHead.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0,weight));
-            }
-            //Calendar calendar = Calendar.getInstance();
-            ///today = calendar.get(Calendar.DATE);
-            //lastDate = mPreferences.getLong(Values.DATE, 0);
+        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_base_sql);
+        mRecyclerView.setItemAnimator(itemAnimator);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(mContext,3));
 
-            mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
-                        return;
-                    }
-                    int pos = position - parent.getFirstVisiblePosition();
-                    View rootView = parent.getChildAt(pos);
-                    TextView textSurname = (TextView) rootView.findViewById(R.id.text_familia);
-                    TextView textName = (TextView) rootView.findViewById(R.id.text_imya);
-                    TextView textLastName = (TextView) rootView.findViewById(R.id.otchestvo);
-                    TextView textKaf = (TextView) rootView.findViewById(R.id.kafedra);
-
-                    String aud = getArguments().getString(Values.AUDITROOM);
-                    String name = "Аноним";
-                    if (textSurname.getText().toString().length() != 0 && textName.getText().toString().length() != 0 && textLastName.getText().toString().length() != 0) {
-                        name = textSurname.getText().toString() + " "
-                                + textName.getText().toString().charAt(0) + "." +
-                                textLastName.getText().toString().charAt(0) + ".";
-                    } else {
-                        if (textSurname.getText().toString().length() != 0 && textName.getText().toString().length() != 0) {
-                            name = textSurname.getText().toString() + " " + textName.getText().toString();
-                        } else {
-                            if (textSurname.getText().toString().length() != 0) {
-                                name = textSurname.getText().toString();
-                            }
-                        }
-                    }
-
-                    final Long time = System.currentTimeMillis();
-
-                    DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
-                    String path = dbFavorite.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
-                            textLastName.getText().toString(), textKaf.getText().toString()});
-                    dbFavorite.closeDB();
-
-                    writeIt(mContext,aud, name, time, path,"null","hand");
-
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
-                    lastClickTime = SystemClock.elapsedRealtime();
-                }
-            });
-
-            mGridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                @Override
-                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    int pos = position - parent.getFirstVisiblePosition();
-                    View rootView = parent.getChildAt(pos);
-                    TextView textSurname = (TextView) rootView.findViewById(R.id.text_familia);
-                    TextView textName = (TextView) rootView.findViewById(R.id.text_imya);
-                    TextView textLastName = (TextView) rootView.findViewById(R.id.otchestvo);
-                    TextView textKaf = (TextView) rootView.findViewById(R.id.kafedra);
-
-                    String aud = getArguments().getString(Values.AUDITROOM);
-                    String name = "Аноним";
-                    if (textSurname.getText().toString().length() != 0 && textName.getText().toString().length() != 0 && textLastName.getText().toString().length() != 0) {
-                        name = textSurname.getText().toString() + " "
-                                + textName.getText().toString().charAt(0) + "." +
-                                textLastName.getText().toString().charAt(0) + ".";
-                    } else {
-                        if (textSurname.getText().toString().length() != 0 && textName.getText().toString().length() != 0) {
-                            name = textSurname.getText().toString() + " " + textName.getText().toString();
-                        } else {
-                            if (textSurname.getText().toString().length() != 0) {
-                                name = textSurname.getText().toString();
-                            }
-                        }
-                    }
-
-                    final Long time = System.currentTimeMillis();
-
-                    DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
-                    String path = dbFavorite.findPhotoPath(new String[]{textSurname.getText().toString(), textName.getText().toString(),
-                            textLastName.getText().toString(), textKaf.getText().toString()});
-                    String tag = dbFavorite.findTagUser(new String[]{textSurname.getText().toString(), textName.getText().toString(),
-                            textLastName.getText().toString()});
-
-                    dbFavorite.closeDB();
-                    writeIt(mContext,aud, name, time, path,tag,"card");
-
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
-                    return false;
-                }
-            });
-        }
+        initializeRecyclerAdapter();
 
         return rootView;
     }
 
-    public static void move (String symbol){
+    private void move (String symbol){
 
         for (int i=0;i<mAllItems.size();i++){
-            String lastname = (String) mAllItems.get(i).get(0);
+            String lastname = mAllItems.get(i).Lastname;
             String startChar = lastname.substring(0,1);
             if (symbol.equalsIgnoreCase(startChar)){
-                mGridView.setSelection(i);
+                mRecyclerView.scrollToPosition(i);
                 break;
             }
         }
@@ -315,11 +312,11 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
     }
 
     private void sortByABC(){
-        Collections.sort(mAllItems, new Comparator<SparseArray>() {
+        Collections.sort(mAllItems, new Comparator<PersonItem>() {
             @Override
-            public int compare(SparseArray lhs, SparseArray rhs) {
-                String first = String.valueOf(lhs.get(0));
-                String second = String.valueOf(rhs.get(0));
+            public int compare(PersonItem lhs, PersonItem rhs) {
+                String first = String.valueOf(lhs.Lastname);
+                String second = String.valueOf(rhs.Lastname);
                 return first.compareToIgnoreCase(second);
             }
         });
@@ -409,13 +406,12 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
         dbFavorite.closeDB();
 
         sortByABC();
-        mAdapter = new adapter_persons_grid(mContext, mAllItems,1);
-        mGridView.setAdapter(mAdapter);
-        mGridView.setNumColumns(mPreferences.getInt(Values.COLUMNS_PER_COUNT, 3));
+
+        initializeRecyclerAdapter();
 
         mListCharacters = new ArrayList<>();
         for (int i=0;i<mAllItems.size();i++){
-            String lastname = (String) mAllItems.get(i).get(0);
+            String lastname = mAllItems.get(i).Lastname;
             String startChar = lastname.substring(0,1);
             if (!mListCharacters.contains(startChar)){
                 mListCharacters.add(startChar);

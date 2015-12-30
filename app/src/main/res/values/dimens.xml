@@ -16,6 +16,7 @@
     <dimen name="divider_height">1dp</dimen>
     <dimen name="text_lastname_surname">16dp</dimen>
 
+    <dimen name="navigation_drawer_widht">240dp</dimen>
     <dimen name="navigation_drawer_item_text_size">14sp</dimen>
     <dimen name="navigation_drawer_account_info_text_size">14sp</dimen>
     <dimen name="navigation_drawer_item_text_left_margin">72dp</dimen>
@@ -28,5 +29,22 @@
     <dimen name="navigation_drawer_account_info_height">56dp</dimen>
     <dimen name="navigation_drawer_account_selection_height">156dp</dimen>
     <dimen name="navigation_drawer_separator_height">3dp</dimen>
+
+    <dimen name="person_card_width">300dp</dimen>
+    <dimen name="person_card_height">160dp</dimen>
+    <dimen name="person_card_elevation">7dp</dimen>
+    <dimen name="person_card_content_padding">5dp</dimen>
+    <dimen name="person_card_image_width">120dp</dimen>
+    <dimen name="person_card_image_height">160dp</dimen>
+    <dimen name="person_card_text_lastname">32sp</dimen>
+    <dimen name="person_card_text_firstname">16sp</dimen>
+    <dimen name="person_card_text_midname">16sp</dimen>
+    <dimen name="person_card_text_division">10sp</dimen>
+    <dimen name="person_card_icon_division_margin">5sp</dimen>
+    <dimen name="person_card_text_division_margin">5sp</dimen>
+
+    <dimen name="view_enter_password_margin">16dp</dimen>
+
+    <dimen name="toast_fullscreen_text">32sp</dimen>
 
 </resources>

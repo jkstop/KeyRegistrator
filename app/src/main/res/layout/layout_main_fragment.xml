@@ -35,6 +35,7 @@
         android:id="@+id/disclaimer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_weight="0"
         android:background="@drawable/disclaimer">
         <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
             android:layout_width="match_parent"

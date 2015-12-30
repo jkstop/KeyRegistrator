@@ -29,7 +29,6 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
@@ -136,13 +135,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
 
                         getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
                     }else{
-                        LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                        View toastLayout = layoutInflater.inflate(R.layout.layout_toast_put_card,null);
-                        Toast toast = new Toast(context);
-                        toast.setDuration(Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER,0,0);
-                        toast.setView(toastLayout);
-                        toast.show();
+                        Values.showFullscreenToast(context,getResources().getString(R.string.text_toast_put_card));
                     }
                 }
                 lastClickTime = SystemClock.elapsedRealtime();
@@ -160,7 +153,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                     dialog_fragment.setArguments(bundle);
                     dialog_fragment.show(getFragmentManager(),"enter_pin");
                 }
-                return false;
+                return true;
             }
         });
 
@@ -226,9 +219,9 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                 dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
                 return true;
             case R.id.test:
-                Save_to_server save_to_server = new Save_to_server(context);
-                save_to_server.execute();
-                return true;
+                //Save_to_server save_to_server = new Save_to_server(context);
+                //save_to_server.execute();
+                                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

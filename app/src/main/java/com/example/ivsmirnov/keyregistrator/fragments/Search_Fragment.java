@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.ListAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -195,9 +196,16 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     @Override
     public void updateGrid(ArrayList<SparseArray> items) {
         if (!items.isEmpty()){
-            mGridPersons.setAdapter(new adapter_persons_grid(mContext,items,2));
+            //mGridPersons.setAdapter((ListAdapter) new adapter_persons_grid(mContext,items,2));
         }
     }
+
+    //RecyclerView recyclerView = (RecyclerView) findViewById(
+    //        R.id.recycler_view);
+    //recyclerView.addItemDecoration(new MarginDecoration(this));
+    //recyclerView.setHasFixedSize(true);
+    //recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+    //recyclerView.setAdapter(new NumberedAdapter(30));
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

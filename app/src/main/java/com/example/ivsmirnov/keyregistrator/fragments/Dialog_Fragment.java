@@ -1,7 +1,17 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.res.TypedArray;
+import android.graphics.Paint;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.LayoutInflaterCompat;
+import android.support.v4.view.LayoutInflaterFactory;
+import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AlertDialog;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -12,9 +22,13 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +40,9 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -48,21 +64,21 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
+public class Dialog_Fragment extends DialogFragment{
 
     private Context context;
     private int dialog_id;
-    //private String cntx;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private LayoutInflater inflater;
+    private LayoutInflater mInflater;
     private Resources mResources;
-
     private boolean pin_verify;
 
     DialogInterface.OnDismissListener onDismissListener;
@@ -75,14 +91,13 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dialog_id = getArguments().getInt(Values.DIALOG_TYPE,0);
-        //cntx = getArguments().getString("cntx", "nicht");
-        context = getActivity().getApplicationContext();
+        context = getActivity();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResources = context.getResources();
-
     }
+
 
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -137,7 +152,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         .create();
             case Values.DIALOG_EDIT:
 
-                final View dialogView = inflater.inflate(R.layout.layout_dialog_edit, null);
+                final View dialogView = mInflater.inflate(R.layout.layout_dialog_edit, null);
                 final ImageView imageView = (ImageView) dialogView.findViewById(R.id.layout_dialog_edit_image_person);
                 final String [] values = getArguments().getStringArray("valuesForEdit");
                 final DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
@@ -308,16 +323,18 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                 final String ident = getArguments().getString("AudOrPer");
                 final int mSelectedItemAud = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 0);
                 final int mSelectedItemPer = sharedPreferences.getInt(Values.COLUMNS_PER_COUNT, 0);
-                final NumberPicker numberPicker = new NumberPicker(context);
-                numberPicker.setMinValue(2);
+                LayoutInflater layoutInflater1 = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View pickerView  = layoutInflater1.inflate(R.layout.view_column_selector,null);
+                final NumberPicker numberPicker = (NumberPicker)pickerView.findViewById(R.id.select_column_number_picker);
+                setNumberPickerTextColor(numberPicker,Color.BLACK);
                 numberPicker.setMaxValue(5);
-                numberPicker.setGravity(Gravity.CENTER);
+                numberPicker.setMinValue(2);
                 if (ident != null && ident.equalsIgnoreCase("aud")) {
                     numberPicker.setValue(mSelectedItemAud);
                 } else if (ident != null && ident.equalsIgnoreCase("per")) {
                     numberPicker.setValue(mSelectedItemPer);
                 }
-                return new AlertDialog.Builder(getActivity(), R.style.Base_Theme_AppCompat_Dialog_Alert)
+                return new AlertDialog.Builder(getActivity())
                         .setTitle(getResources().getString(R.string.dialog_columns_title))
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
@@ -336,7 +353,7 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                                 dialog.cancel();
                             }
                         })
-                        .setView(numberPicker)
+                        .setView(pickerView)
                         .create();
             case Values.DIALOG_SEEKBARS:
 
@@ -432,23 +449,49 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
                         })
                         .create();
             case Values.DIALOG_CLOSE_ROOM:
-                LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View rootView = inflater.inflate(R.layout.view_enter_password,null);
-                final EditText passwordInput = (EditText)rootView.findViewById(R.id.view_enter_password_editText);
-                return new AlertDialog.Builder(getActivity())
-                        .setTitle("Введите пароль")
-                        .setView(rootView)
-                        .setCancelable(false)
-                        .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (passwordInput.getText().toString().equalsIgnoreCase("1212")) {
-                                    pin_verify = true;
-                                } else {
-                                    pin_verify = false;
+
+                final TextInputLayout textInputLayout = (TextInputLayout) mInflater.inflate(R.layout.view_enter_password,null);
+                final AppCompatEditText editPassword = (AppCompatEditText)textInputLayout.findViewById(R.id.view_enter_password_edit_text);
+                AppCompatButton okButton = (AppCompatButton)textInputLayout.findViewById(R.id.view_enter_password_ok_button);
+                okButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (editPassword.getText().toString().equalsIgnoreCase("1212")){
+                            if (getArguments().getInt(Values.DIALOG_CLOSE_ROOM_TYPE)==Values.DIALOG_CLOSE_ROOM_TYPE_ROOMS){
+                                DataBaseJournal dbJournal = new DataBaseJournal(context);
+                                DataBaseRooms dbRooms = new DataBaseRooms(context);
+                                String aud = getArguments().getString("aud");
+                                int pos = sharedPreferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + aud, -1);
+                                if (pos != -1) {
+                                    dbJournal.updateDB(pos);
                                 }
+                                dbRooms.updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), "true");
+                                getActivity().getSupportFragmentManager()
+                                        .beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
+                                dbJournal.closeDB();
+                                dbRooms.closeDB();
+                                dismiss();
+                            }else{
+                                Bundle bundle = new Bundle();
+                                bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
+                                bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
+                                Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+                                persons_fragment.setArguments(bundle);
+
+                                getActivity().getSupportFragmentManager()
+                                        .beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
                             }
-                        })
+                        }else{
+                            textInputLayout.setError(getResources().getString(R.string.view_enter_password_entered_incorrect));
+                            editPassword.getText().clear();
+                        }
+                    }
+                });
+
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.view_enter_password_title)
+                        .setView(textInputLayout)
+                        .setCancelable(false)
                         .create();
             case Values.DIALOG_SQL_CONNECT:
                 LayoutInflater inflater_sql = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -491,39 +534,33 @@ public class Dialog_Fragment extends android.support.v4.app.DialogFragment {
     }
 
 
-    @Override
-    public void onDismiss(DialogInterface dialog) {
-        super.onDismiss(dialog);
-        switch (dialog_id){
-            case Values.DIALOG_CLOSE_ROOM:
-                if (pin_verify){
-                    if (getArguments().getInt(Values.DIALOG_CLOSE_ROOM_TYPE)==Values.DIALOG_CLOSE_ROOM_TYPE_ROOMS){
-                        DataBaseJournal dbJournal = new DataBaseJournal(context);
-                        DataBaseRooms dbRooms = new DataBaseRooms(context);
-                        String aud = getArguments().getString("aud");
-                        int pos = sharedPreferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + aud, -1);
-                        if (pos != -1) {
-                            dbJournal.updateDB(pos);
-                        }
-                        dbRooms.updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), "true");
-                        getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
-                        dbJournal.closeDB();
-                        dbRooms.closeDB();
-                    }else{
-                        Bundle bundle = new Bundle();
-                        bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
-                        bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
-                        Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
-                        persons_fragment.setArguments(bundle);
-                        getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
-                    }
-
-                }else{
-                    Toast.makeText(context,"НЕВЕРНЫЙ ПАРОЛЬ!",Toast.LENGTH_LONG).show();
+    public static boolean setNumberPickerTextColor(NumberPicker numberPicker, int color)
+    {
+        final int count = numberPicker.getChildCount();
+        for(int i = 0; i < count; i++){
+            View child = numberPicker.getChildAt(i);
+            if(child instanceof EditText){
+                try{
+                    Field selectorWheelPaintField = numberPicker.getClass()
+                            .getDeclaredField("mSelectorWheelPaint");
+                    selectorWheelPaintField.setAccessible(true);
+                    ((Paint)selectorWheelPaintField.get(numberPicker)).setColor(color);
+                    ((EditText)child).setTextColor(color);
+                    numberPicker.invalidate();
+                    return true;
                 }
-                break;
-            default:
-                break;
+                catch(NoSuchFieldException e){
+                    Log.w("setNumberPickerTextColor", e);
+                }
+                catch(IllegalAccessException e){
+                    Log.w("setNumberPickerTextColor", e);
+                }
+                catch(IllegalArgumentException e){
+                    Log.w("setNumberPickerTextColor", e);
+                }
+            }
         }
+        return false;
     }
+
 }

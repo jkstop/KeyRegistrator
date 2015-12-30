@@ -18,6 +18,7 @@ import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.ByteArrayOutputStream;
@@ -243,22 +244,20 @@ public class DataBaseFavorite {
 
     }
 
-    public ArrayList<SparseArray> readTeachersFromDB(){
+    public ArrayList<PersonItem> readTeachersFromDB(){
         cursor.moveToPosition(-1);
-        ArrayList <SparseArray> items = new ArrayList<>();
+        ArrayList <PersonItem> mPerson = new ArrayList<>();
         while (cursor.moveToNext()){
-            SparseArray<String> card = new SparseArray<>();
-            card.put(0, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE)));
-            card.put(1, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE)));
-            card.put(2, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)));
-            card.put(3, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE)));
-            card.put(4, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_GENDER_FAVORITE)));
-            card.put(5, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_FAVORITE)));
-            card.put(6, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
-            card.put(7,cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE)));
-            items.add(card);
+            mPerson.add(new PersonItem(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_GENDER_FAVORITE)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_FAVORITE)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE))));
         }
-        return items;
+        return mPerson;
     }
 
 

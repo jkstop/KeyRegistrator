@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -82,7 +83,7 @@ public class Nfc_Fragment extends Fragment {
                 bundle.putInt(Values.DIALOG_CLOSE_ROOM_TYPE,Values.DIALOG_CLOSE_ROOM_TYPE_PERSONS);
                 bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLOSE_ROOM);
                 dialog_fragment.setArguments(bundle);
-                dialog_fragment.show(getFragmentManager(),"enter_pin");
+                dialog_fragment.show(getChildFragmentManager(),"enter_pin");
                 /*Bundle bundle = new Bundle();
                 bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
                 bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));

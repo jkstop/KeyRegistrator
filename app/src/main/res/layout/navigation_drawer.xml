@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout
+<LinearLayout
+    android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_activity_navigation_drawer_rootLayout"
-    style="@style/ScrimInsetsLayout"
     tools:context=".activities.Launcher"
-    android:layout_width="240dp"
+    android:fitsSystemWindows="true"
+    android:layout_gravity="left"
+    android:layout_width="@dimen/navigation_drawer_widht"
     android:layout_height="match_parent">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/navigation_drawer_account_view"
@@ -29,7 +26,13 @@
 
             <RelativeLayout
                 android:id="@+id/navigation_drawer_account_section"
-                style="@style/NavigationDrawerAccountInfo">
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nav_drawer_account_selection_height"
+                android:clickable="true"
+                android:layout_alignParentBottom="true"
+                android:gravity="left|center_vertical"
+                android:layout_marginLeft="@dimen/nav_drawer_left_margin"
+                android:layout_marginRight="@dimen/nav_drawer_right_margin">
                 <TextView
                     android:id="@+id/navigation_drawer_account_information_display_name"
                     style="@style/NavigationDrawerAccountInfoText"
@@ -45,9 +48,11 @@
 
         <ListView
             android:id="@+id/left_navigation_drawer_list"
-            style="@style/NavigationDrawerList">
+            android:background="@color/material_grey_100"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:dividerHeight="@dimen/navigation_drawer_divider_height"
+            android:divider="@color/transparent">
         </ListView>
 
-    </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>

@@ -54,4 +54,11 @@
     <color name="primary_text_material_dark">#ffffff</color>
 
     <color name="transparent">#00FFFFFF</color>
+
+    <color name="person_card">#FFFFAB40</color>
+    <color name="person_card_text_primary">#000000</color>
+    <color name="person_card_text_secondary">@color/material_grey_900</color>
+
+    <color name="toast_fullscreen_background">#c8000000</color>
+    <color name="toast_fullscreen_text">#ffffff</color>
 </resources>
