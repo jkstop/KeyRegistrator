@@ -533,6 +533,11 @@ public class Dialog_Fragment extends DialogFragment{
                         if (SQL_Connector.check_sql_connection(context,inputServer.getText().toString(),inputUser.getText().toString(),inputPassowrd.getText().toString())){
                             connectionStatus.setText(R.string.connected);
                             connectionStatus.setTextColor(Color.GREEN);
+
+                            editor.putString(Values.SQL_SERVER,inputServer.getText().toString());
+                            editor.putString(Values.SQL_USER,inputUser.getText().toString());
+                            editor.putString(Values.SQL_PASSWORD, inputPassowrd.getText().toString());
+                            editor.apply();
                         }else{
                             connectionStatus.setText(R.string.disconnected);
                             connectionStatus.setTextColor(Color.RED);
@@ -565,13 +570,13 @@ public class Dialog_Fragment extends DialogFragment{
                     return true;
                 }
                 catch(NoSuchFieldException e){
-                    Log.w("setNumberPickerTextColor", e);
+                    Log.w("NumberPickerTextColor", e);
                 }
                 catch(IllegalAccessException e){
-                    Log.w("setNumberPickerTextColor", e);
+                    Log.w("NumberPickerTextColor", e);
                 }
                 catch(IllegalArgumentException e){
-                    Log.w("setNumberPickerTextColor", e);
+                    Log.w("NumberPickerTextColor", e);
                 }
             }
         }

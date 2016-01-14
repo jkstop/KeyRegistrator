@@ -210,12 +210,20 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
 
     @Override
     public void onDone() {
-        //initializeJournal();
+        mDates = calculateDates();
+        getJournalForDate(new Date(System.currentTimeMillis()));
+        showDateSpinner();
     }
 
     @Override
     public void onFinishEditing() {
-        //initializeJournal();
+        mDates = calculateDates();
+        try {
+            getJournalForDate(new SimpleDateFormat("dd MMM yyyy").parse(mDates.get(0)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        showDateSpinner();
     }
 
     private void getJournalForDate(Date date){
