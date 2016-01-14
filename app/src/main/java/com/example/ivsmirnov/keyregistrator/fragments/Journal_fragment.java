@@ -11,41 +11,57 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_journal_list;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Load_from_server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
+import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
+import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 
-public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTeachers {
+public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTeachers,ActionBar.OnNavigationListener {
 
     private Context mContext;
-    private ListView mListView;
+    private RecyclerView mJournalRecycler;
+    private ActionBar mActionBar;
+    private ArrayList<String> mDates;
+    private ArrayList<Long> mDatesLong;
 
     private adapter_journal_list mAdapterjournallist;
-    private ArrayList <SparseArray> mItems;
+    private ArrayList <JournalItem> mJournalItems;
 
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mSharedPreferencesEditor;
@@ -60,6 +76,52 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        showDateSpinner();
+    }
+
+    private ArrayList<String> calculateDates(){
+        ArrayList <String> items = new ArrayList<>();
+        DataBaseJournal dbJournal = new DataBaseJournal(mContext);
+        mDatesLong = dbJournal.readJournalDatesFromDB();
+        dbJournal.closeDB();
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        for (int i=0;i<mDatesLong.size();i++){
+            String dateString = dateFormat.format(new Date(mDatesLong.get(i)));
+            if (!items.contains(dateString)){
+                items.add(dateString);
+            }
+        }
+        return  items;
+    }
+
+    private void showDateSpinner(){
+        mActionBar = ((Launcher)getActivity()).getSupportActionBar();
+        if (mActionBar != null) {
+            SpinnerAdapter spinnerAdapter = new ArrayAdapter<>(mContext,android.R.layout.simple_spinner_dropdown_item,mDates);
+            mActionBar.setListNavigationCallbacks(spinnerAdapter,this);
+            mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        }
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mActionBar != null) {
+            mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        showDateSpinner();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,45 +131,8 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
 
-        DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-        mItems = dbJournal.readJournalFromDB();
-        dbJournal.closeDB();
-
-        mListView = (ListView)rootView.findViewById(R.id.list);
-        mAdapterjournallist = new adapter_journal_list(mContext, mItems);
-        mListView.setAdapter(mAdapterjournallist);
-        mListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
-        mListView.setSelection(mAdapterjournallist.getCount());
-        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setTitle("Удаление элемента")
-                        .setMessage("Удалить выбранный элемент из списка?")
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        })
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mItems.remove(position);
-                                mAdapterjournallist.notifyDataSetChanged();
-
-                                DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-                                dbJournal.deleteFromDB(position);
-                                dbJournal.closeDB();
-                            }
-                        })
-                        .setCancelable(true);
-                Dialog dialog = builder.create();
-                dialog.show();
-                return true;
-            }
-        });
-
+        mJournalRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_journal);
+        mDates = calculateDates();
         return rootView;
 
     }
@@ -124,6 +149,8 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
             case R.id.menu_journal_save_to_file:
                 Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_JOURNAL);
                 saveToFile.execute();
+                return true;
+            case R.id.menu_journal_download_to_server:
                 Save_to_server save_to_server = new Save_to_server(mContext);
                 save_to_server.execute();
                 return true;
@@ -183,20 +210,72 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
 
     @Override
     public void onDone() {
-        DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-        dbJournal = new DataBaseJournal(mContext);
-        mItems = dbJournal.readJournalFromDB();
-        mAdapterjournallist = new adapter_journal_list(mContext, mItems);
-        mListView.setAdapter(mAdapterjournallist);
-        dbJournal.closeDB();
+        //initializeJournal();
     }
 
     @Override
     public void onFinishEditing() {
+        //initializeJournal();
+    }
+
+    private void getJournalForDate(Date date){
         DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-        mItems = dbJournal.readJournalFromDB();
-        mAdapterjournallist = new adapter_journal_list(mContext, mItems);
-        mListView.setAdapter(mAdapterjournallist);
+        mJournalItems = dbJournal.readJournalFromDB(date);
         dbJournal.closeDB();
+
+        initializeJournal();
+    }
+
+    private void initializeJournal(){
+        mAdapterjournallist = new adapter_journal_list(mContext, new RecycleItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+
+            }
+
+            @Override
+            public void onItemLongClick(View v, final int position, final long timeIn) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setTitle("Удаление элемента")
+                        .setMessage("Удалить выбранный элемент из списка?")
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mJournalItems.remove(position);
+                                mAdapterjournallist.notifyItemRemoved(position);
+
+                                DataBaseJournal dbJournal = new DataBaseJournal(mContext);
+                                dbJournal.deleteFromDB(timeIn);
+                                dbJournal.closeDB();
+                            }
+                        })
+                        .setCancelable(true);
+                Dialog dialog = builder.create();
+                dialog.show();
+            }
+        },mJournalItems);
+
+        mJournalRecycler.setLayoutManager(new LinearLayoutManager(mContext));
+        mJournalRecycler.setAdapter(mAdapterjournallist);
+        mJournalRecycler.scrollToPosition(mJournalItems.size()-1);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("dd MMM yyyy").parse(mDates.get(itemPosition));
+            getJournalForDate(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

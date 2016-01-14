@@ -51,7 +51,7 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
         switch (mType){
             case Values.WRITE_JOURNAL:
                 DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-                dbJournal.backupJournalToFile();
+                //dbJournal.backupJournalToFile();
                 dbJournal.closeDB();
 
                 mPathForCopy = mSharedPreferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,

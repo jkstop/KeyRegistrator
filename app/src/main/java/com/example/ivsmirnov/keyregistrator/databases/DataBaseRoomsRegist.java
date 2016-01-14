@@ -12,22 +12,24 @@ import android.util.Log;
 public class DataBaseRoomsRegist extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String name = "Rooms.db";
-    private static final int version = 3;
+    private static final int version = 7;
 
     public static final String TABLE_ROOMS = "Аудитории";
     public static final String COLUMN_ROOM = "Помещение";
     public static final String COLUMN_STATUS = "Статус";
-    public static final String COLUMN_CARD_OR_HANDLE = "Картой_или_вручную";
+    public static final String COLUMN_ACCESS = "Доступ";
+    public static final String COLUMN_POSITION_IN_BASE = "Строка";
     public static final String COLUMN_LAST_VISITER = "Последний";
     public static final String COLUMN_TAG = "Тэг";
     public static final String COLUMN_PHOTO_PATH = "Фото";
     public static final String CREATE_ROOMS_BASE = "CREATE TABLE " + TABLE_ROOMS + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_ROOM + " text not null, "
-            + COLUMN_STATUS + " text not null, "
-            + COLUMN_CARD_OR_HANDLE + " text not null, "
-            + COLUMN_LAST_VISITER + " text not null, "
-            + COLUMN_TAG + " text not null, "
-            + COLUMN_PHOTO_PATH + " text not null);";
+            + COLUMN_ROOM + " text, "
+            + COLUMN_STATUS + " integer, "
+            + COLUMN_ACCESS + " integer, "
+            + COLUMN_POSITION_IN_BASE + " long, "
+            + COLUMN_LAST_VISITER + " text, "
+            + COLUMN_TAG + " text, "
+            + COLUMN_PHOTO_PATH + " text);";
 
     public static final String DELETE_ROOMS_BASE = "DROP TABLE IF EXISTS " + TABLE_ROOMS;
 

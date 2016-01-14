@@ -10,14 +10,19 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
+import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Time;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -44,54 +49,90 @@ public class DataBaseJournal{
         mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
     }
 
-    public void writeInDBJournal(String aud, String name, Long time, Long timePut, boolean isLoadAll){
+    public long writeInDBJournal(JournalItem journalItem){
         ContentValues cv = new ContentValues();
-        cursor.moveToPosition(-1);
-        cv.put(DataBaseJournalRegist.COLUMN_AUD, aud);
-        cv.put(DataBaseJournalRegist.COLUMN_NAME, name);
-        cv.put(DataBaseJournalRegist.COLUMN_TIME, time);
-        cv.put(DataBaseJournalRegist.COLUMN_TIME_PUT, timePut);
-        long id = sqLiteDatabase.insert(DataBaseJournalRegist.TABLE_JOURNAL, null, cv);
+        cv.put(DataBaseJournalRegist.COLUMN_AUD, journalItem.Auditroom);
+        cv.put(DataBaseJournalRegist.COLUMN_TIME_IN, journalItem.TimeIn);
+        cv.put(DataBaseJournalRegist.COLUMN_TIME_OUT, journalItem.TimeOut);
+        cv.put(DataBaseJournalRegist.COLUMN_ACCESS_TYPE,journalItem.AccessType);
+        cv.put(DataBaseJournalRegist.COLUMN_PERSON_LASTNAME,journalItem.PersonLastname);
+        cv.put(DataBaseJournalRegist.COLUMN_PERSON_FIRSTNAME, journalItem.PersonFirstname);
+        cv.put(DataBaseJournalRegist.COLUMN_PERSON_MIDNAME, journalItem.PersonMidname);
+        cv.put(DataBaseJournalRegist.COLUMN_PERSON_PHOTO, journalItem.PersonPhoto);
 
-        if (!isLoadAll){
-            mSharedPreferencesEditor.putInt(Values.POSITION_IN_BASE_FOR_ROOM + aud, (int) id);
-            mSharedPreferencesEditor.apply();
-        }
+        return sqLiteDatabase.insert(DataBaseJournalRegist.TABLE_JOURNAL, null, cv);
     }
 
     public void writeInDBJournalHeaderDate(){
         ContentValues cv = new ContentValues();
-        cursor.moveToPosition(-1);
-        cv.put(DataBaseJournalRegist.COLUMN_AUD, "_");
-        cv.put(DataBaseJournalRegist.COLUMN_NAME, Values.showDate());
-        cv.put(DataBaseJournalRegist.COLUMN_TIME, (long) 1);
-        cv.put(DataBaseJournalRegist.COLUMN_TIME_PUT, (long) 1);
+        cv.put(DataBaseJournalRegist.COLUMN_AUD, Values.showDate());
+       // cv.put(DataBaseJournalRegist.COLUMN_NAME, Values.showDate());
+       // cv.put(DataBaseJournalRegist.COLUMN_TIME, (long) 1);
+       // cv.put(DataBaseJournalRegist.COLUMN_TIME_PUT, (long) 1);
         sqLiteDatabase.insert(DataBaseJournalRegist.TABLE_JOURNAL, null, cv);
-        mSharedPreferencesEditor.putString(Values.TODAY, Values.showDate());
-        mSharedPreferencesEditor.apply();
+        //mSharedPreferencesEditor.putString(Values.TODAY, Values.showDate());
+        //mSharedPreferencesEditor.apply();
+
     }
 
-    public ArrayList<SparseArray> readJournalFromDB(){
+    public ArrayList<JournalItem> readJournalFromDB(Date date){
+        DateFormat dateFormat = DateFormat.getDateInstance();
         cursor.moveToPosition(-1);
-        ArrayList <SparseArray> items = new ArrayList<>();
+        ArrayList <JournalItem> items = new ArrayList<>();
         while (cursor.moveToNext()){
-            SparseArray <String> card = new SparseArray<>();
-            card.put(0, cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_AUD)));
-            card.put(1,cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_NAME)));
-            card.put(2, cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME)));
-            card.put(3,cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_PUT)));
-            items.add(card);
+            if (dateFormat.format(date).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN)))))){
+                items.add(new JournalItem(cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_AUD)),
+                        cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN)),
+                        cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_OUT)),
+                        cursor.getInt(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_ACCESS_TYPE)),
+                        cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_LASTNAME)),
+                        cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_FIRSTNAME)),
+                        cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_MIDNAME)),
+                        cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_PHOTO))));
+            }
         }
         return items;
     }
 
-    public void updateDB(int id){
-        ContentValues cv = new ContentValues();
-        cv.put(DataBaseJournalRegist.COLUMN_TIME_PUT, System.currentTimeMillis());
-        sqLiteDatabase.update(DataBaseJournalRegist.TABLE_JOURNAL, cv,
-                DataBaseJournalRegist._ID + "=" + id, null);
+    public ArrayList<JournalItem> realAllJournalFromDB(){
+        cursor.moveToPosition(-1);
+        ArrayList<JournalItem> items = new ArrayList<>();
+        while (cursor.moveToNext()){
+            items.add(new JournalItem(cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_AUD)),
+                    cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN)),
+                    cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_OUT)),
+                    cursor.getInt(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_ACCESS_TYPE)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_LASTNAME)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_FIRSTNAME)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_MIDNAME)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_PHOTO))));
+        }
+        return items;
     }
 
+    public ArrayList<Long> readJournalDatesFromDB(){
+        final ArrayList <Long> items = new ArrayList<>();
+        cursor.moveToPosition(-1);
+        while (cursor.moveToNext()){
+            items.add(cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN)));
+        }
+
+        Collections.sort(items, new Comparator<Long>() {
+            @Override
+            public int compare(Long lhs, Long rhs) {
+                return rhs.compareTo(lhs);
+            }
+        });
+        return items;
+    }
+
+    public void updateDB(Long roomPositionInBase){
+        ContentValues cv = new ContentValues();
+        cv.put(DataBaseJournalRegist.COLUMN_TIME_OUT, System.currentTimeMillis());
+        sqLiteDatabase.update(DataBaseJournalRegist.TABLE_JOURNAL, cv,
+                DataBaseJournalRegist._ID + "=" + roomPositionInBase, null);
+    }
+/*
     public void backupJournalToFile(){
         File file = null;
         ArrayList <String> itemList = new ArrayList<>();
@@ -149,7 +190,7 @@ public class DataBaseJournal{
         mSharedPreferencesEditor.putInt(Values.AUTO_CLOSED_COUNT, count);
         mSharedPreferencesEditor.apply();
     }
-
+*/
     public void closeDB(){
         dataBaseJournalRegist.close();
         sqLiteDatabase.close();
@@ -160,10 +201,10 @@ public class DataBaseJournal{
         sqLiteDatabase.delete(DataBaseJournalRegist.TABLE_JOURNAL, null, null);
     }
 
-    public void deleteFromDB(int id){
-        cursor.moveToPosition(id);
-        int row = cursor.getInt(cursor.getColumnIndex(DataBaseJournalRegist._ID));
-        sqLiteDatabase.delete(DataBaseJournalRegist.TABLE_JOURNAL, DataBaseJournalRegist._ID + "=" + row, null);
+    public void deleteFromDB(long timeIn){
+        String itemPositionInBase = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseJournalRegist.TABLE_JOURNAL +
+                " WHERE " + DataBaseJournalRegist.COLUMN_TIME_IN + " = " + timeIn).simpleQueryForString();
+        sqLiteDatabase.delete(DataBaseJournalRegist.TABLE_JOURNAL, DataBaseJournalRegist._ID + "=" + itemPositionInBase, null);
     }
 
 }

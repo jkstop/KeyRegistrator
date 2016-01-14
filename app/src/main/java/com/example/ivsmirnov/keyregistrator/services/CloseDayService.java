@@ -50,7 +50,7 @@ public class CloseDayService extends Service {
         String dtFileTeachers = path + "/Teachers.csv";
 
         DataBaseJournal dbJournal = new DataBaseJournal(context);
-        dbJournal.closeDay();
+        //dbJournal.closeDay();
         dbJournal.closeDB();
 
         new Close_day_task(context).execute();

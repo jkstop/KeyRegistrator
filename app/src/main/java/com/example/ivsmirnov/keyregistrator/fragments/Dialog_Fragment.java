@@ -52,6 +52,7 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_autoComplete_teachersBase;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
+import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
@@ -305,10 +306,17 @@ public class Dialog_Fragment extends DialogFragment{
                             public void onClick(DialogInterface dialog, int which) {
                                 String item = editText.getText().toString();
                                 DataBaseRooms dbRooms = new DataBaseRooms(context);
-                                dbRooms.writeInRoomsDB(item,"true","null","Аноним","null","null");
+                                dbRooms.writeInRoomsDB(new RoomItem(
+                                        item,
+                                        Values.ROOM_IS_FREE,
+                                        Values.ACCESS_BY_CLICK,
+                                        0,
+                                        null,
+                                        null,
+                                        null));
                                 dbRooms.closeDB();
 
-                                editText.setText("");
+                                editText.getText().clear();
 
                                 UpdateTeachers updateTeachers = (UpdateTeachers) getTargetFragment();
                                 updateTeachers.onFinishEditing();
@@ -461,11 +469,18 @@ public class Dialog_Fragment extends DialogFragment{
                                 DataBaseJournal dbJournal = new DataBaseJournal(context);
                                 DataBaseRooms dbRooms = new DataBaseRooms(context);
                                 String aud = getArguments().getString("aud");
-                                int pos = sharedPreferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + aud, -1);
+                                long pos = getArguments().getLong(Values.POSITION_IN_BASE_FOR_ROOM,-1);
                                 if (pos != -1) {
                                     dbJournal.updateDB(pos);
                                 }
-                                dbRooms.updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), "true");
+                                //dbRooms.updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), "true");
+                                dbRooms.updateRoom(new RoomItem(aud,
+                                        Values.ROOM_IS_FREE,
+                                        Values.ACCESS_BY_CLICK,
+                                        0,
+                                        null,
+                                        null,
+                                        null));
                                 getActivity().getSupportFragmentManager()
                                         .beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
                                 dbJournal.closeDB();

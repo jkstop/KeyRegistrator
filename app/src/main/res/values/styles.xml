@@ -129,4 +129,12 @@
         <item name="android:background">@color/toast_fullscreen_background</item>
     </style>
 
+    <style name="CardJournalPersonText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginRight">@dimen/journal_item_card_person_text_right_margin</item>
+        <item name="android:textSize">@dimen/journal_item_card_person_text_size</item>
+    </style>
+
 </resources>

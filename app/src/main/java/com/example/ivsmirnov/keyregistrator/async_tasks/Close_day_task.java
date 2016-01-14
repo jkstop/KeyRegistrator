@@ -34,13 +34,13 @@ public class Close_day_task extends AsyncTask<Void,Void,Void> {
         DataBaseJournal dbJournal = new DataBaseJournal(mContext);
         DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
 
-        dbJournal.backupJournalToFile();
+        //dbJournal.backupJournalToFile();
         dbFavorite.backupFavoriteStaffToFile();
 
         dbFavorite.closeDB();
 
-        ArrayList<SparseArray> mItems = dbJournal.readJournalFromDB();
-
+        //ArrayList<SparseArray> mItems = dbJournal.readJournalFromDB();
+/*
         String ip = mSharedPreferences.getString(Values.SQL_SERVER,"");
         String classs = "net.sourceforge.jtds.jdbc.Driver";
         String db = "KeyRegistratorBase";
@@ -72,7 +72,7 @@ public class Close_day_task extends AsyncTask<Void,Void,Void> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        dbJournal.closeDB();
+        dbJournal.closeDB();*/
         return null;
     }
 

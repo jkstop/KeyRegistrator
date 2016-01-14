@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/journal_item_card_height"
+    app:contentPadding="@dimen/journal_item_card_content_padding"
+    app:elevation="@dimen/journal_item_card_elevation">
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/card_journal_item_frame_person"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true">
+
+            <FrameLayout
+                android:id="@+id/card_journal_item_person_image_frame"
+                android:layout_alignParentLeft="true"
+                android:layout_width="60dp"
+                android:layout_height="80dp">
+
+                <ImageView
+                    android:id="@+id/card_journal_item_person_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/person_male_colored" />
+
+            </FrameLayout>
+
+            <RelativeLayout
+                android:layout_toRightOf="@+id/card_journal_item_person_image_frame"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp">
+
+                <TextView
+                    android:layout_alignParentLeft="true"
+                    android:text="Фамилия"
+                    android:id="@+id/journal_card_text_lastname"
+                    style="@style/CardJournalPersonText"/>
+
+                <TextView
+                    android:text="Имя"
+                    android:layout_toRightOf="@+id/journal_card_text_lastname"
+                    android:id="@+id/journal_card_text_firstname"
+                    style="@style/CardJournalPersonText" />
+
+                <TextView
+                    android:text="Отчество"
+                    android:layout_toRightOf="@+id/journal_card_text_firstname"
+                    android:id="@+id/journal_card_text_midname"
+                    style="@style/CardJournalPersonText"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+        
+        <RelativeLayout
+            android:id="@+id/card_journal_item_frame_auditroom"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true">
+
+            <TextView
+                android:id="@+id/card_journal_item_text_auditroom"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="409"
+                android:textSize="@dimen/journal_item_card_aud_text_size"
+                android:textColor="@color/black"
+                android:gravity="center" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_margin="5dp"
+            android:id="@+id/card_journal_item_frame_time"
+            android:layout_toRightOf="@id/card_journal_item_frame_auditroom"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <TextView
+                android:layout_margin="5dp"
+                android:gravity="center"
+                android:id="@+id/card_journal_item_time_in"
+                android:layout_toLeftOf="@+id/card_journal_item_time_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="12:00:00"
+                android:textSize="28sp"/>
+
+            <ImageView
+                android:id="@+id/card_journal_item_time_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_access_time_black_18dp"
+                android:layout_centerInParent="true" />
+
+            <TextView
+                android:layout_margin="5dp"
+                android:layout_toRightOf="@id/card_journal_item_time_icon"
+                android:gravity="center"
+                android:id="@+id/card_journal_item_time_out"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="12:40:00"
+                android:textSize="28sp"/>
+
+            <ImageView
+                android:id="@+id/card_journal_item_access_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_secure"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true" />
+
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+
+    
+
+</android.support.v7.widget.CardView>

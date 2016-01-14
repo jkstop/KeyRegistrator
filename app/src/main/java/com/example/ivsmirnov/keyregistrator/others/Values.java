@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
+import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,6 +34,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -95,8 +102,13 @@ public class Values{
     public static final String DIALOG_CLOSE_ROOM_TYPE = "close_room_type";
     public static final int DIALOG_CLOSE_ROOM_TYPE_PERSONS = 127;
     public static final int DIALOG_CLOSE_ROOM_TYPE_ROOMS = 128;
-    public static final int TYPE_GRID_PERSONS = 129;
-    public static final int TAG_LASTNAME= 129;
+    public static final int DIALOG_DELETE_JOURNAL_ITEM = 129;
+
+    public static final int ROOM_IS_BUSY = 0;
+    public static final int ROOM_IS_FREE = 1;
+
+    public static final int ACCESS_BY_CLICK = 0;
+    public static final int ACCESS_BY_CARD = 1;
 
     public static void copyfile(Context context, String srFile, String dtFile){
         try{
@@ -180,6 +192,34 @@ public class Values{
 
         }
         return items;
+    }
+
+    public static long writeInJournal(Context context, JournalItem journalItem){
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor preferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+
+        Calendar calendar = Calendar.getInstance();
+        //int today = calendar.get(Calendar.DATE);
+        //int lastDate = preferences.getInt(Values.DATE, 0);
+
+        DataBaseJournal dbJournal = new DataBaseJournal(context);
+        //if (today == lastDate) {
+
+            //preferencesEditor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, dbJournal.cursor.getCount());
+        //} else {
+       //     dbJournal.writeInDBJournalHeaderDate();
+        //    dbJournal.writeInDBJournal(journalItem,personItem);
+           // dbJournal.writeInDBJournalHeaderDate();
+           // editor.putInt(Values.CURSOR_POSITION, dbJournal.cursor.getCount());
+           // editor.apply();
+           // dbJournal.writeInDBJournal(aud, name, time, (long) 0, false);
+           // editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, dbJournal.cursor.getCount() + 1);
+        //}
+        Long journalItemID = dbJournal.writeInDBJournal(journalItem);
+        dbJournal.closeDB();
+
+        return journalItemID;
     }
 
 }

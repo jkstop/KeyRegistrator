@@ -48,7 +48,7 @@ public class Nfc_Fragment extends Fragment {
             String aud = getArguments().getString(Values.AUDITROOM);
             String path = "";
             String tag = "";
-            Persons_Fragment.writeIt(mContext,aud, ((Button) v).getText().toString(), System.currentTimeMillis(), path,tag,"hand");
+            //Persons_Fragment.writeIt(mContext,aud, ((Button) v).getText().toString(), System.currentTimeMillis(), path,tag,"hand");
             getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
         }
     };

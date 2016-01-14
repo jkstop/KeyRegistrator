@@ -31,7 +31,9 @@ import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
+import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
@@ -48,7 +50,6 @@ import java.util.Comparator;
 public class Persons_Fragment extends Fragment implements UpdateTeachers{
 
     private Context mContext;
-   // private static GridView mGridView;
     private static RecyclerView mRecyclerView;
     private ListView mListView;
 
@@ -132,7 +133,7 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
                 }
 
                 @Override
-                public void onItemLongClick(View v, int position) {
+                public void onItemLongClick(View v, int position, long timeIn) {
                 }
             });
         }else if (type==Values.PERSONS_FRAGMENT_SELECTOR){
@@ -164,18 +165,34 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
 
                     final Long time = System.currentTimeMillis();
 
-                    DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
-                    String path = dbFavorite.findPhotoPath(new String[]{lastname, firstname, midname, division});
-                    dbFavorite.closeDB();
+                    JournalItem journalItem = new JournalItem(
+                            aud,
+                            time,
+                            null,
+                            0,
+                            mAllItems.get(position).Lastname,
+                            mAllItems.get(position).Firstname,
+                            mAllItems.get(position).Midname,
+                            mAllItems.get(position).PhotoPreview);
+                    long positionInBase = Values.writeInJournal(mContext,journalItem);
 
-                    writeIt(mContext,aud, name, time, path,"null","hand");
+                    DataBaseRooms dbRooms = new DataBaseRooms(mContext);
+                    dbRooms.updateRoom(new RoomItem(journalItem.Auditroom,
+                            Values.ROOM_IS_BUSY,
+                            Values.ACCESS_BY_CLICK,
+                            positionInBase,
+                            journalItem.PersonLastname,
+                            mAllItems.get(position).RadioLabel,
+                            mAllItems.get(position).PhotoPreview));
+                    dbRooms.closeDB();
+
 
                     getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
 
                 @Override
-                public void onItemLongClick(View v, int position) {
+                public void onItemLongClick(View v, int position, long timeIn) {
                     if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
                         return;
                     }
@@ -201,11 +218,32 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
 
                     final Long time = System.currentTimeMillis();
 
-                    DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
-                    String path = dbFavorite.findPhotoPath(new String[]{lastname, firstname, midname, division});
-                    String tag = dbFavorite.findTagUser(new String[]{lastname,firstname,midname});
-                    dbFavorite.closeDB();
-                    writeIt(mContext,aud, name, time, path,tag,"card");
+                    //DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
+                    //String path = dbFavorite.findPhotoPath(new String[]{lastname, firstname, midname, division});
+                    //String tag = dbFavorite.findTagUser(new String[]{lastname,firstname,midname});
+                    //dbFavorite.closeDB();
+                    //writeIt(mContext,aud, name, time, path,tag,"card");
+
+                    JournalItem journalItem = new JournalItem(
+                            aud,
+                            time,
+                            null,
+                            1,
+                            mAllItems.get(position).Lastname,
+                            mAllItems.get(position).Firstname,
+                            mAllItems.get(position).Midname,
+                            mAllItems.get(position).PhotoPreview);
+                    long positionInBase = Values.writeInJournal(mContext,journalItem);
+
+                    DataBaseRooms dbRooms = new DataBaseRooms(mContext);
+                    dbRooms.updateRoom(new RoomItem(journalItem.Auditroom,
+                            Values.ROOM_IS_BUSY,
+                            Values.ACCESS_BY_CARD,
+                            positionInBase,
+                            journalItem.PersonLastname,
+                            mAllItems.get(position).RadioLabel,
+                            mAllItems.get(position).PhotoPreview));
+                    dbRooms.closeDB();
 
                     getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
                     lastClickTime = SystemClock.elapsedRealtime();
@@ -278,7 +316,7 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
 
     }
 
-    public static void writeIt(Context context,String aud, String name, Long time, String path, String tag, String cardOrHandle) {
+   /* public static void writeIt(Context context,String aud, String name, Long time, String path, String tag, String cardOrHandle) {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
@@ -309,7 +347,7 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
 
         editor.putLong(Values.DATE, today);
         editor.apply();
-    }
+    }*/
 
     private void sortByABC(){
         Collections.sort(mAllItems, new Comparator<PersonItem>() {

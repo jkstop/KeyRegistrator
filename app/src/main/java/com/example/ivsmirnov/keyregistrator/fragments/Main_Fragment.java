@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
+import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
@@ -45,13 +46,14 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
     private Context context;
     static int selected_aud;
 
+    private ArrayList<RoomItem> mRoomItems;
     private ArrayList <SparseArray<String>> mItems;
-    private ArrayList<String> rooms;
-    private ArrayList<Boolean> isFreeAud;
-    private ArrayList<String> handOrCard;
-    private ArrayList <String> lastVisiters;
-    private ArrayList <String> photoPath;
-    private ArrayList <String> tags;
+   // private ArrayList<String> rooms;
+   // private ArrayList<Boolean> isFreeAud;
+   // private ArrayList<String> handOrCard;
+   // private ArrayList <String> lastVisiters;
+   // private ArrayList <String> photoPath;
+   // private ArrayList <String> tags;
     private LinearLayout disclaimer;
     private FrameLayout frameForGrid;
 
@@ -76,17 +78,17 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         View rootView = inflater.inflate(R.layout.layout_main_fragment,container,false);
         context = rootView.getContext();
 
-        rooms = new ArrayList<>();
-        isFreeAud = new ArrayList<>();
-        lastVisiters = new ArrayList<>();
-        photoPath = new ArrayList<>();
-        handOrCard = new ArrayList<>();
-        tags = new ArrayList<>();
+       // rooms = new ArrayList<>();
+       // isFreeAud = new ArrayList<>();
+       // lastVisiters = new ArrayList<>();
+       // photoPath = new ArrayList<>();
+       // handOrCard = new ArrayList<>();
+       // tags = new ArrayList<>();
 
         DataBaseRooms dbRooms = new DataBaseRooms(context);
-        mItems = dbRooms.readRoomsDB();
+        mRoomItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();
-
+/*
         for (int i=0;i<mItems.size();i++){
             rooms.add(mItems.get(i).get(0));
             isFreeAud.add(Boolean.parseBoolean(mItems.get(i).get(1)));
@@ -95,7 +97,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
             photoPath.add(mItems.get(i).get(5));
             tags.add(mItems.get(i).get(4));
         }
-
+*/
         frameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
 
         preferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
@@ -103,7 +105,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         final int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
         gridView = (GridView)rootView.findViewById(R.id.gridView);
         gridView.setNumColumns(columns);
-        adapter = new adapter_main_auditrooms_grid(context,rooms,isFreeAud,lastVisiters,photoPath,tags);
+        adapter = new adapter_main_auditrooms_grid(context,mRoomItems);
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -112,25 +114,31 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
                     return;
                 }
                 selected_aud = position;
-                if (isFreeAud.get(position)) {
+                if (mRoomItems.get(position).Status==1) {
                     Bundle bundle = new Bundle();
                     bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
                     bundle.putString(Values.AUDITROOM, view.getTag().toString());
-
                     Nfc_Fragment nfc_fragment = Nfc_Fragment.newInstance();
                     nfc_fragment.setArguments(bundle);
                     getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, nfc_fragment, getResources().getString(R.string.fragment_tag_nfc)).commit();
                 } else {
-                    if (handOrCard.get(position).equalsIgnoreCase("hand")) {
-                        int pos = preferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + view.getTag().toString(), -1);
+                    if (mRoomItems.get(position).Access==0) {  // 0 - доступ по клику, 1 - по карте
+                        long pos = mRoomItems.get(position).PositionInBase;
+                        //Log.d("pos", String.valueOf(pos));
 
-                        if (pos != -1) {
-                            DataBaseJournal dbJournal = new DataBaseJournal(context);
-                            dbJournal.updateDB(pos);
-                            dbJournal.closeDB();
-                        }
+                        DataBaseJournal dbJournal = new DataBaseJournal(context);
+                        dbJournal.updateDB(mRoomItems.get(position).PositionInBase);
+                        dbJournal.closeDB();
+
                         DataBaseRooms dbRooms = new DataBaseRooms(context);
-                        dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), "true");
+                        //dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + view.getTag(), -1), "true");
+                        dbRooms.updateRoom(new RoomItem(mRoomItems.get(position).Auditroom,
+                                Values.ROOM_IS_FREE,
+                                Values.ACCESS_BY_CLICK,
+                                0,
+                                null,
+                                null,
+                                null));
                         dbRooms.closeDB();
 
                         getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
@@ -144,9 +152,10 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (handOrCard.get(position).equalsIgnoreCase("card")){
+                if (mRoomItems.get(position).Access==1){
                     Dialog_Fragment dialog_fragment = new Dialog_Fragment();
                     Bundle bundle = new Bundle();
+                    bundle.putLong(Values.POSITION_IN_BASE_FOR_ROOM,mRoomItems.get(position).PositionInBase);
                     bundle.putString("aud",view.getTag().toString());
                     bundle.putInt(Values.DIALOG_CLOSE_ROOM_TYPE,Values.DIALOG_CLOSE_ROOM_TYPE_ROOMS);
                     bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLOSE_ROOM);
@@ -158,7 +167,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         });
 
         TextView textEmptyAud = (TextView)rootView.findViewById(R.id.text_empty_aud_list);
-        if (rooms.isEmpty()){
+        if (mRoomItems.isEmpty()){
             textEmptyAud.setVisibility(View.VISIBLE);
         }else{
             textEmptyAud.setVisibility(View.INVISIBLE);
@@ -174,9 +183,9 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
         super.onResume();
 
         DataBaseRooms dbRooms = new DataBaseRooms(context);
-        mItems = dbRooms.readRoomsDB();
+        mRoomItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();
-
+/*
         rooms = new ArrayList<>();
         isFreeAud = new ArrayList<>();
         lastVisiters = new ArrayList<>();
@@ -189,10 +198,10 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame{
             photoPath.add(mItems.get(i).get(5));
             tags.add(mItems.get(i).get(4));
         }
-
+*/
         int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
         float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
-        adapter = new adapter_main_auditrooms_grid(context, rooms, isFreeAud, lastVisiters, photoPath,tags);
+        adapter = new adapter_main_auditrooms_grid(context, mRoomItems);
 
         gridView.setAdapter(adapter);
         gridView.setNumColumns(columns);

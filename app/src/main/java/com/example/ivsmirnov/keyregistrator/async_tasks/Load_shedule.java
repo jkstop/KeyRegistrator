@@ -65,13 +65,13 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
         result = 0;
 
         DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-        ArrayList<SparseArray<String>> mItems = dbRooms.readRoomsDB();
+        //ArrayList<SparseArray<String>> mItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();
-
+/*
         for (int i=0;i<mItems.size();i++){
             auditroomsList.add(mItems.get(i).get(0));
         }
-
+*/
         Calendar calendar = Calendar.getInstance();
         int today = calendar.get(Calendar.DAY_OF_WEEK)-1;
 

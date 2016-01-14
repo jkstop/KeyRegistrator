@@ -61,4 +61,6 @@
 
     <color name="toast_fullscreen_background">#c8000000</color>
     <color name="toast_fullscreen_text">#ffffff</color>
+
+    <color name="journal_card_text_primary">@color/material_grey_600</color>
 </resources>

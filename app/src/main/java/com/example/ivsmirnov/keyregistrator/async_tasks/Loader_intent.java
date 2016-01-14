@@ -150,7 +150,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                     timePut = (long)1;
                                 }
                             }
-                            dbJournal.writeInDBJournal(aud, name, time, timePut, true);
+                            //dbJournal.writeInDBJournal(aud, name, time, timePut, true);
                             publishProgress(i);
                             i++;
                         }
@@ -169,7 +169,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                             if (!lines.contains(line)){
                                 String [] split = line.split(";");
                                 if(split.length==6){
-                                    dbRooms.writeInRoomsDB(split[0],split[1],split[2],split[3],split[4],split[5]);
+                                    //dbRooms.writeInRoomsDB(split[0],Integer.parseInt(split[1]),split[2],split[3],split[4],split[5]);
                                     publishProgress(i);
                                     i++;
                                 }

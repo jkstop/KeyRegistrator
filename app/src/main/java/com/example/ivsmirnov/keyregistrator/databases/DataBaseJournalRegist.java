@@ -12,15 +12,28 @@ import android.util.Log;
 public class DataBaseJournalRegist extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String name = "Journal.db";
-    private static final int version = 1;
+    private static final int version = 3;
 
     public static final String TABLE_JOURNAL = "Журнал";
     public static final String COLUMN_AUD = "Аудитория";
-    public static final String COLUMN_NAME = "Фамилия";
-    public static final String COLUMN_TIME = "Взял";
-    public static final String COLUMN_TIME_PUT = "Сдал";
+    public static final String COLUMN_TIME_IN = "Взял";
+    public static final String COLUMN_TIME_OUT = "Сдал";
+    public static final String COLUMN_ACCESS_TYPE = "Доступ";
+    public static final String COLUMN_PERSON_LASTNAME = "Фамилия";
+    public static final String COLUMN_PERSON_FIRSTNAME = "Имя";
+    public static final String COLUMN_PERSON_MIDNAME = "Отчество";
+    public static final String COLUMN_PERSON_PHOTO = "Фото";
+
     private static final String SQL_CREATE_BASE_JOURNAL = "create table " + TABLE_JOURNAL + " (" + BaseColumns._ID + " integer primary key autoincrement, "
-            + COLUMN_AUD + " integer, " + COLUMN_NAME + " text not null, " + COLUMN_TIME + " long, " + COLUMN_TIME_PUT + " long);";
+            + COLUMN_AUD + " text not null, "
+            + COLUMN_TIME_IN + " long, "
+            + COLUMN_TIME_OUT + " long, "
+            + COLUMN_ACCESS_TYPE + " integer, "
+            + COLUMN_PERSON_LASTNAME + " text not null, "
+            + COLUMN_PERSON_FIRSTNAME + " text not null, "
+            + COLUMN_PERSON_MIDNAME + " text not null, "
+            + COLUMN_PERSON_PHOTO + " text not null);";
+
     private static final String SQL_DELETE_BASE_JOURNAL = "DROP TABLE IF EXISTS "
             + TABLE_JOURNAL;
 

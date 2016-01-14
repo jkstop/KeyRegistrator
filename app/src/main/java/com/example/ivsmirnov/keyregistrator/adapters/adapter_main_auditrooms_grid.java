@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -23,34 +24,26 @@ import java.util.ArrayList;
 public class adapter_main_auditrooms_grid extends BaseAdapter {
 
     private Context context;
-    private ArrayList<String> items;
-    private ArrayList<Boolean> isFree;
-    private ArrayList<String> lastVisiters;
-    private ArrayList<String> photoPaths;
-    private ArrayList<String> tags;
+    private ArrayList<RoomItem> mRoomItems;
     private LayoutInflater inflater;
     private SharedPreferences preferences;
 
 
-    public adapter_main_auditrooms_grid(Context c, ArrayList<String> i, ArrayList<Boolean> isF, ArrayList<String> sT, ArrayList<String> pP, ArrayList<String> t) {
+    public adapter_main_auditrooms_grid(Context c, ArrayList<RoomItem> roomItems) {
         context = c;
-        items = i;
-        isFree = isF;
-        lastVisiters = sT;
-        photoPaths = pP;
-        tags = t;
+        this.mRoomItems = roomItems;
         inflater = (LayoutInflater)this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
     }
     @Override
     public int getCount() {
-        return items.size();
+        return mRoomItems.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return items.get(position);
+        return mRoomItems.get(position);
     }
 
     @Override
@@ -67,7 +60,7 @@ public class adapter_main_auditrooms_grid extends BaseAdapter {
         TextView textAud,textPerson;
 
         if (convertView == null) {
-                if (isFree.get(position)){
+                if (mRoomItems.get(position).Status==1){
                     view = inflater.inflate(R.layout.cell_for_grid_is_free, null);
                 }else{
                     view = inflater.inflate(R.layout.cell_for_grid_is_busy,null);
@@ -87,10 +80,10 @@ public class adapter_main_auditrooms_grid extends BaseAdapter {
                 btnHeight);
         view.setLayoutParams(layoutParams);
 
-        if (isFree.get(position)){
+        if (mRoomItems.get(position).Status==1){
             image = (ImageView)view.findViewById(R.id.imageButton);
             textAud = (TextView)view.findViewById(R.id.textButton);
-            textAud.setText(items.get(position));
+            textAud.setText(mRoomItems.get(position).Auditroom);
             view.setBackgroundResource(R.drawable.button_background);
             image.setImageResource(R.drawable.key_colored);
         }else{
@@ -98,29 +91,29 @@ public class adapter_main_auditrooms_grid extends BaseAdapter {
             textAud = (TextView)view.findViewById(R.id.text_aud);
             textPerson = (TextView)view.findViewById(R.id.textButton);
 
-            if (!photoPaths.get(position).equalsIgnoreCase("")){
+            if (!mRoomItems.get(position).Photo.equalsIgnoreCase("")){
                 ImageLoader imageLoader = ImageLoader.getInstance();
                 if (!imageLoader.isInited()){
                     imageLoader.init(ImageLoaderConfiguration.createDefault(context));
                 }
-                imageLoader.displayImage("file://"+photoPaths.get(position),image);
+                imageLoader.displayImage("file://"+mRoomItems.get(position).Photo,image);
             }else{
                 image.setImageResource(R.drawable.person_male_colored);
             }
-            textAud.setText(String.valueOf(items.get(position)));
-            textPerson.setText(lastVisiters.get(position));
+            textAud.setText(String.valueOf(mRoomItems.get(position).Auditroom));
+            textPerson.setText(mRoomItems.get(position).LastVisiter);
 
-            if (tags.get(position).equalsIgnoreCase("99 80 DC 1A 00 00")
-                    ||tags.get(position).equalsIgnoreCase("EF 36 83 D9 00 00")
-                    ||tags.get(position).equalsIgnoreCase("0F 4B 7C D9 00 00")
-                    ||tags.get(position).equalsIgnoreCase("69 B1 D2 29 00 00")){
+            if (mRoomItems.get(position).Tag.equalsIgnoreCase("99 80 DC 1A 00 00")
+                    ||mRoomItems.get(position).Tag.equalsIgnoreCase("EF 36 83 D9 00 00")
+                    ||mRoomItems.get(position).Tag.equalsIgnoreCase("0F 4B 7C D9 00 00")
+                    ||mRoomItems.get(position).Tag.equalsIgnoreCase("69 B1 D2 29 00 00")){
                 view.setBackgroundResource(R.drawable.button_background_support);
             }else{
                 view.setBackgroundResource(R.drawable.button_background_selected);
             }
         }
 
-        view.setTag(items.get(position));
+        view.setTag(mRoomItems.get(position).Auditroom);
 
         return view;
     }

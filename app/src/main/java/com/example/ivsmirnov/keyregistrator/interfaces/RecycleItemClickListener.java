@@ -7,5 +7,5 @@ import android.view.View;
  */
 public interface RecycleItemClickListener {
     public void onItemClick(View v,int position);
-    public void onItemLongClick(View v, int position);
+    public void onItemLongClick(View v, int position, long timeIn);
 }

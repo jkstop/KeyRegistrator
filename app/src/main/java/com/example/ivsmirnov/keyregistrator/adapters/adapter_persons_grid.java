@@ -76,7 +76,7 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
         rowView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                mListener.onItemLongClick(v,viewHolder.getLayoutPosition());
+                mListener.onItemLongClick(v,viewHolder.getLayoutPosition(),0);
                 return true;
             }
         });

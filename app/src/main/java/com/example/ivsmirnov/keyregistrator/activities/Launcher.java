@@ -38,6 +38,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
 import com.example.ivsmirnov.keyregistrator.custom_views.NavigationItem;
+import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
@@ -289,19 +290,19 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
         if (isOpened){
             DataBaseRooms dbRooms = new DataBaseRooms(mContext);
             DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-            ArrayList <SparseArray<String>> rms = dbRooms.readRoomsDB();
+            ArrayList <RoomItem> rms = dbRooms.readRoomsDB();
 
             int closedRooms = 0;
 
             for (int i=0;i<rms.size();i++){
-                if (rms.get(i).get(1).equalsIgnoreCase("false")){
-                    if (items.get(7).equalsIgnoreCase(rms.get(i).get(4))){
-                        int pos = mPreferences.getInt(Values.POSITION_IN_BASE_FOR_ROOM + rms.get(i).get(0), -1);
+                if (rms.get(i).Status==0){
+                    if (items.get(7).equalsIgnoreCase(rms.get(i).Tag)){
+                        long pos = rms.get(i).PositionInBase;
                         if (pos != -1) {
-                            dbJournal.updateDB(pos);
+                            dbJournal.updateDB(rms.get(i).PositionInBase);
                             closedRooms++;
                         }
-                        dbRooms.updateStatusRooms(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + rms.get(i).get(0), -1), "true");
+                        //dbRooms.updateStatusRooms(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + rms.get(i).get(0), -1), "true");
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
                     }
                 }
@@ -327,7 +328,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
                     String name  = items.get(2) + " "
                             + items.get(3).charAt(0) + "." +
                             items.get(4).charAt(0) + ".";
-                    Persons_Fragment.writeIt(mContext,aud,name,System.currentTimeMillis(),items.get(6),items.get(7),"card");
+                    //Persons_Fragment.writeIt(mContext,aud,name,System.currentTimeMillis(),items.get(6),items.get(7),"card");
                     getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
                 }
             }else{

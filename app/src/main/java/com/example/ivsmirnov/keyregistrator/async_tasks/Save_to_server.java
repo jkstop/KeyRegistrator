@@ -10,6 +10,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -48,8 +49,7 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
     @Override
     protected Void doInBackground(Void... params) {
         DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-        ArrayList<SparseArray> mItems = dbJournal.readJournalFromDB();
-        dbJournal.closeDB();
+        ArrayList<JournalItem> mItems = dbJournal.realAllJournalFromDB();
 
         String ip = mSharedPreferences.getString(Values.SQL_SERVER,"");
         String classs = "net.sourceforge.jtds.jdbc.Driver";
@@ -69,16 +69,22 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
                     + "database=" + db + ";user=" + user + ";password="
                     + password + ";";
             conn = DriverManager.getConnection(ConnURL);
-            Statement statement = conn.createStatement();
-            PreparedStatement trunacteTable = conn.prepareStatement("TRUNCATE TABLE JOURNAL");
+            conn.createStatement();
+            PreparedStatement trunacteTable = conn.prepareStatement("TRUNCATE TABLE Journal_recycler");
             trunacteTable.execute();
             for (int i=0;i<mItems.size();i++){
-                SparseArray row = mItems.get(i);
-                PreparedStatement preparedStatement  = conn.prepareStatement("INSERT INTO JOURNAL VALUES ('"+row.get(0)+"','"+row.get(1)+"','"+row.get(2)+"','"+row.get(3)+"')");
+                JournalItem journalItem = mItems.get(i);
+                PreparedStatement preparedStatement  = conn.prepareStatement("INSERT INTO Journal_recycler VALUES ('"
+                        +journalItem.Auditroom+"','"
+                        +journalItem.TimeIn+"','"
+                        +journalItem.TimeOut+"',"
+                        +journalItem.AccessType+",'"
+                        +journalItem.PersonLastname+"','"
+                        +journalItem.PersonFirstname+"','"
+                        +journalItem.PersonMidname+"','"
+                        +journalItem.PersonPhoto+"')");
                 preparedStatement.execute();
             }
-
-
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {

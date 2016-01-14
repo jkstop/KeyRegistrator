@@ -24,6 +24,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_edit_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
+import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -38,7 +39,8 @@ public class Rooms_Fragment extends Fragment implements UpdateTeachers,FinishLoa
 
     private GridView mGridView;
     private CircleButton mCircleButton;
-    private ArrayList<SparseArray<String>> mItems;
+    //private ArrayList<SparseArray<String>> mItems;
+    private ArrayList<RoomItem> mRoomItems;
     private ArrayList<String> mRooms;
     private adapter_edit_auditrooms_grid mAdaptereditauditroomsgrid;
     private Context mContext;
@@ -69,12 +71,12 @@ public class Rooms_Fragment extends Fragment implements UpdateTeachers,FinishLoa
         mCircleButton = (CircleButton)rootView.findViewById(R.id.buttonAddRoom);
 
         DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-        mItems = dbRooms.readRoomsDB();
+        mRoomItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();
 
         mRooms = new ArrayList<>();
-        for (int i=0;i<mItems.size();i++){
-            mRooms.add(mItems.get(i).get(0));
+        for (int i=0;i<mRoomItems.size();i++){
+            mRooms.add(mRoomItems.get(i).Auditroom);
         }
 
         int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
@@ -153,12 +155,12 @@ public class Rooms_Fragment extends Fragment implements UpdateTeachers,FinishLoa
     @Override
     public void onFinishEditing() {
         DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-        mItems = dbRooms.readRoomsDB();
+        mRoomItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();
 
         mRooms = new ArrayList<>();
-        for (int i=0;i<mItems.size();i++){
-            mRooms.add(mItems.get(i).get(0));
+        for (int i=0;i<mRoomItems.size();i++){
+            mRooms.add(mRoomItems.get(i).Auditroom);
         }
 
         int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
@@ -187,12 +189,12 @@ public class Rooms_Fragment extends Fragment implements UpdateTeachers,FinishLoa
     @Override
     public void onFinish() {
         DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-        mItems = dbRooms.readRoomsDB();
+        mRoomItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();
 
         mRooms = new ArrayList<>();
-        for (int i=0;i<mItems.size();i++){
-            mRooms.add(mItems.get(i).get(0));
+        for (int i=0;i<mRoomItems.size();i++){
+            mRooms.add(mRoomItems.get(i).Auditroom);
         }
 
         int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);

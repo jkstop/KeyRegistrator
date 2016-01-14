@@ -113,4 +113,54 @@
     <string name="view_enter_password_title">Введите пароль</string>
     <string name="view_enter_password_entered_incorrect">Неверный пароль!</string>
 
+    <string name="journal_card_during_lesson">Идёт занятие</string>
+
+    <array name="list_spinner">
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+        <item>two</item>
+        <item>three</item>
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+
+    </array>
+
 </resources>

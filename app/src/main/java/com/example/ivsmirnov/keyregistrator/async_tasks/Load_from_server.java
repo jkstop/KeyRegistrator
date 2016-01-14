@@ -76,7 +76,7 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
                 String time = result.getString("TIME");
                 String timePut = result.getString("TIMEPUT");
 
-                dbjournal.writeInDBJournal(aud,person,Long.parseLong(time),Long.parseLong(timePut),true);
+                //dbjournal.writeInDBJournal(aud,person,Long.parseLong(time),Long.parseLong(timePut),true);
             }
             dbjournal.closeDB();
         } catch (ClassNotFoundException e) {

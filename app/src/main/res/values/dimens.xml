@@ -43,6 +43,13 @@
     <dimen name="person_card_icon_division_margin">5sp</dimen>
     <dimen name="person_card_text_division_margin">5sp</dimen>
 
+    <dimen name="journal_item_card_height">80dp</dimen>
+    <dimen name="journal_item_card_elevation">7dp</dimen>
+    <dimen name="journal_item_card_content_padding">5dp</dimen>
+    <dimen name="journal_item_card_person_text_right_margin">5sp</dimen>
+    <dimen name="journal_item_card_person_text_size">32sp</dimen>
+    <dimen name="journal_item_card_aud_text_size">50sp</dimen>
+
     <dimen name="view_enter_password_margin">16dp</dimen>
 
     <dimen name="toast_fullscreen_text">32sp</dimen>
