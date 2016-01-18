@@ -65,7 +65,7 @@
     <string name="dialog_clear_rooms_title">ВНИМАНИЕ!</string>
     <string name="dialog_clear_rooms_message">Из базы  будут удалены все записи. Продолжить?</string>
 
-    <string name="fragment_add_new_staff_edit_hint">Начните вводить здесь фамилию</string>
+    <string name="fragment_add_new_staff_edit_hint">Начните вводить фамилию</string>
 
     <string name="done">Готово!</string>
     <string name="added">Добавлено!</string>
@@ -108,6 +108,7 @@
     <string name="navigation_drawer_item_stat">Статистика</string>
 
     <string name="person_card_icon_division_descryption">person_card_icon_division_descryption</string>
+    <string name="person_information_photo_descryption">person_information_photo_descryption</string>
 
     <string name="view_enter_password_hint_password">Пароль</string>
     <string name="view_enter_password_title">Введите пароль</string>
@@ -115,52 +116,16 @@
 
     <string name="journal_card_during_lesson">Идёт занятие</string>
 
-    <array name="list_spinner">
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
-        <item>two</item>
-        <item>three</item>
-        <item>one</item>
-        <item>two</item>
-        <item>three</item>
+    <string name="person_information_text_lastname">Фамилия</string>
+    <string name="person_information_text_firstname">Имя</string>
+    <string name="person_information_text_midname">Отчество</string>
+    <string name="person_information_text_division">Структурное подразделение</string>
 
-    </array>
+    <string name="snack_user_added">Пользователь добавлен!</string>
+    <string name="snack_cancel">Отменить</string>
+    <string name="snack_cancelled">Отменено</string>
+
+
+
 
 </resources>

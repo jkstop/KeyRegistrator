@@ -3,8 +3,10 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
@@ -71,8 +73,6 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
              lines = new ArrayList<>(count);
         }
 
-
-
         switch (mLoadType){
             case Values.LOAD_TEACHERS:
                 DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
@@ -83,7 +83,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                             if (!lines.contains(line)){
                                 String [] split = line.split(";");
                                 if (split.length==7){
-                                    dbFavorite.writeCardInBase(split[0], split[1], split[2], split[3], split[4], split[5], split[6]);
+                                   // dbFavorite.writeCardInBase(split[0], split[1], split[2], split[3], split[4], split[5], split[6]);
                                     publishProgress(i);
                                     i++;
                                 }
@@ -99,60 +99,26 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                 DataBaseJournal dbJournal = new DataBaseJournal(mContext);
                 dbJournal.clearJournalDB();
                 try {
-                    while ((line = fin.readLine())!=null){
-                        if (i<count){
-                            String [] split = line.split("\\s+");
-                            String aud = "";
-                            String name = "";
-                            Long time = (long)1;
-                            Long timePut = (long)1;
-
-                            if(split.length>5){
-                                aud = split[0];
-                                int nameIndexLast = split.length-3;
-                                for (int k=1;k<=nameIndexLast;k++){
-                                    name += split[k]+" ";
-                                }
+                    if (fin != null) {
+                        while ((line = fin.readLine())!=null){
+                            if (i<count){
                                 try {
-                                    time = parseDate(split[split.length-2]);
-                                    timePut = parseDate(split[split.length-1]);
-                                } catch (ParseException e) {
-                                    time = (long)1;
-                                    timePut = (long)1;
+                                    String [] split = line.split(";");
+                                    String aud = split[0];
+                                    Long timeIn = Long.parseLong(split[1]);
+                                    Long timeOut = Long.parseLong(split[2]);
+                                    int accessType = Integer.parseInt(split[3]);
+                                    String personLastname = split[4];
+                                    String personFirstname = split[5];
+                                    String personMidname = split[6];
+                                    String personPhoto = split[7];
+                                    dbJournal.writeInDBJournal(new JournalItem(aud,timeIn,timeOut,accessType,personLastname,personFirstname,personMidname,personPhoto));
+                                }catch (Exception e){
+                                    e.printStackTrace();
                                 }
-                            }else if(split.length<5){
-                                if (split[0].length()!=3){
-                                    aud = "_";
-                                    for (int k=0;k<=split.length-1;k++){
-                                        name += split[k]+" ";
-                                    }
-                                }else{
-                                    aud = split[0];
-                                    for (int k = 1;k<=split.length-3;k++){
-                                        name += split[k]+" ";
-                                    }
-                                    try {
-                                        time = parseDate(split[split.length-2]);
-                                        timePut = parseDate(split[split.length-1]);
-                                    } catch (ParseException e) {
-                                        time = (long)1;
-                                        timePut = (long)1;
-                                    }
-                                }
-                            }else{
-                                aud = split[0];
-                                name = split[1]+ " "+ split[2];
-                                try {
-                                    time = parseDate(split[3]);
-                                    timePut = parseDate(split[4]);
-                                } catch (ParseException e) {
-                                    time = (long)1;
-                                    timePut = (long)1;
-                                }
+                                publishProgress(i);
+                                i++;
                             }
-                            //dbJournal.writeInDBJournal(aud, name, time, timePut, true);
-                            publishProgress(i);
-                            i++;
                         }
                     }
                     dbJournal.closeDB();

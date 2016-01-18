@@ -23,12 +23,4 @@ public class PersonItem {
         this.PhotoOriginal = photoOriginal;
         this.RadioLabel = radioLabel;
     }
-
-    public String getLastname(){
-        return Lastname;
-    }
-
-    public String getFirstname(){
-        return Firstname;
-    }
 }

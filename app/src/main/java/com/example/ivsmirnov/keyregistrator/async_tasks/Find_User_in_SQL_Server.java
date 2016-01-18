@@ -6,6 +6,7 @@ import android.util.SparseArray;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
 import com.example.ivsmirnov.keyregistrator.fragments.Search_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.Find_User_in_SQL_Server_Interface;
 
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 07.12.2015.
  */
-public class Find_User_in_SQL_Server extends AsyncTask<ResultSet,Void,ArrayList<SparseArray>> {
+public class Find_User_in_SQL_Server extends AsyncTask<ResultSet,Void,ArrayList<PersonItem>> {
 
     private Find_User_in_SQL_Server_Interface mListener;
 
@@ -31,19 +32,18 @@ public class Find_User_in_SQL_Server extends AsyncTask<ResultSet,Void,ArrayList<
     }
 
     @Override
-    protected ArrayList<SparseArray> doInBackground(ResultSet... params) {
-        ArrayList<SparseArray> mItems = new ArrayList<SparseArray>();
+    protected ArrayList<PersonItem> doInBackground(ResultSet... params) {
+        ArrayList<PersonItem> mItems = new ArrayList<>();
         try {
             while (params[0].next()){
-                SparseArray mSparce = new SparseArray();
-                mSparce.put(0,params[0].getString("LASTNAME"));
-                mSparce.put(1,params[0].getString("FIRSTNAME"));
-                mSparce.put(2,params[0].getString("MIDNAME"));
-                mSparce.put(3,params[0].getString("NAME_DIVISION"));
-                mSparce.put(4,params[0].getString("SEX"));
-                mSparce.put(5,params[0].getString("PHOTO"));
-                mSparce.put(6,params[0].getString("RADIO_LABEL"));
-                mItems.add(mSparce);
+                mItems.add(new PersonItem(params[0].getString("LASTNAME"),
+                        params[0].getString("FIRSTNAME"),
+                        params[0].getString("MIDNAME"),
+                        params[0].getString("NAME_DIVISION"),
+                        params[0].getString("SEX"),
+                        null,
+                        params[0].getString("PHOTO"),
+                        params[0].getString("RADIO_LABEL")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -52,9 +52,9 @@ public class Find_User_in_SQL_Server extends AsyncTask<ResultSet,Void,ArrayList<
     }
 
     @Override
-    protected void onPostExecute(ArrayList<SparseArray> sparseArrays) {
-        super.onPostExecute(sparseArrays);
+    protected void onPostExecute(ArrayList<PersonItem> personItems) {
+        super.onPostExecute(personItems);
         mListener.changeProgressBar(View.INVISIBLE);
-        mListener.updateGrid(sparseArrays);
+        mListener.updateGrid(personItems);
     }
 }

@@ -2,6 +2,8 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.app.Dialog;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
@@ -28,6 +30,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -153,39 +156,42 @@ public class Dialog_Fragment extends DialogFragment{
                         .create();
             case Values.DIALOG_EDIT:
 
-                final View dialogView = mInflater.inflate(R.layout.layout_dialog_edit, null);
-                final ImageView imageView = (ImageView) dialogView.findViewById(R.id.layout_dialog_edit_image_person);
+                final View dialogView = mInflater.inflate(R.layout.layout_person_information, null);
+                final ImageView personImage = (ImageView) dialogView.findViewById(R.id.person_information_image);
                 final String [] values = getArguments().getStringArray("valuesForEdit");
                 final DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
 
-                final EditText editSurname = (EditText) dialogView.findViewById(R.id.editSurname);
-                final EditText editName = (EditText) dialogView.findViewById(R.id.editName);
-                final EditText editLastname = (EditText) dialogView.findViewById(R.id.editLastname);
-                final EditText editKaf = (EditText) dialogView.findViewById(R.id.editKaf);
+                final TextInputLayout inputLastname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_lastname_layout);
+                final TextInputLayout inputFirstname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_firstname_layout);
+                final TextInputLayout inputMidname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_midname_layout);
+                final TextInputLayout inputDivision = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_division_layout);
 
                 try {
                     assert values != null;
-                    editSurname.setText(values[0]);
-                    editName.setText(values[1]);
-                    editLastname.setText(values[2]);
-                    editKaf.setText(values[3]);
+                    inputLastname.getEditText().setText(values[0]);
+                    inputFirstname.getEditText().setText(values[1]);
+                    inputMidname.getEditText().setText(values[2]);
+                    inputDivision.getEditText().setText(values[3]);
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
 
-
+/*
                 try {
                     ImageLoader imageLoader = ImageLoader.getInstance();
                     if (!imageLoader.isInited()){
                         imageLoader.init(ImageLoaderConfiguration.createDefault(context));
                     }
-                    imageLoader.displayImage("file://" + values[5], imageView);
+                    imageLoader.displayImage("file://" + values[5], personImage);
                 } catch (NullPointerException e) {
                     e.printStackTrace();
-                }
+                }*/
+
+                byte[] decodedString = Base64.decode(values[5], Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                personImage.setImageBitmap(bitmap);
 
                 AlertDialog.Builder builderEdit = new AlertDialog.Builder(getActivity());
-                builderEdit.setTitle("Редактирование");
                 builderEdit.setView(dialogView);
                 builderEdit.setNeutralButton(getResources().getString(R.string.delete), new DialogInterface.OnClickListener() {
                     @Override
@@ -211,10 +217,10 @@ public class Dialog_Fragment extends DialogFragment{
                         String [] source = getArguments().getStringArray("valuesForEdit");
                         String[] edited = new String[4];
 
-                        edited[0] = editSurname.getText().toString();
-                        edited[1] = editName.getText().toString();
-                        edited[2] = editLastname.getText().toString();
-                        edited[3] = editKaf.getText().toString();
+                        edited[0] = inputLastname.getEditText().getText().toString();
+                        edited[1] = inputFirstname.getEditText().getText().toString();
+                        edited[2] = inputMidname.getEditText().getText().toString();
+                        edited[3] = inputDivision.getEditText().getText().toString();
 
                         dbFavorite.updateTeachersDB(source, edited);
                         dbFavorite.closeDB();
@@ -228,7 +234,6 @@ public class Dialog_Fragment extends DialogFragment{
                         }
 
                         activity.onFinishEditing();
-
                     }
                 });
                 builderEdit.setCancelable(false);
@@ -473,7 +478,6 @@ public class Dialog_Fragment extends DialogFragment{
                                 if (pos != -1) {
                                     dbJournal.updateDB(pos);
                                 }
-                                //dbRooms.updateStatusRooms(sharedPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), "true");
                                 dbRooms.updateRoom(new RoomItem(aud,
                                         Values.ROOM_IS_FREE,
                                         Values.ACCESS_BY_CLICK,

@@ -104,8 +104,13 @@ public class Values{
     public static final int DIALOG_CLOSE_ROOM_TYPE_ROOMS = 128;
     public static final int DIALOG_DELETE_JOURNAL_ITEM = 129;
 
+
     public static final int ROOM_IS_BUSY = 0;
     public static final int ROOM_IS_FREE = 1;
+
+    public static final int SHOW_FAVORITE_PERSONS = 0;
+    public static final int SHOW_ALL_PERSONS = 1;
+
 
     public static final int ACCESS_BY_CLICK = 0;
     public static final int ACCESS_BY_CARD = 1;

@@ -45,11 +45,23 @@ import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
+import java.io.File;
+import java.io.IOException;
+import java.security.spec.ECField;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
+
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
 
 
 public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTeachers,ActionBar.OnNavigationListener {
@@ -58,8 +70,6 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
     private RecyclerView mJournalRecycler;
     private ActionBar mActionBar;
     private ArrayList<String> mDates;
-    private ArrayList<Long> mDatesLong;
-
     private adapter_journal_list mAdapterjournallist;
     private ArrayList <JournalItem> mJournalItems;
 
@@ -79,18 +89,17 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         showDateSpinner();
     }
 
-    private ArrayList<String> calculateDates(){
+    public static ArrayList<String> calculateDates(Context context){
         ArrayList <String> items = new ArrayList<>();
-        DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-        mDatesLong = dbJournal.readJournalDatesFromDB();
+        DataBaseJournal dbJournal = new DataBaseJournal(context);
+        ArrayList<Long>datesLong = dbJournal.readJournalDatesFromDB();
         dbJournal.closeDB();
         DateFormat dateFormat = DateFormat.getDateInstance();
-        for (int i=0;i<mDatesLong.size();i++){
-            String dateString = dateFormat.format(new Date(mDatesLong.get(i)));
+        for (int i = 0; i< datesLong.size(); i++){
+            String dateString = dateFormat.format(new Date(datesLong.get(i)));
             if (!items.contains(dateString)){
                 items.add(dateString);
             }
@@ -132,7 +141,7 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
         mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
 
         mJournalRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_journal);
-        mDates = calculateDates();
+        mDates = calculateDates(mContext);
         return rootView;
 
     }
@@ -210,17 +219,17 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
 
     @Override
     public void onDone() {
-        mDates = calculateDates();
+        mDates = calculateDates(mContext);
         getJournalForDate(new Date(System.currentTimeMillis()));
         showDateSpinner();
     }
 
     @Override
     public void onFinishEditing() {
-        mDates = calculateDates();
+        mDates = calculateDates(mContext);
         try {
             getJournalForDate(new SimpleDateFormat("dd MMM yyyy").parse(mDates.get(0)));
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         showDateSpinner();

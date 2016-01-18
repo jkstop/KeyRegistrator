@@ -49,4 +49,5 @@ dependencies {
     compile files('D:/KeyRegistrator-jkstop/libs/acssmc-1.1.2.jar')
     compile 'com.nononsenseapps:filepicker:2.4.2'
     compile files('D:/KeyRegistrator-jkstop/libs/jtds-1.2.7.jar')
+    compile files('D:/KeyRegistrator-jkstop/libs/jxl.jar')
 }

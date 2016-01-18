@@ -1,8 +1,11 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Gravity;
@@ -17,6 +20,7 @@ import android.widget.TextView;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -57,6 +61,7 @@ public class adapter_journal_list extends RecyclerView.Adapter<adapter_journal_l
         holder.mTextTimeIn.setText(String.valueOf(new Time(journalItems.get(position).TimeIn)));
         if (journalItems.get(position).TimeOut==0){
             holder.mTextTimeOut.setText(R.string.journal_card_during_lesson);
+            holder.mTextTimeOut.setTextColor(Color.RED);
         }else{
             holder.mTextTimeOut.setText(String.valueOf(new Time(journalItems.get(position).TimeOut)));
         }
@@ -70,12 +75,21 @@ public class adapter_journal_list extends RecyclerView.Adapter<adapter_journal_l
             holder.mImageAccess.setImageResource(R.drawable.ic_click_icon);
         }
 
-        ImageLoader imageLoader = ImageLoader.getInstance();
-        if (!imageLoader.isInited()){
-            imageLoader.init(ImageLoaderConfiguration.createDefault(context));
+        Bitmap bitmap = null;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        String photo = journalItems.get(position).PersonPhoto;
+        if (photo!=null){
+            byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
+            BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
+            options.inSampleSize = DataBaseFavorite.calculateInSampleSize(options, 120, 160);
+            options.inJustDecodeBounds = false;
+            bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
+
         }
 
-        imageLoader.displayImage("file://"+journalItems.get(position).PersonPhoto,holder.mImagePerson);
+        holder.mImagePerson.setImageBitmap(bitmap);
+
     }
 
     @Override

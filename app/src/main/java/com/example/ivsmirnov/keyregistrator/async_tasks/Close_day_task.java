@@ -34,7 +34,7 @@ public class Close_day_task extends AsyncTask<Void,Void,Void> {
         DataBaseJournal dbJournal = new DataBaseJournal(mContext);
         DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
 
-        //dbJournal.backupJournalToFile();
+        //dbJournal.backupJournalToXLS();
         dbFavorite.backupFavoriteStaffToFile();
 
         dbFavorite.closeDB();

@@ -103,7 +103,7 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
 
     private void initializeRecyclerAdapter(){
         if (type==Values.PERSONS_FRAGMENT_EDITOR){
-            mAdapter = new adapter_persons_grid(mContext, mAllItems, 1, new RecycleItemClickListener() {
+            mAdapter = new adapter_persons_grid(mContext, mAllItems, Values.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position) {
                     String gender = "";
@@ -137,7 +137,7 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
                 }
             });
         }else if (type==Values.PERSONS_FRAGMENT_SELECTOR){
-            mAdapter = new adapter_persons_grid(mContext, mAllItems, 1, new RecycleItemClickListener() {
+            mAdapter = new adapter_persons_grid(mContext, mAllItems, Values.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position) {
                     if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
@@ -217,12 +217,6 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
                     }
 
                     final Long time = System.currentTimeMillis();
-
-                    //DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
-                    //String path = dbFavorite.findPhotoPath(new String[]{lastname, firstname, midname, division});
-                    //String tag = dbFavorite.findTagUser(new String[]{lastname,firstname,midname});
-                    //dbFavorite.closeDB();
-                    //writeIt(mContext,aud, name, time, path,tag,"card");
 
                     JournalItem journalItem = new JournalItem(
                             aud,

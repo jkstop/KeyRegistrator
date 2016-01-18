@@ -1,43 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <android.support.design.widget.TextInputLayout
         android:id="@+id/layout_add_new_staff_input"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp">
+        android:layout_height="wrap_content">
 
-        <EditText
+        <android.support.v7.widget.AppCompatEditText
             android:id="@+id/layout_add_new_staff_input_text"
-            android:layout_width="0dp"
-            android:layout_weight="0.7"
-            android:layout_height="match_parent"
             android:hint="@string/fragment_add_new_staff_edit_hint"
             android:gravity="center"
-            android:textColor="#000000"
-            android:inputType="textCapWords"
-            android:layout_margin="10dp"
-            android:focusable="true" />
+            android:layout_marginLeft="@dimen/layout_add_new_staff_input_text_margin_left"
+            android:layout_marginRight="@dimen/layout_add_new_staff_input_text_margin_right"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </android.support.design.widget.TextInputLayout>
 
-        <Button
-            android:id="@+id/layout_add_new_staff_input_button"
-            android:layout_width="0dp"
-            android:layout_weight="0.3"
-            android:layout_height="match_parent"
-            android:text="@string/label_add_button"
-            style="@style/ButtonTransparent"
-            android:layout_margin="10dp" />
-
-    </LinearLayout>
-
+    <Button
+        android:layout_alignParentRight="true"
+        android:id="@+id/layout_add_new_staff_input_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_add_button"
+        style="@style/ButtonTransparent"
+        android:layout_margin="10dp" />
 
     <FrameLayout
+        android:layout_below="@+id/layout_add_new_staff_input"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.9">
+        android:layout_height="match_parent">
 
         <ProgressBar
             android:id="@+id/layout_add_new_staff_progress"
@@ -45,18 +38,19 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|center" />
 
-        <GridView
-            android:id="@+id/layout_add_new_staff_grid"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_for_search_persons"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:columnWidth="90dp"
-            android:numColumns="3"
-            android:verticalSpacing="15dp"
-            android:horizontalSpacing="15dp"
-            android:stretchMode="columnWidth"
-            android:gravity="center">
+            android:layout_height="match_parent"/>
 
-        </GridView>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/layout_add_new_staff_add_button"
+            android:layout_gravity="end|bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:longClickable="false"
+            android:src="@drawable/ic_add_black_24dp" />
+
     </FrameLayout>
 
-</LinearLayout>
+</RelativeLayout>

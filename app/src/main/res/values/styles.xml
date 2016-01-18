@@ -137,4 +137,11 @@
         <item name="android:textSize">@dimen/journal_item_card_person_text_size</item>
     </style>
 
+    <style name="PersonInformationField">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">@dimen/person_information_field_left_margin</item>
+        <item name="android:layout_marginRight">@dimen/person_information_field_right_margin</item>
+    </style>
+
 </resources>

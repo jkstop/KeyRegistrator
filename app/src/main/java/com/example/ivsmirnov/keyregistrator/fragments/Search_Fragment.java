@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -34,8 +37,11 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
+import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.Find_User_in_SQL_Server_Interface;
+import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
+import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.sql.Connection;
@@ -48,15 +54,18 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 04.12.2015.
  */
-public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server_Interface{
+public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server_Interface, RecycleItemClickListener{
 
     private Context mContext;
     private SharedPreferences mPreferences;
     private Connection conn;
     private Find_User_in_SQL_Server_Interface mListener;
 
+    private ArrayList<PersonItem> mPersonItems;
+
     private ProgressBar mProgressBar;
-    private GridView mGridPersons;
+    //private GridView mGridPersons;
+    private RecyclerView mPersonsRecycler;
     private Button mAddButton;
 
     public static Search_Fragment new_Instance(){
@@ -78,7 +87,10 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
         mProgressBar.setVisibility(View.INVISIBLE);
 
         mListener = this;
-        mGridPersons = (GridView)rootView.findViewById(R.id.layout_add_new_staff_grid);
+
+        mPersonsRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_search_persons);
+        mPersonsRecycler.setLayoutManager(new GridLayoutManager(mContext,3));
+
         mAddButton = (Button)rootView.findViewById(R.id.layout_add_new_staff_input_button);
 
         String ip = mPreferences.getString(Values.SQL_SERVER,"");
@@ -123,15 +135,11 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                     try {
 
                         Statement statement = conn.createStatement();
-
                         ResultSet resultSet = statement.executeQuery("select * from STAFF where [LASTNAME] like '"+s+"%'");
-
                         Find_User_in_SQL_Server find_user_in_sql_server = new Find_User_in_SQL_Server(mListener);
-
                         find_user_in_sql_server.execute(resultSet);
 
                     } catch (SQLException e) {
-                        //Toast.makeText(mContext,e.toString(),Toast.LENGTH_LONG).show();
                         e.printStackTrace();
                     }
                 }
@@ -141,21 +149,6 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
             }
         });
 
-        mGridPersons.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int selectedPosition = position - parent.getFirstVisiblePosition();
-                View gridItem = parent.getChildAt(selectedPosition);
-                String [] items = new String[]{gridItem.getTag(R.string.grid_item_tag_lastname).toString(),
-                        gridItem.getTag(R.string.grid_item_tag_firstname).toString(),
-                        gridItem.getTag(R.string.grid_item_tag_midname).toString(),
-                        gridItem.getTag(R.string.grid_item_tag_division).toString(),
-                        gridItem.getTag(R.string.grid_item_tag_sex).toString(),
-                        gridItem.getTag(R.string.grid_item_tag_radio_label).toString()};
-                Loader_Image loader_image = new Loader_Image(mContext,items,Search_Fragment.this);
-                loader_image.execute();
-            }
-        });
 
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,9 +168,11 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                String [] items = new String[]{surname,name,lastname,div,gender,tag};
-                Loader_Image loader_image = new Loader_Image(mContext,items,Search_Fragment.this);
+                Loader_Image loader_image = new Loader_Image(mContext,
+                        new PersonItem(surname,name,lastname,div,gender,null,null,tag),
+                        Search_Fragment.this);
                 loader_image.execute();
+
             }
         });
         return rootView;
@@ -187,25 +182,22 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     public void changeProgressBar(int visibility) {
         mProgressBar.setVisibility(visibility);
         if (visibility==View.VISIBLE){
-            mGridPersons.setVisibility(View.INVISIBLE);
+            mPersonsRecycler.setVisibility(View.INVISIBLE);
         }else{
-            mGridPersons.setVisibility(View.VISIBLE);
+            mPersonsRecycler.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
-    public void updateGrid(ArrayList<SparseArray> items) {
+    public void updateGrid(ArrayList<PersonItem> items) {
         if (!items.isEmpty()){
-            //mGridPersons.setAdapter((ListAdapter) new adapter_persons_grid(mContext,items,2));
+            mPersonItems = items;
+            mPersonsRecycler.setAdapter(new adapter_persons_grid(mContext,
+                    mPersonItems,
+                    Values.SHOW_ALL_PERSONS,
+                    this));
         }
     }
-
-    //RecyclerView recyclerView = (RecyclerView) findViewById(
-    //        R.id.recycler_view);
-    //recyclerView.addItemDecoration(new MarginDecoration(this));
-    //recyclerView.setHasFixedSize(true);
-    //recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-    //recyclerView.setAdapter(new NumberedAdapter(30));
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -214,4 +206,17 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
             ((Launcher)getActivity()).getSupportActionBar().setTitle(getResources().getString(R.string.title_add_new_staff));
         }
     }
+
+    @Override
+    public void onItemClick(View v, int position) {
+        Loader_Image loader_image = new Loader_Image(mContext,
+                mPersonItems.get(position),
+                Search_Fragment.this);
+        loader_image.execute();
+    }
+
+    @Override
+    public void onItemLongClick(View v, int position, long timeIn) {
+    }
+
 }

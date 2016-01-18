@@ -17,6 +17,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -85,39 +86,42 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        //card = allItems.get(position);
         holder.textSurname.setText(allItems.get(position).Lastname);
         holder.textMidname.setText(allItems.get(position).Firstname);
         holder.textLastname.setText(allItems.get(position).Midname);
         holder.textDivision.setText(allItems.get(position).Division);
 
-        if (mType==1){
-            ImageLoader imageLoader = ImageLoader.getInstance();
-            if (!imageLoader.isInited()){
-                imageLoader.init(ImageLoaderConfiguration.createDefault(context));
-            }
-            imageLoader.displayImage("file://"+allItems.get(position).PhotoOriginal, holder.imageView);
-        }else{
-            Bitmap bitmap;
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
 
-            if (allItems.get(position).PhotoOriginal!=null){
-                byte[] decodedString = Base64.decode(allItems.get(position).PhotoOriginal, Base64.DEFAULT);
+        Bitmap bitmap;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+
+        String photo = null;
+
+        if (mType== Values.SHOW_FAVORITE_PERSONS){
+            photo = allItems.get(position).PhotoPreview;
+        }else if (mType==Values.SHOW_ALL_PERSONS){
+            photo = allItems.get(position).PhotoOriginal;
+        }
+
+        if (photo!=null){
+                byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
                 BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
                 options.inSampleSize = DataBaseFavorite.calculateInSampleSize(options, 120, 160);
                 options.inJustDecodeBounds = false;
                 bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
 
+        }else{
+            if(allItems.get(position).Sex.equals("Ж")){
+                bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.person_female_colored);
             }else{
-                //decodedString = Base64.decode("",Base64.DEFAULT);
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_male_colored);
-                options.inSampleSize = DataBaseFavorite.calculateInSampleSize(options, 120, 160);
-                options.inJustDecodeBounds = false;
-                //image.setImageBitmap(bitmap);
+                bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.person_male_colored);
             }
-            holder.imageView.setImageBitmap(bitmap);
+            options.inSampleSize = DataBaseFavorite.calculateInSampleSize(options, 120, 160);
+            options.inJustDecodeBounds = false;
         }
+        holder.imageView.setImageBitmap(bitmap);
+
     }
 
 
