@@ -109,6 +109,8 @@
 
     <string name="person_card_icon_division_descryption">person_card_icon_division_descryption</string>
     <string name="person_information_photo_descryption">person_information_photo_descryption</string>
+    <string name="auditroom_grid_free_image_descryption">auditroom_grid_free_image_descryption</string>
+    <string name="auditroom_grid_busy_image_description">auditroom_grid_busy_image_description</string>
 
     <string name="view_enter_password_hint_password">Пароль</string>
     <string name="view_enter_password_title">Введите пароль</string>

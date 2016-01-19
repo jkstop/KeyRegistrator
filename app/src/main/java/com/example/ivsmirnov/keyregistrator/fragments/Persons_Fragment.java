@@ -38,6 +38,7 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
@@ -47,7 +48,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class Persons_Fragment extends Fragment implements UpdateTeachers{
+public class Persons_Fragment extends Fragment implements UpdateInterface{
 
     private Context mContext;
     private static RecyclerView mRecyclerView;
@@ -426,13 +427,18 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
                     mPreferencesEditor.apply();
                 }
             }
-            onFinishEditing();
+           // onFinishEditing();
         }
     }
 
-    @Override
-    public void onFinishEditing() {
 
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void updateInformation() {
         DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
         mAllItems = dbFavorite.readTeachersFromDB();
         dbFavorite.closeDB();
@@ -453,10 +459,4 @@ public class Persons_Fragment extends Fragment implements UpdateTeachers{
         mListAdapter = new adapter_list_characters(mContext,mListCharacters);
         mListView.setAdapter(mListAdapter);
     }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
 }

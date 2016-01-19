@@ -63,4 +63,7 @@
     <color name="toast_fullscreen_text">#ffffff</color>
 
     <color name="journal_card_text_primary">@color/material_grey_600</color>
+
+    <color name="auditroom_card">@color/primaryDark</color>
+    <color name="auditroom_busy_card">#FFD50000</color>
 </resources>

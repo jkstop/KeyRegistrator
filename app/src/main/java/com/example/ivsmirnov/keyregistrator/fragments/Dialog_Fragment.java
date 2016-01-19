@@ -1,17 +1,11 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.app.Dialog;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.LayoutInflaterCompat;
-import android.support.v4.view.LayoutInflaterFactory;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 
 import android.content.Context;
@@ -20,32 +14,22 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
-import android.util.AttributeSet;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.NumberPicker;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -53,27 +37,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_autoComplete_teachersBase;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_Image;
 import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Values;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Dialog_Fragment extends DialogFragment{
 
@@ -124,8 +99,8 @@ public class Dialog_Fragment extends DialogFragment{
                                 dbJournal.clearJournalDB();
                                 dbJournal.closeDB();
 
-                                UpdateJournal listen = (UpdateJournal)getTargetFragment();
-                                listen.onDone();
+                                UpdateInterface listen = (UpdateInterface)getTargetFragment();
+                                listen.updateInformation();
 
                                 Toast.makeText(context,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }

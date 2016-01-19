@@ -27,6 +27,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
 import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
@@ -35,7 +36,7 @@ import java.util.ArrayList;
 
 import at.markushi.ui.CircleButton;
 
-public class Rooms_Fragment extends Fragment implements UpdateTeachers,FinishLoad {
+public class Rooms_Fragment extends Fragment implements UpdateInterface {
 
     private GridView mGridView;
     private CircleButton mCircleButton;
@@ -151,7 +152,7 @@ public class Rooms_Fragment extends Fragment implements UpdateTeachers,FinishLoa
                 return super.onOptionsItemSelected(item);
         }
     }
-
+/*
     @Override
     public void onFinishEditing() {
         DataBaseRooms dbRooms = new DataBaseRooms(mContext);
@@ -168,7 +169,7 @@ public class Rooms_Fragment extends Fragment implements UpdateTeachers,FinishLoa
         mGridView.setAdapter(mAdaptereditauditroomsgrid);
         mGridView.setNumColumns(columns);
     }
-
+*/
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -181,13 +182,30 @@ public class Rooms_Fragment extends Fragment implements UpdateTeachers,FinishLoa
                     loader_intent.execute();
                 }
             }
-            onFinishEditing();
+            //onFinishEditing();
 
         }
     }
-
+/*
     @Override
     public void onFinish() {
+        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
+        mRoomItems = dbRooms.readRoomsDB();
+        dbRooms.closeDB();
+
+        mRooms = new ArrayList<>();
+        for (int i=0;i<mRoomItems.size();i++){
+            mRooms.add(mRoomItems.get(i).Auditroom);
+        }
+
+        int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
+        mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mRooms);
+        mGridView.setAdapter(mAdaptereditauditroomsgrid);
+        mGridView.setNumColumns(columns);
+    }*/
+
+    @Override
+    public void updateInformation() {
         DataBaseRooms dbRooms = new DataBaseRooms(mContext);
         mRoomItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();

@@ -6,17 +6,14 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.util.SparseArray;
 
 import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -29,11 +26,11 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
     private Context mContext;
     private SharedPreferences mSharedPreferences;
     private ProgressDialog mProgressDialog;
-    private UpdateTeachers mListener;
+    private UpdateInterface mListener;
 
-    public Load_from_server(Context context, UpdateTeachers updateTeachers){
+    public Load_from_server(Context context, UpdateInterface updateInterface){
         this.mContext = context;
-        this.mListener = updateTeachers;
+        this.mListener = updateInterface;
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mProgressDialog = new ProgressDialog(mContext);
     }
@@ -98,6 +95,6 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
         if (mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }
-        mListener.onFinishEditing();
+        mListener.updateInformation();
     }
 }

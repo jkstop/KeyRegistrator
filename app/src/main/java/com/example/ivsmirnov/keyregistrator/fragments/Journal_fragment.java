@@ -11,15 +11,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -40,31 +35,18 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
 import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateJournal;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.spec.ECField;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
-
-import jxl.Workbook;
-import jxl.WorkbookSettings;
-import jxl.write.Label;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
 
 
-public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTeachers,ActionBar.OnNavigationListener {
+public class Journal_fragment extends Fragment implements UpdateInterface,ActionBar.OnNavigationListener {
 
     private Context mContext;
     private RecyclerView mJournalRecycler;
@@ -213,17 +195,32 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
                     mSharedPreferencesEditor.apply();
                 }
             }
-            onFinishEditing();
+            //updateInformation();
         }
     }
 
     @Override
-    public void onDone() {
+    public void updateInformation() {
         mDates = calculateDates(mContext);
-        getJournalForDate(new Date(System.currentTimeMillis()));
+        Date date = null;
+        if (mDates.size()!=0){
+            try {
+                date = new SimpleDateFormat("dd MMM yyyy").parse(mDates.get(0));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }else{
+            date = new Date(System.currentTimeMillis());
+        }
+
+        try {
+            getJournalForDate(date);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         showDateSpinner();
     }
-
+/*
     @Override
     public void onFinishEditing() {
         mDates = calculateDates(mContext);
@@ -234,7 +231,7 @@ public class Journal_fragment extends Fragment implements UpdateJournal,UpdateTe
         }
         showDateSpinner();
     }
-
+*/
     private void getJournalForDate(Date date){
         DataBaseJournal dbJournal = new DataBaseJournal(mContext);
         mJournalItems = dbJournal.readJournalFromDB(date);

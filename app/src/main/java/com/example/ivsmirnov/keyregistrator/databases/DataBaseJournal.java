@@ -9,9 +9,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.util.Base64;
 import android.util.Log;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
@@ -22,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.spec.ECField;
 import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -161,37 +164,38 @@ public class DataBaseJournal{
            DateFormat dateFormat = DateFormat.getDateInstance();
 
             ArrayList<String> datesString = Journal_fragment.calculateDates(mContext);
-            for (int i=0;i<datesString.size();i++){
-                cursor.moveToPosition(-1);
-                int row=1;
+            if (datesString.size()!=0){
+                for (int i=0;i<datesString.size();i++){
+                    cursor.moveToPosition(-1);
+                    int row=1;
+                    WritableSheet daySheet = workbook.createSheet(datesString.get(i),i);
 
-                WritableSheet daySheet = workbook.createSheet(datesString.get(i),i);
-                daySheet.addCell(new Label(0,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_AUD))));
-                daySheet.addCell(new Label(1,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN))));
-                daySheet.addCell(new Label(2,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_OUT))));
-                daySheet.addCell(new Label(3,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_LASTNAME))));
-                daySheet.addCell(new Label(4,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_FIRSTNAME))));
-                daySheet.addCell(new Label(5,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_MIDNAME))));
-
-                while (cursor.moveToNext()){
-                    if (datesString.get(i).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN)))))){
-                        daySheet.addCell(new Label(0,row,cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_AUD))));
-                        daySheet.addCell(new Label(1,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN))))));
-                        daySheet.addCell(new Label(2,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_OUT))))));
-                        daySheet.addCell(new Label(3,row,cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_LASTNAME))));
-                        daySheet.addCell(new Label(4,row,cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_FIRSTNAME))));
-                        daySheet.addCell(new Label(5,row,cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_MIDNAME))));
-                        row++;
-                    }
+                        daySheet.addCell(new Label(0,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_AUD))));
+                        daySheet.addCell(new Label(1,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN))));
+                        daySheet.addCell(new Label(2,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_OUT))));
+                        daySheet.addCell(new Label(3,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_LASTNAME))));
+                        daySheet.addCell(new Label(4,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_FIRSTNAME))));
+                        daySheet.addCell(new Label(5,0,cursor.getColumnName(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_MIDNAME))));
+                        while (cursor.moveToNext()){
+                            if (datesString.get(i).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN)))))){
+                                daySheet.addCell(new Label(0,row,cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_AUD))));
+                                daySheet.addCell(new Label(1,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN))))));
+                                daySheet.addCell(new Label(2,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_OUT))))));
+                                daySheet.addCell(new Label(3,row,cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_LASTNAME))));
+                                daySheet.addCell(new Label(4,row,cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_FIRSTNAME))));
+                                daySheet.addCell(new Label(5,row,cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_MIDNAME))));
+                                row++;
+                            }
+                        }
+                }
+                try {
+                    workbook.write();
+                    workbook.close();
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             }
 
-            workbook.write();
-            try {
-                workbook.close();
-            } catch (WriteException e) {
-                e.printStackTrace();
-            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (RowsExceededException e) {

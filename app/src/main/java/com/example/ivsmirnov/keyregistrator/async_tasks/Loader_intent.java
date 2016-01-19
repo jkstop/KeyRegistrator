@@ -3,14 +3,13 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.BufferedReader;
@@ -31,13 +30,13 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
     private Context mContext;
     private String mPath;
     private ProgressDialog progressDialog;
-    private UpdateTeachers updateTeachers;
+    private UpdateInterface mListener;
     private int mLoadType;
 
-    public Loader_intent(Context context, String path, UpdateTeachers listener, int loadType){
+    public Loader_intent(Context context, String path, UpdateInterface listener, int loadType){
         this.mContext = context;
         this.mPath = path;
-        this.updateTeachers = listener;
+        this.mListener = listener;
         this.mLoadType = loadType;
         progressDialog = new ProgressDialog(mContext);
     }
@@ -165,7 +164,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
         if (progressDialog.isShowing()){
             progressDialog.cancel();
         }
-        updateTeachers.onFinishEditing();
+        mListener.updateInformation();
         Toast.makeText(mContext, "Готово!", Toast.LENGTH_SHORT).show();
     }
 
