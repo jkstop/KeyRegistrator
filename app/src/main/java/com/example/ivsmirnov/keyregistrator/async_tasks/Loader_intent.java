@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
+import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
@@ -134,7 +135,14 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                             if (!lines.contains(line)){
                                 String [] split = line.split(";");
                                 if(split.length==6){
-                                    //dbRooms.writeInRoomsDB(split[0],Integer.parseInt(split[1]),split[2],split[3],split[4],split[5]);
+                                    dbRooms.writeInRoomsDB(new RoomItem(
+                                            split[0],
+                                            Integer.parseInt(split[1]),
+                                            Integer.parseInt(split[2]),
+                                            0,
+                                            split[3],
+                                            split[4],
+                                            split[5]));
                                     publishProgress(i);
                                     i++;
                                 }

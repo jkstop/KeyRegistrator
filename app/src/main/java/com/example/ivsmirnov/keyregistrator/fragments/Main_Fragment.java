@@ -39,7 +39,7 @@ import java.util.ArrayList;
 public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleItemClickListener{
 
 
-    private RecyclerView mAuditroomGrid;
+    public static RecyclerView mAuditroomGrid;
 
     private SharedPreferences.Editor preferencesEditor;
     private SharedPreferences preferences;

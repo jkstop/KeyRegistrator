@@ -55,8 +55,6 @@ public class DataBaseRooms {
         cv.put(DataBaseRoomsRegist.COLUMN_TAG,roomItem.Tag);
         cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, roomItem.Photo);
         sqLiteDatabase.insert(DataBaseRoomsRegist.TABLE_ROOMS, null, cv);
-       // mSharedPreferencesEditor.putInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + room, (int) id);
-       // mSharedPreferencesEditor.apply();
     }
 
     public void updateRoom(RoomItem roomItem){
@@ -72,35 +70,6 @@ public class DataBaseRooms {
         sqLiteDatabase.update(DataBaseRoomsRegist.TABLE_ROOMS,cv,DataBaseRoomsRegist._ID + "=" + roomPositionInBase, null);
     }
 
-    public void updateStatusRooms(int id, String status){
-        ContentValues cv = new ContentValues();
-        cv.put(DataBaseRoomsRegist.COLUMN_STATUS, status);
-        sqLiteDatabase.update(DataBaseRoomsRegist.TABLE_ROOMS, cv, DataBaseRoomsRegist._ID + "=" + id, null);
-    }
-
-    public void updateCardOrHandle(int id, String cardOrHandle){
-        ContentValues cv = new ContentValues();
-        cv.put(DataBaseRoomsRegist.COLUMN_ACCESS, cardOrHandle);
-        sqLiteDatabase.update(DataBaseRoomsRegist.TABLE_ROOMS, cv, DataBaseRoomsRegist._ID + "=" + id, null);
-    }
-
-    public void updateTagRoom(int id, String tag){
-        ContentValues cv = new ContentValues();
-        cv.put(DataBaseRoomsRegist.COLUMN_TAG, tag);
-        sqLiteDatabase.update(DataBaseRoomsRegist.TABLE_ROOMS, cv, DataBaseRoomsRegist._ID + "=" + id, null);
-    }
-
-    public void updateLastVisitersRoom(int id,String name){
-        ContentValues cv = new ContentValues();
-        cv.put(DataBaseRoomsRegist.COLUMN_LAST_VISITER, name);
-        sqLiteDatabase.update(DataBaseRoomsRegist.TABLE_ROOMS, cv, DataBaseRoomsRegist._ID + "=" + id, null);
-    }
-
-    public void updatePhotoPath(int id, String path){
-        ContentValues cv = new ContentValues();
-        cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, path);
-        sqLiteDatabase.update(DataBaseRoomsRegist.TABLE_ROOMS, cv, DataBaseRoomsRegist._ID + "=" + id, null);
-    }
 
     public void deleteFromRoomsDB(String aud){
         cursor = sqLiteDatabase.query(DataBaseRoomsRegist.TABLE_ROOMS,new String[]{DataBaseRoomsRegist._ID,DataBaseRoomsRegist.COLUMN_ROOM},

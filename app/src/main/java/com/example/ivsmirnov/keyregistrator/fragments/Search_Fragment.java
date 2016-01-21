@@ -64,7 +64,6 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     private ArrayList<PersonItem> mPersonItems;
 
     private ProgressBar mProgressBar;
-    //private GridView mGridPersons;
     private RecyclerView mPersonsRecycler;
     private Button mAddButton;
 
@@ -155,10 +154,10 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
             public void onClick(View v) {
                 String source = mInputText.getText().toString();
                 String[] split = source.split("\\s+");
-                String surname = "-";
-                String name = "-";
-                String lastname = "-";
-                String div = "-";
+                String surname = " ";
+                String name = " ";
+                String lastname = " ";
+                String div = " ";
                 String gender = "М";
                 String tag = "null";
                 try {

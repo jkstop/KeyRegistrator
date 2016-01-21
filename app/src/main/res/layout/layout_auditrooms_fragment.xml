@@ -1,35 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--<ListView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/auditroom_fragment_room_grid"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/list_rooms"
-        />-->
-    <GridView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnWidth="90dp"
-        android:gravity="center"
-        android:horizontalSpacing="20dp"
-        android:verticalSpacing="@dimen/grid_vertical_spacing"
-        android:stretchMode="columnWidth"
-        android:id="@+id/grid_rooms"/>
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"/>
 
-
-    <at.markushi.ui.CircleButton
-        android:id="@+id/buttonAddRoom"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/auditroom_fragment_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        app:backgroundTint="@color/colorAccent"
+        app:elevation="@dimen/rooms_fragment_fab_elevation"
+        android:layout_margin="@dimen/rooms_fragment_fab_margin"
         android:src="@drawable/fab_ic_add"
-        app:cb_color="#99CC00"
-        android:onClick="showAddUserDialog"
-        app:cb_pressedRingWidth="10dip"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true" />
+        />
 
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

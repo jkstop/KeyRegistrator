@@ -5,6 +5,7 @@
     <color name="primary">@color/green_500</color>
     <color name="primaryDark">@color/green_700</color>
     <color name="textPrimary">@color/text_white_text_icons_100</color>
+    <color name="colorAccent">#FFD50000</color>
 
     <!-- Text -->
     <color name="text_black_100">#000000</color>

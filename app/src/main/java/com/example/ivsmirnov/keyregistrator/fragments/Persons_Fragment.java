@@ -60,8 +60,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
 
     private ArrayList<String> mListCharacters;
 
-    private static long today, lastDate;
-
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mPreferencesEditor;
 
@@ -145,50 +143,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                         return;
                     }
 
-                    String lastname = mAllItems.get(position).Lastname;
-                    String firstname = mAllItems.get(position).Firstname;
-                    String midname = mAllItems.get(position).Midname;
-                    String division = mAllItems.get(position).Division;
+                    takeKey(Values.ACCESS_BY_CLICK, position);
 
-                    String aud = getArguments().getString(Values.AUDITROOM);
-                    String name = "Аноним";
-                    if (lastname.length() != 0 && firstname.length() != 0 && midname.length() != 0) {
-                        name = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";
-                    } else {
-                        if (lastname.length() != 0 && firstname.length() != 0) {
-                            name = lastname + " " + firstname;
-                        } else {
-                            if (lastname.length() != 0) {
-                                name = lastname;
-                            }
-                        }
-                    }
-
-                    final Long time = System.currentTimeMillis();
-
-                    JournalItem journalItem = new JournalItem(
-                            aud,
-                            time,
-                            null,
-                            0,
-                            mAllItems.get(position).Lastname,
-                            mAllItems.get(position).Firstname,
-                            mAllItems.get(position).Midname,
-                            mAllItems.get(position).PhotoPreview);
-                    long positionInBase = Values.writeInJournal(mContext,journalItem);
-
-                    DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                    dbRooms.updateRoom(new RoomItem(journalItem.Auditroom,
-                            Values.ROOM_IS_BUSY,
-                            Values.ACCESS_BY_CLICK,
-                            positionInBase,
-                            journalItem.PersonLastname,
-                            mAllItems.get(position).RadioLabel,
-                            mAllItems.get(position).PhotoPreview));
-                    dbRooms.closeDB();
-
-
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
 
@@ -198,49 +154,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                         return;
                     }
 
-                    String lastname = mAllItems.get(position).Lastname;
-                    String firstname = mAllItems.get(position).Firstname;
-                    String midname = mAllItems.get(position).Midname;
-                    String division = mAllItems.get(position).Division;
+                    takeKey(Values.ACCESS_BY_CARD, position);
 
-                    String aud = getArguments().getString(Values.AUDITROOM);
-                    String name = "Аноним";
-                    if (lastname.length() != 0 && firstname.length() != 0 && midname.length() != 0) {
-                        name = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";
-                    } else {
-                        if (lastname.length() != 0 && firstname.length() != 0) {
-                            name = lastname + " " + firstname;
-                        } else {
-                            if (lastname.length() != 0) {
-                                name = lastname;
-                            }
-                        }
-                    }
-
-                    final Long time = System.currentTimeMillis();
-
-                    JournalItem journalItem = new JournalItem(
-                            aud,
-                            time,
-                            null,
-                            1,
-                            mAllItems.get(position).Lastname,
-                            mAllItems.get(position).Firstname,
-                            mAllItems.get(position).Midname,
-                            mAllItems.get(position).PhotoPreview);
-                    long positionInBase = Values.writeInJournal(mContext,journalItem);
-
-                    DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                    dbRooms.updateRoom(new RoomItem(journalItem.Auditroom,
-                            Values.ROOM_IS_BUSY,
-                            Values.ACCESS_BY_CARD,
-                            positionInBase,
-                            journalItem.PersonLastname,
-                            mAllItems.get(position).RadioLabel,
-                            mAllItems.get(position).PhotoPreview));
-                    dbRooms.closeDB();
-
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
             });
@@ -249,6 +164,55 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    private void takeKey(int accessType, int position){
+        JournalItem journalItem  = createJournalItem(accessType,position);
+        long positionInBase = Values.writeInJournal(mContext, journalItem);
+        writeRoom(journalItem, positionInBase, position);
+        showMainAuditroomsGrid();
+    }
+
+    private String getPersonInitials (String lastname, String firstname, String midname){
+        String initials = "-";
+        if (lastname.length() != 0 && firstname.length() != 1 && midname.length() != 1) {
+            initials = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";
+        } else {
+            if (lastname.length() != 1 && firstname.length() != 1) {
+                initials = lastname + " " + firstname;
+            } else {
+                if (lastname.length() != 1) {
+                    initials = lastname;
+                }
+            }
+        }
+        return initials;
+    }
+
+    private JournalItem createJournalItem(int accessType, int position){
+        return new JournalItem(getArguments().getString(Values.AUDITROOM),
+                System.currentTimeMillis(),
+                null,
+                accessType,
+                mAllItems.get(position).Lastname,
+                mAllItems.get(position).Firstname,
+                mAllItems.get(position).Midname,
+                mAllItems.get(position).PhotoPreview);
+    }
+
+    private void writeRoom (JournalItem journalItem, long positionInBase, int position){
+        DataBaseRooms dataBaseRooms = new DataBaseRooms(mContext);
+        dataBaseRooms.updateRoom(new RoomItem(journalItem.Auditroom,
+                Values.ROOM_IS_BUSY,
+                journalItem.AccessType,
+                positionInBase,
+                getPersonInitials(journalItem.PersonLastname,journalItem.PersonFirstname,journalItem.PersonMidname),
+                mAllItems.get(position).RadioLabel,
+                mAllItems.get(position).PhotoOriginal));
+        dataBaseRooms.closeDB();
+    }
+
+    private void showMainAuditroomsGrid(){
+        getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
+    }
 
     @Nullable
     @Override

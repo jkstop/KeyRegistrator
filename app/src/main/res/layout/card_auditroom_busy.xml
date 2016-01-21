@@ -12,42 +12,60 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/card_auditroom_busy_image_person"
-            android:layout_width="120dp"
-            android:layout_height="150dp"
-            android:contentDescription="@string/auditroom_grid_busy_image_description"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_margin="@dimen/auditroom_card_image_margin"/>
-
         <RelativeLayout
-            android:layout_toRightOf="@+id/card_auditroom_busy_image_person"
+            android:id="@+id/card_auditroom_busy_image_layout"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/auditroom_card_image_margin"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true">
+            <ImageView
+                android:id="@+id/card_auditroom_busy_image_person"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/auditroom_grid_busy_image_person_description"
+                android:scaleType="centerCrop"/>
+
+            <ImageView
+                android:id="@+id/card_auditroom_busy_image_key"
+                android:contentDescription="@string/auditroom_grid_busy_image_key_description"
+                android:src="@drawable/key_colored"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_toRightOf="@+id/card_auditroom_busy_image_layout"
+            android:layout_marginLeft="@dimen/auditroom_card_divider"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
+            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                 android:id="@+id/card_auditroom_busy_text_auditroom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="400"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.6"
+                android:maxLines="1"
                 android:textColor="@color/black"
-                android:textSize="@dimen/auditroom_card_busy_text_size"
-                android:layout_centerInParent="true"
+                android:textSize="@dimen/auditroom_card_busy_text_aud_size"
+                android:gravity="center" />
+
+            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
+                android:id="@+id/card_auditroom_busy_text_person"
+                android:maxLines="1"
+                android:textColor="@color/black"
+                android:textSize="50sp"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.4"
+                android:gravity="center"
                 />
 
-            <TextView
-                android:id="@+id/card_auditroom_busy_text_person"
-                android:text="perosn"
-                android:textColor="@color/black"
-                android:textSize="25dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/card_auditroom_busy_text_auditroom"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true" />
-
-        </RelativeLayout>
+        </LinearLayout>
 
 
 

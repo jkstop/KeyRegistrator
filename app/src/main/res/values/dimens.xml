@@ -68,7 +68,14 @@
     <dimen name="auditroom_card_elevation">10dp</dimen>
     <dimen name="auditroom_card_content_padding">5dp</dimen>
     <dimen name="auditroom_card_text_size">100sp</dimen>
-    <dimen name="auditroom_card_busy_text_size">70sp</dimen>
-    <dimen name="auditroom_card_image_margin">10dp</dimen>
+    <dimen name="auditroom_card_busy_text_aud_size">120sp</dimen>
+    <dimen name="auditroom_card_busy_text_person_size">120sp</dimen>
+    <dimen name="auditroom_card_image_margin">5dp</dimen>
+    <dimen name="auditroom_card_divider">10dp</dimen>
+
+    <dimen name="rooms_fragment_fab_margin">16dp</dimen>
+    <dimen name="rooms_fragment_fab_elevation">5dp</dimen>
+
+    <dimen name="view_enter_auditroom_margin">16dp</dimen>
 
 </resources>

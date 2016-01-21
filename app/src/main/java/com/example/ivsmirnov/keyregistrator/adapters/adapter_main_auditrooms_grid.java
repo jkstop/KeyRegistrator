@@ -13,12 +13,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
+import com.example.ivsmirnov.keyregistrator.custom_views.StaggeredGridView;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
 
@@ -54,14 +58,17 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
     static class auditroomBusyViewHolder extends RecyclerView.ViewHolder{
 
         public ImageView mBusyImagePerson;
+        public ImageView mBusyImageKey;
         public TextView mBusyTextAuditroom;
         public TextView mBusyTextPerson;
 
         public auditroomBusyViewHolder(View itemView) {
             super(itemView);
             mBusyImagePerson = (ImageView)itemView.findViewById(R.id.card_auditroom_busy_image_person);
+            mBusyImageKey = (ImageView)itemView.findViewById(R.id.card_auditroom_busy_image_key);
             mBusyTextAuditroom = (TextView)itemView.findViewById(R.id.card_auditroom_busy_text_auditroom);
             mBusyTextPerson = (TextView)itemView.findViewById(R.id.card_auditroom_busy_text_person);
+
         }
     }
     /*
@@ -96,20 +103,23 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
 
         RecyclerView.ViewHolder viewHolder = null;
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+
         switch (viewType){
             case 1:
-                final View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_auditroom_free,parent,false);
-                viewHolder = new auditroomFreeViewHolder(rootView);
-                rootView.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+                final View rootViewFree = layoutInflater.inflate(R.layout.card_auditroom_free,parent,false);
+                viewHolder = new auditroomFreeViewHolder(rootViewFree);
+                rootViewFree.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getItemScaleHeight()));
                 final RecyclerView.ViewHolder finalViewHolder = viewHolder;
-                rootView.setOnClickListener(new View.OnClickListener() {
+                rootViewFree.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         mListener.onItemClick(v, finalViewHolder.getLayoutPosition());
                     }
                 });
                 final RecyclerView.ViewHolder finalViewHolder1 = viewHolder;
-                rootView.setOnLongClickListener(new View.OnLongClickListener() {
+                rootViewFree.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
                         mListener.onItemLongClick(v, finalViewHolder1.getLayoutPosition(),0);
@@ -118,9 +128,9 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
                 });
                 break;
             case 0:
-                View rootViewBusy = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_auditroom_busy,parent,false);
+                View rootViewBusy = layoutInflater.inflate(R.layout.card_auditroom_busy,parent,false);
                 viewHolder = new auditroomBusyViewHolder(rootViewBusy);
-                rootViewBusy.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                rootViewBusy.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getItemScaleHeight()));
                 final RecyclerView.ViewHolder finalViewHolder2 = viewHolder;
                 rootViewBusy.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -151,30 +161,37 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
                 ((auditroomBusyViewHolder)holder).mBusyTextAuditroom.setText(mRoomItems.get(position).Auditroom);
                 ((auditroomBusyViewHolder)holder).mBusyTextPerson.setText(mRoomItems.get(position).LastVisiter);
 
-                Bitmap bitmap;
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
+
+                RelativeLayout.LayoutParams imageKeyParams = (RelativeLayout.LayoutParams) ((auditroomBusyViewHolder)holder).mBusyImageKey.getLayoutParams();
+                imageKeyParams.width = imageKeyParams.height = (int)(getItemScaleHeight()/5.6);
+
+                RelativeLayout.LayoutParams imagePersonParams = (RelativeLayout.LayoutParams) ((auditroomBusyViewHolder)holder).mBusyImagePerson.getLayoutParams();
+                imagePersonParams.width = (int) (getItemScaleHeight()/1.4);
+
+                ((auditroomBusyViewHolder)holder).mBusyImagePerson.setLayoutParams(imagePersonParams);
+                ((auditroomBusyViewHolder)holder).mBusyImageKey.setLayoutParams(imageKeyParams);
                 if (mRoomItems.get(position).Photo!=null){
                     byte[] decodedString = Base64.decode(mRoomItems.get(position).Photo, Base64.DEFAULT);
-                    BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
-                    options.inSampleSize = DataBaseFavorite.calculateInSampleSize(options, 120, 160);
-                    options.inJustDecodeBounds = false;
-                    bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
-                    ((auditroomBusyViewHolder)holder).mBusyImagePerson.setImageBitmap(bitmap);
+                    ((auditroomBusyViewHolder)holder).mBusyImagePerson.
+                            setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, new BitmapFactory.Options()));
                 }
 
                 break;
         }
     }
 
- //   @Override
- //   public void onBindViewHolder(auditroomFreeViewHolder holder, int position) {
- //       holder.mFreeTextAuditroom.setText(mRoomItems.get(position).Auditroom);
- //   }
 
     @Override
     public int getItemCount() {
         return mRoomItems.size();
+    }
+
+    private int getItemScaleHeight(){
+        int dividersHeight = (int)context.getResources().getDimension(R.dimen.auditroom_card_elevation);
+        int recyclerHeight = Main_Fragment.mAuditroomGrid.getHeight();
+        int recyclerChilds = mRoomItems.size();
+        int recyclerRows = (int) Math.ceil((double) recyclerChilds / preferences.getInt(Values.COLUMNS_AUD_COUNT, 1));
+        return recyclerHeight/recyclerRows-dividersHeight;
     }
 /*
     @Override

@@ -230,8 +230,9 @@ public class Dialog_Fragment extends DialogFragment{
                                 editor.remove(Values.POSITION_IN_LIST_FOR_ROOM + aud);
                                 editor.commit();
 
-                                UpdateTeachers updateTeachers = (UpdateTeachers)getTargetFragment();
-                                updateTeachers.onFinishEditing();
+                                UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
+                                updateInterface.updateInformation();
+
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                                 dialog.cancel();
                             }
@@ -260,52 +261,45 @@ public class Dialog_Fragment extends DialogFragment{
                                 dbRooms.clearRoomsDB();
                                 dbRooms.closeDB();
 
-                                FinishLoad finishLoad = (FinishLoad)getTargetFragment();
-                                finishLoad.onFinish();
+                                UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
+                                updateInterface.updateInformation();
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                             }
                         })
                         .create();
             case Values.ADD_ROOM_DIALOG:
-                final EditText editText = new EditText(context);
-                editText.setGravity(Gravity.CENTER);
-                editText.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                editText.setTextColor(Color.BLACK);
+                final TextInputLayout enterAuditroomLayout = (TextInputLayout) mInflater.inflate(R.layout.view_enter_auditroom,null);
+                final AppCompatEditText enterAuditroomText = (AppCompatEditText)enterAuditroomLayout.findViewById(R.id.view_auditroom_enter_room);
+                AppCompatButton enterAuditroomOkButton = (AppCompatButton)enterAuditroomLayout.findViewById(R.id.view_auditroom_ok_button);
+                enterAuditroomOkButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String inputText = enterAuditroomText.getText().toString();
+                        if (!inputText.isEmpty()){
+                            DataBaseRooms dbRooms = new DataBaseRooms(context);
+                            dbRooms.writeInRoomsDB(new RoomItem(
+                                    inputText,
+                                    Values.ROOM_IS_FREE,
+                                    Values.ACCESS_BY_CLICK,
+                                    0,
+                                    null,
+                                    null,
+                                    null));
+                            dbRooms.closeDB();
+
+                            enterAuditroomText.getText().clear();
+                            UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
+                            updateInterface.updateInformation();
+                            Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
+                            dismiss();
+                        }else{
+                            enterAuditroomLayout.setError(getResources().getString(R.string.view_auditroom_input_empty_error));
+                        }
+                    }
+                });
                 return new AlertDialog.Builder(getActivity())
-                        .setTitle("Добавить")
-                        .setView(editText)
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        })
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String item = editText.getText().toString();
-                                DataBaseRooms dbRooms = new DataBaseRooms(context);
-                                dbRooms.writeInRoomsDB(new RoomItem(
-                                        item,
-                                        Values.ROOM_IS_FREE,
-                                        Values.ACCESS_BY_CLICK,
-                                        0,
-                                        null,
-                                        null,
-                                        null));
-                                dbRooms.closeDB();
-
-                                editText.getText().clear();
-
-                                UpdateTeachers updateTeachers = (UpdateTeachers) getTargetFragment();
-                                updateTeachers.onFinishEditing();
-
-                                Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
-
-                                dialog.cancel();
-                            }
-                        })
+                        .setTitle(R.string.view_enter_auditroom_title)
+                        .setView(enterAuditroomLayout)
                         .create();
             case Values.SELECT_COLUMNS_DIALOG:
                 final String ident = getArguments().getString("AudOrPer");
@@ -330,8 +324,8 @@ public class Dialog_Fragment extends DialogFragment{
                                 if (ident != null && ident.equalsIgnoreCase("aud")) {
                                     editor.putInt(Values.COLUMNS_AUD_COUNT, numberPicker.getValue());
                                     editor.commit();
-                                    UpdateTeachers updateTeachers = (UpdateTeachers) getTargetFragment();
-                                    updateTeachers.onFinishEditing();
+                                    UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
+                                    updateInterface.updateInformation();
                                 } else if (ident != null && ident.equalsIgnoreCase("per")) {
                                     editor.putInt(Values.COLUMNS_PER_COUNT, numberPicker.getValue());
                                     editor.commit();

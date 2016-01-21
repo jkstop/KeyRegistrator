@@ -110,11 +110,15 @@
     <string name="person_card_icon_division_descryption">person_card_icon_division_descryption</string>
     <string name="person_information_photo_descryption">person_information_photo_descryption</string>
     <string name="auditroom_grid_free_image_descryption">auditroom_grid_free_image_descryption</string>
-    <string name="auditroom_grid_busy_image_description">auditroom_grid_busy_image_description</string>
+    <string name="auditroom_grid_busy_image_person_description">auditroom_grid_busy_image_description</string>
+    <string name="auditroom_grid_busy_image_key_description">auditroom_grid_busy_image_key_description</string>
 
     <string name="view_enter_password_hint_password">Пароль</string>
     <string name="view_enter_password_title">Введите пароль</string>
     <string name="view_enter_password_entered_incorrect">Неверный пароль!</string>
+
+    <string name="view_enter_auditroom_hint_room">Помещение</string>
+    <string name="view_enter_auditroom_title">Добавить</string>
 
     <string name="journal_card_during_lesson">Идёт занятие</string>
 
@@ -126,6 +130,8 @@
     <string name="snack_user_added">Пользователь добавлен!</string>
     <string name="snack_cancel">Отменить</string>
     <string name="snack_cancelled">Отменено</string>
+
+    <string name="view_auditroom_input_empty_error">Введите хотя бы один символ!</string>
 
 
 

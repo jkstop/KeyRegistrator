@@ -9,7 +9,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,35 +21,33 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_edit_auditrooms_grid;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
 import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
-import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
+import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
 
-import at.markushi.ui.CircleButton;
+public class Rooms_Fragment extends Fragment implements UpdateInterface, RecycleItemClickListener {
 
-public class Rooms_Fragment extends Fragment implements UpdateInterface {
 
-    private GridView mGridView;
-    private CircleButton mCircleButton;
-    //private ArrayList<SparseArray<String>> mItems;
     private ArrayList<RoomItem> mRoomItems;
-    private ArrayList<String> mRooms;
-    private adapter_edit_auditrooms_grid mAdaptereditauditroomsgrid;
     private Context mContext;
+    private adapter_main_auditrooms_grid mAdapter;
+    private FloatingActionButton mAddFAB;
 
+    private RecyclerView mRoomsGrid;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -60,6 +62,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface {
         setHasOptionsMenu(true);
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -68,37 +71,12 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
 
-        mGridView = (GridView)rootView.findViewById(R.id.grid_rooms);
-        mCircleButton = (CircleButton)rootView.findViewById(R.id.buttonAddRoom);
+        mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.auditroom_fragment_room_grid);
+        mRoomsGrid.setHasFixedSize(true);
 
-        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-        mRoomItems = dbRooms.readRoomsDB();
-        dbRooms.closeDB();
+        mAddFAB = (FloatingActionButton)rootView.findViewById(R.id.auditroom_fragment_fab);
 
-        mRooms = new ArrayList<>();
-        for (int i=0;i<mRoomItems.size();i++){
-            mRooms.add(mRoomItems.get(i).Auditroom);
-        }
-
-        int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
-
-        mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mRooms);
-        mGridView.setAdapter(mAdaptereditauditroomsgrid);
-        mGridView.setNumColumns(columns);
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Dialog_Fragment dialog = new Dialog_Fragment();
-                Bundle b = new Bundle();
-                b.putString("aud", mRooms.get(position));
-                b.putInt(Values.DIALOG_TYPE,Values.DELETE_ROOM_DIALOG);
-                dialog.setArguments(b);
-                dialog.setTargetFragment(Rooms_Fragment.this,0);
-                dialog.show(getFragmentManager(),"delete_room");
-            }
-        });
-
-        mCircleButton.setOnClickListener(new View.OnClickListener() {
+        mAddFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Dialog_Fragment dialog = new Dialog_Fragment();
@@ -109,6 +87,8 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface {
                 dialog.show(getFragmentManager(), "add_room");
             }
         });
+
+        initializeAuditroomsGrid();
         return rootView;
     }
 
@@ -116,6 +96,29 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_auditrooms, menu);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initializeAuditroomsGrid();
+    }
+
+    private void initializeAuditroomsGrid(){
+        int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
+        mRoomsGrid.setLayoutManager(new GridLayoutManager(mContext,columns));
+
+        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
+        mRoomItems = dbRooms.readRoomsDB();
+        dbRooms.closeDB();
+
+        for (int i=0;i<mRoomItems.size();i++){
+            mRoomItems.get(i).Status = Values.ROOM_IS_FREE;
+        }
+
+        mAdapter = new adapter_main_auditrooms_grid(mContext,mRoomItems,this);
+        mRoomsGrid.setAdapter(mAdapter);
+
     }
 
     @Override
@@ -152,24 +155,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface {
                 return super.onOptionsItemSelected(item);
         }
     }
-/*
-    @Override
-    public void onFinishEditing() {
-        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-        mRoomItems = dbRooms.readRoomsDB();
-        dbRooms.closeDB();
 
-        mRooms = new ArrayList<>();
-        for (int i=0;i<mRoomItems.size();i++){
-            mRooms.add(mRoomItems.get(i).Auditroom);
-        }
-
-        int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
-        mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mRooms);
-        mGridView.setAdapter(mAdaptereditauditroomsgrid);
-        mGridView.setNumColumns(columns);
-    }
-*/
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -182,42 +168,27 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface {
                     loader_intent.execute();
                 }
             }
-            //onFinishEditing();
-
         }
     }
-/*
-    @Override
-    public void onFinish() {
-        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-        mRoomItems = dbRooms.readRoomsDB();
-        dbRooms.closeDB();
-
-        mRooms = new ArrayList<>();
-        for (int i=0;i<mRoomItems.size();i++){
-            mRooms.add(mRoomItems.get(i).Auditroom);
-        }
-
-        int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
-        mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mRooms);
-        mGridView.setAdapter(mAdaptereditauditroomsgrid);
-        mGridView.setNumColumns(columns);
-    }*/
 
     @Override
     public void updateInformation() {
-        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-        mRoomItems = dbRooms.readRoomsDB();
-        dbRooms.closeDB();
+        initializeAuditroomsGrid();
+    }
 
-        mRooms = new ArrayList<>();
-        for (int i=0;i<mRoomItems.size();i++){
-            mRooms.add(mRoomItems.get(i).Auditroom);
-        }
+    @Override
+    public void onItemClick(View v, int position) {
+        Dialog_Fragment dialog = new Dialog_Fragment();
+        Bundle b = new Bundle();
+        b.putString("aud", mRoomItems.get(position).Auditroom);
+        b.putInt(Values.DIALOG_TYPE,Values.DELETE_ROOM_DIALOG);
+        dialog.setArguments(b);
+        dialog.setTargetFragment(Rooms_Fragment.this,0);
+        dialog.show(getFragmentManager(),"delete_room");
+    }
 
-        int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
-        mAdaptereditauditroomsgrid = new adapter_edit_auditrooms_grid(mContext, mRooms);
-        mGridView.setAdapter(mAdaptereditauditroomsgrid);
-        mGridView.setNumColumns(columns);
+    @Override
+    public void onItemLongClick(View v, int position, long timeIn) {
+
     }
 }

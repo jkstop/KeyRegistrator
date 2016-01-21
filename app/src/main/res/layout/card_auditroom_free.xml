@@ -25,12 +25,15 @@
         <RelativeLayout
             android:layout_toRightOf="@+id/card_auditroom_free_image_key"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/auditroom_card_divider">
 
-            <TextView
+            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                 android:id="@+id/card_auditroom_free_text_auditroom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:maxLines="1"
                 android:text="400"
                 android:textColor="@color/black"
                 android:textSize="@dimen/auditroom_card_text_size"
