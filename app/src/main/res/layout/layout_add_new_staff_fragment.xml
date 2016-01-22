@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/label_add_button"
-        style="@style/ButtonTransparent"
+        style="@style/ButtonMaterial"
         android:layout_margin="10dp" />
 
     <FrameLayout
@@ -42,14 +42,6 @@
             android:id="@+id/recycler_view_for_search_persons"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/layout_add_new_staff_add_button"
-            android:layout_gravity="end|bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:longClickable="false"
-            android:src="@drawable/ic_add_black_24dp" />
 
     </FrameLayout>
 

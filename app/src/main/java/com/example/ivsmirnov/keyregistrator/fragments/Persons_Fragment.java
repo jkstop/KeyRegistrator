@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -53,6 +54,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
     private Context mContext;
     private static RecyclerView mRecyclerView;
     private ListView mListView;
+    private FloatingActionButton mAddFAB;
 
     private static ArrayList<PersonItem> mAllItems;
     public adapter_persons_grid mAdapter;
@@ -223,6 +225,13 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
         mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
 
+        mAddFAB = (FloatingActionButton)rootView.findViewById(R.id.persons_fragment_fab);
+        mAddFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Search_Fragment.new_Instance(), getResources().getString(R.string.fragment_tag_search)).commit();
+            }
+        });
         DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
         mAllItems = dbFavorite.readTeachersFromDB();
         dbFavorite.closeDB();
@@ -234,7 +243,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
 
         for (int i=0;i<mAllItems.size();i++){
             String surname = mAllItems.get(i).Lastname;
-            String startChar = surname.substring(0,1);
+            String startChar = surname.substring(0,1).toUpperCase();
             if (!mListCharacters.contains(startChar)){
                 mListCharacters.add(startChar);
             }
@@ -363,9 +372,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                 dialog_fragment.setArguments(bundlePersons);
                 dialog_fragment.setTargetFragment(this, 0);
                 dialog_fragment.show(getFragmentManager(), "columns");
-                return true;
-            case R.id.menu_teachers_selector_add:
-                getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Search_Fragment.new_Instance(), getResources().getString(R.string.fragment_tag_search)).commit();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

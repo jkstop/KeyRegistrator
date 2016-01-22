@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
@@ -172,11 +173,11 @@ public class Dialog_Fragment extends DialogFragment{
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (values!=null){
-                            dbFavorite.deleteFromTeachersDB(values[0], values[1], values[2], values[3]);
+                            dbFavorite.deleteFromTeachersDB(new PersonItem(values[0],values[1],values[2],values[3],null,null,null,null));
                             dbFavorite.closeDB();
                         }
-                        UpdateTeachers updateTeachers = (UpdateTeachers)getTargetFragment();
-                        updateTeachers.onFinishEditing();
+                        UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
+                        updateInterface.updateInformation();
                     }
                 });
                 builderEdit.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {

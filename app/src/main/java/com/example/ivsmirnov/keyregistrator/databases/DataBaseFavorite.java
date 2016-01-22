@@ -7,18 +7,17 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
+import android.provider.ContactsContract;
 import android.util.Base64;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
 
-import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.ByteArrayOutputStream;
@@ -30,7 +29,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.util.ArrayList;
 
 /**
@@ -67,9 +65,9 @@ public class DataBaseFavorite {
                 cursor.moveToPosition(position);
                 items.put(0, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE)));
                 items.put(1,"none");
-                items.put(2,cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE)));
-                items.put(3,cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE)));
-                items.put(4,cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)));
+                items.put(2,cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)));
+                items.put(3,cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)));
+                items.put(4,cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)));
                 items.put(5, "none");
                 items.put(6, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_FAVORITE)));
                 items.put(7, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE)));
@@ -148,19 +146,6 @@ public class DataBaseFavorite {
         cursor.close();
     }
 
-    public String findPhotoPath(String[] items){
-        String path = "";
-        cursor.moveToPosition(-1);
-        while (cursor.moveToNext()){
-            if (items[0].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE)))&&
-                    items[1].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE)))&&
-                    items[2].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))&&
-                    items[3].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE)))){
-                path = cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_FAVORITE));
-            }
-        }
-        return path;
-    }
 
   /*  public void writeCardInBase(String surname, String name, String lastname, String kaf, String tag, String gender, String photo) {
         String photoPath = savePhotoToSD(photo,surname+"_"+name+"_"+lastname);
@@ -170,9 +155,9 @@ public class DataBaseFavorite {
 
     public void writeInDBTeachers(String surname, String name, String lastname, String kaf, String tag, String gender, String photo) {
         ContentValues cv = new ContentValues();
-        cv.put(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE, surname);
-        cv.put(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE, name);
-        cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,lastname);
+        cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, surname);
+        cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, name);
+        cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE,lastname);
         cv.put(DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE, kaf);
         cv.put(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE,tag);
         cv.put(DataBaseFavoriteRegist.COLUMN_GENDER_FAVORITE, gender);
@@ -185,9 +170,9 @@ public class DataBaseFavorite {
         String tag = "null";
         cursor.moveToPosition(-1);
         while (cursor.moveToNext()){
-            if (FIO[0].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE)))&&
-                    FIO[1].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE)))&&
-                    FIO[2].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))){
+            if (FIO[0].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))&&
+                    FIO[1].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))&&
+                    FIO[2].equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))){
                 tag = cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE));
             }
         }
@@ -209,9 +194,9 @@ public class DataBaseFavorite {
             byte[] bytes = byteArrayOutputStream.toByteArray();
             String encoded = Base64.encodeToString(bytes, Base64.NO_WRAP);
 
-            itemList.add(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE))+";"
-                    +cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE))+";"
-                    +cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE))+";"
+            itemList.add(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE))+";"
+                    +cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE))+";"
+                    +cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE))+";"
                     +cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE))+";"
                     +cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE))+";"
                     +cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_GENDER_FAVORITE))+";"
@@ -241,9 +226,9 @@ public class DataBaseFavorite {
         cursor.moveToPosition(-1);
         ArrayList <PersonItem> mPerson = new ArrayList<>();
         while (cursor.moveToNext()){
-            mPerson.add(new PersonItem(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)),
+            mPerson.add(new PersonItem(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)),
+                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)),
                     cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE)),
                     cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_GENDER_FAVORITE)),
                     cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_FAVORITE)),
@@ -254,37 +239,33 @@ public class DataBaseFavorite {
     }
 
 
-    public void deleteFromTeachersDB(String surname, String name,String lastname,String kaf){
-        cursor.moveToPosition(-1);
-        while (cursor.moveToNext()){
-            if (surname.equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE)))&&
-                    name.equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE)))&&
-                    lastname.equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))&&
-                    kaf.equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE)))){
-                int row = cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID));
-                sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER,DataBaseFavoriteRegist._ID + "=" + row,null);
-            }
+    public void deleteFromTeachersDB(PersonItem personItem){
+        String personPosition = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                + " WHERE " + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + " = '" + personItem.Lastname + "'"
+                + " AND " + DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE + " = '" + personItem.Firstname + "'"
+                + " AND " + DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE + " = '" + personItem.Midname + "'"
+                + " AND " + DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE + " = '" + personItem.Division + "'" ).simpleQueryForString();
+        if (!personPosition.isEmpty()){
+            sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + personPosition, null);
         }
     }
 
     public void clearTeachersDB(){
         sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, null, null);
-        Log.d("Clear Teachers DB", "OK");
     }
-
 
     public void updateTeachersDB(String [] source, String [] edited){
         cursor.moveToPosition(-1);
         while (cursor.moveToNext()){
-            if (source[0].equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE)))&&
-                    source[1].equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE)))&&
-                    source[2].equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))&&
+            if (source[0].equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))&&
+                    source[1].equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))&&
+                    source[2].equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))&&
                     source[3].equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE)))){
                 int row = cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID));
                 ContentValues cv = new ContentValues();
-                cv.put(DataBaseFavoriteRegist.COLUMN_SURNAME_FAVORITE,edited[0]);
-                cv.put(DataBaseFavoriteRegist.COLUMN_NAME_FAVORITE,edited[1]);
-                cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,edited[2]);
+                cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,edited[0]);
+                cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE,edited[1]);
+                cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE,edited[2]);
                 cv.put(DataBaseFavoriteRegist.COLUMN_KAF_FAVORITE,edited[3]);
                 sqLiteDatabase.update(DataBaseFavoriteRegist.TABLE_TEACHER, cv, DataBaseFavoriteRegist._ID + "=" + row, null);
             }

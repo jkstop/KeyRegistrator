@@ -76,6 +76,9 @@
     <dimen name="rooms_fragment_fab_margin">16dp</dimen>
     <dimen name="rooms_fragment_fab_elevation">5dp</dimen>
 
+    <dimen name="persons_fragment_fab_margin">16dp</dimen>
+    <dimen name="persons_fragment_fab_elevation">5dp</dimen>
+
     <dimen name="view_enter_auditroom_margin">16dp</dimen>
 
 </resources>

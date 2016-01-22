@@ -135,10 +135,7 @@ public class Loader_Image extends AsyncTask <Void, Void, Void> {
                         @Override
                         public void onClick(View v) {
                             DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(context);
-                            dataBaseFavorite.deleteFromTeachersDB(mPersonItem.Lastname,
-                                    mPersonItem.Firstname,
-                                    mPersonItem.Midname,
-                                    mPersonItem.Division);
+                            dataBaseFavorite.deleteFromTeachersDB(mPersonItem);
                             dataBaseFavorite.closeDB();
                             Snackbar.make(activity.getView(),R.string.snack_cancelled,Snackbar.LENGTH_LONG).show();
                         }
