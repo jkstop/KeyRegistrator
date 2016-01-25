@@ -19,17 +19,16 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
-import android.text.InputType;
+import android.support.v7.widget.CardView;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -42,7 +41,6 @@ import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
-import com.example.ivsmirnov.keyregistrator.interfaces.FinishLoad;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
@@ -124,8 +122,9 @@ public class Dialog_Fragment extends DialogFragment{
                                 dbFavorite.clearTeachersDB();
                                 dbFavorite.closeDB();
 
-                                UpdateTeachers updateTeachers = (UpdateTeachers)getTargetFragment();
-                                updateTeachers.onFinishEditing();
+                                UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
+                                updateInterface.updateInformation();
+
                                 Toast.makeText(context,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }
                         })
@@ -294,7 +293,7 @@ public class Dialog_Fragment extends DialogFragment{
                             Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                             dismiss();
                         }else{
-                            enterAuditroomLayout.setError(getResources().getString(R.string.view_auditroom_input_empty_error));
+                            enterAuditroomLayout.setError(getResources().getString(R.string.input_empty_error));
                         }
                     }
                 });
@@ -431,6 +430,26 @@ public class Dialog_Fragment extends DialogFragment{
                             }
                         })
                         .create();
+            case Values.DIALOG_RESIZE_ITEMS:
+                View rootView =  mInflater.inflate(R.layout.view_resize_main_fragment_items,null);
+                CardView cardView = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
+                cardView.getLayoutParams().height=200;
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle("Resize")
+                        .setView(rootView)
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .show();
             case Values.DIALOG_CLOSE_ROOM:
 
                 final TextInputLayout textInputLayout = (TextInputLayout) mInflater.inflate(R.layout.view_enter_password,null);

@@ -103,6 +103,7 @@ public class Values{
     public static final int DIALOG_CLOSE_ROOM_TYPE_PERSONS = 127;
     public static final int DIALOG_CLOSE_ROOM_TYPE_ROOMS = 128;
     public static final int DIALOG_DELETE_JOURNAL_ITEM = 129;
+    public static final int DIALOG_RESIZE_ITEMS = 130;
 
 
     public static final int ROOM_IS_BUSY = 0;

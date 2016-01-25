@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.view.Display;
 
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
@@ -38,11 +39,12 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
 
     @Override
     protected void onPreExecute() {
-        super.onPreExecute();
+
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mProgressDialog.setCancelable(false);
         mProgressDialog.setMessage("Запись...");
         mProgressDialog.show();
+        super.onPreExecute();
     }
 
     @Override
@@ -53,8 +55,6 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
                 dbJournal.backupJournalToXLS();
                 dbJournal.backupJournalToCSV();
                 dbJournal.closeDB();
-
-
 
                 mPathForCopy = mSharedPreferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,
                         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());

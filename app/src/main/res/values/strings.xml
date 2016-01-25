@@ -131,7 +131,7 @@
     <string name="snack_cancel">Отменить</string>
     <string name="snack_cancelled">Отменено</string>
 
-    <string name="view_auditroom_input_empty_error">Введите хотя бы один символ!</string>
+    <string name="input_empty_error">Введите хотя бы один символ!</string>
 
 
 

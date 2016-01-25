@@ -10,6 +10,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -49,6 +50,8 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
 
     private LinearLayout disclaimer;
     private FrameLayout frameForGrid;
+
+    private CardView mDisclaimerCard;
 
     adapter_main_auditrooms_grid mAuditroomGridAdapter;
 
@@ -91,10 +94,21 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
         }else{
             textEmptyAud.setVisibility(View.INVISIBLE);
         }
-        float disclaimer_size = preferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15);
-        disclaimer = (LinearLayout)rootView.findViewById(R.id.disclaimer);
-        disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
+
+        mDisclaimerCard = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
+
+        setDisclaimerWeight();
+        //disclaimer = (LinearLayout)rootView.findViewById(R.id.disclaimer);
+        //disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
         return rootView;
+    }
+
+    private void setDisclaimerWeight(){
+        //float disclaimer_size = preferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15);
+        //LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams();
+        //layoutParams.weight = disclaimer_size;
+        ((LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams()).weight = preferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15);
+
     }
 
     private void initializeAuditroomGrid(){
@@ -114,8 +128,10 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
         mRoomItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();
 
-        float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
-        frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
+        //float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
+        //frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
+
+        setDisclaimerWeight();
 
         initializeAuditroomGrid();
     }
@@ -138,7 +154,12 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
                 dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
                 return true;
             case R.id.test:
-
+                Dialog_Fragment dialog_resize = new Dialog_Fragment();
+                Bundle bundle_dialog_resize = new Bundle();
+                bundle_dialog_resize.putInt(Values.DIALOG_TYPE, Values.DIALOG_RESIZE_ITEMS);
+                dialog_resize.setArguments(bundle_dialog_resize);
+                dialog_resize.setTargetFragment(this,0);
+                dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -173,8 +194,11 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
         float disclaimer_size = preferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15);
         float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
 
-        disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
+       // disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
+        setDisclaimerWeight();
         frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
+
+        initializeAuditroomGrid();
     }
 
     @Override

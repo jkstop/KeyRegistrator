@@ -104,7 +104,7 @@ public class DataBaseRooms {
         ArrayList <String> itemList = new ArrayList<>();
         FileOutputStream fileOutputStream;
         String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        file = new File(mPath + "/Rooms.txt");
+        file = new File(mPath + "/Rooms.csv");
         cursor.moveToPosition(-1);
         while (cursor.moveToNext()){
             String room = cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM));

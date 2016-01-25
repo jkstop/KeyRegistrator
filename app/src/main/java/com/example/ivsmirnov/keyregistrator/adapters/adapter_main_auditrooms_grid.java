@@ -191,7 +191,7 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
         int recyclerHeight = Main_Fragment.mAuditroomGrid.getHeight();
         int recyclerChilds = mRoomItems.size();
         int recyclerRows = (int) Math.ceil((double) recyclerChilds / preferences.getInt(Values.COLUMNS_AUD_COUNT, 1));
-        return recyclerHeight/recyclerRows-dividersHeight;
+        return recyclerHeight/recyclerRows/*-dividersHeight*/;
     }
 /*
     @Override

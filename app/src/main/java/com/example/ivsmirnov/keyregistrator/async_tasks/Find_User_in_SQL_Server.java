@@ -1,15 +1,23 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
+import android.util.Base64;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.fragments.Search_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.Find_User_in_SQL_Server_Interface;
 
+import java.io.ByteArrayOutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,8 +28,10 @@ import java.util.ArrayList;
 public class Find_User_in_SQL_Server extends AsyncTask<ResultSet,Void,ArrayList<PersonItem>> {
 
     private Find_User_in_SQL_Server_Interface mListener;
+    private Context mContext;
 
-    public Find_User_in_SQL_Server (Find_User_in_SQL_Server_Interface listener){
+    public Find_User_in_SQL_Server (Context context, Find_User_in_SQL_Server_Interface listener){
+        this.mContext = context;
         mListener = listener;
     }
 
@@ -36,13 +46,18 @@ public class Find_User_in_SQL_Server extends AsyncTask<ResultSet,Void,ArrayList<
         ArrayList<PersonItem> mItems = new ArrayList<>();
         try {
             while (params[0].next()){
+                String photo = params[0].getString("PHOTO");
+
+                if (photo==null){
+                    photo = getBase64DefaultPhotoFromResources(mContext);
+                }
                 mItems.add(new PersonItem(params[0].getString("LASTNAME"),
                         params[0].getString("FIRSTNAME"),
                         params[0].getString("MIDNAME"),
                         params[0].getString("NAME_DIVISION"),
                         params[0].getString("SEX"),
-                        null,
-                        params[0].getString("PHOTO"),
+                        DataBaseFavorite.getPhotoPreview(photo),
+                        photo,
                         params[0].getString("RADIO_LABEL")));
             }
         } catch (SQLException e) {
@@ -56,5 +71,14 @@ public class Find_User_in_SQL_Server extends AsyncTask<ResultSet,Void,ArrayList<
         super.onPostExecute(personItems);
         mListener.changeProgressBar(View.INVISIBLE);
         mListener.updateGrid(personItems);
+    }
+
+    public static String getBase64DefaultPhotoFromResources(Context context){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_person_black_48dp, options);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(byteArray,Base64.NO_WRAP);
     }
 }

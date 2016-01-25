@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
+import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
@@ -81,12 +82,31 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                     while ((line = fin.readLine())!=null){
                         if (i<count){
                             if (!lines.contains(line)){
-                                String [] split = line.split(";");
-                                if (split.length==7){
-                                   // dbFavorite.writeCardInBase(split[0], split[1], split[2], split[3], split[4], split[5], split[6]);
+                                try {
+                                    String [] split = line.split(";");
+                                    String lastname = split[0];
+                                    String firstname = split[1];
+                                    String midname = split[2];
+                                    String division = split[3];
+                                    String sex = split[4];
+                                    String photoPreview = split[5];
+                                    String photoOriginal = split[6];
+                                    String radioLabel = split[7];
+                                    dbFavorite.writeInDBTeachers(new PersonItem(
+                                            lastname,
+                                            firstname,
+                                            midname,
+                                            division,
+                                            sex,
+                                            photoPreview,
+                                            photoOriginal,
+                                            radioLabel));
                                     publishProgress(i);
                                     i++;
+                                }catch (Exception e){
+                                    e.printStackTrace();
                                 }
+
                             }
                         }
                     }

@@ -92,10 +92,7 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
         holder.textDivision.setText(allItems.get(position).Division);
 
 
-        Bitmap bitmap;
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-
+        Bitmap bitmap = null;
         String photo = null;
 
         if (mType== Values.SHOW_FAVORITE_PERSONS){
@@ -105,22 +102,21 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
         }
 
         if (photo!=null){
-                byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
-                BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
-                options.inSampleSize = DataBaseFavorite.calculateInSampleSize(options, 120, 160);
-                options.inJustDecodeBounds = false;
-                bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
+            byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
+            bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
-        }else{
-            if(allItems.get(position).Sex.equals("Ж")){
-                bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.person_female_colored);
-            }else{
-                bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.person_male_colored);
-            }
-            options.inSampleSize = DataBaseFavorite.calculateInSampleSize(options, 120, 160);
-            options.inJustDecodeBounds = false;
-        }
-        holder.imageView.setImageBitmap(bitmap);
+            holder.imageView.setImageBitmap(bitmap);
+
+        }/*else{
+            //if(allItems.get(position).Sex.equals("Ж")){
+            //    bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.person_female_colored);
+            //}else{
+            //    bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.person_male_colored);
+            //}
+            //options.inSampleSize = DataBaseFavorite.calculateInSampleSize(options, 120, 160);
+            //options.inJustDecodeBounds = false;
+        }*/
+
 
     }
 
