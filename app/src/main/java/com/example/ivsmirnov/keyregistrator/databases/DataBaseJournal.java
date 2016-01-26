@@ -67,6 +67,7 @@ public class DataBaseJournal{
     }
 
     public long writeInDBJournal(JournalItem journalItem){
+
         ContentValues cv = new ContentValues();
         cv.put(DataBaseJournalRegist.COLUMN_AUD, journalItem.Auditroom);
         cv.put(DataBaseJournalRegist.COLUMN_TIME_IN, journalItem.TimeIn);
@@ -79,6 +80,13 @@ public class DataBaseJournal{
 
         return sqLiteDatabase.insert(DataBaseJournalRegist.TABLE_JOURNAL, null, cv);
     }
+
+    private static SQLiteDatabase initDB(Context context){
+        DataBaseJournalRegist dataBaseJournalRegist = new DataBaseJournalRegist(context);
+        return dataBaseJournalRegist.getWritableDatabase();
+    }
+
+
 
     public void writeInDBJournalHeaderDate(){
         ContentValues cv = new ContentValues();

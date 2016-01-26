@@ -1,20 +1,17 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.util.SparseArray;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,12 +29,12 @@ import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateMainFrame;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
 
-public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleItemClickListener{
+public class Main_Fragment extends Fragment implements UpdateInterface,RecycleItemClickListener{
 
 
     public static RecyclerView mAuditroomGrid;
@@ -66,6 +63,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
     }
 
     @Nullable
@@ -91,24 +89,18 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
         TextView textEmptyAud = (TextView)rootView.findViewById(R.id.text_empty_aud_list);
         if (mRoomItems.isEmpty()){
             textEmptyAud.setVisibility(View.VISIBLE);
-        }else{
-            textEmptyAud.setVisibility(View.INVISIBLE);
         }
 
         mDisclaimerCard = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
 
-        setDisclaimerWeight();
-        //disclaimer = (LinearLayout)rootView.findViewById(R.id.disclaimer);
-        //disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
+        setLayoutsWeight();
         return rootView;
     }
 
-    private void setDisclaimerWeight(){
-        //float disclaimer_size = preferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15);
-        //LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams();
-        //layoutParams.weight = disclaimer_size;
-        ((LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams()).weight = preferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15);
-
+    private void setLayoutsWeight(){
+        int weightCard = preferences.getInt(Values.DISCLAIMER_SIZE, 30);
+        ((LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams()).weight = weightCard;
+        ((LinearLayout.LayoutParams) frameForGrid.getLayoutParams()).weight = 100 - weightCard;
     }
 
     private void initializeAuditroomGrid(){
@@ -128,10 +120,7 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
         mRoomItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();
 
-        //float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
-        //frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
-
-        setDisclaimerWeight();
+        setLayoutsWeight();
 
         initializeAuditroomGrid();
     }
@@ -146,14 +135,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_main_items_size:
-                Dialog_Fragment dialog_grid_size = new Dialog_Fragment();
-                Bundle bundle_grid = new Bundle();
-                bundle_grid.putInt(Values.DIALOG_TYPE, Values.DIALOG_SEEKBARS);
-                dialog_grid_size.setArguments(bundle_grid);
-                dialog_grid_size.setTargetFragment(this, 0);
-                dialog_grid_size.show(getFragmentManager(), "seek_grid_size");
-                return true;
-            case R.id.test:
                 Dialog_Fragment dialog_resize = new Dialog_Fragment();
                 Bundle bundle_dialog_resize = new Bundle();
                 bundle_dialog_resize.putInt(Values.DIALOG_TYPE, Values.DIALOG_RESIZE_ITEMS);
@@ -161,8 +142,20 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
                 dialog_resize.setTargetFragment(this,0);
                 dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
+            case R.id.test:
+
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(getResources().getString(R.string.toolbar_title_main));
         }
     }
 /*
@@ -189,17 +182,6 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
         }
     }
 */
-    @Override
-    public void onFinish() {
-        float disclaimer_size = preferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15);
-        float grid_weight = preferences.getFloat(Values.GRID_SIZE, (float) 0.45);
-
-       // disclaimer.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, disclaimer_size));
-        setDisclaimerWeight();
-        frameForGrid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, grid_weight));
-
-        initializeAuditroomGrid();
-    }
 
     @Override
     public void onItemClick(View v, int position) {
@@ -249,5 +231,11 @@ public class Main_Fragment extends Fragment implements UpdateMainFrame,RecycleIt
             dialog_fragment.setArguments(bundle);
             dialog_fragment.show(getFragmentManager(),"enter_pin");
         }
+    }
+
+    @Override
+    public void updateInformation() {
+        setLayoutsWeight();
+        initializeAuditroomGrid();
     }
 }

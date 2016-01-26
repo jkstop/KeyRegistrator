@@ -1,6 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -9,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -63,6 +65,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
 
     @Nullable
     @Override
@@ -200,8 +203,9 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (((Launcher)getActivity()).getSupportActionBar() !=null){
-            ((Launcher)getActivity()).getSupportActionBar().setTitle(getResources().getString(R.string.title_add_new_staff));
+        ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(getResources().getString(R.string.title_add_new_staff));
         }
     }
 

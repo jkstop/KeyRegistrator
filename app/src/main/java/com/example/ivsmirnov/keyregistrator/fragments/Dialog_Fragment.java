@@ -20,13 +20,17 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -36,6 +40,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
 import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
@@ -48,6 +54,7 @@ import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 public class Dialog_Fragment extends DialogFragment{
 
@@ -58,6 +65,10 @@ public class Dialog_Fragment extends DialogFragment{
     private LayoutInflater mInflater;
     private Resources mResources;
     private boolean pin_verify;
+
+    public static FrameLayout mFrameGrid;
+
+    private int mProgress = 0;
 
     DialogInterface.OnDismissListener onDismissListener;
 
@@ -337,116 +348,77 @@ public class Dialog_Fragment extends DialogFragment{
                         })
                         .setView(pickerView)
                         .create();
-            case Values.DIALOG_SEEKBARS:
 
-                LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-                String[] seekItems = getResources().getStringArray(R.array.seek_items);
-                TableLayout tableLayout1 = new TableLayout(context);
-                for (int i = 0; i < seekItems.length; i++) {
-                    TableRow tableRow = new TableRow(context);
-                    View row = layoutInflater.inflate(R.layout.layout_dialog_items_size, null);
-                    TextView textR = (TextView) row.findViewById(R.id.text_seek_row);
-                    textR.setText(seekItems[i]);
-
-                    SeekBar seek = (SeekBar) row.findViewById(R.id.seek_seek_row);
-                    if (i == 0) {
-                        seek.setProgress((int) (sharedPreferences.getFloat(Values.GRID_SIZE, (float) 0.45) * 100));
-                        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                            float prog = 0;
-
-                            @Override
-                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                prog = (float) (progress / 100.0);
-                            }
-
-                            @Override
-                            public void onStartTrackingTouch(SeekBar seekBar) {
-                            }
-
-                            @Override
-                            public void onStopTrackingTouch(SeekBar seekBar) {
-                                editor.putFloat(Values.GRID_SIZE, prog);
-                                editor.commit();
-                            }
-                        });
-                    } else if (i == 1) {
-                        seek.setMax(50);
-                        seek.setProgress((int) (sharedPreferences.getFloat(Values.DISCLAIMER_SIZE, (float) 0.15) * 100));
-                        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                            float prog = 0;
-
-                            @Override
-                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                prog = (float) (progress / 100.0);
-                            }
-
-                            @Override
-                            public void onStartTrackingTouch(SeekBar seekBar) {
-                            }
-
-                            @Override
-                            public void onStopTrackingTouch(SeekBar seekBar) {
-                                editor.putFloat(Values.DISCLAIMER_SIZE, prog);
-                                editor.commit();
-                            }
-                        });
-                    } else if (i == 2) {
-                        seek.setMax(50);
-                        seek.setProgress((int) (sharedPreferences.getFloat(Values.JOURNAL_SIZE, (float) 0.3) * 100));
-                        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                            float prog = 0;
-
-                            @Override
-                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                prog = (float) (progress / 100.0);
-                            }
-
-                            @Override
-                            public void onStartTrackingTouch(SeekBar seekBar) {
-                            }
-
-                            @Override
-                            public void onStopTrackingTouch(SeekBar seekBar) {
-                                editor.putFloat(Values.JOURNAL_SIZE, prog);
-                                editor.commit();
-                            }
-                        });
-                    }
-                    tableRow.addView(row);
-                    tableLayout1.addView(tableRow);
-                }
-                tableLayout1.setColumnStretchable(0, true);
-
-                return new AlertDialog.Builder(getActivity())
-                        .setView(tableLayout1)
-                        .setTitle("Размер элементов")
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                UpdateMainFrame updateMainFrame = (UpdateMainFrame) getTargetFragment();
-                                updateMainFrame.onFinish();
-                                dialog.cancel();
-                            }
-                        })
-                        .create();
             case Values.DIALOG_RESIZE_ITEMS:
                 View rootView =  mInflater.inflate(R.layout.view_resize_main_fragment_items,null);
-                CardView cardView = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
-                cardView.getLayoutParams().height=200;
+                final CardView cardView = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
+                final SeekBar mResizeSeekBar = (SeekBar)rootView.findViewById(R.id.view_resize_vertical_seekbar);
+                mFrameGrid = (FrameLayout)rootView.findViewById(R.id.frame_for_grid_aud);
+
+                final LinearLayout.LayoutParams cardViewLayoutParams = (LinearLayout.LayoutParams)cardView.getLayoutParams();
+                final LinearLayout.LayoutParams frameGridParams = (LinearLayout.LayoutParams)mFrameGrid.getLayoutParams();
+
+                DataBaseRooms dbRooms = new DataBaseRooms(context);
+                ArrayList <RoomItem> mRoomsItems = dbRooms.readRoomsDB();
+                dbRooms.closeDB();
+
+                RecyclerView mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
+                mRoomsGrid.setClickable(false);
+                mRoomsGrid.setLayoutManager(new GridLayoutManager(context,sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT,1)));
+                final adapter_main_auditrooms_grid_resize mAdapter = new adapter_main_auditrooms_grid_resize(context, mRoomsItems);
+                mRoomsGrid.setAdapter(mAdapter);
+
+                int weightCard = sharedPreferences.getInt(Values.DISCLAIMER_SIZE, 30);
+                mResizeSeekBar.setMax(100);
+                mResizeSeekBar.setProgress(weightCard);
+                cardViewLayoutParams.weight = weightCard;
+                frameGridParams.weight = mResizeSeekBar.getMax() - weightCard;
+                mResizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                        cardViewLayoutParams.weight = progress;
+                        frameGridParams.weight = mResizeSeekBar.getMax() - progress;
+                        cardView.requestLayout();
+                        mFrameGrid.requestLayout();
+                        mAdapter.notifyDataSetChanged();
+
+                        mProgress = progress;
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
                 return new AlertDialog.Builder(getActivity())
-                        .setTitle("Resize")
+                        .setTitle(R.string.view_resize_title)
                         .setView(rootView)
                         .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
+                                dismiss();
                             }
                         })
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                if (mProgress==0){
+                                    editor.putInt(Values.DISCLAIMER_SIZE, mResizeSeekBar.getProgress());
+                                }else{
+                                    editor.putInt(Values.DISCLAIMER_SIZE, mProgress);
+                                }
+                                editor.apply();
 
+                                UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
+                                updateInterface.updateInformation();
+
+                                dismiss();
                             }
                         })
                         .show();
@@ -545,7 +517,6 @@ public class Dialog_Fragment extends DialogFragment{
                 return null;
         }
     }
-
 
     public static boolean setNumberPickerTextColor(NumberPicker numberPicker, int color)
     {

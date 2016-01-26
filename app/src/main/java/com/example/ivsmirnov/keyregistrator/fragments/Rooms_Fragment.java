@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
@@ -60,6 +62,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
     }
 
 
@@ -90,6 +93,15 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
 
         initializeAuditroomsGrid();
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(getResources().getString(R.string.toolbar_title_auditrooms));
+        }
     }
 
     @Override

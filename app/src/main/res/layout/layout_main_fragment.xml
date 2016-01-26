@@ -18,6 +18,7 @@
             android:text="Список пуст. Добавьте аудитории через настройки."
             android:id="@+id/text_empty_aud_list"
             android:gravity="center"
+            android:visibility="invisible"
             android:textColor="#ff000000"
             android:textStyle="italic"
             android:textSize="@dimen/text_empty_auditrooms" />
@@ -35,7 +36,7 @@
         android:id="@+id/layout_main_fragment_disclaimer_card"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0"
+        android:layout_weight="1"
         app:cardBackgroundColor="@color/colorAccent"
         app:cardElevation="10dp">
 

@@ -81,4 +81,6 @@
 
     <dimen name="view_enter_auditroom_margin">16dp</dimen>
 
+    <dimen name="view_resize_included_margin">16dp</dimen>
+
 </resources>

@@ -133,6 +133,8 @@
 
     <string name="input_empty_error">Введите хотя бы один символ!</string>
 
+    <string name="view_resize_title">Для изменения размера элементов перетащите ползунок справа</string>
+
 
 
 

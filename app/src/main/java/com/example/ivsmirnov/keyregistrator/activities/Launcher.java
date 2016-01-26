@@ -7,11 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -91,7 +93,13 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.launcher);
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+        Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
+
+        if (savedInstanceState==null){
+            showFragment(Main_Fragment.newInstance(),R.string.fragment_tag_main);
+            //toolbar.setTitle(getResources().getString(R.string.toolbar_title_main));
+        }
 
         mContext = this;
         mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -160,10 +168,9 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
             }
         });
 
-        getSupportFragmentManager().beginTransaction().add(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
-        toolbar.setTitle(getResources().getString(R.string.toolbar_title_main));
+
+
 
         setSupportActionBar(toolbar);
 
@@ -220,23 +227,6 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
                 mDrawerLayout.closeDrawer(mLayout_Drawer_root);
             }
         });
-        //mLinearLayout_Home = (LinearLayout)findViewById(R.id.navigation_drawer_layout_home);
-        //mLinearLayout_Settings = (LinearLayout)findViewById(R.id.navigation_drawer_layout_settings);
-        //mLinearLayout_Statistics = (LinearLayout)findViewById(R.id.navigation_drawer_layout_statistics);
-        //mLinearLayout_Journal = (LinearLayout)findViewById(R.id.navigation_drawer_layout_journal);
-        //mLinearLayout_Rooms = (LinearLayout)findViewById(R.id.navigation_drawer_layout_rooms);
-        //mLinearLayout_Email = (LinearLayout) findViewById(R.id.navigation_drawer_layout_email);
-        //mLinearLayout_Shedule = (LinearLayout) findViewById(R.id.navigation_drawer_layout_shedule);
-        //mLinearLayout_Sql = (LinearLayout)findViewById(R.id.navigation_drawer_layout_sql);
-
-        //mLinearLayout_Home.setOnClickListener(this);
-        //mLinearLayout_Settings.setOnClickListener(this);
-        //mLinearLayout_Statistics.setOnClickListener(this);
-        //mLinearLayout_Journal.setOnClickListener(this);
-        //mLinearLayout_Rooms.setOnClickListener(this);
-        //mLinearLayout_Email.setOnClickListener(this);
-        //mLinearLayout_Shedule.setOnClickListener(this);
-        //mLinearLayout_Sql.setOnClickListener(this);
 
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_opened, R.string.navigation_drawer_closed) {
@@ -273,6 +263,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
     private void showFragment(Fragment fragment, int fragmentTagId){
         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,fragment,getResources().getString(fragmentTagId)).commit();
     }
+
 
 
     private void powerReader (){
@@ -420,68 +411,6 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
             }
         }
     };
-/*
-    @Override
-    public void onClick(View v) {
-        Resources res = getResources();
-
-        if (v.getTag().equals(res.getString(R.string.nav_drawer_item_home))){
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main))
-                    .commit();
-        }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_persons))){
-            if (getSupportActionBar()!=null){
-                getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_persons));
-            }
-            Bundle bundle = new Bundle();
-            bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_EDITOR);
-            Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
-            persons_fragment.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
-        }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_statistics))){
-            startActivity(new Intent(mContext, CloseDay.class).putExtra("type", 1).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-        }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_journal))){
-            if (getSupportActionBar()!=null){
-                getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_journal));
-            }
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Journal_fragment.newInstance()).commit();
-        }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_rooms))){
-            if (getSupportActionBar()!=null){
-                getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_auditrooms));
-            }
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Rooms_Fragment.newInstance()).commit();
-        } else if (v.getTag().equals(getResources().getString(R.string.nav_drawer_item_email))) {
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_email));
-            }
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Email_Fragment.newInstance()).commit();
-        } else if (v.getTag().equals(getResources().getString(R.string.nav_drawer_item_shedule))) {
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(res.getString(R.string.nav_drawer_item_shedule));
-            }
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Shedule_Fragment.newInstance()).commit();
-        }else if(v.getTag().equals(res.getString(R.string.nav_drawer_item_sql))){
-            Dialog_Fragment dialog_sql = new Dialog_Fragment();
-            Bundle bundle_sql = new Bundle();
-            bundle_sql.putInt(Values.DIALOG_TYPE,Values.DIALOG_SQL_CONNECT);
-            dialog_sql.setArguments(bundle_sql);
-            dialog_sql.show(getSupportFragmentManager(),"sql");
-        }else if (v.getTag().equals(res.getString(R.string.nav_drawer_item_about))){
-            String version = "";
-            try {
-                PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(),0);
-                version = packageInfo.versionName;
-
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
-            Toast.makeText(mContext,version,Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(mContext,"CLick",Toast.LENGTH_SHORT).show();
-        }
-        mDrawerLayout.closeDrawer(mLayout_Drawer_root);
-    }
-*/
     //закрытие всех позиций в 22.01
     public void setAlarm(Calendar calendar){
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
@@ -524,6 +453,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
 
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -546,22 +476,4 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
         }
     }
 
-  /*  @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (symbol_pressed + 2000 > System.currentTimeMillis()){
-            super.onKeyDown(keyCode,event);
-        }else{
-            char key = (char)event.getUnicodeChar();
-            try{
-                if (getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_persons)).isVisible()){
-                    Persons_Fragment.move(String.valueOf(key));
-                }
-            }catch (Exception e){
-                Log.d("persons"," NOT visible");
-            }
-            symbol_pressed = System.currentTimeMillis();
-        }
-
-        return super.onKeyDown(keyCode, event);
-    }*/
 }

@@ -71,6 +71,10 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(getResources().getString(R.string.toolbar_title_journal));
+        }
         showDateSpinner();
     }
 

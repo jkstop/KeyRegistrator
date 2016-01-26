@@ -5,12 +5,12 @@
     android:padding="16dp">
 
     <FrameLayout
-        android:layout_margin="16dp"
         android:foreground="@color/black_alpha_50"
         android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@+id/view_resize_frame_seekbar"
+        android:layout_toLeftOf="@+id/view_resize_vertical_seekbar"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/view_resize_included_margin">
 
         <include
             layout="@layout/layout_main_fragment" />
@@ -18,16 +18,11 @@
     </FrameLayout>
 
 
-    <LinearLayout
-        android:id="@+id/view_resize_frame_seekbar"
+    <com.example.ivsmirnov.keyregistrator.custom_views.VerticalSeekBar
         android:layout_alignParentRight="true"
+        android:id="@+id/view_resize_vertical_seekbar"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent" />
 
-        <com.example.ivsmirnov.keyregistrator.custom_views.VerticalSeekBar
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
-
-    </LinearLayout>
 
 </RelativeLayout>

@@ -19,6 +19,7 @@ import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
+import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -202,30 +203,23 @@ public class Values{
 
     public static long writeInJournal(Context context, JournalItem journalItem){
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor preferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-
-        Calendar calendar = Calendar.getInstance();
-        //int today = calendar.get(Calendar.DATE);
-        //int lastDate = preferences.getInt(Values.DATE, 0);
-
         DataBaseJournal dbJournal = new DataBaseJournal(context);
-        //if (today == lastDate) {
-
-            //preferencesEditor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, dbJournal.cursor.getCount());
-        //} else {
-       //     dbJournal.writeInDBJournalHeaderDate();
-        //    dbJournal.writeInDBJournal(journalItem,personItem);
-           // dbJournal.writeInDBJournalHeaderDate();
-           // editor.putInt(Values.CURSOR_POSITION, dbJournal.cursor.getCount());
-           // editor.apply();
-           // dbJournal.writeInDBJournal(aud, name, time, (long) 0, false);
-           // editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, dbJournal.cursor.getCount() + 1);
-        //}
         Long journalItemID = dbJournal.writeInDBJournal(journalItem);
         dbJournal.closeDB();
 
         return journalItemID;
+    }
+
+    public static void writeRoom (Context context, JournalItem journalItem, PersonItem personItem, long positionInBase){
+        DataBaseRooms dataBaseRooms = new DataBaseRooms(context);
+        dataBaseRooms.updateRoom(new RoomItem(journalItem.Auditroom,
+                Values.ROOM_IS_BUSY,
+                journalItem.AccessType,
+                positionInBase,
+                Persons_Fragment.getPersonInitials(journalItem.PersonLastname,journalItem.PersonFirstname,journalItem.PersonMidname),
+                personItem.RadioLabel,
+                personItem.PhotoOriginal));
+        dataBaseRooms.closeDB();
     }
 
 }

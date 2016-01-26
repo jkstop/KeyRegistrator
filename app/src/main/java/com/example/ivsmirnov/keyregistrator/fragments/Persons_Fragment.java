@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -76,30 +78,23 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
 
         Bundle extras = getArguments();
         if (extras != null) {
             type = extras.getInt(Values.PERSONS_FRAGMENT_TYPE);
         }
 
-        if (type == Values.PERSONS_FRAGMENT_EDITOR) {
-            setHasOptionsMenu(true);
-        } else {
-            setHasOptionsMenu(false);
-
-        }
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (type == Values.PERSONS_FRAGMENT_SELECTOR) {
-            if (((Launcher) getActivity()).getSupportActionBar() != null) {
-                ((Launcher) getActivity()).getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_persons_select));
-            }
-            setHasOptionsMenu(true);
+        ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(getResources().getString(R.string.toolbar_title_persons));
         }
-
+        setHasOptionsMenu(true);
     }
 
     private void initializeRecyclerAdapter(){
@@ -169,11 +164,11 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
     private void takeKey(int accessType, int position){
         JournalItem journalItem  = createJournalItem(accessType,position);
         long positionInBase = Values.writeInJournal(mContext, journalItem);
-        writeRoom(journalItem, positionInBase, position);
+        Values.writeRoom(mContext,journalItem,mAllItems.get(position),positionInBase);
         showMainAuditroomsGrid();
     }
 
-    private String getPersonInitials (String lastname, String firstname, String midname){
+    public static String getPersonInitials (String lastname, String firstname, String midname){
         String initials = "-";
         if (lastname.length() != 0 && firstname.length() != 1 && midname.length() != 1) {
             initials = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";

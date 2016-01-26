@@ -15,6 +15,10 @@ import android.widget.Button;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
+import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
+import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 /**
@@ -45,10 +49,24 @@ public class Nfc_Fragment extends Fragment {
     View.OnClickListener clickDekanat = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            String aud = getArguments().getString(Values.AUDITROOM);
-            String path = "";
-            String tag = "";
-            //Persons_Fragment.writeIt(mContext,aud, ((Button) v).getText().toString(), System.currentTimeMillis(), path,tag,"hand");
+            JournalItem journalItem = new JournalItem(getArguments().getString(Values.AUDITROOM),
+                    System.currentTimeMillis(),
+                    null,
+                    Values.ACCESS_BY_CLICK,
+                    ((Button)v).getText().toString(),
+                    " ",
+                    " ",
+                    Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext));
+            PersonItem personItem = new PersonItem(((Button)v).getText().toString(),
+                    " ",
+                    " ",
+                    " ",
+                    "М",
+                    DataBaseFavorite.getPhotoPreview(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext)),
+                    Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext),
+                    " ");
+            long positionInBase = Values.writeInJournal(mContext, journalItem);
+            Values.writeRoom(mContext,journalItem,personItem,positionInBase);
             getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
         }
     };

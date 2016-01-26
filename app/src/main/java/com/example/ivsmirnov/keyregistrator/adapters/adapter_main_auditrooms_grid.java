@@ -161,7 +161,6 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
                 ((auditroomBusyViewHolder)holder).mBusyTextAuditroom.setText(mRoomItems.get(position).Auditroom);
                 ((auditroomBusyViewHolder)holder).mBusyTextPerson.setText(mRoomItems.get(position).LastVisiter);
 
-
                 RelativeLayout.LayoutParams imageKeyParams = (RelativeLayout.LayoutParams) ((auditroomBusyViewHolder)holder).mBusyImageKey.getLayoutParams();
                 imageKeyParams.width = imageKeyParams.height = (int)(getItemScaleHeight()/5.6);
 
