@@ -1,7 +1,11 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
@@ -9,6 +13,7 @@ import com.example.ivsmirnov.keyregistrator.custom_views.AccountItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
+import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -21,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -39,11 +45,13 @@ public class Get_Account_Information extends AsyncTask<Void,AccountItem,AccountI
     private Context mContext;
     private String mAccountName;
     private Get_Account_Information_Interface mListener;
+    private SharedPreferences.Editor mSharedPreferencesEditor;
 
     public Get_Account_Information (Context context, String accountName, Get_Account_Information_Interface get_account_information_interface){
         this.mContext = context;
         this.mAccountName = accountName;
         this.mListener = get_account_information_interface;
+        mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
     }
 
     @Override
@@ -93,12 +101,14 @@ public class Get_Account_Information extends AsyncTask<Void,AccountItem,AccountI
         if (accountItem!=null){
             DataBaseAccount dbAccount = new DataBaseAccount(mContext);
             dbAccount.writeAccount(accountItem);
-            Log.d("lastname",accountItem.Lastname);
-            Log.d("firstname",accountItem.Firstname);
-            Log.d("email",accountItem.Email);
-            Log.d("photo",accountItem.Photo);
-            Log.d("id",accountItem.AccountID);
+            dbAccount.closeDB();
+
+            mSharedPreferencesEditor.putString(Values.ACTIVE_ACCOUNT_ID, accountItem.AccountID);
+            mSharedPreferencesEditor.apply();
+            mListener.onChangeAccount();
         }
     }
+
+
 
 }

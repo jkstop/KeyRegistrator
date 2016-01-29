@@ -1,5 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.activities;
 
+import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -7,15 +9,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,27 +24,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Gravity;
-import android.view.InputDevice;
-import android.view.KeyEvent;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_navigation_drawer_list;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Open_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
+import com.example.ivsmirnov.keyregistrator.custom_views.AccountItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.NavigationItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
@@ -55,14 +59,20 @@ import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
+import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.AccountPicker;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class Launcher extends AppCompatActivity implements GetUserByTag{
+public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Account_Information_Interface{
 
     private final static String G_PLUS_SCOPE =
             "oauth2:https://www.googleapis.com/auth/plus.me";
@@ -75,8 +85,11 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
     private DrawerLayout mDrawerLayout;
     private LinearLayout mLayout_Drawer_root;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
+    private RelativeLayout mDrawerAccountView;
     private ListView mNavigationDrawerList;
     private adapter_navigation_drawer_list mNavigationDrawerListAdapter;
+    private TextView mAccountName, mAccountEmail;
+    private ImageView mChangeAccount, mPersonAccountImage;
     private LinearLayout mLinearLayout_Home, mLinearLayout_Settings, mLinearLayout_Statistics, mLinearLayout_Journal,mLinearLayout_Rooms, mLinearLayout_Email, mLinearLayout_Shedule,mLinearLayout_Sql;
 
     private Context mContext;
@@ -102,7 +115,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.launcher);
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
+
 
         if (savedInstanceState==null){
             showFragment(Main_Fragment.newInstance(),R.string.fragment_tag_main);
@@ -115,6 +128,8 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
         mResources = getResources();
 
         SQL_Connector.check_sql_connection(mContext,null,null,null);
+
+        initNavigationDrawer();
 
         //init reader
         mManager = (UsbManager)getSystemService(Context.USB_SERVICE);
@@ -176,14 +191,28 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
             }
         });
 
+    }
 
-
-
-
+    // Navigation Drawer initialization; Toolbar initialization
+    private void initNavigationDrawer(){
+        Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
-
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
         mLayout_Drawer_root = (LinearLayout)findViewById(R.id.main_activity_navigation_drawer_rootLayout);
         mNavigationDrawerList = (ListView)findViewById(R.id.left_navigation_drawer_list);
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        mDrawerAccountView = (RelativeLayout)findViewById(R.id.navigation_drawer_account_view);
+        mAccountName = (TextView)findViewById(R.id.navigation_drawer_account_information_display_name);
+        mAccountEmail = (TextView)findViewById(R.id.navigation_drawer_account_information_email);
+        mChangeAccount = (ImageView)findViewById(R.id.navigation_drawer_account_information_change_account);
+        mPersonAccountImage = (ImageView)findViewById(R.id.navigation_drawer_account_information_image_person);
+
+        mLayout_Drawer_root.getLayoutParams().width = (int) calculateDrawerWidth();
+        mDrawerAccountView.getLayoutParams().height = (int) calculateDrawerHeight(mLayout_Drawer_root.getLayoutParams().width);
 
         ArrayList<NavigationItem> mNavigationItems = new ArrayList<>();
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_home)).setIcon(R.drawable.ic_home_black_24dp));
@@ -195,6 +224,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_mail)).setIcon(R.drawable.ic_attachment_black_24dp));
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_sql)).setIcon(R.drawable.ic_backup_black_24dp));
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_stat)).setIcon(R.drawable.ic_info_outline_black_24dp));
+
         mNavigationDrawerListAdapter = new adapter_navigation_drawer_list(mContext,mNavigationItems);
         mNavigationDrawerList.setAdapter(mNavigationDrawerListAdapter);
         mNavigationDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -236,7 +266,6 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
             }
         });
 
-        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_opened, R.string.navigation_drawer_closed) {
             @Override
             public void onDrawerOpened(View drawerView) {
@@ -249,13 +278,93 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
         };
 
         mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
-
-       if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
-        }
         mActionBarDrawerToggle.syncState();
+
+        mChangeAccount.setOnClickListener(changeAccountClick);
+
+        getUserActiveAccount();
+    }
+
+    View.OnClickListener changeAccountClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"},
+                    false, null, null, null, null);
+            startActivityForResult(intent, 123);
+        }
+    };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 123){
+            if (resultCode == Activity.RESULT_OK){
+                try {
+                    Get_Account_Information get_account_information = new Get_Account_Information(mContext,data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME),this);
+                    get_account_information.execute();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void getUserActiveAccount(){
+
+        DataBaseAccount dbAccount = new DataBaseAccount(mContext);
+        AccountItem mAccount = dbAccount.getAccount(mPreferences.getString(Values.ACTIVE_ACCOUNT_ID," "));
+        dbAccount.closeDB();
+
+        if (mAccount!=null){
+            String text = mAccount.Lastname+ " "+mAccount.Firstname;
+            mAccountName.setText(text);
+            mAccountEmail.setText(mAccount.Email);
+            new loadImageFromWeb(mAccount.Photo).execute();
+        }
+    }
+
+
+
+    private class loadImageFromWeb extends AsyncTask<Void,Drawable,Drawable>{
+
+        private String mUrl;
+
+        private loadImageFromWeb(String url){
+            this.mUrl = url;
+        }
+
+        @Override
+        protected Drawable doInBackground(Void... params) {
+            try{
+                InputStream inputStream = (InputStream)new URL(mUrl).getContent();
+                return Drawable.createFromStream(inputStream,"photo");
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Drawable drawable) {
+            if (drawable!=null){
+                mPersonAccountImage.setImageDrawable(drawable);
+            }
+        }
+    }
+
+
+    private float calculateDrawerWidth(){
+        int viewMin = Math.min(getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(R.attr.actionBarSize,typedValue,true);
+        int actionBarSize = TypedValue.complexToDimensionPixelSize(typedValue.data,getResources().getDisplayMetrics());
+        int widht = viewMin - actionBarSize;
+        return Math.min(widht,getResources().getDimension(R.dimen.navigation_drawer_widht));
+    }
+
+    private float calculateDrawerHeight(int widht){
+        int acpestRatioHeight = Math.round(widht/ 16*9);
+        int minHeiht = 16;
+        return Math.max(acpestRatioHeight,minHeiht);
     }
 
     private String getStringFromResources(int resId){
@@ -271,7 +380,6 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
     private void showFragment(Fragment fragment, int fragmentTagId){
         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,fragment,getResources().getString(fragmentTagId)).commit();
     }
-
 
 
     private void powerReader (){
@@ -345,6 +453,16 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
             }
         }
     }
+
+    @Override
+    public void onUserRecoverableAuthException(UserRecoverableAuthException e) {
+    }
+
+    @Override
+    public void onChangeAccount() {
+        initNavigationDrawer();
+    }
+
 
     public static class PowerParams {
         public int slotNum;
@@ -460,7 +578,6 @@ public class Launcher extends AppCompatActivity implements GetUserByTag{
         }
 
     }
-
 
     @Override
     protected void onDestroy() {

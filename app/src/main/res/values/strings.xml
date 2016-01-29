@@ -112,6 +112,8 @@
     <string name="auditroom_grid_free_image_descryption">auditroom_grid_free_image_descryption</string>
     <string name="auditroom_grid_busy_image_person_description">auditroom_grid_busy_image_description</string>
     <string name="auditroom_grid_busy_image_key_description">auditroom_grid_busy_image_key_description</string>
+    <string name="navigation_drawer_change_account_image_descritpion">navigation_drawer_change_account_image_descritpion</string>
+    <string name="navigation_drawer_person_image_descritpion">navigation_drawer_person_image_descritpion</string>
 
     <string name="view_enter_password_hint_password">Пароль</string>
     <string name="view_enter_password_title">Введите пароль</string>

@@ -4,6 +4,7 @@ package com.example.ivsmirnov.keyregistrator.others;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -28,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -105,7 +107,7 @@ public class Values{
     public static final int DIALOG_CLOSE_ROOM_TYPE_ROOMS = 128;
     public static final int DIALOG_DELETE_JOURNAL_ITEM = 129;
     public static final int DIALOG_RESIZE_ITEMS = 130;
-
+    public static final String ACTIVE_ACCOUNT_ID = "active_account_id";
 
     public static final int ROOM_IS_BUSY = 0;
     public static final int ROOM_IS_FREE = 1;
@@ -221,5 +223,4 @@ public class Values{
                 personItem.PhotoOriginal));
         dataBaseRooms.closeDB();
     }
-
 }

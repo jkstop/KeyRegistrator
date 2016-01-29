@@ -332,13 +332,14 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         initializeAuditroomGrid();
     }
 
-    @Override
-    public void onServerRequest(AccountItem accountItem) {
-
-    }
 
     @Override
     public void onUserRecoverableAuthException(UserRecoverableAuthException e) {
         startActivityForResult(e.getIntent(),123);
+    }
+
+    @Override
+    public void onChangeAccount() {
+
     }
 }
