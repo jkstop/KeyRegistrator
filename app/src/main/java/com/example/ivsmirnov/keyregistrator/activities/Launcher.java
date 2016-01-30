@@ -62,6 +62,7 @@ import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -75,14 +76,6 @@ import java.util.Calendar;
 
 public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Account_Information_Interface{
 
-    private final static String G_PLUS_SCOPE =
-            "oauth2:https://www.googleapis.com/auth/plus.me";
-    private final static String USERINFO_SCOPE =
-            "https://www.googleapis.com/auth/userinfo.profile";
-    private final static String EMAIL_SCOPE =
-            "https://www.googleapis.com/auth/userinfo.email";
-    private final static String SCOPES = G_PLUS_SCOPE + " " + USERINFO_SCOPE + " " + EMAIL_SCOPE;
-
     private DrawerLayout mDrawerLayout;
     private LinearLayout mLayout_Drawer_root;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
@@ -91,12 +84,10 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
     private adapter_navigation_drawer_list mNavigationDrawerListAdapter;
     private TextView mAccountName, mAccountEmail;
     private ImageView mChangeAccount, mPersonAccountImage;
-    private LinearLayout mLinearLayout_Home, mLinearLayout_Settings, mLinearLayout_Statistics, mLinearLayout_Journal,mLinearLayout_Rooms, mLinearLayout_Email, mLinearLayout_Shedule,mLinearLayout_Sql;
 
     private Context mContext;
-    private SharedPreferences mPreferences;
-    private SharedPreferences.Editor mPreferencesEditor;
     private Resources mResources;
+    private Settings mSettings;
 
     private static long back_pressed;
     private static long symbol_pressed;
@@ -124,9 +115,8 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
         }
 
         mContext = this;
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
         mResources = getResources();
+        mSettings = new Settings(mContext);
 
         SQL_Connector.check_sql_connection(mContext,null,null,null);
 
@@ -296,7 +286,6 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
             }catch (ActivityNotFoundException e){
                 Toast.makeText(mContext,"Сервисы Google Play не установлены!", Toast.LENGTH_SHORT).show();
             }
-
         }
     };
 
@@ -317,7 +306,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
     private void getUserActiveAccount(){
 
         DataBaseAccount dbAccount = new DataBaseAccount(mContext);
-        AccountItem mAccount = dbAccount.getAccount(mPreferences.getString(Values.ACTIVE_ACCOUNT_ID," "));
+        AccountItem mAccount = dbAccount.getAccount(mSettings.getActiveAccountID());
         dbAccount.closeDB();
 
         if (mAccount!=null){
@@ -555,8 +544,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
             alarmManager.setExact(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent);
         }
 
-        mPreferencesEditor.putBoolean(Values.ALARM_SET, true);
-        mPreferencesEditor.commit();
+        mSettings.setAutoCloseStatus(true);
         Log.d("alarmSet", "ok");
     }
 
@@ -577,9 +565,8 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
     @Override
     protected void onResume() {
         super.onResume();
-        Boolean isAlarmSet = mPreferences.getBoolean(Values.ALARM_SET,false);
-        Log.d("alarm", String.valueOf(isAlarmSet));
-        if (!isAlarmSet){
+
+        if (!mSettings.getAutoCloseStatus()){
             setAlarm(closingTime());
         }
 
@@ -588,8 +575,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mPreferencesEditor.remove(Values.ALARM_SET);
-        mPreferencesEditor.commit();
+        mSettings.cleanAutoCloseStatus();
         mReader.close();
         unregisterReceiver(mReceiver);
     }
