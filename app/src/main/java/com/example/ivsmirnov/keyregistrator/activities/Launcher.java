@@ -4,6 +4,7 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -288,9 +289,14 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
     View.OnClickListener changeAccountClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"},
-                    false, null, null, null, null);
-            startActivityForResult(intent, 123);
+            try{
+                Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"},
+                        false, null, null, null, null);
+                startActivityForResult(intent, 123);
+            }catch (ActivityNotFoundException e){
+                Toast.makeText(mContext,"Сервисы Google Play не установлены!", Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
 

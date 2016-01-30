@@ -23,6 +23,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
@@ -56,6 +57,8 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     private ProgressBar mProgressBar;
     private RecyclerView mPersonsRecycler;
     private Button mAddButton;
+
+    private boolean isServerConnected;
 
     public static Search_Fragment new_Instance(){
         return new Search_Fragment();
@@ -102,11 +105,10 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                     + "database=" + db +";user=" + user + ";password="
                     + password + ";";
             conn = DriverManager.getConnection(ConnURL);
-
-        } catch (ClassNotFoundException e) {
+            isServerConnected = true;
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            isServerConnected = false;
         }
 
 
@@ -123,15 +125,19 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length()>=3){
-                    try {
+                    if (isServerConnected){
+                        try {
 
-                        Statement statement = conn.createStatement();
-                        ResultSet resultSet = statement.executeQuery("select * from STAFF where [LASTNAME] like '"+s+"%'");
-                        Find_User_in_SQL_Server find_user_in_sql_server = new Find_User_in_SQL_Server(mContext, mListener);
-                        find_user_in_sql_server.execute(resultSet);
+                            Statement statement = conn.createStatement();
+                            ResultSet resultSet = statement.executeQuery("select * from STAFF where [LASTNAME] like '"+s+"%'");
+                            Find_User_in_SQL_Server find_user_in_sql_server = new Find_User_in_SQL_Server(mContext, mListener);
+                            find_user_in_sql_server.execute(resultSet);
 
-                    } catch (SQLException e) {
-                        e.printStackTrace();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
                     }
                 }
             }
