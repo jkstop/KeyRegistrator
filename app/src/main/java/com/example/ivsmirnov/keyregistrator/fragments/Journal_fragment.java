@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +36,7 @@ import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
@@ -55,8 +56,10 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     private adapter_journal_list mAdapterjournallist;
     private ArrayList <JournalItem> mJournalItems;
 
-    private SharedPreferences mSharedPreferences;
-    private SharedPreferences.Editor mSharedPreferencesEditor;
+    private Settings mSettings;
+
+    //private SharedPreferences mSharedPreferences;
+   // private SharedPreferences.Editor mSharedPreferencesEditor;
 
     public static Journal_fragment newInstance() {
         return new Journal_fragment();
@@ -122,9 +125,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_journal_fragment,container,false);
         mContext = rootView.getContext();
-
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        mSettings = new Settings(mContext);
 
         mJournalRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_journal);
         mDates = calculateDates(mContext);
@@ -171,8 +172,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
                 Intent iLC = new Intent(Intent.ACTION_GET_CONTENT);
                 iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
                 iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-                iLC.putExtra(FilePickerActivity.EXTRA_START_PATH,
-                        mSharedPreferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL, Environment.getExternalStorageDirectory().getPath()));
+                iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, mSettings.getJournalBackupLocation());
                 startActivityForResult(iLC,Values.SELECT_LOCATION_JOURNAL);
                 return true;
             default:
@@ -182,7 +182,8 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        //super.onActivityResult(requestCode, resultCode, data);
+        Log.d("result",String.valueOf(requestCode));//not work!!!!!!!!!!!!!!!!!!!!!!!!!
         if (data!=null){
             if (requestCode==Values.LOAD_JOURNAL){
                 if (resultCode== Activity.RESULT_OK){
@@ -193,10 +194,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
                 }
             }else if (requestCode == Values.SELECT_LOCATION_JOURNAL){
                 if (resultCode==Activity.RESULT_OK){
-                    Uri uri = data.getData();
-                    String path = uri.getPath();
-                    mSharedPreferencesEditor.putString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,path);
-                    mSharedPreferencesEditor.apply();
+                    mSettings.setJournalBackupLocation(data.getData().getPath());
                 }
             }
             //updateInformation();

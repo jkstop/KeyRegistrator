@@ -48,6 +48,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
 import com.example.ivsmirnov.keyregistrator.custom_views.AccountItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.NavigationItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
+import com.example.ivsmirnov.keyregistrator.custom_views.ServerConnectionItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
@@ -118,7 +119,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
         mResources = getResources();
         mSettings = new Settings(mContext);
 
-        SQL_Connector.check_sql_connection(mContext,null,null,null);
+        SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
 
         initNavigationDrawer();
 

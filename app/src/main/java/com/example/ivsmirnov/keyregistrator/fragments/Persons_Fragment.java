@@ -43,6 +43,7 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
@@ -64,8 +65,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
 
     private ArrayList<String> mListCharacters;
 
-    private SharedPreferences mPreferences;
-    private SharedPreferences.Editor mPreferencesEditor;
+    private Settings mSettings;
 
     private int type;
 
@@ -217,8 +217,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
         View rootView = inflater.inflate(R.layout.layout_persons_fragment, container, false);
         mContext = rootView.getContext();
 
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        mSettings = new Settings(mContext);
 
         mAddFAB = (FloatingActionButton)rootView.findViewById(R.id.persons_fragment_fab);
         mAddFAB.setOnClickListener(new View.OnClickListener() {
@@ -355,8 +354,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                 Intent iLC = new Intent(Intent.ACTION_GET_CONTENT);
                 iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
                 iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-                iLC.putExtra(FilePickerActivity.EXTRA_START_PATH,
-                        mPreferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS, Environment.getExternalStorageDirectory().getPath()));
+                iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, mSettings.getPersonsBackupLocation());
                 startActivityForResult(iLC,Values.SELECT_LOCATION_TEACHERS);
                 return true;
             case R.id.menu_teachers_set_columns_number:
@@ -376,6 +374,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d("result",String.valueOf(resultCode));
         if (data!=null){
             if (requestCode==Values.LOAD_TEACHERS){
                 if (resultCode== Activity.RESULT_OK){
@@ -386,10 +385,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                 }
             }else if (requestCode == Values.SELECT_LOCATION_TEACHERS){
                 if (resultCode == Activity.RESULT_OK){
-                    Uri uri = data.getData();
-                    String path = uri.getPath();
-                    mPreferencesEditor.putString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS,path);
-                    mPreferencesEditor.apply();
+                    mSettings.setPersonsBackupLocation(data.getData().getPath());
                 }
             }
            // onFinishEditing();

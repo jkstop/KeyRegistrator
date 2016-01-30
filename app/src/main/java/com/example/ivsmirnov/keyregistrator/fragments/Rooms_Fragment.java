@@ -3,29 +3,21 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.GridView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
@@ -36,6 +28,7 @@ import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
@@ -51,8 +44,10 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
 
     private RecyclerView mRoomsGrid;
 
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
+    private Settings mSettings;
+
+    //private SharedPreferences sharedPreferences;
+    //private SharedPreferences.Editor editor;
 
     public static Rooms_Fragment newInstance(){
         return new Rooms_Fragment();
@@ -71,8 +66,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_auditrooms_fragment,container,false);
         mContext = rootView.getContext();
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        mSettings = new Settings(mContext);
 
         mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.auditroom_fragment_room_grid);
         mRoomsGrid.setHasFixedSize(true);
@@ -117,8 +111,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
     }
 
     private void initializeAuditroomsGrid(){
-        int columns = sharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
-        mRoomsGrid.setLayoutManager(new GridLayoutManager(mContext,columns));
+        mRoomsGrid.setLayoutManager(new GridLayoutManager(mContext, mSettings.getAuditroomColumnsCount()));
 
         DataBaseRooms dbRooms = new DataBaseRooms(mContext);
         mRoomItems = dbRooms.readRoomsDB();

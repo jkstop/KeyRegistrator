@@ -4,18 +4,14 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,21 +23,18 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.HttpClientStack;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
-import com.example.ivsmirnov.keyregistrator.custom_views.AccountItem;
 import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.AccountPicker;
 
@@ -53,7 +46,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -63,9 +55,8 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
 
     public static RecyclerView mAuditroomGrid;
 
-    private SharedPreferences.Editor preferencesEditor;
-    private SharedPreferences preferences;
     private Context mContext;
+    private Settings mSettings;
 
     private ArrayList<RoomItem> mRoomItems;
 
@@ -102,8 +93,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
 
         frameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
 
-        preferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-        preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mSettings = new Settings(mContext);
 
         mAuditroomGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
         mAuditroomGrid.setHasFixedSize(true);
@@ -122,17 +112,15 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     }
 
     private void setLayoutsWeight(){
-        int weightCard = preferences.getInt(Values.DISCLAIMER_SIZE, 30);
+        int weightCard = mSettings.getDisclaimerWeight();
         ((LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams()).weight = weightCard;
         ((LinearLayout.LayoutParams) frameForGrid.getLayoutParams()).weight = 100 - weightCard;
     }
 
     private void initializeAuditroomGrid(){
-        final int columns = preferences.getInt(Values.COLUMNS_AUD_COUNT, 1);
-
         mAuditroomGridAdapter = new adapter_main_auditrooms_grid(mContext,mRoomItems,this);
         mAuditroomGrid.setAdapter(mAuditroomGridAdapter);
-        mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext,columns));
+        mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext,mSettings.getAuditroomColumnsCount()));
     }
 
 
