@@ -489,7 +489,7 @@ public class Dialog_Fragment extends DialogFragment{
                                 .setServerName(inputServer.getText().toString())
                                 .setUserName(inputUser.getText().toString())
                                 .setUserPassword(inputPassowrd.getText().toString());
-                        if (SQL_Connector.check_sql_connection(mContext, serverConnectionItem)){
+                        if (SQL_Connector.check_sql_connection(mContext, serverConnectionItem)!=null){
                             connectionStatus.setText(R.string.connected);
                             connectionStatus.setTextColor(Color.GREEN);
                             mSettings.setServerConnectionParams(serverConnectionItem);

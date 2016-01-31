@@ -16,7 +16,7 @@ import java.sql.SQLException;
  */
 public abstract class SQL_Connector implements Connection {
 
-    public static boolean check_sql_connection(Context context, ServerConnectionItem serverConnectionItem){
+    public static Connection check_sql_connection(Context context, ServerConnectionItem serverConnectionItem){
         String classs = "net.sourceforge.jtds.jdbc.Driver";
         String db = "KeyRegistratorBase";
 
@@ -31,11 +31,11 @@ public abstract class SQL_Connector implements Connection {
                     + serverConnectionItem.getUserPassword() + ";";
             Connection conn = DriverManager.getConnection(ConnURL);
             new Settings(context).setServerStatus(true);
-            return true;
+            return conn;
         }catch (Exception e) {
             e.printStackTrace();
             new Settings(context).setServerStatus(false);
-            return false;
+            return null;
         }
     }
 }

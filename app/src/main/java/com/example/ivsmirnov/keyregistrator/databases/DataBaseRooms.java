@@ -33,16 +33,11 @@ public class DataBaseRooms {
     private SQLiteDatabase sqLiteDatabase;
     private Cursor cursor;
 
-    private SharedPreferences mSharedPreferences;
-    private SharedPreferences.Editor mSharedPreferencesEditor;
-
     public DataBaseRooms(Context context){
         this.mContext = context;
         dataBaseRoomsRegist = new DataBaseRoomsRegist(mContext);
         sqLiteDatabase = dataBaseRoomsRegist.getWritableDatabase();
         cursor = sqLiteDatabase.query(DataBaseRoomsRegist.TABLE_ROOMS, null, null, null, null, null, null);
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
     }
 
     public void writeInRoomsDB (RoomItem roomItem) {

@@ -52,8 +52,6 @@ public class DataBaseJournal{
     public DataBaseJournalRegist dataBaseJournalRegist;
     public SQLiteDatabase sqLiteDatabase;
     public Cursor cursor;
-    private SharedPreferences mSharedPreferences;
-    private SharedPreferences.Editor mSharedPreferencesEditor;
 
     public DataBaseJournal(Context context){
         this.mContext = context;
@@ -62,8 +60,6 @@ public class DataBaseJournal{
         sqLiteDatabase = dataBaseJournalRegist.getWritableDatabase();
         cursor = sqLiteDatabase.query(DataBaseJournalRegist.TABLE_JOURNAL, null, null, null, null, null, null);
 
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
     }
 
     public long writeInDBJournal(JournalItem journalItem){

@@ -15,6 +15,8 @@ import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.ByteArrayOutputStream;
@@ -38,19 +40,19 @@ public class DataBaseFavorite {
     public Cursor cursor;
 
     private Context mContext;
-    private SharedPreferences.Editor mEditor;
-    private SharedPreferences mSharedPreferences;
+    private Settings mSettings;
+   // private SharedPreferences.Editor mEditor;
+   // private SharedPreferences mSharedPreferences;
 
     public DataBaseFavorite(Context context){
         this.mContext = context;
         dataBaseFavoriteRegist = new DataBaseFavoriteRegist(mContext);
         sqLiteDatabase = dataBaseFavoriteRegist.getWritableDatabase();
         cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER,null,null,null,null,null,null);
-        mEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        mSettings = new Settings(mContext);
     }
 
-    public SparseArray<String> findUserByTag(String tag){
+    public SparseArray<String> findUserByTag(String tag){ //make return PersonItem
         SparseArray<String> items = new SparseArray<>();
         cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER,new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null);
         cursor.moveToPosition(-1);
@@ -72,69 +74,53 @@ public class DataBaseFavorite {
             }
         }
         if (items.size()==0){
-            String ip = mSharedPreferences.getString(Values.SQL_SERVER,"");
-            String classs = "net.sourceforge.jtds.jdbc.Driver";
-            String db = "KeyRegistratorBase";
-            String user = mSharedPreferences.getString(Values.SQL_USER,"");
-            String password = mSharedPreferences.getString(Values.SQL_PASSWORD,"");
-
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-
-            Connection conn = null;
-            String ConnURL = null;
             try {
-                Class.forName(classs);
-                ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"
-                        + "database=" + db + ";user=" + user + ";password="
-                        + password + ";";
-                conn = DriverManager.getConnection(ConnURL);
-                Statement statement = conn.createStatement();
-                ResultSet resultSet = statement.executeQuery("select * from STAFF where [RADIO_LABEL] = '"+tag+"'");
-                while (resultSet.next()){
+                Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
+                if (connection!=null){
+                    Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery("select * from STAFF where [RADIO_LABEL] = '"+tag+"'");
 
-                    String nameDivision = resultSet.getString("NAME_DIVISION");
-                    String namePosition = resultSet.getString("NAME_POSITION");
-                    String lastname = resultSet.getString("LASTNAME");
-                    String firstname = resultSet.getString("FIRSTNAME");
-                    String midname = resultSet.getString("MIDNAME");
-                    String sex = resultSet.getString("SEX");
-                    String photo = resultSet.getString("PHOTO");
-                    String radioLabel = resultSet.getString("RADIO_LABEL");
+                    while(resultSet.next()){
+                        String nameDivision = resultSet.getString("NAME_DIVISION");
+                        String namePosition = resultSet.getString("NAME_POSITION");
+                        String lastname = resultSet.getString("LASTNAME");
+                        String firstname = resultSet.getString("FIRSTNAME");
+                        String midname = resultSet.getString("MIDNAME");
+                        String sex = resultSet.getString("SEX");
+                        String photo = resultSet.getString("PHOTO");
+                        String radioLabel = resultSet.getString("RADIO_LABEL");
 
-                    items.put(0,nameDivision);
-                    items.put(1,namePosition);
-                    items.put(2,lastname);
-                    items.put(3,firstname);
-                    items.put(4,midname);
-                    items.put(5,sex);
-                    items.put(6,photo);
-                    items.put(7,radioLabel);
+                        items.put(0,nameDivision);
+                        items.put(1,namePosition);
+                        items.put(2,lastname);
+                        items.put(3,firstname);
+                        items.put(4,midname);
+                        items.put(5,sex);
+                        items.put(6,photo);
+                        items.put(7,radioLabel);
 
-                    writeInDBTeachers(new PersonItem(
-                            lastname,
-                            firstname,
-                            midname,
-                            nameDivision,
-                            sex,
-                            getPhotoPreview(photo),
-                            photo,
-                            radioLabel));
+                        writeInDBTeachers(new PersonItem(
+                                lastname,
+                                firstname,
+                                midname,
+                                nameDivision,
+                                sex,
+                                getPhotoPreview(photo),
+                                photo,
+                                radioLabel));
+                    }
+                    if (items.size()==0){
+                        items.put(0, "-");
+                        items.put(1,"-");
+                        items.put(2,"Аноним");
+                        items.put(3,"Аноним");
+                        items.put(4,"Аноним");
+                        items.put(5, "-");
+                        items.put(6, null);
+                        items.put(7, tag);
+                    }
+
                 }
-                if (items.size()==0){
-                    items.put(0, "-");
-                    items.put(1,"-");
-                    items.put(2,"Аноним");
-                    items.put(3,"Аноним");
-                    items.put(4,"Аноним");
-                    items.put(5, "-");
-                    items.put(6, null);
-                    items.put(7, tag);
-                }
-
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
             } catch (SQLException e) {
                 e.printStackTrace();
                 Toast.makeText(mContext,"Нет подключения к серверу",Toast.LENGTH_SHORT).show();

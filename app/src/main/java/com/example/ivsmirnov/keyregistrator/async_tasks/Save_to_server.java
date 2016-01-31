@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
+import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.sql.Connection;
@@ -28,12 +30,12 @@ import java.util.ArrayList;
 public class Save_to_server extends AsyncTask <Void,Void,Void> {
 
     private Context mContext;
-    private SharedPreferences mSharedPreferences;
+    private Settings mSettings;
     private ProgressDialog mProgressDialog;
 
     public Save_to_server (Context context){
         this.mContext = context;
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mSettings = new Settings(mContext);
         mProgressDialog = new ProgressDialog(mContext);
     }
 
@@ -51,42 +53,25 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
         DataBaseJournal dbJournal = new DataBaseJournal(mContext);
         ArrayList<JournalItem> mItems = dbJournal.realAllJournalFromDB();
 
-        String ip = mSharedPreferences.getString(Values.SQL_SERVER,"");
-        String classs = "net.sourceforge.jtds.jdbc.Driver";
-        String db = "KeyRegistratorBase";
-        String user = mSharedPreferences.getString(Values.SQL_USER,"");
-        String password = mSharedPreferences.getString(Values.SQL_PASSWORD,"");
-
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        Connection conn = null;
-        String ConnURL = null;
         try {
-            Class.forName(classs);
-            ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"
-                    + "database=" + db + ";user=" + user + ";password="
-                    + password + ";";
-            conn = DriverManager.getConnection(ConnURL);
-            conn.createStatement();
-            PreparedStatement trunacteTable = conn.prepareStatement("TRUNCATE TABLE Journal_recycler");
-            trunacteTable.execute();
-            for (int i=0;i<mItems.size();i++){
-                JournalItem journalItem = mItems.get(i);
-                PreparedStatement preparedStatement  = conn.prepareStatement("INSERT INTO Journal_recycler VALUES ('"
-                        +journalItem.Auditroom+"','"
-                        +journalItem.TimeIn+"','"
-                        +journalItem.TimeOut+"',"
-                        +journalItem.AccessType+",'"
-                        +journalItem.PersonLastname+"','"
-                        +journalItem.PersonFirstname+"','"
-                        +journalItem.PersonMidname+"','"
-                        +journalItem.PersonPhoto+"')");
-                preparedStatement.execute();
+            Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
+            if (connection!=null){
+                PreparedStatement trunacteTable = connection.prepareStatement("TRUNCATE TABLE Journal_recycler");
+                trunacteTable.execute();
+                for (int i=0;i<mItems.size();i++){
+                    JournalItem journalItem = mItems.get(i);
+                    PreparedStatement preparedStatement  = connection.prepareStatement("INSERT INTO Journal_recycler VALUES ('"
+                            +journalItem.Auditroom+"','"
+                            +journalItem.TimeIn+"','"
+                            +journalItem.TimeOut+"',"
+                            +journalItem.AccessType+",'"
+                            +journalItem.PersonLastname+"','"
+                            +journalItem.PersonFirstname+"','"
+                            +journalItem.PersonMidname+"','"
+                            +journalItem.PersonPhoto+"')");
+                    preparedStatement.execute();
+                }
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
         }

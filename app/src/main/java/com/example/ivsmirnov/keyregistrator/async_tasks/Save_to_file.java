@@ -11,6 +11,7 @@ import android.view.Display;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 /**
@@ -20,10 +21,9 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
 
     private Context mContext;
     private int mType;
-    private SharedPreferences mSharedPreferences;
+    private Settings mSettings;
     private ProgressDialog mProgressDialog;
     private String mPathExternal;
-    private String mPathForCopy;
 
     private static final String JOURNAL = "/Journal.xls";
     private static final String TEACHERS = "/Teachers.csv";
@@ -31,7 +31,7 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
     public Save_to_file (Context context, int loadType){
         this.mContext = context;
         this.mType = loadType;
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mSettings = new Settings(mContext);
         mPathExternal = Environment.getExternalStorageDirectory().getPath();
         mProgressDialog = new ProgressDialog(mContext);
     }
@@ -56,10 +56,8 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
                 dbJournal.backupJournalToCSV();
                 dbJournal.closeDB();
 
-                mPathForCopy = mSharedPreferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
                 String srFileJournal = mPathExternal + JOURNAL;
-                String dtFileJournal = mPathForCopy + JOURNAL;
+                String dtFileJournal = mSettings.getJournalBackupLocation() + JOURNAL;
                 Values.copyfile(mContext, srFileJournal, dtFileJournal);
                 break;
             case Values.WRITE_TEACHERS:
@@ -67,10 +65,8 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
                 dbFavorite.backupFavoriteStaffToFile();
                 dbFavorite.closeDB();
 
-                mPathForCopy = mSharedPreferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS,
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
                 String srFileTeachers = mPathExternal + TEACHERS;
-                String dtFileTeachers = mPathForCopy + TEACHERS;
+                String dtFileTeachers = mSettings.getPersonsBackupLocation() + TEACHERS;
                 Values.copyfile(mContext, srFileTeachers, dtFileTeachers);
                 break;
             case Values.WRITE_ROOMS:
