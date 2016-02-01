@@ -5,13 +5,14 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
+import com.example.ivsmirnov.keyregistrator.items.JournalItem;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.BufferedReader;
@@ -31,6 +32,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
 
     private Context mContext;
     private String mPath;
+    private Settings mSettings;
     private ProgressDialog progressDialog;
     private UpdateInterface mListener;
     private int mLoadType;
@@ -41,6 +43,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
         this.mListener = listener;
         this.mLoadType = loadType;
         progressDialog = new ProgressDialog(mContext);
+        mSettings = new Settings(mContext);
     }
 
     @Override
@@ -124,15 +127,17 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                             if (i<count){
                                 try {
                                     String [] split = line.split(";");
-                                    String aud = split[0];
-                                    Long timeIn = Long.parseLong(split[1]);
-                                    Long timeOut = Long.parseLong(split[2]);
-                                    int accessType = Integer.parseInt(split[3]);
-                                    String personLastname = split[4];
-                                    String personFirstname = split[5];
-                                    String personMidname = split[6];
-                                    String personPhoto = split[7];
-                                    dbJournal.writeInDBJournal(new JournalItem(aud,timeIn,timeOut,accessType,personLastname,personFirstname,personMidname,personPhoto));
+
+                                    dbJournal.writeInDBJournal(new JournalItem()
+                                    .setAccountID(mSettings.getActiveAccountID())
+                                    .setAuditroom(split[0])
+                                    .setTimeIn(Long.parseLong(split[1]))
+                                    .setTimeOut(Long.parseLong(split[2]))
+                                    .setAccessType(Integer.parseInt(split[3]))
+                                    .setPersonLastname(split[4])
+                                    .setPersonFirstname(split[5])
+                                    .setPersonMidname(split[6])
+                                    .setPersonPhoto(split[7]));
                                 }catch (Exception e){
                                     e.printStackTrace();
                                 }

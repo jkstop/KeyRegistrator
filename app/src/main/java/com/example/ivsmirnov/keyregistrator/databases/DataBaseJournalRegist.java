@@ -12,9 +12,10 @@ import android.util.Log;
 public class DataBaseJournalRegist extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String name = "Journal.db";
-    private static final int version = 3;
+    private static final int version = 4;
 
     public static final String TABLE_JOURNAL = "Журнал";
+    public static final String COLUMN_USER_ID = "id_пользователя";
     public static final String COLUMN_AUD = "Аудитория";
     public static final String COLUMN_TIME_IN = "Взял";
     public static final String COLUMN_TIME_OUT = "Сдал";
@@ -25,6 +26,7 @@ public class DataBaseJournalRegist extends SQLiteOpenHelper implements BaseColum
     public static final String COLUMN_PERSON_PHOTO = "Фото";
 
     private static final String SQL_CREATE_BASE_JOURNAL = "create table " + TABLE_JOURNAL + " (" + BaseColumns._ID + " integer primary key autoincrement, "
+            + COLUMN_USER_ID + " text not null, "
             + COLUMN_AUD + " text not null, "
             + COLUMN_TIME_IN + " long, "
             + COLUMN_TIME_OUT + " long, "

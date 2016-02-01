@@ -1,4 +1,4 @@
-package com.example.ivsmirnov.keyregistrator.custom_views;
+package com.example.ivsmirnov.keyregistrator.items;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -2,26 +2,16 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.StrictMode;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.util.SparseArray;
-import android.widget.Toast;
 
-import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
+import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 /**
@@ -61,14 +51,15 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
                 for (int i=0;i<mItems.size();i++){
                     JournalItem journalItem = mItems.get(i);
                     PreparedStatement preparedStatement  = connection.prepareStatement("INSERT INTO Journal_recycler VALUES ('"
-                            +journalItem.Auditroom+"','"
-                            +journalItem.TimeIn+"','"
-                            +journalItem.TimeOut+"',"
-                            +journalItem.AccessType+",'"
-                            +journalItem.PersonLastname+"','"
-                            +journalItem.PersonFirstname+"','"
-                            +journalItem.PersonMidname+"','"
-                            +journalItem.PersonPhoto+"')");
+                            +journalItem.getAccountID()+"','"
+                            +journalItem.getAuditroom()+"','"
+                            +journalItem.getTimeIn()+"','"
+                            +journalItem.getTimeOut()+"',"
+                            +journalItem.getAccessType()+",'"
+                            +journalItem.getPersonLastname()+"','"
+                            +journalItem.getPersonFirstname()+"','"
+                            +journalItem.getPersonMidname()+"','"
+                            +journalItem.getPersonPhoto()+"')");
                     preparedStatement.execute();
                 }
             }

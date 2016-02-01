@@ -1,13 +1,10 @@
 package com.example.ivsmirnov.keyregistrator.others;
 
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +12,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
+import com.example.ivsmirnov.keyregistrator.items.JournalItem;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
@@ -29,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -37,7 +33,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 

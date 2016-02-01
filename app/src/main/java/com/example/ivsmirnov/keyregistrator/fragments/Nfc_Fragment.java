@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,9 +15,10 @@ import android.widget.Button;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
-import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.items.JournalItem;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 /**
@@ -28,6 +28,7 @@ public class Nfc_Fragment extends Fragment {
 
     private Context mContext;
     private Button mSelectButton;
+    private Settings mSettings;
     private Button mDekanatPmit,mDekanatAR;
 
     public static Nfc_Fragment newInstance(){
@@ -39,6 +40,7 @@ public class Nfc_Fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_nfc_fragment,container,false);
         mContext = rootView.getContext();
+        mSettings = new Settings(mContext);
         mDekanatPmit = (Button)rootView.findViewById(R.id.nfc_fragment_button_dekanat_pmit);
         mDekanatAR = (Button)rootView.findViewById(R.id.nfc_fragment_button_dekanat_ar);
         mDekanatPmit.setOnClickListener(clickDekanat);
@@ -49,14 +51,15 @@ public class Nfc_Fragment extends Fragment {
     View.OnClickListener clickDekanat = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            JournalItem journalItem = new JournalItem(getArguments().getString(Values.AUDITROOM),
-                    System.currentTimeMillis(),
-                    null,
-                    Values.ACCESS_BY_CLICK,
-                    ((Button)v).getText().toString(),
-                    " ",
-                    " ",
-                    Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext));
+
+            JournalItem journalItem = new JournalItem()
+                    .setAccountID(mSettings.getActiveAccountID())
+                    .setAuditroom(getArguments().getString(Values.AUDITROOM))
+                    .setTimeIn(System.currentTimeMillis())
+                    .setAccessType(Values.ACCESS_BY_CLICK)
+                    .setPersonLastname(((Button)v).getText().toString())
+                    .setPersonPhoto(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext));
+
             PersonItem personItem = new PersonItem(((Button)v).getText().toString(),
                     " ",
                     " ",

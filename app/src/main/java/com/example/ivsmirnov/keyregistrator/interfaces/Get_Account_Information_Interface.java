@@ -1,6 +1,5 @@
 package com.example.ivsmirnov.keyregistrator.interfaces;
 
-import com.example.ivsmirnov.keyregistrator.custom_views.AccountItem;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 
 /**

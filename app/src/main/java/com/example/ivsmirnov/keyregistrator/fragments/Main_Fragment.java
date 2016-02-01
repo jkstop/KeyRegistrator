@@ -27,7 +27,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
-import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
@@ -36,7 +36,6 @@ import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.common.AccountPicker;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -155,9 +154,10 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                 dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
             case R.id.test:
-                Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"},
-                        false, null, null, null, null);
-                startActivityForResult(intent, 123);
+                //Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"},
+                //        false, null, null, null, null);
+                //startActivityForResult(intent, 123);
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

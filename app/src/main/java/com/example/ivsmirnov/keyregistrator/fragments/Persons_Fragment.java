@@ -3,12 +3,10 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -22,11 +20,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
@@ -34,21 +30,18 @@ import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
-import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
+import com.example.ivsmirnov.keyregistrator.items.JournalItem;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -185,14 +178,15 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
     }
 
     private JournalItem createJournalItem(int accessType, int position){
-        return new JournalItem(getArguments().getString(Values.AUDITROOM),
-                System.currentTimeMillis(),
-                null,
-                accessType,
-                mAllItems.get(position).Lastname,
-                mAllItems.get(position).Firstname,
-                mAllItems.get(position).Midname,
-                mAllItems.get(position).PhotoPreview);
+        return new JournalItem()
+                .setAccountID(mSettings.getActiveAccountID())
+                .setAuditroom(getArguments().getString(Values.AUDITROOM))
+                .setTimeIn(System.currentTimeMillis())
+                .setAccessType(accessType)
+                .setPersonLastname(mAllItems.get(position).Lastname)
+                .setPersonFirstname(mAllItems.get(position).Firstname)
+                .setPersonMidname(mAllItems.get(position).Midname)
+                .setPersonPhoto(mAllItems.get(position).PhotoPreview);
     }
 
     private void writeRoom (JournalItem journalItem, long positionInBase, int position){

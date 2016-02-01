@@ -1,11 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
@@ -21,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -29,14 +24,15 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
-import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.Find_User_in_SQL_Server_Interface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -48,8 +44,7 @@ import java.util.ArrayList;
 public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server_Interface, RecycleItemClickListener{
 
     private Context mContext;
-    private SharedPreferences mPreferences;
-    private Connection conn;
+    private Settings mSettings;
     private Find_User_in_SQL_Server_Interface mListener;
 
     private ArrayList<PersonItem> mPersonItems;
@@ -57,8 +52,6 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     private ProgressBar mProgressBar;
     private RecyclerView mPersonsRecycler;
     private Button mAddButton;
-
-    private boolean isServerConnected;
 
     public static Search_Fragment new_Instance(){
         return new Search_Fragment();
@@ -75,7 +68,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_add_new_staff_fragment,container,false);
         mContext = rootView.getContext();
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mSettings = new Settings(mContext);
         mProgressBar = (ProgressBar)rootView.findViewById(R.id.layout_add_new_staff_progress);
         mProgressBar.setVisibility(View.INVISIBLE);
 
@@ -86,32 +79,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
         mAddButton = (Button)rootView.findViewById(R.id.layout_add_new_staff_input_button);
 
-        String ip = mPreferences.getString(Values.SQL_SERVER,"");
-        String classs = "net.sourceforge.jtds.jdbc.Driver";
-        final String db = "KeyRegistratorBase";
-        String user = mPreferences.getString(Values.SQL_USER,"");
-        String password = mPreferences.getString(Values.SQL_PASSWORD,"");
-
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        conn = null;
-        String ConnURL = null;
-
-        try {
-            Class.forName(classs);
-            ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"
-                    + "database=" + db +";user=" + user + ";password="
-                    + password + ";";
-            conn = DriverManager.getConnection(ConnURL);
-            isServerConnected = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            isServerConnected = false;
-        }
-
-
+        final Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
         final TextInputLayout mInputLayout = (TextInputLayout)rootView.findViewById(R.id.layout_add_new_staff_input);
         final AppCompatEditText mInputText = (AppCompatEditText) rootView.findViewById(R.id.layout_add_new_staff_input_text);
         if (mInputText.requestFocus()){
@@ -125,14 +93,12 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length()>=3){
-                    if (isServerConnected){
+                    if (connection!=null){
                         try {
-
-                            Statement statement = conn.createStatement();
+                            Statement statement = connection.createStatement();
                             ResultSet resultSet = statement.executeQuery("select * from STAFF where [LASTNAME] like '"+s+"%'");
                             Find_User_in_SQL_Server find_user_in_sql_server = new Find_User_in_SQL_Server(mContext, mListener);
                             find_user_in_sql_server.execute(resultSet);
-
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }

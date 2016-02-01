@@ -1,4 +1,4 @@
-package com.example.ivsmirnov.keyregistrator.custom_views;
+package com.example.ivsmirnov.keyregistrator.items;
 
 /**
  * Created by ivsmirnov on 30.01.2016.

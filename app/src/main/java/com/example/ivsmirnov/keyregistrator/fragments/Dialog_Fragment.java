@@ -36,9 +36,9 @@ import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
-import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.ServerConnectionItem;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
+import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;

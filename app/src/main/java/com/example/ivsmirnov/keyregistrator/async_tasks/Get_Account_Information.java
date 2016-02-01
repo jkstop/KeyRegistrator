@@ -2,16 +2,11 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.custom_views.AccountItem;
+import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
-import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.google.android.gms.auth.GoogleAuthException;
@@ -26,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**

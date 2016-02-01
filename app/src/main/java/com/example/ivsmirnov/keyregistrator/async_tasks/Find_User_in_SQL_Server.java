@@ -4,17 +4,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.support.design.widget.Snackbar;
 import android.util.Base64;
-import android.util.Log;
-import android.util.SparseArray;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.fragments.Search_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.Find_User_in_SQL_Server_Interface;
 
 import java.io.ByteArrayOutputStream;

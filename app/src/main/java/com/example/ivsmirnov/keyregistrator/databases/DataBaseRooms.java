@@ -2,25 +2,15 @@ package com.example.ivsmirnov.keyregistrator.databases;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
 import android.os.Environment;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.util.SparseArray;
 
-import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
-import com.example.ivsmirnov.keyregistrator.others.Values;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.Time;
 import java.util.ArrayList;
 
 /**

@@ -1,15 +1,11 @@
 package com.example.ivsmirnov.keyregistrator.databases;
 
-import android.app.VoiceInteractor;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
-import com.example.ivsmirnov.keyregistrator.custom_views.AccountItem;
-
-import java.sql.ResultSet;
+import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 
 /**
  * Created by ivsmirnov on 28.01.2016.

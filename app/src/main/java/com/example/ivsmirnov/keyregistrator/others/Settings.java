@@ -4,9 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
-import com.example.ivsmirnov.keyregistrator.custom_views.ServerConnectionItem;
+import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 
 /**
  * Created by ivsmirnov on 30.01.2016.
@@ -22,7 +21,7 @@ public class Settings {
     }
 
     public String getActiveAccountID(){
-        return mPreferences.getString(Values.ACTIVE_ACCOUNT_ID," ");
+        return mPreferences.getString(Values.ACTIVE_ACCOUNT_ID, "localAccount");
     }
 
     public void setDisclaimerWeight(int weight){

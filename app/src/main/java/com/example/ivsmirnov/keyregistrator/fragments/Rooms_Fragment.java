@@ -24,7 +24,7 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
-import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;

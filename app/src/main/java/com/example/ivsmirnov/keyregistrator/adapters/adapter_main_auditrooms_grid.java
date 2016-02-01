@@ -2,12 +2,10 @@ package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
-import com.example.ivsmirnov.keyregistrator.custom_views.StaggeredGridView;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.Values;

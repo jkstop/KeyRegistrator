@@ -1,8 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.interfaces;
 
-import android.util.SparseArray;
-
-import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 
 import java.util.ArrayList;
 

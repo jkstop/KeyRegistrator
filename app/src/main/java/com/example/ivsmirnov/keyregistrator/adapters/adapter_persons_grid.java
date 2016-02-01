@@ -14,8 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 

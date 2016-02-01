@@ -6,9 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ProgressBar;
 import android.widget.SpinnerAdapter;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -32,7 +33,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Load_from_server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
-import com.example.ivsmirnov.keyregistrator.custom_views.JournalItem;
+import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
@@ -40,7 +41,6 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,10 +56,9 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     private adapter_journal_list mAdapterjournallist;
     private ArrayList <JournalItem> mJournalItems;
 
-    private Settings mSettings;
+    private ProgressBar mLoadingBar;
 
-    //private SharedPreferences mSharedPreferences;
-   // private SharedPreferences.Editor mSharedPreferencesEditor;
+    private Settings mSettings;
 
     public static Journal_fragment newInstance() {
         return new Journal_fragment();
@@ -81,19 +80,11 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
         showDateSpinner();
     }
 
-    public static ArrayList<String> calculateDates(Context context){
-        ArrayList <String> items = new ArrayList<>();
+    public static ArrayList<String> getDates(Context context){
         DataBaseJournal dbJournal = new DataBaseJournal(context);
-        ArrayList<Long>datesLong = dbJournal.readJournalDatesFromDB();
+        ArrayList<String>datesLong = dbJournal.readJournalDatesFromDB();
         dbJournal.closeDB();
-        DateFormat dateFormat = DateFormat.getDateInstance();
-        for (int i = 0; i< datesLong.size(); i++){
-            String dateString = dateFormat.format(new Date(datesLong.get(i)));
-            if (!items.contains(dateString)){
-                items.add(dateString);
-            }
-        }
-        return  items;
+        return datesLong;
     }
 
     private void showDateSpinner(){
@@ -128,7 +119,8 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
         mSettings = new Settings(mContext);
 
         mJournalRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_journal);
-        mDates = calculateDates(mContext);
+        mLoadingBar = (ProgressBar)rootView.findViewById(R.id.layout_journal_fragment_loading_progress_bar);
+        mDates = getDates(mContext);
         return rootView;
 
     }
@@ -203,7 +195,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
 
     @Override
     public void updateInformation() {
-        mDates = calculateDates(mContext);
+        mDates = getDates(mContext);
         Date date = null;
         if (mDates.size()!=0){
             try {
@@ -216,30 +208,11 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
         }
 
         try {
-            getJournalForDate(date);
+            new getJournalForDate(date).execute();
         }catch (Exception e){
             e.printStackTrace();
         }
         showDateSpinner();
-    }
-/*
-    @Override
-    public void onFinishEditing() {
-        mDates = calculateDates(mContext);
-        try {
-            getJournalForDate(new SimpleDateFormat("dd MMM yyyy").parse(mDates.get(0)));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        showDateSpinner();
-    }
-*/
-    private void getJournalForDate(Date date){
-        DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-        mJournalItems = dbJournal.readJournalFromDB(date);
-        dbJournal.closeDB();
-
-        initializeJournal();
     }
 
     private void initializeJournal(){
@@ -287,11 +260,38 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
         Date date = null;
         try {
             date = new SimpleDateFormat("dd MMM yyyy").parse(mDates.get(itemPosition));
-            getJournalForDate(date);
+            new getJournalForDate(date).execute();
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         return false;
+    }
+
+    private class getJournalForDate extends AsyncTask<Void,Void,Void>{
+
+        private Date mDate;
+        private getJournalForDate(Date date){
+            this.mDate = date;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mLoadingBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            DataBaseJournal dbJournal = new DataBaseJournal(mContext);
+            mJournalItems = dbJournal.readJournalFromDB(mDate);
+            dbJournal.closeDB();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mLoadingBar.setVisibility(View.INVISIBLE);
+            initializeJournal();
+        }
     }
 }

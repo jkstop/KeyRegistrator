@@ -1,0 +1,99 @@
+package com.example.ivsmirnov.keyregistrator.items;
+
+import java.sql.Time;
+
+/**
+ * Created by ivsmirnov on 11.01.2016.
+ */
+public class JournalItem {
+    public String AccountID;
+    public String Auditroom;
+    public Long TimeIn;
+    public Long TimeOut;
+    public int AccessType;
+    public String PersonLastname = " ";
+    public String PersonFirstname = " ";
+    public String PersonMidname = " ";
+    public String PersonPhoto;
+
+    public JournalItem setAccountID(String accountID){
+        this.AccountID = accountID;
+        return this;
+    }
+
+    public String getAccountID(){
+        return AccountID;
+    }
+
+    public JournalItem setAuditroom (String auditroom){
+        this.Auditroom = auditroom;
+        return this;
+    }
+
+    public String getAuditroom (){
+        return Auditroom;
+    }
+
+    public JournalItem setTimeIn (Long timeIn){
+        this.TimeIn = timeIn;
+        return this;
+    }
+
+    public Long getTimeIn(){
+        return TimeIn;
+    }
+
+    public JournalItem setTimeOut (Long timeOut){
+        this.TimeOut = timeOut;
+        return this;
+    }
+
+    public Long getTimeOut(){
+        return TimeOut;
+    }
+
+    public JournalItem setAccessType (int accessType){
+        this.AccessType = accessType;
+        return this;
+    }
+
+    public int getAccessType(){
+        return AccessType;
+    }
+
+    public JournalItem setPersonLastname (String personLastname){
+        this.PersonLastname = personLastname;
+        return this;
+    }
+
+    public String getPersonLastname(){
+        return PersonLastname;
+    }
+
+    public JournalItem setPersonFirstname (String personFirstname){
+        this.PersonFirstname = personFirstname;
+        return this;
+    }
+
+    public String getPersonFirstname(){
+        return PersonFirstname;
+    }
+
+    public JournalItem setPersonMidname (String personMidname){
+        this.PersonMidname = personMidname;
+        return this;
+    }
+
+    public String getPersonMidname(){
+        return PersonMidname;
+    }
+
+    public JournalItem setPersonPhoto (String personPhoto){
+        this.PersonPhoto = personPhoto;
+        return this;
+    }
+
+    public String getPersonPhoto(){
+        return PersonPhoto;
+    }
+}

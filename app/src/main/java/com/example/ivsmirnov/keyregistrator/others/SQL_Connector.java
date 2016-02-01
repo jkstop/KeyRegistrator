@@ -1,15 +1,12 @@
 package com.example.ivsmirnov.keyregistrator.others;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.StrictMode;
-import android.preference.PreferenceManager;
 
-import com.example.ivsmirnov.keyregistrator.custom_views.ServerConnectionItem;
+import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 /**
  * Created by ivsmirnov on 09.12.2015.

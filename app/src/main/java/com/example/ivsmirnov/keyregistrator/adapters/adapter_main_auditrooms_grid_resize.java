@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.custom_views.RoomItem;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.others.Values;

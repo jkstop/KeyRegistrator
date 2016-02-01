@@ -2,29 +2,24 @@ package com.example.ivsmirnov.keyregistrator.databases;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
-import android.os.StrictMode;
-import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.SparseArray;
 import android.widget.Toast;
 
-import com.example.ivsmirnov.keyregistrator.custom_views.PersonItem;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -254,7 +249,7 @@ public class DataBaseFavorite {
         Bitmap bitmapPrew = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmapPrew.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
+        bitmapPrew.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
 
         return Base64.encodeToString(byteArray,Base64.NO_WRAP);
