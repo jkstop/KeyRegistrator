@@ -83,19 +83,19 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.textSurname.setText(allItems.get(position).Lastname);
-        holder.textMidname.setText(allItems.get(position).Firstname);
-        holder.textLastname.setText(allItems.get(position).Midname);
-        holder.textDivision.setText(allItems.get(position).Division);
+        holder.textSurname.setText(allItems.get(position).getLastname());
+        holder.textMidname.setText(allItems.get(position).getFirstname());
+        holder.textLastname.setText(allItems.get(position).getMidname());
+        holder.textDivision.setText(allItems.get(position).getDivision());
 
 
         Bitmap bitmap = null;
         String photo = null;
 
         if (mType== Values.SHOW_FAVORITE_PERSONS){
-            photo = allItems.get(position).PhotoPreview;
+            photo = allItems.get(position).getPhotoPreview();
         }else if (mType==Values.SHOW_ALL_PERSONS){
-            photo = allItems.get(position).PhotoOriginal;
+            photo = allItems.get(position).getPhotoOriginal();
         }
 
         if (photo!=null){

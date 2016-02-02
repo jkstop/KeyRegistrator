@@ -8,7 +8,7 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 
 /**
  * Created by ivsmirnov on 02.11.2015.
- */
+
 public class Protocol_Reader extends AsyncTask<Launcher.SetProtocolParams,Void,Launcher.SetProtocolResult> {
 
     private Reader mReader;
@@ -51,3 +51,4 @@ public class Protocol_Reader extends AsyncTask<Launcher.SetProtocolParams,Void,L
         }
     }
 }
+ */

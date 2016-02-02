@@ -146,7 +146,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i,Values.LOAD_ROOMS);
+                startActivityForResult(i,Values.REQUEST_CODE_LOAD_ROOMS);
                 return true;
             case R.id.menu_auditrooms_clear:
                 Dialog_Fragment dialog = new Dialog_Fragment();
@@ -165,11 +165,11 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data!=null){
-            if (requestCode == Values.LOAD_ROOMS){
+            if (requestCode == Values.REQUEST_CODE_LOAD_ROOMS){
                 if (resultCode == Activity.RESULT_OK){
                     Uri uri = data.getData();
                     String path = uri.getPath();
-                    Loader_intent loader_intent = new Loader_intent(mContext,path,this,Values.LOAD_ROOMS);
+                    Loader_intent loader_intent = new Loader_intent(mContext,path,this,Values.REQUEST_CODE_LOAD_ROOMS);
                     loader_intent.execute();
                 }
             }

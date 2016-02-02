@@ -46,14 +46,16 @@ public class Find_User_in_SQL_Server extends AsyncTask<ResultSet,Void,ArrayList<
                 if (photo==null){
                     photo = getBase64DefaultPhotoFromResources(mContext);
                 }
-                mItems.add(new PersonItem(params[0].getString("LASTNAME"),
-                        params[0].getString("FIRSTNAME"),
-                        params[0].getString("MIDNAME"),
-                        params[0].getString("NAME_DIVISION"),
-                        params[0].getString("SEX"),
-                        DataBaseFavorite.getPhotoPreview(photo),
-                        photo,
-                        params[0].getString("RADIO_LABEL")));
+
+                mItems.add(new PersonItem()
+                        .setLastname(params[0].getString("LASTNAME"))
+                        .setFirstname(params[0].getString("FIRSTNAME"))
+                        .setMidname(params[0].getString("MIDNAME"))
+                        .setDivision(params[0].getString("NAME_DIVISION"))
+                        .setSex(params[0].getString("SEX"))
+                        .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo))
+                        .setPhotoOriginal(photo)
+                        .setRadioLabel(params[0].getString("RADIO_LABEL")));
             }
         } catch (SQLException e) {
             e.printStackTrace();

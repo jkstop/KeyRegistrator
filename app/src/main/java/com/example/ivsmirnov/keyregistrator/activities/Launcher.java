@@ -13,6 +13,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -39,10 +40,12 @@ import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_navigation_drawer_list;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Open_Reader;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
+//import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
+//import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
+//import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
+import com.example.ivsmirnov.keyregistrator.interfaces.ReaderResponse;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.items.NavigationItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
@@ -63,6 +66,8 @@ import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
+import com.example.ivsmirnov.keyregistrator.services.NFC_Reader;
+import com.example.ivsmirnov.keyregistrator.services.ReaderBroadcastReceiver;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.AccountPicker;
 
@@ -72,7 +77,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Account_Information_Interface{
+public class Launcher extends AppCompatActivity implements Get_Account_Information_Interface{
 
     private DrawerLayout mDrawerLayout;
     private LinearLayout mLayout_Drawer_root;
@@ -88,14 +93,13 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
     private Settings mSettings;
 
     private static long back_pressed;
-    private static long symbol_pressed;
 
-    private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+
     private static final String[] stateStrings = { "Unknown", "Absent",
             "Present", "Swallowed", "Powered", "Negotiable", "Specific" };
-    private UsbManager mManager;
+    private UsbManager mUsbManager;
     private Reader mReader;
-    private PendingIntent mPermissionIntent;
+    private BroadcastReceiver mBroadcastReceiver;
 
     String aud = null;
     Boolean isOpened = false;
@@ -109,7 +113,6 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
 
         if (savedInstanceState==null){
             showFragment(Main_Fragment.newInstance(),R.string.fragment_tag_main);
-            //toolbar.setTitle(getResources().getString(R.string.toolbar_title_main));
         }
 
         mContext = this;
@@ -120,8 +123,12 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
 
         initNavigationDrawer();
 
+        new initReader().execute();
+
+        //new NFC_Reader(mContext).execute();
+
         //init reader
-        mManager = (UsbManager)getSystemService(Context.USB_SERVICE);
+        /*mManager = (UsbManager)getSystemService(Context.USB_SERVICE);
         mReader = new Reader(mManager);
         mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(
                 ACTION_USB_PERMISSION), 0);
@@ -151,7 +158,6 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
                                 Nfc_Fragment nfc_fragment = (Nfc_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_nfc));
                                 Main_Fragment main_fragment = (Main_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_main));
                                 if (persons_fragment != null && persons_fragment.isVisible()) {
-                                    Log.d("persons_fragment", "visible");
                                     aud = null;
                                     powerReader();
                                     setProtocol();
@@ -161,7 +167,6 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
                                     powerReader();
                                     setProtocol();
                                     getTag();
-
                                 } else if (main_fragment != null && main_fragment.isVisible()) {
                                     isOpened = true;
                                     powerReader();
@@ -179,7 +184,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
                 });
             }
         });
-
+*/
     }
 
     // Navigation Drawer initialization; Toolbar initialization
@@ -289,8 +294,9 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 123){
-            if (resultCode == Activity.RESULT_OK){
+        super.onActivityResult(requestCode,resultCode,data);
+        if (resultCode == Activity.RESULT_OK){
+            if (requestCode == 123){
                 try {
                     Get_Account_Information get_account_information = new Get_Account_Information(mContext,data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME),this);
                     get_account_information.execute();
@@ -374,7 +380,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,fragment,getResources().getString(fragmentTagId)).commit();
     }
 
-
+/*
     private void powerReader (){
         int slotNum = 0;
         int actionNum = 2;
@@ -405,7 +411,6 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
                             dbJournal.updateDB(rms.get(i).PositionInBase);
                             closedRooms++;
                         }
-                        //dbRooms.updateStatusRooms(mPreferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + rms.get(i).get(0), -1), "true");
                         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
                     }
                 }
@@ -446,7 +451,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
             }
         }
     }
-
+*/
     @Override
     public void onUserRecoverableAuthException(UserRecoverableAuthException e) {
     }
@@ -456,7 +461,7 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
         initNavigationDrawer();
     }
 
-
+/*
     public static class PowerParams {
         public int slotNum;
         public int action;
@@ -510,26 +515,9 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
         public byte[] response;
         public int responseLength;
         public Exception e;
-    }
+    }*/
 
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (ACTION_USB_PERMISSION.equals(action)){
-                synchronized (this){
-                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED,false)){
-                        if (device!=null){
-                            Log.d("opening","reader...");
-                            Open_Reader open_reader = new Open_Reader(mReader);
-                            open_reader.execute(device);
-                        }
-                    }
-                }
-            }
-        }
-    };
+
     //закрытие всех позиций в 22.01
     public void setAlarm(Calendar calendar){
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
@@ -574,8 +562,11 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
     protected void onDestroy() {
         super.onDestroy();
         mSettings.cleanAutoCloseStatus();
-        mReader.close();
+
         unregisterReceiver(mReceiver);
+       // new NFC_Reader(mContext).unregisterReceiver();
+        //mReader.close();
+        //unregisterReceiver(new NFC_Reader(mContext).mReceiver);
     }
 
     @Override
@@ -590,5 +581,81 @@ public class Launcher extends AppCompatActivity implements GetUserByTag, Get_Acc
             back_pressed = System.currentTimeMillis();
         }
     }
+
+    private class initReader extends AsyncTask<Void,Void,Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mUsbManager = (UsbManager)getSystemService(Context.USB_SERVICE);
+            mReader = new Reader(mUsbManager);
+            PendingIntent mPermissionIntent = PendingIntent.getBroadcast(mContext, 0, new Intent(Values.ACTION_USB_PERMISSION), 0);
+
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Values.ACTION_USB_PERMISSION);
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+
+            registerReceiver(mReceiver, filter);
+
+            for (UsbDevice device : mUsbManager.getDeviceList().values()) {
+                mUsbManager.requestPermission(device,mPermissionIntent);
+            }
+
+
+            mReader.setOnStateChangeListener(new com.acs.smartcard.Reader.OnStateChangeListener() {
+                @Override
+                public void onStateChange(int i, int prevState, int currState) {
+
+                    if (currState < com.acs.smartcard.Reader.CARD_UNKNOWN
+                            || currState > com.acs.smartcard.Reader.CARD_SPECIFIC) {
+                        currState = com.acs.smartcard.Reader.CARD_UNKNOWN;
+                    }
+
+                    final int finalCurrState = currState;
+                    try {
+                        if (stateStrings[finalCurrState].equals("Present")) {
+                            new NFC_Reader().getTag(mReader, new ReaderResponse() {
+                                @Override
+                                public void onGetResult(String tag) {
+                                    Log.d("tag",tag); // <---- HERE IS A TAG!!!! WOOOHOOOOOOOOOOOOO
+                                }
+                            });
+                            Persons_Fragment persons_fragment = (Persons_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_persons));
+                            Nfc_Fragment nfc_fragment = (Nfc_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_nfc));
+                            Main_Fragment main_fragment = (Main_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_main));
+                            if (persons_fragment != null && persons_fragment.isVisible()) {
+                                Log.d("persons","visible");
+                            } else if (nfc_fragment != null && nfc_fragment.isVisible()) {
+                                Log.d("nfc","visible");
+                            } else if (main_fragment != null && main_fragment.isVisible()) {
+
+                            } else {
+                                Log.d("not","one");
+                            }
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            return null;
+        }
+    }
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (Values.ACTION_USB_PERMISSION.equals(intent.getAction())){
+                synchronized (this){
+                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED,false)){
+                        if (device!=null){
+                            new NFC_Reader.openReader(mReader).execute(device);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
 
 }

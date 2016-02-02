@@ -32,9 +32,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
@@ -96,7 +94,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                 @Override
                 public void onItemClick(View v, int position) {
                     String gender = "";
-                    String lastname = mAllItems.get(position).Midname;
+                    String lastname = mAllItems.get(position).getMidname();
                     if (lastname.length() != 0) {
                         if (lastname.substring(lastname.length() - 1).equals("а")) {
                             gender = "Ж";
@@ -108,12 +106,12 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                     Bundle b = new Bundle();
                     b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
                     b.putStringArray("valuesForEdit", new String[]{
-                            mAllItems.get(position).Lastname,
-                            mAllItems.get(position).Firstname,
-                            mAllItems.get(position).Midname,
-                            mAllItems.get(position).Division,
+                            mAllItems.get(position).getLastname(),
+                            mAllItems.get(position).getFirstname(),
+                            mAllItems.get(position).getMidname(),
+                            mAllItems.get(position).getDivision(),
                             gender,
-                            mAllItems.get(position).PhotoOriginal});
+                            mAllItems.get(position).getPhotoOriginal()});
                     b.putInt("position", position);
                     Dialog_Fragment dialog = new Dialog_Fragment();
                     dialog.setArguments(b);
@@ -183,24 +181,24 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                 .setAuditroom(getArguments().getString(Values.AUDITROOM))
                 .setTimeIn(System.currentTimeMillis())
                 .setAccessType(accessType)
-                .setPersonLastname(mAllItems.get(position).Lastname)
-                .setPersonFirstname(mAllItems.get(position).Firstname)
-                .setPersonMidname(mAllItems.get(position).Midname)
-                .setPersonPhoto(mAllItems.get(position).PhotoPreview);
+                .setPersonLastname(mAllItems.get(position).getLastname())
+                .setPersonFirstname(mAllItems.get(position).getFirstname())
+                .setPersonMidname(mAllItems.get(position).getMidname())
+                .setPersonPhoto(mAllItems.get(position).getPhotoPreview());
     }
 
-    private void writeRoom (JournalItem journalItem, long positionInBase, int position){
+ /*   private void writeRoom (JournalItem journalItem, long positionInBase, int position){
         DataBaseRooms dataBaseRooms = new DataBaseRooms(mContext);
-        dataBaseRooms.updateRoom(new RoomItem(journalItem.Auditroom,
+        dataBaseRooms.updateRoom(new RoomItem(journalItem.getAuditroom(),
                 Values.ROOM_IS_BUSY,
-                journalItem.AccessType,
+                journalItem.getAccessType(),
                 positionInBase,
-                getPersonInitials(journalItem.PersonLastname,journalItem.PersonFirstname,journalItem.PersonMidname),
+                getPersonInitials(journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()),
                 mAllItems.get(position).RadioLabel,
                 mAllItems.get(position).PhotoOriginal));
         dataBaseRooms.closeDB();
     }
-
+*/
     private void showMainAuditroomsGrid(){
         getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
     }
@@ -230,7 +228,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
         mListCharacters = new ArrayList<>();
 
         for (int i=0;i<mAllItems.size();i++){
-            String surname = mAllItems.get(i).Lastname;
+            String surname = mAllItems.get(i).getLastname();
             String startChar = surname.substring(0,1).toUpperCase();
             if (!mListCharacters.contains(startChar)){
                 mListCharacters.add(startChar);
@@ -262,7 +260,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
     private void move (String symbol){
 
         for (int i=0;i<mAllItems.size();i++){
-            String lastname = mAllItems.get(i).Lastname;
+            String lastname = mAllItems.get(i).getLastname();
             String startChar = lastname.substring(0,1);
             if (symbol.equalsIgnoreCase(startChar)){
                 mRecyclerView.scrollToPosition(i);
@@ -309,8 +307,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
         Collections.sort(mAllItems, new Comparator<PersonItem>() {
             @Override
             public int compare(PersonItem lhs, PersonItem rhs) {
-                String first = String.valueOf(lhs.Lastname);
-                String second = String.valueOf(rhs.Lastname);
+                String first = String.valueOf(lhs.getLastname());
+                String second = String.valueOf(rhs.getLastname());
                 return first.compareToIgnoreCase(second);
             }
         });
@@ -334,7 +332,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i,Values.LOAD_TEACHERS);
+                startActivityForResult(i,Values.REQUEST_CODE_LOAD_FAVORITE_STAFF);
                 return true;
             case R.id.menu_teachers_delete:
                 Dialog_Fragment dialog = new Dialog_Fragment();
@@ -349,7 +347,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                 iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
                 iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
                 iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, mSettings.getPersonsBackupLocation());
-                startActivityForResult(iLC,Values.SELECT_LOCATION_TEACHERS);
+                startActivityForResult(iLC,Values.REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
                 return true;
             case R.id.menu_teachers_set_columns_number:
                 Dialog_Fragment dialog_fragment = new Dialog_Fragment();
@@ -368,25 +366,19 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("result",String.valueOf(resultCode));
-        if (data!=null){
-            if (requestCode==Values.LOAD_TEACHERS){
-                if (resultCode== Activity.RESULT_OK){
-                    Uri uri = data.getData();
-                    String path = uri.getPath();
-                    Loader_intent loader_intent = new Loader_intent(mContext,path,this,Values.LOAD_TEACHERS);
-                    loader_intent.execute();
-                }
-            }else if (requestCode == Values.SELECT_LOCATION_TEACHERS){
-                if (resultCode == Activity.RESULT_OK){
+        if (resultCode == Activity.RESULT_OK){
+            if (data!=null){
+                if (requestCode==Values.REQUEST_CODE_LOAD_FAVORITE_STAFF){
+                    new Loader_intent(mContext,
+                            data.getData().getPath(),
+                            this,
+                            Values.REQUEST_CODE_LOAD_FAVORITE_STAFF).execute();
+                }else if (requestCode == Values.REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION){
                     mSettings.setPersonsBackupLocation(data.getData().getPath());
                 }
             }
-           // onFinishEditing();
         }
     }
-
-    
 
 
     @Override
@@ -406,7 +398,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
 
         mListCharacters = new ArrayList<>();
         for (int i=0;i<mAllItems.size();i++){
-            String lastname = mAllItems.get(i).Lastname;
+            String lastname = mAllItems.get(i).getLastname();
             String startChar = lastname.substring(0,1);
             if (!mListCharacters.contains(startChar)){
                 mListCharacters.add(startChar);

@@ -62,11 +62,10 @@ public class Values{
     public static final int DIALOG_CLEAR_JOURNAL = 104;
     public static final int DIALOG_CLEAR_TEACHERS = 105;
     public static final int DIALOG_CLEAR_ROOMS = 120;
-    public static final int LOAD_JOURNAL = 106;
-    public static final int LOAD_TEACHERS = 107;
-    public static final int LOAD_ROOMS = 119;
-    public static final int SELECT_LOCATION_JOURNAL = 121;
-    public static final int SELECT_LOCATION_TEACHERS = 122;
+
+
+
+
     public static final int LOAD_FROM_SQL_SERVER = 124;
     public static final int DIALOG_SQL_CONNECT = 125;
     public static final String LINES_COUNT_IN_FILE = "lines_count";
@@ -110,9 +109,19 @@ public class Values{
     public static final int SHOW_FAVORITE_PERSONS = 0;
     public static final int SHOW_ALL_PERSONS = 1;
 
-
     public static final int ACCESS_BY_CLICK = 0;
     public static final int ACCESS_BY_CARD = 1;
+
+    //request codes
+    public static final int REQUEST_CODE_LOAD_FAVORITE_STAFF = 200;
+    public static final int REQUEST_CODE_LOAD_JOURNAL = 201;
+    public static final int REQUEST_CODE_LOAD_ROOMS = 202;
+    public static final int REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION = 203;
+    public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
+    public static final int REQUEST_CODE_SELECT_ACTIVE_ACCOUNT = 205;
+
+    public static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+
 
     public static void copyfile(Context context, String srFile, String dtFile){
         try{
@@ -209,13 +218,13 @@ public class Values{
 
     public static void writeRoom (Context context, JournalItem journalItem, PersonItem personItem, long positionInBase){
         DataBaseRooms dataBaseRooms = new DataBaseRooms(context);
-        dataBaseRooms.updateRoom(new RoomItem(journalItem.Auditroom,
+        dataBaseRooms.updateRoom(new RoomItem(journalItem.getAuditroom(),
                 Values.ROOM_IS_BUSY,
-                journalItem.AccessType,
+                journalItem.getAccessType(),
                 positionInBase,
-                Persons_Fragment.getPersonInitials(journalItem.PersonLastname,journalItem.PersonFirstname,journalItem.PersonMidname),
-                personItem.RadioLabel,
-                personItem.PhotoOriginal));
+                Persons_Fragment.getPersonInitials(journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()),
+                personItem.getRadioLabel(),
+                personItem.getPhotoOriginal()));
         dataBaseRooms.closeDB();
     }
 }

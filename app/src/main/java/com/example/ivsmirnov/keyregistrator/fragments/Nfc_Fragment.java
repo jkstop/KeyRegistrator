@@ -60,14 +60,11 @@ public class Nfc_Fragment extends Fragment {
                     .setPersonLastname(((Button)v).getText().toString())
                     .setPersonPhoto(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext));
 
-            PersonItem personItem = new PersonItem(((Button)v).getText().toString(),
-                    " ",
-                    " ",
-                    " ",
-                    "М",
-                    DataBaseFavorite.getPhotoPreview(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext)),
-                    Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext),
-                    " ");
+            PersonItem personItem = new PersonItem()
+                    .setLastname(((Button)v).getText().toString())
+                    .setPhotoPreview(DataBaseFavorite.getPhotoPreview(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext)))
+                    .setPhotoOriginal(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext));
+
             long positionInBase = Values.writeInJournal(mContext, journalItem);
             Values.writeRoom(mContext,journalItem,personItem,positionInBase);
             getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();

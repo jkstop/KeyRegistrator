@@ -94,15 +94,15 @@ public class DataBaseFavorite {
                         items.put(6,photo);
                         items.put(7,radioLabel);
 
-                        writeInDBTeachers(new PersonItem(
-                                lastname,
-                                firstname,
-                                midname,
-                                nameDivision,
-                                sex,
-                                getPhotoPreview(photo),
-                                photo,
-                                radioLabel));
+                        writeInDBTeachers(new PersonItem()
+                                .setLastname(lastname)
+                                .setFirstname(firstname)
+                                .setMidname(midname)
+                                .setDivision(nameDivision)
+                                .setSex(sex)
+                                .setPhotoPreview(getPhotoPreview(photo))
+                                .setPhotoOriginal(photo)
+                                .setRadioLabel(radioLabel));
                     }
                     if (items.size()==0){
                         items.put(0, "-");
@@ -141,14 +141,14 @@ public class DataBaseFavorite {
 
     public void writeInDBTeachers(PersonItem personItem) {
         ContentValues cv = new ContentValues();
-        cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, personItem.Lastname);
-        cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, personItem.Firstname);
-        cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE, personItem.Midname);
-        cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE, personItem.Division);
-        cv.put(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE, personItem.RadioLabel);
-        cv.put(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE, personItem.Sex);
-        cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE, personItem.PhotoPreview);
-        cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE, personItem.PhotoOriginal);
+        cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
+        cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
+        cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE, personItem.getMidname());
+        cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
+        cv.put(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE, personItem.getRadioLabel());
+        cv.put(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE, personItem.getSex());
+        cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE, personItem.getPhotoPreview());
+        cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE, personItem.getPhotoOriginal());
         sqLiteDatabase.insert(DataBaseFavoriteRegist.TABLE_TEACHER, null, cv);
     }
 
@@ -189,14 +189,15 @@ public class DataBaseFavorite {
         cursor.moveToPosition(-1);
         ArrayList <PersonItem> mPerson = new ArrayList<>();
         while (cursor.moveToNext()){
-            mPerson.add(new PersonItem(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE))));
+            mPerson.add(new PersonItem()
+                    .setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
+                    .setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))
+                    .setMidname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))
+                    .setDivision(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))
+                    .setSex(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE)))
+                    .setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)))
+                    .setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)))
+                    .setRadioLabel(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE))));
         }
         return mPerson;
     }
@@ -204,10 +205,10 @@ public class DataBaseFavorite {
 
     public void deleteFromTeachersDB(PersonItem personItem){
         String personPosition = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
-                + " WHERE " + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + " = '" + personItem.Lastname + "'"
-                + " AND " + DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE + " = '" + personItem.Firstname + "'"
-                + " AND " + DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE + " = '" + personItem.Midname + "'"
-                + " AND " + DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE + " = '" + personItem.Division + "'" ).simpleQueryForString();
+                + " WHERE " + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + " = '" + personItem.getLastname() + "'"
+                + " AND " + DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE + " = '" + personItem.getFirstname() + "'"
+                + " AND " + DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE + " = '" + personItem.getMidname() + "'"
+                + " AND " + DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE + " = '" + personItem.getDivision() + "'" ).simpleQueryForString();
         if (!personPosition.isEmpty()){
             sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + personPosition, null);
         }
@@ -249,7 +250,7 @@ public class DataBaseFavorite {
         Bitmap bitmapPrew = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmapPrew.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
+        bitmapPrew.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
 
         return Base64.encodeToString(byteArray,Base64.NO_WRAP);

@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by ivsmirnov on 11.01.2016.
  */
-public class RoomItem implements Parcelable{
+public class RoomItem {
     public String Auditroom;
     public int Status;
     public int Access;
@@ -23,18 +23,5 @@ public class RoomItem implements Parcelable{
         this.LastVisiter = lastVisiter;
         this.Tag = tag;
         this.Photo = photo;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(Auditroom);
-        dest.writeInt(Status);
-        dest.writeInt(Access);
-        dest.writeLong(PositionInBase);
     }
 }

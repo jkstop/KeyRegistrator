@@ -1,26 +1,88 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
+
 /**
  * Created by ivsmirnov on 22.12.2015.
  */
 public class PersonItem {
-    public String Lastname;
-    public String Firstname;
-    public String Midname;
-    public String Division;
-    public String Sex;
-    public String PhotoPreview;
-    public String PhotoOriginal;
-    public String RadioLabel;
+    private String Lastname = " ";
+    private String Firstname = " ";
+    private String Midname = " ";
+    private String Division = " ";
+    private String Sex = "М";
+    private String PhotoPreview;
+    private String PhotoOriginal;
+    private String RadioLabel = " ";
 
-    public PersonItem (String lastname, String firstname, String midname, String division, String sex, String photoPreview, String photoOriginal, String radioLabel){
+    public PersonItem setLastname (String lastname){
         this.Lastname = lastname;
+        return this;
+    }
+
+    public String getLastname(){
+        return Lastname;
+    }
+
+    public PersonItem setFirstname (String firstname){
         this.Firstname = firstname;
+        return this;
+    }
+
+    public String getFirstname(){
+        return Firstname;
+    }
+
+    public PersonItem setMidname (String midname){
         this.Midname = midname;
+        return this;
+    }
+
+    public String getMidname(){
+        return Midname;
+    }
+
+    public PersonItem setDivision (String division){
         this.Division = division;
+        return this;
+    }
+
+    public String getDivision(){
+        return Division;
+    }
+
+    public PersonItem setSex (String sex){
         this.Sex = sex;
+        return this;
+    }
+
+    public String getSex(){
+        return Sex;
+    }
+
+    public PersonItem setPhotoPreview (String photoPreview){
         this.PhotoPreview = photoPreview;
+        return this;
+    }
+
+    public String getPhotoPreview(){
+        return PhotoPreview;
+    }
+
+    public PersonItem setPhotoOriginal (String photoOriginal){
         this.PhotoOriginal = photoOriginal;
+        return this;
+    }
+
+    public String getPhotoOriginal(){
+        return PhotoOriginal;
+    }
+
+    public PersonItem setRadioLabel (String radioLabel){
         this.RadioLabel = radioLabel;
+        return this;
+    }
+
+    public String getRadioLabel(){
+        return RadioLabel;
     }
 }

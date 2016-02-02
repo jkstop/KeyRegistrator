@@ -150,7 +150,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i,Values.LOAD_JOURNAL);
+                startActivityForResult(i,Values.REQUEST_CODE_LOAD_JOURNAL);
                 return true;
             case R.id.menu_journal_delete:
                 Dialog_Fragment dialog = new Dialog_Fragment();
@@ -165,7 +165,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
                 iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
                 iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
                 iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, mSettings.getJournalBackupLocation());
-                startActivityForResult(iLC,Values.SELECT_LOCATION_JOURNAL);
+                startActivityForResult(iLC,Values.REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -174,22 +174,18 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
-        Log.d("result",String.valueOf(requestCode));//not work!!!!!!!!!!!!!!!!!!!!!!!!!
-        if (data!=null){
-            if (requestCode==Values.LOAD_JOURNAL){
-                if (resultCode== Activity.RESULT_OK){
-                    Uri uri = data.getData();
-                    String path = uri.getPath();
-                    Loader_intent loader_intent = new Loader_intent(mContext,path,this,Values.LOAD_JOURNAL);
-                    loader_intent.execute();
-                }
-            }else if (requestCode == Values.SELECT_LOCATION_JOURNAL){
-                if (resultCode==Activity.RESULT_OK){
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK){
+            if (data!=null){
+                if (requestCode == Values.REQUEST_CODE_LOAD_JOURNAL){
+                    new Loader_intent(mContext,
+                            data.getData().getPath(),
+                            this,
+                            Values.REQUEST_CODE_LOAD_JOURNAL).execute();
+                }else if (requestCode == Values.REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION){
                     mSettings.setJournalBackupLocation(data.getData().getPath());
                 }
             }
-            //updateInformation();
         }
     }
 

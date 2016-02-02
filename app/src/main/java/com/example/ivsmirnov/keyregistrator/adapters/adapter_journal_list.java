@@ -40,7 +40,7 @@ public class adapter_journal_list extends RecyclerView.Adapter<adapter_journal_l
         rowView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                mListener.onItemLongClick(v,viewHolderJournalItem.getLayoutPosition(),journalItems.get(viewHolderJournalItem.getLayoutPosition()).TimeIn);
+                mListener.onItemLongClick(v,viewHolderJournalItem.getLayoutPosition(),journalItems.get(viewHolderJournalItem.getLayoutPosition()).getTimeIn());
                 return true;
             }
         });
@@ -49,19 +49,19 @@ public class adapter_journal_list extends RecyclerView.Adapter<adapter_journal_l
 
     @Override
     public void onBindViewHolder(ViewHolderJournalItem holder, int position) {
-        holder.mTextAuditroom.setText(journalItems.get(position).Auditroom);
-        holder.mTextTimeIn.setText(String.valueOf(new Time(journalItems.get(position).TimeIn)));
-        if (journalItems.get(position).TimeOut==0){
+        holder.mTextAuditroom.setText(journalItems.get(position).getAuditroom());
+        holder.mTextTimeIn.setText(String.valueOf(new Time(journalItems.get(position).getTimeIn())));
+        if (journalItems.get(position).getTimeOut()==0){
             holder.mTextTimeOut.setText(R.string.journal_card_during_lesson);
             holder.mTextTimeOut.setTextColor(Color.RED);
         }else{
-            holder.mTextTimeOut.setText(String.valueOf(new Time(journalItems.get(position).TimeOut)));
+            holder.mTextTimeOut.setText(String.valueOf(new Time(journalItems.get(position).getTimeOut())));
         }
-        holder.mTextLastname.setText(journalItems.get(position).PersonLastname);
-        holder.mTextMidname.setText(journalItems.get(position).PersonMidname);
-        holder.mTextFirstname.setText(journalItems.get(position).PersonFirstname);
+        holder.mTextLastname.setText(journalItems.get(position).getPersonLastname());
+        holder.mTextMidname.setText(journalItems.get(position).getPersonMidname());
+        holder.mTextFirstname.setText(journalItems.get(position).getPersonFirstname());
 
-        if (journalItems.get(position).AccessType==1){
+        if (journalItems.get(position).getAccessType()==1){
             holder.mImageAccess.setImageResource(R.drawable.ic_credit_card_black_18dp);
         }else{
             holder.mImageAccess.setImageResource(R.drawable.ic_click_icon);
@@ -70,7 +70,7 @@ public class adapter_journal_list extends RecyclerView.Adapter<adapter_journal_l
         Bitmap bitmap = null;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        String photo = journalItems.get(position).PersonPhoto;
+        String photo = journalItems.get(position).getPersonPhoto();
         if (photo!=null){
             byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
             BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);

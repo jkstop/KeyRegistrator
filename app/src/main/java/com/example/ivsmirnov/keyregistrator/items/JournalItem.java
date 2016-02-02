@@ -6,15 +6,15 @@ import java.sql.Time;
  * Created by ivsmirnov on 11.01.2016.
  */
 public class JournalItem {
-    public String AccountID;
-    public String Auditroom;
-    public Long TimeIn;
-    public Long TimeOut;
-    public int AccessType;
-    public String PersonLastname = " ";
-    public String PersonFirstname = " ";
-    public String PersonMidname = " ";
-    public String PersonPhoto;
+    private String AccountID;
+    private String Auditroom;
+    private Long TimeIn;
+    private Long TimeOut;
+    private int AccessType;
+    private String PersonLastname = " ";
+    private String PersonFirstname = " ";
+    private String PersonMidname = " ";
+    private String PersonPhoto;
 
     public JournalItem setAccountID(String accountID){
         this.AccountID = accountID;

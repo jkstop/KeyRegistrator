@@ -55,12 +55,9 @@ public class Dialog_Fragment extends DialogFragment{
 
     private Context mContext;
     private int dialog_id;
-   // private SharedPreferences sharedPreferences;
-   // private SharedPreferences.Editor editor;
     private Settings mSettings;
     private LayoutInflater mInflater;
     private Resources mResources;
-    private boolean pin_verify;
 
     public static FrameLayout mFrameGrid;
 
@@ -104,8 +101,7 @@ public class Dialog_Fragment extends DialogFragment{
                                 dbJournal.clearJournalDB();
                                 dbJournal.closeDB();
 
-                                UpdateInterface listen = (UpdateInterface)getTargetFragment();
-                                listen.updateInformation();
+                                updateInformation();
 
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }
@@ -128,8 +124,7 @@ public class Dialog_Fragment extends DialogFragment{
                                 dbFavorite.clearTeachersDB();
                                 dbFavorite.closeDB();
 
-                                UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
-                                updateInterface.updateInformation();
+                                updateInformation();
 
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }
@@ -178,11 +173,14 @@ public class Dialog_Fragment extends DialogFragment{
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (values!=null){
-                            dbFavorite.deleteFromTeachersDB(new PersonItem(values[0],values[1],values[2],values[3],null,null,null,null));
+                            dbFavorite.deleteFromTeachersDB(new PersonItem()
+                                    .setLastname(values[0])
+                                    .setFirstname(values[1])
+                                    .setMidname(values[2])
+                                    .setDivision(values[3]));
                             dbFavorite.closeDB();
                         }
-                        UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
-                        updateInterface.updateInformation();
+                        updateInformation();
                     }
                 });
                 builderEdit.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -206,15 +204,7 @@ public class Dialog_Fragment extends DialogFragment{
                         dbFavorite.updateTeachersDB(source, edited);
                         dbFavorite.closeDB();
 
-
-                        UpdateTeachers activity;
-                        if (getTargetFragment()==null){
-                            activity = (UpdateTeachers)getActivity();
-                        }else{
-                            activity = (UpdateTeachers)getTargetFragment();
-                        }
-
-                        activity.onFinishEditing();
+                        updateInformation();
                     }
                 });
                 builderEdit.setCancelable(false);
@@ -231,8 +221,7 @@ public class Dialog_Fragment extends DialogFragment{
                                 dbRooms.deleteFromRoomsDB(aud);
                                 dbRooms.closeDB();
 
-                                UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
-                                updateInterface.updateInformation();
+                                updateInformation();
 
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                                 dialog.cancel();
@@ -262,8 +251,7 @@ public class Dialog_Fragment extends DialogFragment{
                                 dbRooms.clearRoomsDB();
                                 dbRooms.closeDB();
 
-                                UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
-                                updateInterface.updateInformation();
+                                updateInformation();
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                             }
                         })
@@ -289,8 +277,7 @@ public class Dialog_Fragment extends DialogFragment{
                             dbRooms.closeDB();
 
                             enterAuditroomText.getText().clear();
-                            UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
-                            updateInterface.updateInformation();
+                            updateInformation();
                             Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                             dismiss();
                         }else{
@@ -324,8 +311,7 @@ public class Dialog_Fragment extends DialogFragment{
                             public void onClick(DialogInterface dialog, int which) {
                                 if (ident != null && ident.equalsIgnoreCase("aud")) {
                                     mSettings.setAuditroomColumnsCount(numberPicker.getValue());
-                                    UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
-                                    updateInterface.updateInformation();
+                                    updateInformation();
                                 } else if (ident != null && ident.equalsIgnoreCase("per")) {
                                     //editor.putInt(Values.COLUMNS_PER_COUNT, numberPicker.getValue());
                                     //editor.commit();
@@ -403,9 +389,7 @@ public class Dialog_Fragment extends DialogFragment{
                                     mSettings.setDisclaimerWeight(mProgress);
                                 }
 
-                                UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
-                                updateInterface.updateInformation();
-
+                                updateInformation();
                                 dismiss();
                             }
                         })
@@ -535,6 +519,11 @@ public class Dialog_Fragment extends DialogFragment{
             }
         }
         return false;
+    }
+
+    private void updateInformation(){
+        UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
+        updateInterface.updateInformation();
     }
 
 }

@@ -124,9 +124,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                     String lastname = " ";
                     String firstname = " ";
                     String midname = " ";
-                    String div = " ";
-                    String gender = "М";
-                    String tag = "null";
+
                     String photo = Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext);
                     try {
                         lastname = split[0];
@@ -136,15 +134,12 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                         e.printStackTrace();
                     }
 
-                    addUserInFavorite(mContext, new PersonItem(
-                            lastname,
-                            firstname,
-                            midname,
-                            div,
-                            gender,
-                            DataBaseFavorite.getPhotoPreview(photo),
-                            photo,
-                            tag));
+                    addUserInFavorite(mContext, new PersonItem().setLastname(lastname)
+                            .setFirstname(firstname)
+                            .setMidname(midname)
+                            .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo))
+                            .setPhotoOriginal(photo));
+
                 }
             }
         });

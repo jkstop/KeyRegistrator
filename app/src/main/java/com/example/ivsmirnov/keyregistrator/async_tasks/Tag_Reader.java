@@ -12,7 +12,7 @@ import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 
 /**
  * Created by ivsmirnov on 02.11.2015.
- */
+
 public class Tag_Reader extends AsyncTask <Launcher.TransmitParams,Void,Launcher.TransmitResult> {
 
     private Reader mReader;
@@ -84,3 +84,4 @@ public class Tag_Reader extends AsyncTask <Launcher.TransmitParams,Void,Launcher
         return bufferString;
     }
 }
+ */

@@ -8,7 +8,7 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 
 /**
  * Created by ivsmirnov on 02.11.2015.
- */
+
 public class Power_Reader extends AsyncTask<Launcher.PowerParams,Void,Launcher.PowerResult>{
 
     private Reader mReader;
@@ -56,3 +56,4 @@ public class Power_Reader extends AsyncTask<Launcher.PowerParams,Void,Launcher.P
         return bufferString;
     }
 }
+ */

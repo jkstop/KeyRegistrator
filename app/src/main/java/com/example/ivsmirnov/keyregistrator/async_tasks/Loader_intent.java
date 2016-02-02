@@ -78,7 +78,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
         }
 
         switch (mLoadType){
-            case Values.LOAD_TEACHERS:
+            case Values.REQUEST_CODE_LOAD_FAVORITE_STAFF:
                 DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
                 dbFavorite.clearTeachersDB();
                 try {
@@ -87,23 +87,16 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                             if (!lines.contains(line)){
                                 try {
                                     String [] split = line.split(";");
-                                    String lastname = split[0];
-                                    String firstname = split[1];
-                                    String midname = split[2];
-                                    String division = split[3];
-                                    String sex = split[4];
-                                    String photoPreview = split[5];
-                                    String photoOriginal = split[6];
-                                    String radioLabel = split[7];
-                                    dbFavorite.writeInDBTeachers(new PersonItem(
-                                            lastname,
-                                            firstname,
-                                            midname,
-                                            division,
-                                            sex,
-                                            photoPreview,
-                                            photoOriginal,
-                                            radioLabel));
+
+                                    dbFavorite.writeInDBTeachers( new PersonItem()
+                                            .setLastname(split[0])
+                                            .setFirstname(split[1])
+                                            .setMidname(split[2])
+                                            .setDivision(split[3])
+                                            .setSex(split[4])
+                                            .setPhotoPreview(split[5])
+                                            .setPhotoOriginal(split[6])
+                                            .setRadioLabel(split[7]));
                                     publishProgress(i);
                                     i++;
                                 }catch (Exception e){
@@ -118,7 +111,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                     e.printStackTrace();
                 }
                 break;
-            case Values.LOAD_JOURNAL:
+            case Values.REQUEST_CODE_LOAD_JOURNAL:
                 DataBaseJournal dbJournal = new DataBaseJournal(mContext);
                 dbJournal.clearJournalDB();
                 try {
@@ -151,7 +144,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                     e.printStackTrace();
                 }
                 break;
-            case Values.LOAD_ROOMS:
+            case Values.REQUEST_CODE_LOAD_ROOMS:
                 DataBaseRooms dbRooms = new DataBaseRooms(mContext);
                 dbRooms.clearRoomsDB();
                 try {
