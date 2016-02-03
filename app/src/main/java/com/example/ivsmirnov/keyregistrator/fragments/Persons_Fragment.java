@@ -30,11 +30,14 @@ import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
+import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
+import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
+import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
@@ -43,7 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class Persons_Fragment extends Fragment implements UpdateInterface{
+public class Persons_Fragment extends Fragment implements UpdateInterface, KeyInterface{
 
     private Context mContext;
     private static RecyclerView mRecyclerView;
@@ -53,6 +56,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
     private static ArrayList<PersonItem> mAllItems;
     public adapter_persons_grid mAdapter;
     private adapter_list_characters mListAdapter;
+
+    private KeyInterface mKeyInterface;
 
     private ArrayList<String> mListCharacters;
 
@@ -75,7 +80,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
         if (extras != null) {
             type = extras.getInt(Values.PERSONS_FRAGMENT_TYPE);
         }
-
     }
 
     @Override
@@ -131,7 +135,12 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                         return;
                     }
 
-                    takeKey(Values.ACCESS_BY_CLICK, position);
+                    new TakeKey(mContext).execute(new TakeKeyParams()
+                            .setAccessType(Values.ACCESS_BY_CLICK)
+                            .setAuditroom(getArguments().getString(Values.AUDITROOM))
+                            .setPersonItem(mAllItems.get(position))
+                            .setPublicInterface(mKeyInterface));
+                    //takeKey(Values.ACCESS_BY_CLICK, position);
 
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
@@ -142,7 +151,12 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
                         return;
                     }
 
-                    takeKey(Values.ACCESS_BY_CARD, position);
+                    new TakeKey(mContext).execute(new TakeKeyParams()
+                            .setAccessType(Values.ACCESS_BY_CARD)
+                            .setAuditroom(getArguments().getString(Values.AUDITROOM))
+                            .setPersonItem(mAllItems.get(position))
+                            .setPublicInterface(mKeyInterface));
+                    //takeKey(Values.ACCESS_BY_CARD, position);
 
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
@@ -151,13 +165,17 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
 
         mRecyclerView.setAdapter(mAdapter);
     }
-
+/*
     private void takeKey(int accessType, int position){
-        JournalItem journalItem  = createJournalItem(accessType,position);
+        JournalItem journalItem  = Values.createNewItemForJournal(mContext,
+                mAllItems.get(position),
+                getArguments().getString(Values.AUDITROOM),
+                accessType);
         long positionInBase = Values.writeInJournal(mContext, journalItem);
         Values.writeRoom(mContext,journalItem,mAllItems.get(position),positionInBase);
         showMainAuditroomsGrid();
     }
+*/
 
     public static String getPersonInitials (String lastname, String firstname, String midname){
         String initials = "-";
@@ -210,6 +228,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
         mContext = rootView.getContext();
 
         mSettings = new Settings(mContext);
+        mKeyInterface = this;
 
         mAddFAB = (FloatingActionButton)rootView.findViewById(R.id.persons_fragment_fab);
         mAddFAB.setOnClickListener(new View.OnClickListener() {
@@ -407,5 +426,10 @@ public class Persons_Fragment extends Fragment implements UpdateInterface{
 
         mListAdapter = new adapter_list_characters(mContext,mListCharacters);
         mListView.setAdapter(mListAdapter);
+    }
+
+    @Override
+    public void onTakeKey() {
+        showMainAuditroomsGrid();
     }
 }

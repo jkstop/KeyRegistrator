@@ -36,6 +36,8 @@ import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
+import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
@@ -404,7 +406,10 @@ public class Dialog_Fragment extends DialogFragment{
                     public void onClick(View v) {
                         if (editPassword.getText().toString().equalsIgnoreCase("1212")){
                             if (getArguments().getInt(Values.DIALOG_CLOSE_ROOM_TYPE)==Values.DIALOG_CLOSE_ROOM_TYPE_ROOMS){
-                                DataBaseJournal dbJournal = new DataBaseJournal(mContext);
+                                new CloseRooms(mContext).execute(new CloseRoomsParams()
+                                        .setTag(getArguments().getString("tag"))
+                                        .setRoomInterface(Main_Fragment.roomInterface));
+                                /*DataBaseJournal dbJournal = new DataBaseJournal(mContext);
                                 DataBaseRooms dbRooms = new DataBaseRooms(mContext);
                                 String aud = getArguments().getString("aud");
                                 long pos = getArguments().getLong(Values.POSITION_IN_BASE_FOR_ROOM,-1);
@@ -421,7 +426,7 @@ public class Dialog_Fragment extends DialogFragment{
                                 getActivity().getSupportFragmentManager()
                                         .beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
                                 dbJournal.closeDB();
-                                dbRooms.closeDB();
+                                dbRooms.closeDB();*/
                                 dismiss();
                             }else{
                                 Bundle bundle = new Bundle();

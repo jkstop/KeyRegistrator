@@ -1,18 +1,28 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
 
+import com.example.ivsmirnov.keyregistrator.others.Values;
+
 /**
  * Created by ivsmirnov on 22.12.2015.
  */
 public class PersonItem {
-    private String Lastname = " ";
-    private String Firstname = " ";
-    private String Midname = " ";
-    private String Division = " ";
+    private String Lastname = Values.EMPTY;
+    private String Firstname = Values.EMPTY;
+    private String Midname = Values.EMPTY;
+    private String Division = Values.EMPTY;
     private String Sex = "М";
     private String PhotoPreview;
     private String PhotoOriginal;
-    private String RadioLabel = " ";
+    private String RadioLabel = Values.EMPTY;
+
+    public boolean isEmpty(){
+        return Lastname.equals(Values.EMPTY) &&
+                Firstname.equals(Values.EMPTY) &&
+                Midname.equals(Values.EMPTY) &&
+                Division.equals(Values.EMPTY) &&
+                RadioLabel.equals(Values.EMPTY);
+    }
 
     public PersonItem setLastname (String lastname){
         this.Lastname = lastname;

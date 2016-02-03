@@ -120,6 +120,8 @@ public class Values{
     public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
     public static final int REQUEST_CODE_SELECT_ACTIVE_ACCOUNT = 205;
 
+    public static final String EMPTY = " ";
+
     public static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
 
 
@@ -226,5 +228,17 @@ public class Values{
                 personItem.getRadioLabel(),
                 personItem.getPhotoOriginal()));
         dataBaseRooms.closeDB();
+    }
+
+    public static JournalItem createNewItemForJournal (Context context, PersonItem personItem, String auditroom, int accessType){
+        Settings settings = new Settings(context);
+        return new JournalItem().setAccountID(settings.getActiveAccountID())
+                .setAuditroom(auditroom)
+                .setAccessType(accessType)
+                .setTimeIn(System.currentTimeMillis())
+                .setPersonLastname(personItem.getLastname())
+                .setPersonFirstname(personItem.getFirstname())
+                .setPersonMidname(personItem.getMidname())
+                .setPersonPhoto(personItem.getPhotoPreview());
     }
 }

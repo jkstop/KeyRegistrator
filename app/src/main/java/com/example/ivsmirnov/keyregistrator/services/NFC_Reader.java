@@ -55,11 +55,10 @@ public class NFC_Reader{
         }
     }
 
-    public String getTag(Reader reader, ReaderResponse response){
+    public void getTag(Reader reader, ReaderResponse response){
         new setPower(reader).execute(getPowerParams());
         new setProtocol(reader).execute(getProtocolParams());
         new transmit(reader, response).execute(getTransmitParams());
-        return null;
     }
 
     private class setPower extends AsyncTask<PowerParams,Void,Void>{
@@ -125,7 +124,7 @@ public class NFC_Reader{
         protected void onPostExecute(TransmitResult transmitResult) {
             if (transmitResult.responseLength!=0){
                 String tag = getStringFromByte(transmitResult.response, transmitResult.responseLength-2) + "00 00";
-                mListener.onGetResult("taaaagololopspsps");
+                mListener.onGetResult(tag);
             }
         }
     }

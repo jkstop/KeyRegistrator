@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Base64;
+import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
 
@@ -47,8 +48,9 @@ public class DataBaseFavorite {
         mSettings = new Settings(mContext);
     }
 
-    public SparseArray<String> findUserByTag(String tag){ //make return PersonItem
-        SparseArray<String> items = new SparseArray<>();
+    public PersonItem findUserByTag(String tag){
+        Long start = System.currentTimeMillis();
+        PersonItem personItem = new PersonItem();
         cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER,new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null);
         cursor.moveToPosition(-1);
         DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
@@ -57,64 +59,35 @@ public class DataBaseFavorite {
                 int position = cursor.getPosition();
                 cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER,null,null,null,null,null,null);
                 cursor.moveToPosition(position);
-                items.put(0, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)));
-                items.put(1,"none");
-                items.put(2,cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)));
-                items.put(3,cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)));
-                items.put(4,cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)));
-                items.put(5, "none");
-                items.put(6, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)));
-                items.put(7, cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE)));
+                personItem.setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
+                        .setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))
+                        .setMidname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))
+                        .setDivision(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))
+                        .setSex(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE)))
+                        .setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)))
+                        .setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)))
+                        .setRadioLabel(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE)));
                 break;
             }
         }
-        if (items.size()==0){
+        if (personItem.isEmpty()){
             try {
                 Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
                 if (connection!=null){
                     Statement statement = connection.createStatement();
                     ResultSet resultSet = statement.executeQuery("select * from STAFF where [RADIO_LABEL] = '"+tag+"'");
-
                     while(resultSet.next()){
-                        String nameDivision = resultSet.getString("NAME_DIVISION");
-                        String namePosition = resultSet.getString("NAME_POSITION");
-                        String lastname = resultSet.getString("LASTNAME");
-                        String firstname = resultSet.getString("FIRSTNAME");
-                        String midname = resultSet.getString("MIDNAME");
-                        String sex = resultSet.getString("SEX");
-                        String photo = resultSet.getString("PHOTO");
-                        String radioLabel = resultSet.getString("RADIO_LABEL");
-
-                        items.put(0,nameDivision);
-                        items.put(1,namePosition);
-                        items.put(2,lastname);
-                        items.put(3,firstname);
-                        items.put(4,midname);
-                        items.put(5,sex);
-                        items.put(6,photo);
-                        items.put(7,radioLabel);
-
+                        //String namePosition = resultSet.getString("NAME_POSITION");
                         writeInDBTeachers(new PersonItem()
-                                .setLastname(lastname)
-                                .setFirstname(firstname)
-                                .setMidname(midname)
-                                .setDivision(nameDivision)
-                                .setSex(sex)
-                                .setPhotoPreview(getPhotoPreview(photo))
-                                .setPhotoOriginal(photo)
-                                .setRadioLabel(radioLabel));
+                                .setLastname(resultSet.getString("LASTNAME"))
+                                .setFirstname(resultSet.getString("FIRSTNAME"))
+                                .setMidname(resultSet.getString("MIDNAME"))
+                                .setDivision(resultSet.getString("NAME_DIVISION"))
+                                .setSex(resultSet.getString("SEX"))
+                                .setPhotoPreview(getPhotoPreview(resultSet.getString("PHOTO")))
+                                .setPhotoOriginal(resultSet.getString("PHOTO"))
+                                .setRadioLabel(resultSet.getString("RADIO_LABEL")));
                     }
-                    if (items.size()==0){
-                        items.put(0, "-");
-                        items.put(1,"-");
-                        items.put(2,"Аноним");
-                        items.put(3,"Аноним");
-                        items.put(4,"Аноним");
-                        items.put(5, "-");
-                        items.put(6, null);
-                        items.put(7, tag);
-                    }
-
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -122,8 +95,10 @@ public class DataBaseFavorite {
             }
         }
         dbFavorite.closeDB();
+        Long end = System.currentTimeMillis();
+        Log.d("durable",String.valueOf(end - start));
 
-        return items;
+        return personItem;
     }
 
     public void closeDB(){

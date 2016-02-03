@@ -26,7 +26,11 @@ import android.widget.TextView;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
+import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
+import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
+import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
@@ -48,7 +52,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class Main_Fragment extends Fragment implements UpdateInterface,RecycleItemClickListener, Get_Account_Information_Interface{
+public class Main_Fragment extends Fragment implements UpdateInterface,RecycleItemClickListener, Get_Account_Information_Interface, RoomInterface{
 
 
 
@@ -65,6 +69,8 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     private CardView mDisclaimerCard;
 
     adapter_main_auditrooms_grid mAuditroomGridAdapter;
+
+    public static RoomInterface roomInterface;
 
     private static long lastClickTime = 0;
 
@@ -89,6 +95,8 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         DataBaseRooms dbRooms = new DataBaseRooms(mContext);
         mRoomItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();
+
+        roomInterface = this;
 
         frameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
 
@@ -188,7 +196,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         }
     }
 
-
+/*
     private String getUserName(final String token){
 
         final String[] lastname = {"-"};
@@ -269,7 +277,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
             return;
         }
-        if (mRoomItems.get(position).Status==1) {
+        if (mRoomItems.get(position).Status==Values.ROOM_IS_FREE) {
             Bundle bundle = new Bundle();
             bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
             bundle.putString(Values.AUDITROOM, mRoomItems.get(position).Auditroom);
@@ -277,8 +285,8 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
             nfc_fragment.setArguments(bundle);
             getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, nfc_fragment, getResources().getString(R.string.fragment_tag_nfc)).commit();
         } else {
-            if (mRoomItems.get(position).Access==0) {
-
+            if (mRoomItems.get(position).Access==Values.ACCESS_BY_CLICK) {
+/*
                 DataBaseJournal dbJournal = new DataBaseJournal(mContext);
                 dbJournal.updateDB(mRoomItems.get(position).PositionInBase);
                 dbJournal.closeDB();
@@ -292,7 +300,10 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                         null,
                         null));
                 dbRooms.closeDB();
-                getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
+                */
+                new CloseRooms(mContext).execute(new CloseRoomsParams()
+                        .setTag(mRoomItems.get(position).Tag)
+                        .setRoomInterface(roomInterface));
             }else{
                 Values.showFullscreenToast(mContext,getResources().getString(R.string.text_toast_put_card));
             }
@@ -302,11 +313,13 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
 
     @Override
     public void onItemLongClick(View v, int position, long timeIn) {
-        if (mRoomItems.get(position).Access==1){
+        if (mRoomItems.get(position).Access==Values.ACCESS_BY_CARD){
             Dialog_Fragment dialog_fragment = new Dialog_Fragment();
             Bundle bundle = new Bundle();
             bundle.putLong(Values.POSITION_IN_BASE_FOR_ROOM,mRoomItems.get(position).PositionInBase);
             bundle.putString("aud",mRoomItems.get(position).Auditroom);
+            bundle.putString("tag",mRoomItems.get(position).Tag);
+            bundle.putLong("positionInBase",mRoomItems.get(position).PositionInBase);
             bundle.putInt(Values.DIALOG_CLOSE_ROOM_TYPE,Values.DIALOG_CLOSE_ROOM_TYPE_ROOMS);
             bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLOSE_ROOM);
             dialog_fragment.setArguments(bundle);
@@ -329,5 +342,10 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     @Override
     public void onChangeAccount() {
 
+    }
+
+    @Override
+    public void onRoomClosed() {
+        getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
     }
 }

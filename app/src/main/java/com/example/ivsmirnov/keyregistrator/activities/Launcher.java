@@ -39,15 +39,22 @@ import android.widget.Toast;
 import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_navigation_drawer_list;
+import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Open_Reader;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.ReaderResponse;
+import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
+import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.NavigationItem;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
@@ -62,6 +69,7 @@ import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
+import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -77,7 +85,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class Launcher extends AppCompatActivity implements Get_Account_Information_Interface{
+public class Launcher extends AppCompatActivity implements Get_Account_Information_Interface, KeyInterface, RoomInterface{
 
     private DrawerLayout mDrawerLayout;
     private LinearLayout mLayout_Drawer_root;
@@ -91,6 +99,9 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     private Context mContext;
     private Resources mResources;
     private Settings mSettings;
+
+    private KeyInterface mKeyInterface;
+    private RoomInterface mRoomInterface;
 
     private static long back_pressed;
 
@@ -118,6 +129,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         mContext = this;
         mResources = getResources();
         mSettings = new Settings(mContext);
+        mKeyInterface = this;
+        mRoomInterface = this;
 
         SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
 
@@ -320,7 +333,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
             new loadImageFromWeb(mAccount.Photo).execute();
         }
     }
-
 
 
     private class loadImageFromWeb extends AsyncTask<Void,Drawable,Drawable>{
@@ -600,7 +612,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                 mUsbManager.requestPermission(device,mPermissionIntent);
             }
 
-
             mReader.setOnStateChangeListener(new com.acs.smartcard.Reader.OnStateChangeListener() {
                 @Override
                 public void onStateChange(int i, int prevState, int currState) {
@@ -613,24 +624,41 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                     final int finalCurrState = currState;
                     try {
                         if (stateStrings[finalCurrState].equals("Present")) {
+
                             new NFC_Reader().getTag(mReader, new ReaderResponse() {
                                 @Override
                                 public void onGetResult(String tag) {
-                                    Log.d("tag",tag); // <---- HERE IS A TAG!!!! WOOOHOOOOOOOOOOOOO
+                                    Persons_Fragment persons_fragment = (Persons_Fragment) getFragmentByTag(R.string.fragment_tag_persons);
+                                    Nfc_Fragment nfc_fragment = (Nfc_Fragment)getFragmentByTag(R.string.fragment_tag_nfc);
+                                    Main_Fragment main_fragment = (Main_Fragment) getFragmentByTag(R.string.fragment_tag_main);
+
+                                    if (persons_fragment != null && persons_fragment.isVisible()) {
+                                        Log.d("persons","visible");
+                                    } else if (nfc_fragment != null && nfc_fragment.isVisible()) {
+                                        DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
+                                        PersonItem personItem = dataBaseFavorite.findUserByTag(tag);
+                                        dataBaseFavorite.closeDB();
+                                        if (!personItem.isEmpty()){
+                                            new TakeKey(mContext).execute(new TakeKeyParams()
+                                                    .setPersonItem(personItem)
+                                                    .setAuditroom(nfc_fragment.getArguments().getString(Values.AUDITROOM))
+                                                    .setAccessType(Values.ACCESS_BY_CARD)
+                                                    .setPublicInterface(mKeyInterface));
+                                        }else{
+                                            Log.d("wrong","card!!!");
+                                        }
+
+                                    } else if (main_fragment != null && main_fragment.isVisible()) {
+                                        new CloseRooms(mContext).execute(new CloseRoomsParams()
+                                                .setTag(tag)
+                                                .setRoomInterface(mRoomInterface));
+                                    } else {
+                                        Log.d("not","one");
+                                    }
                                 }
                             });
-                            Persons_Fragment persons_fragment = (Persons_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_persons));
-                            Nfc_Fragment nfc_fragment = (Nfc_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_nfc));
-                            Main_Fragment main_fragment = (Main_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_main));
-                            if (persons_fragment != null && persons_fragment.isVisible()) {
-                                Log.d("persons","visible");
-                            } else if (nfc_fragment != null && nfc_fragment.isVisible()) {
-                                Log.d("nfc","visible");
-                            } else if (main_fragment != null && main_fragment.isVisible()) {
 
-                            } else {
-                                Log.d("not","one");
-                            }
+
                         }
                     }catch (Exception e){
                         e.printStackTrace();
@@ -639,6 +667,20 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
             });
             return null;
         }
+    }
+
+    @Override
+    public void onTakeKey() {
+        showFragment(Main_Fragment.newInstance(), R.string.fragment_tag_main);
+    }
+
+    @Override
+    public void onRoomClosed() {
+        showFragment(Main_Fragment.newInstance(), R.string.fragment_tag_main);
+    }
+
+    private Fragment getFragmentByTag(int resID){
+        return getSupportFragmentManager().findFragmentByTag(getResources().getString(resID));
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
