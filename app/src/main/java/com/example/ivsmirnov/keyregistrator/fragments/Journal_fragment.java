@@ -82,9 +82,9 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
 
     public static ArrayList<String> getDates(Context context){
         DataBaseJournal dbJournal = new DataBaseJournal(context);
-        ArrayList<String>datesLong = dbJournal.readJournalDatesFromDB();
+        ArrayList<String>dates = dbJournal.readJournalDatesFromDB();
         dbJournal.closeDB();
-        return datesLong;
+        return dates;
     }
 
     private void showDateSpinner(){
@@ -135,7 +135,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_journal_save_to_file:
-                Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_JOURNAL);
+                Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_JOURNAL, true);
                 saveToFile.execute();
                 return true;
             case R.id.menu_journal_download_to_server:

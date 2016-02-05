@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.graphics.drawable.Drawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
@@ -48,6 +49,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Open_Reader;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.fragments.Search_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.ReaderResponse;
 import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
@@ -106,11 +108,11 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     private static long back_pressed;
 
 
+    private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
     private static final String[] stateStrings = { "Unknown", "Absent",
             "Present", "Swallowed", "Powered", "Negotiable", "Specific" };
     private UsbManager mUsbManager;
     private Reader mReader;
-    private BroadcastReceiver mBroadcastReceiver;
 
     String aud = null;
     Boolean isOpened = false;
@@ -137,67 +139,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         initNavigationDrawer();
 
         new initReader().execute();
-
-        //new NFC_Reader(mContext).execute();
-
-        //init reader
-        /*mManager = (UsbManager)getSystemService(Context.USB_SERVICE);
-        mReader = new Reader(mManager);
-        mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(
-                ACTION_USB_PERMISSION), 0);
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_USB_PERMISSION);
-        filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        registerReceiver(mReceiver, filter);
-        for (UsbDevice device : mManager.getDeviceList().values()) {
-            mManager.requestPermission(device,mPermissionIntent);
-        }
-        mReader.setOnStateChangeListener(new Reader.OnStateChangeListener() {
-            @Override
-            public void onStateChange(int i, int prevState, int currState) {
-
-                if (currState < Reader.CARD_UNKNOWN
-                        || currState > Reader.CARD_SPECIFIC) {
-                    currState = Reader.CARD_UNKNOWN;
-                }
-
-                final int finalCurrState = currState;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            if (stateStrings[finalCurrState].equals("Present")) {
-                                Persons_Fragment persons_fragment = (Persons_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_persons));
-                                Nfc_Fragment nfc_fragment = (Nfc_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_nfc));
-                                Main_Fragment main_fragment = (Main_Fragment) getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_main));
-                                if (persons_fragment != null && persons_fragment.isVisible()) {
-                                    aud = null;
-                                    powerReader();
-                                    setProtocol();
-                                    getTag();
-                                } else if (nfc_fragment != null && nfc_fragment.isVisible()) {
-                                    aud = getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_nfc)).getArguments().getString(Values.AUDITROOM);
-                                    powerReader();
-                                    setProtocol();
-                                    getTag();
-                                } else if (main_fragment != null && main_fragment.isVisible()) {
-                                    isOpened = true;
-                                    powerReader();
-                                    setProtocol();
-                                    getTag();
-                                } else {
-                                    Toast.makeText(mContext, "Not one of yet", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-
-                    }
-                });
-            }
-        });
-*/
     }
 
     // Navigation Drawer initialization; Toolbar initialization
@@ -392,78 +333,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,fragment,getResources().getString(fragmentTagId)).commit();
     }
 
-/*
-    private void powerReader (){
-        int slotNum = 0;
-        int actionNum = 2;
-
-        PowerParams params = new PowerParams();
-        params.slotNum = slotNum;
-        params.action = actionNum;
-
-        Power_Reader powerTask = new Power_Reader(mReader);
-        powerTask.execute(params);
-    }
-
-    @Override
-    public void onGetSparse(SparseArray<String> items) {
-
-        if (isOpened){
-            DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-            DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-            ArrayList <RoomItem> rms = dbRooms.readRoomsDB();
-
-            int closedRooms = 0;
-
-            for (int i=0;i<rms.size();i++){
-                if (rms.get(i).Status==0){
-                    if (items.get(7).equalsIgnoreCase(rms.get(i).Tag)){
-                        long pos = rms.get(i).PositionInBase;
-                        if (pos != -1) {
-                            dbJournal.updateDB(rms.get(i).PositionInBase);
-                            closedRooms++;
-                        }
-                        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
-                    }
-                }
-            }
-            if (closedRooms==0){
-                Values.showFullscreenToast(mContext,getResources().getString(R.string.text_toast_choise_room_in_first));
-            }
-
-            dbRooms.closeDB();
-            dbJournal.closeDB();
-            isOpened = false;
-        }else{
-            if (aud!=null){
-                if (items.get(2).equals("Аноним")){
-                    LayoutInflater inflater = getLayoutInflater();
-                    View toastLayout = inflater.inflate(R.layout.layout_toast_incorrect_card,
-                            (ViewGroup)findViewById(R.id.toast_nfc_incorrect_root));
-                    Toast toast = new Toast(mContext);
-                    toast.setDuration(Toast.LENGTH_LONG);
-                    toast.setView(toastLayout);
-                    toast.show();
-                }else{
-                    String name  = items.get(2) + " "
-                            + items.get(3).charAt(0) + "." +
-                            items.get(4).charAt(0) + ".";
-                    //Persons_Fragment.writeIt(mContext,aud,name,System.currentTimeMillis(),items.get(6),items.get(7),"card");
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment,Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
-                }
-            }else{
-                String [] values = new String[]{items.get(2),items.get(3),items.get(4),items.get(0),items.get(5),items.get(6)};
-                Bundle b = new Bundle();
-                b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
-                b.putStringArray("valuesForEdit", values);
-                Dialog_Fragment dialog = new Dialog_Fragment();
-                dialog.setArguments(b);
-                dialog.setTargetFragment(getSupportFragmentManager().findFragmentByTag(getResources().getString(R.string.fragment_tag_persons)), 0);
-                dialog.show(getSupportFragmentManager(),"edit");
-            }
-        }
-    }
-*/
     @Override
     public void onUserRecoverableAuthException(UserRecoverableAuthException e) {
     }
@@ -472,63 +341,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     public void onChangeAccount() {
         initNavigationDrawer();
     }
-
-/*
-    public static class PowerParams {
-        public int slotNum;
-        public int action;
-    }
-    public static class PowerResult {
-        public byte[] atr;
-        public Exception e;
-    }
-
-    private void setProtocol(){
-        int slotNum = 0;
-        int prefferedProtocol = Reader.PROTOCOL_UNDEFINED;
-        String prefferedProtocolString = "";
-        prefferedProtocol |= Reader.PROTOCOL_T0;
-        prefferedProtocolString = "T0";
-        prefferedProtocol |= Reader.PROTOCOL_T1;
-        prefferedProtocolString +="/T1";
-        if (prefferedProtocolString==""){
-            prefferedProtocolString="None";
-        }
-        SetProtocolParams params = new SetProtocolParams();
-        params.slotNum = slotNum;
-        params.preferredProtocols = prefferedProtocol;
-        Protocol_Reader protocol_task = new Protocol_Reader(mReader);
-        protocol_task.execute(params);
-    }
-    public static class SetProtocolParams {
-        public int slotNum;
-        public int preferredProtocols;
-    }
-    public static class SetProtocolResult {
-        public int activeProtocol;
-        public Exception e;
-    }
-
-    private void getTag(){
-        int slotNum = 0;
-        TransmitParams transmitParams = new TransmitParams();
-        transmitParams.slotNum = slotNum;
-        transmitParams.controlCode = -1;
-        transmitParams.command = new byte[]{(byte) 0xFF, (byte) 0xCA, (byte) 0x00, (byte) 0x00, (byte) 0x04};
-        Tag_Reader transmit_task = new Tag_Reader(mContext,mReader,this);
-        transmit_task.execute(transmitParams);
-    }
-    public static class TransmitParams {
-        public int slotNum;
-        public int controlCode;
-        public byte [] command;
-    }
-    public static class TransmitResult {
-        public byte[] response;
-        public int responseLength;
-        public Exception e;
-    }*/
-
 
     //закрытие всех позиций в 22.01
     public void setAlarm(Calendar calendar){
@@ -567,7 +379,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         if (!mSettings.getAutoCloseStatus()){
             setAlarm(closingTime());
         }
-
     }
 
     @Override
@@ -575,10 +386,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         super.onDestroy();
         mSettings.cleanAutoCloseStatus();
 
+        mReader.close();
         unregisterReceiver(mReceiver);
-       // new NFC_Reader(mContext).unregisterReceiver();
-        //mReader.close();
-        //unregisterReceiver(new NFC_Reader(mContext).mReceiver);
     }
 
     @Override
@@ -586,11 +395,21 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         if (back_pressed + 2000 > System.currentTimeMillis()) {
             super.onBackPressed();
         } else {
-            Toast.makeText(getBaseContext(), "Нажмите еще раз для выхода", Toast.LENGTH_SHORT).show();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main))
-                    .commit();
-            back_pressed = System.currentTimeMillis();
+            Search_Fragment search_fragment = (Search_Fragment) getFragmentByTag(R.string.fragment_tag_search);
+            if (search_fragment!=null && search_fragment.isVisible()){
+                Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+                Bundle bundle = new Bundle();
+                bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
+                bundle.putString(Values.AUDITROOM, mSettings.getLastClickedAuditroom());
+                persons_fragment.setArguments(bundle);
+                showFragment(persons_fragment, R.string.fragment_tag_main);
+            }else{
+                Toast.makeText(getBaseContext(), "Нажмите еще раз для выхода", Toast.LENGTH_SHORT).show();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main))
+                        .commit();
+                back_pressed = System.currentTimeMillis();
+            }
         }
     }
 
@@ -598,6 +417,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         @Override
         protected Void doInBackground(Void... params) {
+
             mUsbManager = (UsbManager)getSystemService(Context.USB_SERVICE);
             mReader = new Reader(mUsbManager);
             PendingIntent mPermissionIntent = PendingIntent.getBroadcast(mContext, 0, new Intent(Values.ACTION_USB_PERMISSION), 0);
@@ -633,7 +453,24 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                                     Main_Fragment main_fragment = (Main_Fragment) getFragmentByTag(R.string.fragment_tag_main);
 
                                     if (persons_fragment != null && persons_fragment.isVisible()) {
-                                        Log.d("persons","visible");
+                                        PersonItem personItem = DataBaseFavorite.findInServer(mContext, tag);
+                                        ArrayList <String> valuesForDialog = new ArrayList<>();
+                                        valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME, personItem.getLastname());
+                                        valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME, personItem.getFirstname());
+                                        valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME, personItem.getMidname());
+                                        valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION, personItem.getDivision());
+                                        valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL, personItem.getPhotoOriginal());
+                                        valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, personItem.getRadioLabel());
+                                        valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_SEX, personItem.getSex());
+
+                                        Bundle b = new Bundle();
+                                        b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
+                                        b.putStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION, valuesForDialog);
+                                        Dialog_Fragment dialog = new Dialog_Fragment();
+                                        dialog.setArguments(b);
+                                        dialog.setTargetFragment(persons_fragment, 0);
+                                        dialog.show(persons_fragment.getChildFragmentManager(), "edit");
+
                                     } else if (nfc_fragment != null && nfc_fragment.isVisible()) {
                                         DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
                                         PersonItem personItem = dataBaseFavorite.findUserByTag(tag);
@@ -641,7 +478,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                                         if (!personItem.isEmpty()){
                                             new TakeKey(mContext).execute(new TakeKeyParams()
                                                     .setPersonItem(personItem)
-                                                    .setAuditroom(nfc_fragment.getArguments().getString(Values.AUDITROOM))
+                                                    .setAuditroom(mSettings.getLastClickedAuditroom())
                                                     .setAccessType(Values.ACCESS_BY_CARD)
                                                     .setPublicInterface(mKeyInterface));
                                         }else{
@@ -671,22 +508,30 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
     @Override
     public void onTakeKey() {
+        Values.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_take_key), Values.TOAST_POSITIVE);
         showFragment(Main_Fragment.newInstance(), R.string.fragment_tag_main);
     }
 
     @Override
-    public void onRoomClosed() {
-        showFragment(Main_Fragment.newInstance(), R.string.fragment_tag_main);
+    public void onRoomClosed(int closedRooms) {
+        if (closedRooms!=0){
+            Values.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_thanks), Values.TOAST_POSITIVE);
+            showFragment(Main_Fragment.newInstance(), R.string.fragment_tag_main);
+        }else{
+            Values.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_choise_room_in_first), Values.TOAST_NEGATIVE);
+        }
+
     }
 
     private Fragment getFragmentByTag(int resID){
         return getSupportFragmentManager().findFragmentByTag(getResources().getString(resID));
     }
 
+
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (Values.ACTION_USB_PERMISSION.equals(intent.getAction())){
+            if (ACTION_USB_PERMISSION.equals(intent.getAction())){
                 synchronized (this){
                     UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED,false)){
@@ -698,6 +543,5 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
             }
         }
     };
-
 
 }

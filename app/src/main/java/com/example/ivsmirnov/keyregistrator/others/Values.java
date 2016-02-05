@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.others;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.view.Gravity;
@@ -52,6 +53,7 @@ public class Values{
     public static final int WRITE_TEACHERS = 101;
     public static final int WRITE_ROOMS = 123;
     public static final String AUTO_CLOSED_COUNT = "auto_closed_count";
+    public static final String TOTAL_JOURNAL_COUNT = "total_journal_count";
     public static final String PATH_FOR_COPY_ON_PC_FOR_JOURNAL = "path_for_copy_on_pc_for_journal";
     public static final String PATH_FOR_COPY_ON_PC_FOR_TEACHERS = "path_for_copy_on_pc_for_teachers";
     public static final String DISCLAIMER_SIZE = "disclaimer_size";
@@ -120,9 +122,22 @@ public class Values{
     public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
     public static final int REQUEST_CODE_SELECT_ACTIVE_ACCOUNT = 205;
 
+    public static final String KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION = "values_for_dialog_person_information";
+    public static final String KEY_USER_FOR_DIALOG_PERSON_INFORMATION = "values_for_dialog_person_information";
+    public static final int DIALOG_PERSON_INFORMATION_KEY_LASTNAME = 0;
+    public static final int DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME = 1;
+    public static final int DIALOG_PERSON_INFORMATION_KEY_MIDNAME = 2;
+    public static final int DIALOG_PERSON_INFORMATION_KEY_DIVISION = 3;
+    public static final int DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL = 4;
+    public static final int DIALOG_PERSON_INFORMATION_KEY_TAG = 5;
+    public static final int DIALOG_PERSON_INFORMATION_KEY_SEX = 6;
+
     public static final String EMPTY = " ";
 
     public static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+
+    public static final int TOAST_NEGATIVE = 0;
+    public static final int TOAST_POSITIVE = 1;
 
 
     public static void copyfile(Context context, String srFile, String dtFile){
@@ -154,11 +169,17 @@ public class Values{
         return String.valueOf(dateFormat.format(currentDate));
     }
 
-    public static void showFullscreenToast(Context context, String message){
+    public static void showFullscreenToast(Context context, String message, int type){
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View toastView = inflater.inflate(R.layout.layout_toast_fullscreen,null);
         TextView toastText = (TextView)toastView.findViewById(R.id.toast_fullscreen_text);
         toastText.setText(message);
+
+        if (type==Values.TOAST_NEGATIVE){
+            toastView.setBackgroundResource(R.color.colorAccent);
+        }else{
+            toastView.setBackgroundResource(R.color.primary);
+        }
 
         Toast toast = new Toast(context);
         toast.setDuration(Toast.LENGTH_SHORT);
@@ -240,5 +261,25 @@ public class Values{
                 .setPersonFirstname(personItem.getFirstname())
                 .setPersonMidname(personItem.getMidname())
                 .setPersonPhoto(personItem.getPhotoPreview());
+    }
+
+    public static int closeAllRooms(Context context){
+        int closedRooms = 0;
+        DataBaseRooms dataBaseRooms = new DataBaseRooms(context);
+        DataBaseJournal dataBaseJournal = new DataBaseJournal(context);
+        ArrayList<RoomItem> rooms = dataBaseRooms.readRoomsDB();
+        for (RoomItem roomItem : rooms){
+            if (roomItem.Status==Values.ROOM_IS_BUSY){
+                roomItem.Status = Values.ROOM_IS_FREE;
+                roomItem.Tag = Values.EMPTY;
+
+                dataBaseRooms.updateRoom(roomItem);
+                dataBaseJournal.updateDB(roomItem.PositionInBase);
+
+                closedRooms++;
+            }
+        }
+
+        return closedRooms;
     }
 }

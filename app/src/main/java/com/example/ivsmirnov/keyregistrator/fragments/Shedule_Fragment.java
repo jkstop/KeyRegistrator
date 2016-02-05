@@ -35,7 +35,7 @@ import java.util.Locale;
 /**
  * Created by IVSmirnov on 08.09.2015.
  */
-public class Shedule_Fragment extends Fragment implements Shedule_Load{
+public class Shedule_Fragment extends Fragment{
 
     private Context mContext;
     private DataBaseShedule dbShedule;
@@ -53,14 +53,14 @@ public class Shedule_Fragment extends Fragment implements Shedule_Load{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+        //setHasOptionsMenu(true);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_shedule_fragment,container,false);
-        mContext = rootView.getContext();
+       /* mContext = rootView.getContext();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
@@ -75,10 +75,10 @@ public class Shedule_Fragment extends Fragment implements Shedule_Load{
 
         textHead = (TextView)rootView.findViewById(R.id.layout_shedule_head_date);
         textHead.setText(mSharedPreferences.getString(Values.DATE_SHEDULE_UPDATE, "Нажмите ОБНОВИТЬ"));
-
+*/
         return rootView;
     }
-
+/*
     private void sortByABC(ArrayList <SparseArray> items){
         Collections.sort(items, new Comparator<SparseArray>() {
             @Override
@@ -131,6 +131,6 @@ public class Shedule_Fragment extends Fragment implements Shedule_Load{
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM",new Locale("ru"));
         return String.valueOf(dateFormat.format(currentDate));
     }
-
+*/
 
 }

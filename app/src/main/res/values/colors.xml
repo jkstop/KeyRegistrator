@@ -60,7 +60,7 @@
     <color name="person_card_text_primary">#000000</color>
     <color name="person_card_text_secondary">@color/material_grey_900</color>
 
-    <color name="toast_fullscreen_background">#c8000000</color>
+    <color name="toast_fullscreen_background">#a4000000</color>
     <color name="toast_fullscreen_text">#ffffff</color>
 
     <color name="journal_card_text_primary">@color/material_grey_600</color>

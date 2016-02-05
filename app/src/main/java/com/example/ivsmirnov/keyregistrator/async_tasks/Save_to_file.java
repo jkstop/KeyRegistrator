@@ -24,27 +24,28 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
     private Settings mSettings;
     private ProgressDialog mProgressDialog;
     private String mPathExternal;
+    private boolean isShowDialog;
 
     private static final String JOURNAL = "/Journal.xls";
     private static final String TEACHERS = "/Teachers.csv";
 
-    public Save_to_file (Context context, int loadType){
+    public Save_to_file (Context context, int loadType, boolean isShowDialog){
         this.mContext = context;
         this.mType = loadType;
+        this.isShowDialog = isShowDialog;
         mSettings = new Settings(mContext);
         mPathExternal = Environment.getExternalStorageDirectory().getPath();
         mProgressDialog = new ProgressDialog(mContext);
     }
 
-
     @Override
     protected void onPreExecute() {
-
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setMessage("Запись...");
-        mProgressDialog.show();
-        super.onPreExecute();
+        if (isShowDialog){
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.setMessage("Запись...");
+            mProgressDialog.show();
+        }
     }
 
     @Override
@@ -80,7 +81,6 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
         if (mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }

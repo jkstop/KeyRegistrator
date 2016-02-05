@@ -139,7 +139,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
                 dialog_fragment.show(getFragmentManager(),"columns");
                 return true;
             case R.id.menu_auditrooms_save_to_file:
-                Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_ROOMS);
+                Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_ROOMS, true);
                 saveToFile.execute();
                 return true;
             case R.id.menu_auditrooms_load_from_file:

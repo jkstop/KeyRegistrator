@@ -70,9 +70,12 @@
     <string name="done">Готово!</string>
     <string name="added">Добавлено!</string>
 
+    <string name="add">Добавить</string>
+
     <string name="title_check_sql_server_connect">Проверка подключения к SQL - серверу</string>
     <string name="connected">Подключено</string>
     <string name="disconnected">Отключено</string>
+
 
     <string name="dialog_delete_room_message">Удалить аудиторию </string>
     <string name="dialog_columns_title">Выберите количество колонок</string>
@@ -90,7 +93,9 @@
 
     <!-- Toasts -->
     <string name="text_toast_put_card">Для сдачи ключей просто приложите карту</string>
-    <string name="text_toast_choise_room_in_first">Чтобы взять ключ сначала выберите аудиторию</string>
+    <string name="text_toast_choise_room_in_first">Для начала выберите аудиторию!</string>
+    <string name="text_toast_thanks">Спасибо!</string>
+    <string name="text_toast_take_key">Возьмите ключ</string>
     <string name="text_nfc_head_card_incorrect">Не удалось распознать вашу карту.\n
         Попробуйте приложить её еще раз.</string>
     

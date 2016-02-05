@@ -49,7 +49,7 @@ public class NFC_Reader{
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (mReader!=null){
+            if (mReader.getReaderName()!=null){
                 Log.d("ReaderName: ", mReader.getReaderName());
             }
         }

@@ -97,26 +97,19 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
             mAdapter = new adapter_persons_grid(mContext, mAllItems, Values.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position) {
-                    String gender = "";
-                    String lastname = mAllItems.get(position).getMidname();
-                    if (lastname.length() != 0) {
-                        if (lastname.substring(lastname.length() - 1).equals("а")) {
-                            gender = "Ж";
-                        } else {
-                            gender = "М";
-                        }
-                    }
+
+                    ArrayList <String> valuesForDialog = new ArrayList<>();
+                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME, mAllItems.get(position).getLastname());
+                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME, mAllItems.get(position).getFirstname());
+                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME, mAllItems.get(position).getMidname());
+                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION, mAllItems.get(position).getDivision());
+                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL, mAllItems.get(position).getPhotoOriginal());
+                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, mAllItems.get(position).getRadioLabel());
+                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_SEX, mAllItems.get(position).getSex());
 
                     Bundle b = new Bundle();
                     b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
-                    b.putStringArray("valuesForEdit", new String[]{
-                            mAllItems.get(position).getLastname(),
-                            mAllItems.get(position).getFirstname(),
-                            mAllItems.get(position).getMidname(),
-                            mAllItems.get(position).getDivision(),
-                            gender,
-                            mAllItems.get(position).getPhotoOriginal()});
-                    b.putInt("position", position);
+                    b.putStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION, valuesForDialog);
                     Dialog_Fragment dialog = new Dialog_Fragment();
                     dialog.setArguments(b);
                     dialog.setTargetFragment(Persons_Fragment.this, 0);
@@ -137,7 +130,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
                     new TakeKey(mContext).execute(new TakeKeyParams()
                             .setAccessType(Values.ACCESS_BY_CLICK)
-                            .setAuditroom(getArguments().getString(Values.AUDITROOM))
+                            .setAuditroom(mSettings.getLastClickedAuditroom())
                             .setPersonItem(mAllItems.get(position))
                             .setPublicInterface(mKeyInterface));
                     //takeKey(Values.ACCESS_BY_CLICK, position);
@@ -153,7 +146,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
                     new TakeKey(mContext).execute(new TakeKeyParams()
                             .setAccessType(Values.ACCESS_BY_CARD)
-                            .setAuditroom(getArguments().getString(Values.AUDITROOM))
+                            .setAuditroom(mSettings.getLastClickedAuditroom())
                             .setPersonItem(mAllItems.get(position))
                             .setPublicInterface(mKeyInterface));
                     //takeKey(Values.ACCESS_BY_CARD, position);
@@ -193,30 +186,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         return initials;
     }
 
-    private JournalItem createJournalItem(int accessType, int position){
-        return new JournalItem()
-                .setAccountID(mSettings.getActiveAccountID())
-                .setAuditroom(getArguments().getString(Values.AUDITROOM))
-                .setTimeIn(System.currentTimeMillis())
-                .setAccessType(accessType)
-                .setPersonLastname(mAllItems.get(position).getLastname())
-                .setPersonFirstname(mAllItems.get(position).getFirstname())
-                .setPersonMidname(mAllItems.get(position).getMidname())
-                .setPersonPhoto(mAllItems.get(position).getPhotoPreview());
-    }
 
- /*   private void writeRoom (JournalItem journalItem, long positionInBase, int position){
-        DataBaseRooms dataBaseRooms = new DataBaseRooms(mContext);
-        dataBaseRooms.updateRoom(new RoomItem(journalItem.getAuditroom(),
-                Values.ROOM_IS_BUSY,
-                journalItem.getAccessType(),
-                positionInBase,
-                getPersonInitials(journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()),
-                mAllItems.get(position).RadioLabel,
-                mAllItems.get(position).PhotoOriginal));
-        dataBaseRooms.closeDB();
-    }
-*/
     private void showMainAuditroomsGrid(){
         getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
     }
@@ -244,23 +214,15 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         sortByABC();
 
         mListView = (ListView)rootView.findViewById(R.id.list_for_base_sql);
-        mListCharacters = new ArrayList<>();
 
-        for (int i=0;i<mAllItems.size();i++){
-            String surname = mAllItems.get(i).getLastname();
-            String startChar = surname.substring(0,1).toUpperCase();
-            if (!mListCharacters.contains(startChar)){
-                mListCharacters.add(startChar);
-            }
-        }
+        initListCharacters();
 
         mListAdapter = new adapter_list_characters(mContext,mListCharacters);
         mListView.setAdapter(mListAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String character = mListCharacters.get(i);
-                move(character);
+                move(mListCharacters.get(i));
             }
         });
 
@@ -287,6 +249,17 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
             }
         }
 
+    }
+
+    private void initListCharacters(){
+        mListCharacters = new ArrayList<>();
+        for (int i=0;i<mAllItems.size();i++){
+            String surname = mAllItems.get(i).getLastname();
+            String startChar = surname.substring(0,1).toUpperCase();
+            if (!mListCharacters.contains(startChar)){
+                mListCharacters.add(startChar);
+            }
+        }
     }
 
    /* public static void writeIt(Context context,String aud, String name, Long time, String path, String tag, String cardOrHandle) {
@@ -344,7 +317,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_teachers_save_to_file:
-                Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_TEACHERS);
+                Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_TEACHERS, true);
                 saveToFile.execute();
                 return true;
             case R.id.menu_teachers_download_favorite:
@@ -368,14 +341,14 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                 iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, mSettings.getPersonsBackupLocation());
                 startActivityForResult(iLC,Values.REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
                 return true;
-            case R.id.menu_teachers_set_columns_number:
+            case R.id.menu_teachers_set_columns_number:/*
                 Dialog_Fragment dialog_fragment = new Dialog_Fragment();
                 Bundle bundlePersons = new Bundle();
                 bundlePersons.putInt(Values.DIALOG_TYPE, Values.SELECT_COLUMNS_DIALOG);
                 bundlePersons.putString("AudOrPer", "per");
                 dialog_fragment.setArguments(bundlePersons);
                 dialog_fragment.setTargetFragment(this, 0);
-                dialog_fragment.show(getFragmentManager(), "columns");
+                dialog_fragment.show(getFragmentManager(), "columns");*/
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -399,7 +372,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         }
     }
 
-
     @Override
     public void onPause() {
         super.onPause();
@@ -415,14 +387,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
         initializeRecyclerAdapter();
 
-        mListCharacters = new ArrayList<>();
-        for (int i=0;i<mAllItems.size();i++){
-            String lastname = mAllItems.get(i).getLastname();
-            String startChar = lastname.substring(0,1);
-            if (!mListCharacters.contains(startChar)){
-                mListCharacters.add(startChar);
-            }
-        }
+        initListCharacters();
 
         mListAdapter = new adapter_list_characters(mContext,mListCharacters);
         mListView.setAdapter(mListAdapter);
@@ -430,6 +395,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
     @Override
     public void onTakeKey() {
+        Values.showFullscreenToast(mContext, getResources().getString(R.string.text_toast_take_key), Values.TOAST_POSITIVE);
         showMainAuditroomsGrid();
     }
 }

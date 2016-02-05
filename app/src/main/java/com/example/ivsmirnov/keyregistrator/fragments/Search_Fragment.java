@@ -37,6 +37,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by ivsmirnov on 04.12.2015.
@@ -138,8 +139,8 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                             .setFirstname(firstname)
                             .setMidname(midname)
                             .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo))
-                            .setPhotoOriginal(photo));
-
+                            .setPhotoOriginal(photo)
+                            .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1));
                 }
             }
         });

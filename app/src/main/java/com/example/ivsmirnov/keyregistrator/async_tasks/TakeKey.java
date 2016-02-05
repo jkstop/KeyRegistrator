@@ -26,9 +26,9 @@ public class TakeKey extends AsyncTask<TakeKeyParams,Void,Void> {
 
     @Override
     protected void onPreExecute() {
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setMessage("Подождите...");
         mProgressDialog.setCancelable(false);
-        mProgressDialog.setMessage("Подождите");
         mProgressDialog.show();
     }
 

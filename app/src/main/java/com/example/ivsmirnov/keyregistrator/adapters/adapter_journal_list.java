@@ -53,7 +53,7 @@ public class adapter_journal_list extends RecyclerView.Adapter<adapter_journal_l
         holder.mTextTimeIn.setText(String.valueOf(new Time(journalItems.get(position).getTimeIn())));
         if (journalItems.get(position).getTimeOut()==0){
             holder.mTextTimeOut.setText(R.string.journal_card_during_lesson);
-            holder.mTextTimeOut.setTextColor(Color.RED);
+            //holder.mTextTimeOut.setTextColor(Color.RED);
         }else{
             holder.mTextTimeOut.setText(String.valueOf(new Time(journalItems.get(position).getTimeOut())));
         }

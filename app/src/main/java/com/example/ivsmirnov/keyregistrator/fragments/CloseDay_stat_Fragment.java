@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 
@@ -25,11 +26,7 @@ public class CloseDay_stat_Fragment extends Fragment {
         Context context = root.getContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        DataBaseJournal dbJournal = new DataBaseJournal(context);
-        int previousCursorPosition = preferences.getInt(Values.CURSOR_POSITION, dbJournal.cursor.getCount()) +1;
 
-        int nowCursorPosition = dbJournal.cursor.getCount();
-        int positionsForToday = nowCursorPosition - previousCursorPosition;
 
         TextView textDate = (TextView) root.findViewById(R.id.close_day_date);
         TextView textItems = (TextView) root.findViewById(R.id.close_day_items_in_journal);
@@ -38,11 +35,10 @@ public class CloseDay_stat_Fragment extends Fragment {
 
 
         textDate.setText(preferences.getString(Values.TODAY, Values.showDate()));
-        textItems.setText(String.valueOf(positionsForToday));
-        textClosed.setText(String.valueOf(preferences.getInt(Values.AUTO_CLOSED_COUNT, 0)));
-        textTotal.setText(String.valueOf(dbJournal.cursor.getCount()));
+        textItems.setText(String.valueOf(new DataBaseJournal(context).getItemCountForToday()));
+        textClosed.setText(String.valueOf(new Settings(context).getAutoClosedRoomsCount()));
+        textTotal.setText(String.valueOf(new Settings(context).getTotalJournalCount()));
 
-        dbJournal.closeDB();
         return root;
     }
 }

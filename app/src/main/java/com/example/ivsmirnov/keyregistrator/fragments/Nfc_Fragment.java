@@ -54,7 +54,7 @@ public class Nfc_Fragment extends Fragment {
 
             JournalItem journalItem = new JournalItem()
                     .setAccountID(mSettings.getActiveAccountID())
-                    .setAuditroom(getArguments().getString(Values.AUDITROOM))
+                    .setAuditroom(mSettings.getLastClickedAuditroom())
                     .setTimeIn(System.currentTimeMillis())
                     .setAccessType(Values.ACCESS_BY_CLICK)
                     .setPersonLastname(((Button)v).getText().toString())
@@ -95,19 +95,20 @@ public class Nfc_Fragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_nfc_all_persons:
-                Dialog_Fragment dialog_fragment = new Dialog_Fragment();
+                /*Dialog_Fragment dialog_fragment = new Dialog_Fragment();
                 Bundle bundle = new Bundle();
                 bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
                 bundle.putInt(Values.DIALOG_CLOSE_ROOM_TYPE,Values.DIALOG_CLOSE_ROOM_TYPE_PERSONS);
                 bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLOSE_ROOM);
                 dialog_fragment.setArguments(bundle);
-                dialog_fragment.show(getChildFragmentManager(),"enter_pin");
-                /*Bundle bundle = new Bundle();
+                dialog_fragment.show(getChildFragmentManager(),"enter_pin");*/
+                Bundle bundle = new Bundle();
                 bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
-                bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
                 Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
                 persons_fragment.setArguments(bundle);
-                getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.tag_persons_fragment)).commit();*/
+
+               getActivity().getSupportFragmentManager()
+                       .beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

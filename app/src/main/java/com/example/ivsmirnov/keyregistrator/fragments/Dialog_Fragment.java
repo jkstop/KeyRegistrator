@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
+import android.support.annotation.StringDef;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -37,6 +38,7 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
@@ -136,7 +138,7 @@ public class Dialog_Fragment extends DialogFragment{
 
                 final View dialogView = mInflater.inflate(R.layout.layout_person_information, null);
                 final ImageView personImage = (ImageView) dialogView.findViewById(R.id.person_information_image);
-                final String [] values = getArguments().getStringArray("valuesForEdit");
+                final ArrayList<String> valuesForEdits = getArguments().getStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION);
                 final DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
 
                 final TextInputLayout inputLastname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_lastname_layout);
@@ -144,71 +146,83 @@ public class Dialog_Fragment extends DialogFragment{
                 final TextInputLayout inputMidname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_midname_layout);
                 final TextInputLayout inputDivision = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_division_layout);
 
-                try {
-                    assert values != null;
-                    inputLastname.getEditText().setText(values[0]);
-                    inputFirstname.getEditText().setText(values[1]);
-                    inputMidname.getEditText().setText(values[2]);
-                    inputDivision.getEditText().setText(values[3]);
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
+                String tag = Values.EMPTY;
+
+                if (valuesForEdits!=null){
+                    inputLastname.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME));
+                    inputFirstname.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME));
+                    inputMidname.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME));
+                    inputDivision.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION));
+
+                    byte[] decodedString = Base64.decode(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL), Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    personImage.setImageBitmap(bitmap);
+
+                    tag = valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_TAG);
                 }
 
-/*
-                try {
-                    ImageLoader imageLoader = ImageLoader.getInstance();
-                    if (!imageLoader.isInited()){
-                        imageLoader.init(ImageLoaderConfiguration.createDefault(mContext));
-                    }
-                    imageLoader.displayImage("file://" + values[5], personImage);
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                }*/
 
-                byte[] decodedString = Base64.decode(values[5], Base64.DEFAULT);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                personImage.setImageBitmap(bitmap);
+
 
                 AlertDialog.Builder builderEdit = new AlertDialog.Builder(getActivity());
                 builderEdit.setView(dialogView);
-                builderEdit.setNeutralButton(getResources().getString(R.string.delete), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (values!=null){
-                            dbFavorite.deleteFromTeachersDB(new PersonItem()
-                                    .setLastname(values[0])
-                                    .setFirstname(values[1])
-                                    .setMidname(values[2])
-                                    .setDivision(values[3]));
+
+                final DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
+                if (dataBaseFavorite.isAccountInBase(tag)){
+                    builderEdit.setNeutralButton(getResources().getString(R.string.delete), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (valuesForEdits!=null){
+                                dbFavorite.deleteFromTeachersDB(new PersonItem()
+                                        .setLastname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME))
+                                        .setFirstname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME))
+                                        .setMidname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME))
+                                        .setDivision(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION)));
+                                dbFavorite.closeDB();
+                                updateInformation();
+                            }
+                        }
+                    });
+                    builderEdit.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
                             dbFavorite.closeDB();
                         }
-                        updateInformation();
-                    }
-                });
-                builderEdit.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        dbFavorite.closeDB();
-                    }
-                });
-                builderEdit.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String [] source = getArguments().getStringArray("valuesForEdit");
-                        String[] edited = new String[4];
+                    });
+                    builderEdit.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ArrayList<String> valuesEdited = new ArrayList<String>();
+                            valuesEdited.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME,inputLastname.getEditText().getText().toString());
+                            valuesEdited.add(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME, inputFirstname.getEditText().getText().toString());
+                            valuesEdited.add(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME, inputMidname.getEditText().getText().toString());
+                            valuesEdited.add(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION, inputDivision.getEditText().getText().toString());
 
-                        edited[0] = inputLastname.getEditText().getText().toString();
-                        edited[1] = inputFirstname.getEditText().getText().toString();
-                        edited[2] = inputMidname.getEditText().getText().toString();
-                        edited[3] = inputDivision.getEditText().getText().toString();
+                            dbFavorite.updateTeachersDB(valuesForEdits, valuesEdited);
+                            dbFavorite.closeDB();
 
-                        dbFavorite.updateTeachersDB(source, edited);
-                        dbFavorite.closeDB();
+                            updateInformation();
+                        }
+                    });
+                }else{
+                    builderEdit.setNeutralButton(getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dataBaseFavorite.writeInDBTeachers(new PersonItem().setLastname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME))
+                                    .setFirstname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME))
+                                    .setMidname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME))
+                                    .setDivision(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION))
+                                    .setPhotoOriginal(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL))
+                                    .setPhotoPreview(DataBaseFavorite.getPhotoPreview(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL)))
+                                    .setSex(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_SEX))
+                                    .setRadioLabel(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_TAG)));
+                            updateInformation();
+                        }
+                    });
+                }
 
-                        updateInformation();
-                    }
-                });
+
                 builderEdit.setCancelable(false);
                 return builderEdit.create();
             case Values.DELETE_ROOM_DIALOG:

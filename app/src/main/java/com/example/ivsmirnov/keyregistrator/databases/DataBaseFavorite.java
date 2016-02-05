@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -71,28 +72,7 @@ public class DataBaseFavorite {
             }
         }
         if (personItem.isEmpty()){
-            try {
-                Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
-                if (connection!=null){
-                    Statement statement = connection.createStatement();
-                    ResultSet resultSet = statement.executeQuery("select * from STAFF where [RADIO_LABEL] = '"+tag+"'");
-                    while(resultSet.next()){
-                        //String namePosition = resultSet.getString("NAME_POSITION");
-                        writeInDBTeachers(new PersonItem()
-                                .setLastname(resultSet.getString("LASTNAME"))
-                                .setFirstname(resultSet.getString("FIRSTNAME"))
-                                .setMidname(resultSet.getString("MIDNAME"))
-                                .setDivision(resultSet.getString("NAME_DIVISION"))
-                                .setSex(resultSet.getString("SEX"))
-                                .setPhotoPreview(getPhotoPreview(resultSet.getString("PHOTO")))
-                                .setPhotoOriginal(resultSet.getString("PHOTO"))
-                                .setRadioLabel(resultSet.getString("RADIO_LABEL")));
-                    }
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                Toast.makeText(mContext,"Нет подключения к серверу",Toast.LENGTH_SHORT).show();
-            }
+            writeInDBTeachers(findInServer(mContext,tag));
         }
         dbFavorite.closeDB();
         Long end = System.currentTimeMillis();
@@ -101,10 +81,48 @@ public class DataBaseFavorite {
         return personItem;
     }
 
+    public static PersonItem findInServer(Context context,String tag){
+        PersonItem personItem = null;
+        try {
+            Connection connection = SQL_Connector.check_sql_connection(context, new Settings(context).getServerConnectionParams());
+            if (connection!=null){
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery("select * from STAFF where [RADIO_LABEL] = '"+tag+"'");
+                while(resultSet.next()){
+                    //String namePosition = resultSet.getString("NAME_POSITION");
+                    personItem = new PersonItem()
+                            .setLastname(resultSet.getString("LASTNAME"))
+                            .setFirstname(resultSet.getString("FIRSTNAME"))
+                            .setMidname(resultSet.getString("MIDNAME"))
+                            .setDivision(resultSet.getString("NAME_DIVISION"))
+                            .setSex(resultSet.getString("SEX"))
+                            .setPhotoPreview(getPhotoPreview(resultSet.getString("PHOTO")))
+                            .setPhotoOriginal(resultSet.getString("PHOTO"))
+                            .setRadioLabel(resultSet.getString("RADIO_LABEL"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return personItem;
+    }
+
     public void closeDB(){
         dataBaseFavoriteRegist.close();
         sqLiteDatabase.close();
         cursor.close();
+    }
+
+    public boolean isAccountInBase (String tag){
+        String userInBase = null;
+        try {
+            userInBase = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " = '" + tag + "'").simpleQueryForString();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return userInBase != null;
     }
 
 
@@ -115,16 +133,18 @@ public class DataBaseFavorite {
     }*/
 
     public void writeInDBTeachers(PersonItem personItem) {
-        ContentValues cv = new ContentValues();
-        cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
-        cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
-        cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE, personItem.getMidname());
-        cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
-        cv.put(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE, personItem.getRadioLabel());
-        cv.put(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE, personItem.getSex());
-        cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE, personItem.getPhotoPreview());
-        cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE, personItem.getPhotoOriginal());
-        sqLiteDatabase.insert(DataBaseFavoriteRegist.TABLE_TEACHER, null, cv);
+        if (personItem!=null){
+            ContentValues cv = new ContentValues();
+            cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
+            cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
+            cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE, personItem.getMidname());
+            cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
+            cv.put(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE, personItem.getRadioLabel());
+            cv.put(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE, personItem.getSex());
+            cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE, personItem.getPhotoPreview());
+            cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE, personItem.getPhotoOriginal());
+            sqLiteDatabase.insert(DataBaseFavoriteRegist.TABLE_TEACHER, null, cv);
+        }
     }
 
     public void backupFavoriteStaffToFile(){
@@ -193,19 +213,19 @@ public class DataBaseFavorite {
         sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, null, null);
     }
 
-    public void updateTeachersDB(String [] source, String [] edited){
+    public void updateTeachersDB(ArrayList<String> source, ArrayList<String> edited){
         cursor.moveToPosition(-1);
         while (cursor.moveToNext()){
-            if (source[0].equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))&&
-                    source[1].equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))&&
-                    source[2].equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))&&
-                    source[3].equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))){
+            if (source.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME).equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))&&
+                    source.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME).equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))&&
+                    source.get(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME).equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))&&
+                    source.get(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION).equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))){
                 int row = cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID));
                 ContentValues cv = new ContentValues();
-                cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,edited[0]);
-                cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE,edited[1]);
-                cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE,edited[2]);
-                cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE,edited[3]);
+                cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,edited.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME));
+                cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE,edited.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME));
+                cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE,edited.get(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME));
+                cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE,edited.get(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION));
                 sqLiteDatabase.update(DataBaseFavoriteRegist.TABLE_TEACHER, cv, DataBaseFavoriteRegist._ID + "=" + row, null);
             }
         }

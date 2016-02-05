@@ -20,6 +20,22 @@ public class Settings {
         mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
     }
 
+    public void setLastClickedAuditroom(String auditroom){
+        mPreferencesEditor.putString(Values.AUDITROOM, auditroom).apply();
+    }
+
+    public String getLastClickedAuditroom(){
+        return mPreferences.getString(Values.AUDITROOM, Values.EMPTY);
+    }
+
+    public void setTotalJournalCount(int count){
+        mPreferencesEditor.putInt(Values.TOTAL_JOURNAL_COUNT,count).apply();
+    }
+
+    public int getTotalJournalCount(){
+        return mPreferences.getInt(Values.TOTAL_JOURNAL_COUNT, 0);
+    }
+
     public String getActiveAccountID(){
         return mPreferences.getString(Values.ACTIVE_ACCOUNT_ID, "localAccount");
     }
@@ -83,9 +99,17 @@ public class Settings {
     }
 
 
-    //Auto close status
+    //Auto close
     public void setAutoCloseStatus(boolean status){
         mPreferencesEditor.putBoolean(Values.ALARM_SET, status).apply();
+    }
+
+    public void setAutoClosedRoomsCount(int closedRoomsCount){
+        mPreferencesEditor.putInt(Values.AUTO_CLOSED_COUNT, closedRoomsCount).apply();
+    }
+
+    public int getAutoClosedRoomsCount(){
+        return mPreferences.getInt(Values.AUTO_CLOSED_COUNT, 0);
     }
 
     public boolean getAutoCloseStatus(){

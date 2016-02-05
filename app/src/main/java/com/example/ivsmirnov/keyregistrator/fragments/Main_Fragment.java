@@ -161,12 +161,12 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                 dialog_resize.setTargetFragment(this,0);
                 dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
-            case R.id.test:
+            //case R.id.test:
                 //Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"},
                 //        false, null, null, null, null);
                 //startActivityForResult(intent, 123);
 
-                return true;
+            //    return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -278,9 +278,9 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
             return;
         }
         if (mRoomItems.get(position).Status==Values.ROOM_IS_FREE) {
+            mSettings.setLastClickedAuditroom(mRoomItems.get(position).Auditroom);
             Bundle bundle = new Bundle();
             bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
-            bundle.putString(Values.AUDITROOM, mRoomItems.get(position).Auditroom);
             Nfc_Fragment nfc_fragment = Nfc_Fragment.newInstance();
             nfc_fragment.setArguments(bundle);
             getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, nfc_fragment, getResources().getString(R.string.fragment_tag_nfc)).commit();
@@ -305,7 +305,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                         .setTag(mRoomItems.get(position).Tag)
                         .setRoomInterface(roomInterface));
             }else{
-                Values.showFullscreenToast(mContext,getResources().getString(R.string.text_toast_put_card));
+                Values.showFullscreenToast(mContext,getResources().getString(R.string.text_toast_put_card),Values.TOAST_NEGATIVE);
             }
         }
         lastClickTime = SystemClock.elapsedRealtime();
@@ -345,7 +345,8 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     }
 
     @Override
-    public void onRoomClosed() {
+    public void onRoomClosed(int closedRooms) {
         getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
+        Values.showFullscreenToast(mContext, getResources().getString(R.string.text_toast_thanks), Values.TOAST_POSITIVE);
     }
 }

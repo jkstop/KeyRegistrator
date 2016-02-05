@@ -42,7 +42,7 @@ public class Email_Fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_dialog_email_settings,container,false);
-        mContext = rootView.getContext();
+       /* mContext = rootView.getContext();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
 
@@ -106,7 +106,7 @@ public class Email_Fragment extends Fragment {
         body.setText(bodyText);
         theme.setText(themeText);
         checkJournal.setChecked(mSharedPreferences.getBoolean(Values.CHECK_JOURNAL, false));
-        checkTeachers.setChecked(mSharedPreferences.getBoolean(Values.CHECK_TEACHERS,false));
+        checkTeachers.setChecked(mSharedPreferences.getBoolean(Values.CHECK_TEACHERS,false));*/
         return rootView;
     }
 }
