@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -40,6 +41,17 @@ import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInApi;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.plus.Plus;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,6 +86,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
 
     private static long lastClickTime = 0;
 
+
     public static Main_Fragment newInstance (){
         return new Main_Fragment();
     }
@@ -95,6 +108,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         DataBaseRooms dbRooms = new DataBaseRooms(mContext);
         mRoomItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();
+
 
         roomInterface = this;
 
@@ -161,16 +175,18 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                 dialog_resize.setTargetFragment(this,0);
                 dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
-            //case R.id.test:
-                //Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"},
-                //        false, null, null, null, null);
-                //startActivityForResult(intent, 123);
+            case R.id.test:
 
-            //    return true;
+
+                return true;
+            case R.id.test2:
+
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
 
     @Override
@@ -191,6 +207,16 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                     get_account_information.execute();
                 }catch (Exception e){
                     e.printStackTrace();
+                }
+            }
+        }else if (requestCode == 1111){
+            if (resultCode == Activity.RESULT_OK){
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                if (result.isSuccess()) {
+                    GoogleSignInAccount acct = result.getSignInAccount();
+                    // Get account information
+                    Log.d("name",acct.getDisplayName());
+                    Log.d("email",acct.getEmail());
                 }
             }
         }
@@ -349,4 +375,5 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
         Values.showFullscreenToast(mContext, getResources().getString(R.string.text_toast_thanks), Values.TOAST_POSITIVE);
     }
+
 }

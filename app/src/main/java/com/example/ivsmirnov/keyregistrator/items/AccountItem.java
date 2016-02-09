@@ -5,17 +5,54 @@ package com.example.ivsmirnov.keyregistrator.items;
  */
 public class AccountItem {
 
-    public String Lastname;
-    public String Firstname;
-    public String Email;
-    public String Photo;
-    public String AccountID;
+    private String Lastname;
+    private String Firstname;
+    private String Email;
+    private String Photo;
+    private String AccountID;
 
-    public AccountItem (String lastname, String firstname, String email, String photo, String id){
+    public AccountItem setLastname(String lastname){
         this.Lastname = lastname;
+        return this;
+    }
+
+    public AccountItem setFirstname(String firstname){
         this.Firstname = firstname;
+        return this;
+    }
+
+    public AccountItem setEmail(String email){
         this.Email = email;
+        return this;
+    }
+
+    public AccountItem setPhoto(String photo){
         this.Photo = photo;
-        this.AccountID = id;
+        return this;
+    }
+
+    public AccountItem setAccountID(String accountID){
+        this.AccountID = accountID;
+        return this;
+    }
+
+    public String getLastname(){
+        return Lastname;
+    }
+
+    public String getFirstname(){
+        return Firstname;
+    }
+
+    public String getEmail(){
+        return Email;
+    }
+
+    public String getPhoto(){
+        return Photo;
+    }
+
+    public String getAccountID(){
+        return AccountID;
     }
 }

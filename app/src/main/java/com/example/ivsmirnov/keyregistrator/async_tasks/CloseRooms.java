@@ -1,5 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
@@ -19,11 +20,20 @@ public class CloseRooms extends AsyncTask<CloseRoomsParams,Integer,Integer> {
 
     private Context mContext;
     private RoomInterface mRoomInterface;
+    private ProgressDialog mProgressDialog;
 
     public CloseRooms (Context context){
         this.mContext = context;
+        mProgressDialog = new ProgressDialog(mContext);
     }
 
+    @Override
+    protected void onPreExecute() {
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setMessage("Подождите...");
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
+    }
 
     @Override
     protected Integer doInBackground(CloseRoomsParams... params) {
@@ -49,6 +59,10 @@ public class CloseRooms extends AsyncTask<CloseRoomsParams,Integer,Integer> {
 
     @Override
     protected void onPostExecute(Integer closedRooms) {
+        if (mProgressDialog.isShowing()){
+            mProgressDialog.cancel();
+        }
+
         if (mRoomInterface!=null){
             mRoomInterface.onRoomClosed(closedRooms);
         }

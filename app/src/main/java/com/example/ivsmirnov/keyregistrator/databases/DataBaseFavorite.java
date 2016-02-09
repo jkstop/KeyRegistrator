@@ -72,7 +72,9 @@ public class DataBaseFavorite {
             }
         }
         if (personItem.isEmpty()){
-            writeInDBTeachers(findInServer(mContext,tag));
+            personItem = findInServer(mContext, tag);
+            writeInDBTeachers(personItem);
+            return personItem;
         }
         dbFavorite.closeDB();
         Long end = System.currentTimeMillis();
@@ -87,7 +89,7 @@ public class DataBaseFavorite {
             Connection connection = SQL_Connector.check_sql_connection(context, new Settings(context).getServerConnectionParams());
             if (connection!=null){
                 Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery("select * from STAFF where [RADIO_LABEL] = '"+tag+"'");
+                ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [RADIO_LABEL] = '"+tag+"'");
                 while(resultSet.next()){
                     //String namePosition = resultSet.getString("NAME_POSITION");
                     personItem = new PersonItem()

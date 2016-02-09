@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
@@ -46,6 +47,7 @@ public class TakeKey extends AsyncTask<TakeKeyParams,Void,Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
+
        if (mProgressDialog.isShowing()){
            mProgressDialog.cancel();
        }

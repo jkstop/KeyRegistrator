@@ -36,6 +36,10 @@ public class Settings {
         return mPreferences.getInt(Values.TOTAL_JOURNAL_COUNT, 0);
     }
 
+    public void setActiveAccountID(String accountID){
+        mPreferencesEditor.putString(Values.ACTIVE_ACCOUNT_ID, accountID).apply();
+    }
+
     public String getActiveAccountID(){
         return mPreferences.getString(Values.ACTIVE_ACCOUNT_ID, "localAccount");
     }

@@ -74,11 +74,11 @@ public class Get_Account_Information extends AsyncTask<Void,AccountItem,AccountI
 
             JSONObject jsonObject = new JSONObject(stringBuilder.toString());
 
-            accountItem = new AccountItem(jsonObject.getString("given_name"),
-                    jsonObject.getString("family_name"),
-                    jsonObject.getString("email"),
-                    jsonObject.getString("picture"),
-                    GoogleAuthUtil.getAccountId(mContext,mAccountName));
+            accountItem = new AccountItem().setLastname(jsonObject.getString("given_name"))
+                    .setFirstname( jsonObject.getString("family_name"))
+                    .setEmail(jsonObject.getString("email"))
+                    .setPhoto(jsonObject.getString("picture"))
+                    .setAccountID(GoogleAuthUtil.getAccountId(mContext,mAccountName));
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         } catch (UserRecoverableAuthException e) {
@@ -97,7 +97,7 @@ public class Get_Account_Information extends AsyncTask<Void,AccountItem,AccountI
             dbAccount.writeAccount(accountItem);
             dbAccount.closeDB();
 
-            mSharedPreferencesEditor.putString(Values.ACTIVE_ACCOUNT_ID, accountItem.AccountID);
+            mSharedPreferencesEditor.putString(Values.ACTIVE_ACCOUNT_ID, accountItem.getAccountID());
             mSharedPreferencesEditor.apply();
             mListener.onChangeAccount();
         }
