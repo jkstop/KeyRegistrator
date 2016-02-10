@@ -97,7 +97,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                     if (connection!=null){
                         try {
                             Statement statement = connection.createStatement();
-                            ResultSet resultSet = statement.executeQuery("select * from STAFF where [LASTNAME] like '"+s+"%'");
+                            ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [LASTNAME] like '"+s+"%'");
                             Find_User_in_SQL_Server find_user_in_sql_server = new Find_User_in_SQL_Server(mContext, mListener);
                             find_user_in_sql_server.execute(resultSet);
                         } catch (SQLException e) {

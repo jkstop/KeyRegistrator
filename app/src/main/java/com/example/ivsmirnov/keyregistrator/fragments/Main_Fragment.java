@@ -175,13 +175,10 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                 dialog_resize.setTargetFragment(this,0);
                 dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
-            case R.id.test:
-
-
-                return true;
-            case R.id.test2:
-
-                return true;
+            //case R.id.test:
+            //    return true;
+            //case R.id.test2:
+            //    return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -198,105 +195,6 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, final Intent data) {
-        if (requestCode == 123){
-            if (resultCode == Activity.RESULT_OK){
-                try {
-                    Get_Account_Information get_account_information = new Get_Account_Information(mContext,data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME),this);
-                    get_account_information.execute();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        }else if (requestCode == 1111){
-            if (resultCode == Activity.RESULT_OK){
-                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-                if (result.isSuccess()) {
-                    GoogleSignInAccount acct = result.getSignInAccount();
-                    // Get account information
-                    Log.d("name",acct.getDisplayName());
-                    Log.d("email",acct.getEmail());
-                }
-            }
-        }
-    }
-
-/*
-    private String getUserName(final String token){
-
-        final String[] lastname = {"-"};
-        final String[] firstname = {"-"};
-
-
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-
-                    URL url = null;
-                    HttpURLConnection urlConnection = null;
-                    BufferedReader bufferedReader = null;
-                    String resultJSON = "";
-                    url = new URL("https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token="+token);
-                    urlConnection = (HttpURLConnection) url.openConnection();
-                    urlConnection.setRequestMethod("GET");
-                    urlConnection.connect();
-
-                    InputStream inputStream = urlConnection.getInputStream();
-                    StringBuffer buffer = new StringBuffer();
-                    bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        buffer.append(line);
-                    }
-                    resultJSON = buffer.toString();
-                    JSONObject jsonObject = new JSONObject(urlConnection.toString());
-                    Log.d("given",String.valueOf(jsonObject.getString("given_name")));
-                    Log.d("family",String.valueOf(jsonObject.getString("family_name")));
-                    lastname[0] = jsonObject.getString("given_name");
-                    firstname[0] = jsonObject.getString("family_name");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        });
-
-        thread.start();
-
-        return  lastname[0] + " " + firstname[0];
-
-    }
-
-    /*
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==1){
-            if (resultCode==Activity.RESULT_OK){
-                Uri uri = data.getData();
-                String path = uri.getPath();
-                Log.d("result",path);
-            }else {
-                Log.d("result","canceled");
-            }
-        }
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (((Launcher) getActivity()).getSupportActionBar() != null) {
-            ((Launcher) getActivity()).getSupportActionBar().setTitle(getResources().getString(R.string.toolbar_title_main));
-            Log.d("toolbar", String.valueOf(((Launcher) getActivity()).getSupportActionBar().getHeight()));
-        }
-    }
-*/
 
     @Override
     public void onItemClick(View v, int position) {
@@ -312,21 +210,6 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
             getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, nfc_fragment, getResources().getString(R.string.fragment_tag_nfc)).commit();
         } else {
             if (mRoomItems.get(position).Access==Values.ACCESS_BY_CLICK) {
-/*
-                DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-                dbJournal.updateDB(mRoomItems.get(position).PositionInBase);
-                dbJournal.closeDB();
-
-                DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                dbRooms.updateRoom(new RoomItem(mRoomItems.get(position).Auditroom,
-                        Values.ROOM_IS_FREE,
-                        Values.ACCESS_BY_CLICK,
-                        0,
-                        null,
-                        null,
-                        null));
-                dbRooms.closeDB();
-                */
                 new CloseRooms(mContext).execute(new CloseRoomsParams()
                         .setTag(mRoomItems.get(position).Tag)
                         .setRoomInterface(roomInterface));
@@ -367,13 +250,11 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
 
     @Override
     public void onChangeAccount() {
-
     }
 
     @Override
     public void onRoomClosed(int closedRooms) {
         getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
-        Values.showFullscreenToast(mContext, getResources().getString(R.string.text_toast_thanks), Values.TOAST_POSITIVE);
     }
 
 }

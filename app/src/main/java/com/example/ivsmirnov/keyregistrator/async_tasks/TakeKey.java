@@ -2,6 +2,7 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -27,6 +28,7 @@ public class TakeKey extends AsyncTask<TakeKeyParams,Void,Void> {
 
     @Override
     protected void onPreExecute() {
+        Values.showFullscreenToast(mContext, mContext.getString(R.string.text_toast_take_key), Values.TOAST_POSITIVE);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mProgressDialog.setMessage("Подождите...");
         mProgressDialog.setCancelable(false);

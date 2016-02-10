@@ -4,17 +4,14 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.graphics.drawable.Drawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,13 +22,9 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.SparseArray;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -44,8 +37,6 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_navigation_drawer_list;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Open_Reader;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
@@ -55,14 +46,12 @@ import com.example.ivsmirnov.keyregistrator.fragments.Search_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.ReaderResponse;
 import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
+import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.NavigationItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Email_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Journal_fragment;
@@ -71,7 +60,6 @@ import com.example.ivsmirnov.keyregistrator.fragments.Nfc_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
-import com.example.ivsmirnov.keyregistrator.interfaces.GetUserByTag;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
@@ -79,13 +67,12 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
 import com.example.ivsmirnov.keyregistrator.services.NFC_Reader;
-import com.example.ivsmirnov.keyregistrator.services.ReaderBroadcastReceiver;
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -98,7 +85,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class Launcher extends AppCompatActivity implements Get_Account_Information_Interface, KeyInterface, RoomInterface, GoogleApiClient.OnConnectionFailedListener{
+public class Launcher extends AppCompatActivity implements Get_Account_Information_Interface,
+        KeyInterface, RoomInterface, GoogleApiClient.OnConnectionFailedListener{
 
     private DrawerLayout mDrawerLayout;
     private LinearLayout mLayout_Drawer_root;
@@ -127,8 +115,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     private UsbManager mUsbManager;
     private Reader mReader;
 
-    private SignInButton signIn, signOut;
-
     private boolean isMainNavigationVisible;
     private ArrayList<AccountItem> mAccountItems;
 
@@ -139,8 +125,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.launcher);
-
-
 
         if (savedInstanceState==null){
             showFragment(Main_Fragment.newInstance(),R.string.fragment_tag_main);
@@ -156,34 +140,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         initNavigationDrawer(getMainNavigationItems());
         initGoogleAPI();
-
-        signIn = (SignInButton)findViewById(R.id.sign_in_button);
-        signOut = (SignInButton)findViewById(R.id.sign_out_button);
-
-        signIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-                startActivityForResult(signInIntent, 777);
-            }
-        });
-        signOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        Log.d("result", String.valueOf(status.getStatus()));
-                    }
-                });
-                Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        Log.d("resultrevoke",String.valueOf(status.getStatus()));
-                    }
-                });
-            }
-        });
 
         new initReader().execute();
     }
@@ -221,7 +177,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         mLayout_Drawer_root.getLayoutParams().width = (int) calculateDrawerWidth();
         mDrawerAccountView.getLayoutParams().height = (int) calculateDrawerHeight(mLayout_Drawer_root.getLayoutParams().width);
 
-
         mNavigationDrawerListAdapter = new adapter_navigation_drawer_list(mContext,navigationItems);
         mNavigationDrawerList.setAdapter(mNavigationDrawerListAdapter);
         mNavigationDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -257,19 +212,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                     dialog_sql.show(getSupportFragmentManager(),"sql");
                 }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_stat))) {
                     startActivity(new Intent(mContext, CloseDay.class).putExtra("type", 1).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                }else if (selectedItem.equals("Добавить исчо")){
-                    Log.d("add","new"); //сделать добавление нового
-                }else{
-                    for (AccountItem accountItem : mAccountItems){
-                        if (selectedItem.equals(accountItem.getEmail())){
-                            DataBaseAccount dbAccount = new DataBaseAccount(mContext);
-                            dbAccount.writeAccount(accountItem);
-                            dbAccount.closeDB();
-                            mSettings.setActiveAccountID(accountItem.getAccountID());
-                            initNavigationDrawer(getMainNavigationItems());
-                            break;
-                        }
-                    }
                 }
 
                 mDrawerLayout.closeDrawer(mLayout_Drawer_root);
@@ -290,7 +232,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
         mActionBarDrawerToggle.syncState();
 
-        mChangeAccount.setOnClickListener(changeAccountClick);
+        mChangeAccount.setOnClickListener(logOutClick);
+        mAccountName.setOnClickListener(logOnClick);
 
         getUserActiveAccount();
     }
@@ -310,37 +253,23 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         return mNavigationItems;
     }
 
-    private ArrayList<NavigationItem> getAccountNavigationItems(){
-        ArrayList<NavigationItem> mNavigationItems = new ArrayList<>();
-        DataBaseAccount dataBaseAccount = new DataBaseAccount(mContext);
-        mAccountItems = dataBaseAccount.getAllAccounts();
-        dataBaseAccount.closeDB();
-        for (AccountItem accountItem : mAccountItems){
-            mNavigationItems.add(new NavigationItem().setText(accountItem.getEmail()));
-        }
-        mNavigationItems.add(new NavigationItem().setText("Добавить исчо"));
-        isMainNavigationVisible = false;
-        return mNavigationItems;
-    }
 
-    View.OnClickListener changeAccountClick = new View.OnClickListener() {
+    View.OnClickListener logOutClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (isMainNavigationVisible){
-                initNavigationDrawer(getAccountNavigationItems());
-            }else{
-                initNavigationDrawer(getMainNavigationItems());
-            }
+            Dialog_Fragment dialog_fragment = new Dialog_Fragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt(Values.DIALOG_TYPE, Values.DIALOG_LOG_OUT);
+            dialog_fragment.setArguments(bundle);
+            dialog_fragment.show(getSupportFragmentManager(),"dialog_logout");
+        }
+    };
 
-
-
-            /*try{
-                Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"},
-                        false, null, null, null, null);
-                startActivityForResult(intent, 123);
-            }catch (ActivityNotFoundException e){
-                Toast.makeText(mContext,"Сервисы Google Play не установлены!", Toast.LENGTH_SHORT).show();
-            }*/
+    View.OnClickListener logOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            startActivityForResult(signInIntent, Values.REQUEST_CODE_LOG_ON);
         }
     };
 
@@ -348,24 +277,21 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
         if (resultCode == Activity.RESULT_OK){
-            if (requestCode == 123){
-                try {
-                    Get_Account_Information get_account_information = new Get_Account_Information(mContext,data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME),this);
-                    get_account_information.execute();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }else if (requestCode == 777){
+            if (requestCode == Values.REQUEST_CODE_LOG_ON){
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
                 if (result.isSuccess()) {
-                    // Signed in successfully, show authenticated UI.
                     GoogleSignInAccount acct = result.getSignInAccount();
-                    Log.d("account",acct.getDisplayName());
-                    Log.d("id",acct.getId());
-
+                    AccountItem accountItem = new AccountItem().setLastname(acct.getDisplayName())
+                            .setEmail(acct.getEmail())
+                            .setPhoto(acct.getPhotoUrl().toString())
+                            .setAccountID(acct.getId());
+                    DataBaseAccount dbAccount = new DataBaseAccount(mContext);
+                    dbAccount.writeAccount(accountItem);
+                    dbAccount.closeDB();
+                    mSettings.setActiveAccountID(acct.getId());
+                    initNavigationDrawer(getMainNavigationItems());
                 } else {
-                    // Signed out, show unauthenticated UI.
-                    Log.d("signed","out");
+                    Toast.makeText(mContext,"Не удалось подключиться", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -378,10 +304,14 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         dbAccount.closeDB();
 
         if (mAccount!=null){
-            String text = mAccount.getLastname()+ " "+mAccount.getFirstname();
+            String text = mAccount.getLastname();
             mAccountName.setText(text);
             mAccountEmail.setText(mAccount.getEmail());
             new loadImageFromWeb(mAccount.getPhoto()).execute();
+        } else {
+            mAccountName.setText(getStringFromResources(R.string.navigation_drawer_account_info_text_user));
+            mAccountEmail.setText(Values.EMPTY);
+            mPersonAccountImage.setImageDrawable(null);
         }
     }
 
@@ -389,7 +319,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-
 
     private class loadImageFromWeb extends AsyncTask<Void,Drawable,Drawable>{
 
@@ -454,7 +383,18 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
     @Override
     public void onChangeAccount() {
-        //initNavigationDrawer();
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(@NonNull Status status) {
+            }
+        });
+        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(@NonNull Status status) {
+            }
+        });
+        mSettings.setActiveAccountID("localAccount");
+        getUserActiveAccount();
     }
 
     //закрытие всех позиций в 22.01
@@ -626,25 +566,21 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
     @Override
     public void onTakeKey() {
-        Values.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_take_key), Values.TOAST_POSITIVE);
         showFragment(Main_Fragment.newInstance(), R.string.fragment_tag_main);
     }
 
     @Override
     public void onRoomClosed(int closedRooms) {
         if (closedRooms!=0){
-            Values.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_thanks), Values.TOAST_POSITIVE);
             showFragment(Main_Fragment.newInstance(), R.string.fragment_tag_main);
         }else{
             Values.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_choise_room_in_first), Values.TOAST_NEGATIVE);
         }
-
     }
 
     private Fragment getFragmentByTag(int resID){
         return getSupportFragmentManager().findFragmentByTag(getResources().getString(resID));
     }
-
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override

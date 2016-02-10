@@ -42,14 +42,14 @@
                 android:layout_marginLeft="@dimen/nav_drawer_left_margin"
                 android:layout_marginRight="@dimen/nav_drawer_right_margin">
                 <TextView
+                    android:clickable="true"
                     android:id="@+id/navigation_drawer_account_information_display_name"
                     style="@style/NavigationDrawerAccountInfoText"
                     android:text="@string/navigation_drawer_account_info_text_user" />
                 <TextView
                     android:id="@+id/navigation_drawer_account_information_email"
                     style="@style/NavigationDrawerAccountInfoText"
-                    android:layout_below="@+id/navigation_drawer_account_information_display_name"
-                    android:text="@string/navigation_drawer_account_info_text_email" />
+                    android:layout_below="@+id/navigation_drawer_account_information_display_name" />
                 <ImageView
                     android:id="@+id/navigation_drawer_account_information_change_account"
                     android:layout_alignParentRight="true"
@@ -57,9 +57,8 @@
                     android:clickable="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
                     android:contentDescription="@string/navigation_drawer_change_account_image_descritpion"
-                    android:background="@drawable/ic_arrow_drop_down_white_24dp"/>
+                    android:background="@drawable/ic_exit_to_app_white_24dp"/>
             </RelativeLayout>
 
         </RelativeLayout>

@@ -37,6 +37,7 @@
     <string name="title_activity_rooms">Список аудиторий: </string>
     <string name="title_delete_room_dialog">Удаление</string>
     <string name="title_add_new_staff">Добавление нового пользователя</string>
+    <string name="title_dialog_log_out">Отсоединение аккаунта</string>
 
     <string name="label_add_button">Добавить</string>
 
@@ -101,7 +102,7 @@
     
     <!-- Navigation drawer -->
     <string name="navigation_drawer_list_item_content_description_image">navigation_drawer_list_item_content_description</string>
-    <string name="navigation_drawer_account_info_text_user">ЦП "Щербаковская"</string>
+    <string name="navigation_drawer_account_info_text_user">Войти</string>
     <string name="navigation_drawer_account_info_text_email">shsupport@fa.ru</string>
     <string name="navigation_drawer_item_home">Главная</string>
     <string name="navigation_drawer_item_persons">Преподаватели</string>
@@ -141,6 +142,10 @@
     <string name="input_empty_error">Введите хотя бы один символ!</string>
 
     <string name="view_resize_title">Для изменения размера элементов перетащите ползунок справа</string>
+
+    <string name="dialog_log_out_message">Вы точно хотите отсоединить этот аккаунт? Все введенные данные останутся невредимы.</string>
+
+
 
 
 

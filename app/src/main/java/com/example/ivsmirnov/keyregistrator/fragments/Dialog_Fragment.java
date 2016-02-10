@@ -39,6 +39,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
+import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
@@ -147,7 +148,6 @@ public class Dialog_Fragment extends DialogFragment{
                 final TextInputLayout inputDivision = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_division_layout);
 
                 String tag = Values.EMPTY;
-
                 if (valuesForEdits!=null){
                     inputLastname.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME));
                     inputFirstname.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME));
@@ -423,24 +423,6 @@ public class Dialog_Fragment extends DialogFragment{
                                 new CloseRooms(mContext).execute(new CloseRoomsParams()
                                         .setTag(getArguments().getString("tag"))
                                         .setRoomInterface(Main_Fragment.roomInterface));
-                                /*DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-                                DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                                String aud = getArguments().getString("aud");
-                                long pos = getArguments().getLong(Values.POSITION_IN_BASE_FOR_ROOM,-1);
-                                if (pos != -1) {
-                                    dbJournal.updateDB(pos);
-                                }
-                                dbRooms.updateRoom(new RoomItem(aud,
-                                        Values.ROOM_IS_FREE,
-                                        Values.ACCESS_BY_CLICK,
-                                        0,
-                                        null,
-                                        null,
-                                        null));
-                                getActivity().getSupportFragmentManager()
-                                        .beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(), getResources().getString(R.string.fragment_tag_main)).commit();
-                                dbJournal.closeDB();
-                                dbRooms.closeDB();*/
                                 dismiss();
                             }else{
                                 Bundle bundle = new Bundle();
@@ -505,6 +487,25 @@ public class Dialog_Fragment extends DialogFragment{
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.title_check_sql_server_connect)
                         .setView(sqlDialogView)
+                        .create();
+            case Values.DIALOG_LOG_OUT:
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle(getString(R.string.title_dialog_log_out))
+                        .setMessage(getString(R.string.dialog_log_out_message))
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Get_Account_Information_Interface get_account_information_interface =
+                                        (Get_Account_Information_Interface)getActivity();
+                                get_account_information_interface.onChangeAccount();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
                         .create();
             default:
                 return null;

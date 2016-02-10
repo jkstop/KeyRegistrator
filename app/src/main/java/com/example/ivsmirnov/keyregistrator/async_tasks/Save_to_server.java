@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
@@ -42,6 +43,7 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
     protected Void doInBackground(Void... params) {
         DataBaseJournal dbJournal = new DataBaseJournal(mContext);
         ArrayList<JournalItem> mItems = dbJournal.realAllJournalFromDB();
+        dbJournal.closeDB();
 
         try {
             Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
@@ -50,6 +52,7 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
                 trunacteTable.execute();
                 for (int i=0;i<mItems.size();i++){
                     JournalItem journalItem = mItems.get(i);
+
                     PreparedStatement preparedStatement  = connection.prepareStatement("INSERT INTO Journal_recycler VALUES ('"
                             +journalItem.getAccountID()+"','"
                             +journalItem.getAuditroom()+"','"

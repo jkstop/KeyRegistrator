@@ -243,35 +243,28 @@ public class DataBaseJournal{
         ArrayList <String> itemList = new ArrayList<>();
         FileOutputStream fileOutputStream;
 
-        cursor.moveToPosition(-1);
-        /*while (cursor.moveToNext()){
-            itemList.add();
-        }*/
-
+        cursor.moveToFirst();
         try {
             if (file != null) {
                 fileOutputStream = new FileOutputStream(file);
                 String row;
                 int count = 0;
-                while (cursor.moveToNext()){
-                    row = cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_AUD))+";"
-                            +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN))+";"
-                            +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_OUT))+";"
-                            +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_ACCESS_TYPE))+";"
-                            +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_LASTNAME))+";"
-                            +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_FIRSTNAME))+";"
-                            +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_MIDNAME))+";"
-                            +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_PHOTO));
-                    fileOutputStream.write(row.getBytes());
-                    fileOutputStream.write("\n".getBytes());
-                    count++;
+                if (cursor.getCount()!=0){
+                    while (cursor.moveToNext()){
+                        row = cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_USER_ID))+";"
+                                +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_AUD))+";"
+                                +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN))+";"
+                                +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_OUT))+";"
+                                +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_ACCESS_TYPE))+";"
+                                +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_LASTNAME))+";"
+                                +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_FIRSTNAME))+";"
+                                +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_MIDNAME))+";"
+                                +cursor.getString(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_PERSON_PHOTO));
+                        fileOutputStream.write(row.getBytes());
+                        fileOutputStream.write("\n".getBytes());
+                        count++;
+                    }
                 }
-                Log.d("count",String.valueOf(count));
-                /*for (int i = 0; i < itemList.size(); i++) {
-                    fileOutputStream.write(itemList.get(i).getBytes());
-                    fileOutputStream.write("\n".getBytes());
-
-                }*/
 
                 fileOutputStream.close();
             }

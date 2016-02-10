@@ -395,7 +395,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
     @Override
     public void onTakeKey() {
-        Values.showFullscreenToast(mContext, getResources().getString(R.string.text_toast_take_key), Values.TOAST_POSITIVE);
+        //Values.showFullscreenToast(mContext, getResources().getString(R.string.text_toast_take_key), Values.TOAST_POSITIVE);
         showMainAuditroomsGrid();
     }
 }

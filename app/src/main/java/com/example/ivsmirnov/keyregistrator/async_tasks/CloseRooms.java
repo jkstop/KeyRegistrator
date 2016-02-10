@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
@@ -29,6 +30,7 @@ public class CloseRooms extends AsyncTask<CloseRoomsParams,Integer,Integer> {
 
     @Override
     protected void onPreExecute() {
+        Values.showFullscreenToast(mContext, mContext.getString(R.string.text_toast_thanks), Values.TOAST_POSITIVE);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mProgressDialog.setMessage("Подождите...");
         mProgressDialog.setCancelable(false);

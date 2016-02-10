@@ -96,7 +96,6 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
         }
     }
 
-
     @Override
     public void onPause() {
         super.onPause();

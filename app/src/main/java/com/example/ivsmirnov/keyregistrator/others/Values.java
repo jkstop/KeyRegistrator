@@ -98,6 +98,7 @@ public class Values{
     public static final int SQL_STATUS_CONNECT = 126;
     public static final int SQL_STATUS_DISCONNECT = 127;
     public static final int DIALOG_CLOSE_ROOM = 118;
+    public static final int DIALOG_LOG_OUT = 131;
     public static final String DIALOG_CLOSE_ROOM_TYPE = "close_room_type";
     public static final int DIALOG_CLOSE_ROOM_TYPE_PERSONS = 127;
     public static final int DIALOG_CLOSE_ROOM_TYPE_ROOMS = 128;
@@ -120,7 +121,7 @@ public class Values{
     public static final int REQUEST_CODE_LOAD_ROOMS = 202;
     public static final int REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION = 203;
     public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
-    public static final int REQUEST_CODE_SELECT_ACTIVE_ACCOUNT = 205;
+    public static final int REQUEST_CODE_LOG_ON = 205;
 
     public static final String KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION = "values_for_dialog_person_information";
     public static final String KEY_USER_FOR_DIALOG_PERSON_INFORMATION = "values_for_dialog_person_information";

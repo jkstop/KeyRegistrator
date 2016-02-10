@@ -122,15 +122,15 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                     String [] split = line.split(";");
 
                                     dbJournal.writeInDBJournal(new JournalItem()
-                                    .setAccountID(mSettings.getActiveAccountID())
-                                    .setAuditroom(split[0])
-                                    .setTimeIn(Long.parseLong(split[1]))
-                                    .setTimeOut(Long.parseLong(split[2]))
-                                    .setAccessType(Integer.parseInt(split[3]))
-                                    .setPersonLastname(split[4])
-                                    .setPersonFirstname(split[5])
-                                    .setPersonMidname(split[6])
-                                    .setPersonPhoto(split[7]));
+                                    .setAccountID(split[0])
+                                    .setAuditroom(split[1])
+                                    .setTimeIn(Long.parseLong(split[2]))
+                                    .setTimeOut(Long.parseLong(split[3]))
+                                    .setAccessType(Integer.parseInt(split[4]))
+                                    .setPersonLastname(split[5])
+                                    .setPersonFirstname(split[6])
+                                    .setPersonMidname(split[7])
+                                    .setPersonPhoto(split[8]));
                                 }catch (Exception e){
                                     e.printStackTrace();
                                 }
