@@ -4,205 +4,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="В разработке"
-        android:layout_gravity="center"/>
-
-    <!--<LinearLayout
-        android:orientation="horizontal"
+    <RelativeLayout
+        android:id="@+id/dialog_email_account_information"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="#d1f5ff"
-        android:padding="15dp"
-        android:id="@+id/email_settings_box_layout"
-        android:layout_weight="0.3">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.7"
-            android:orientation="vertical"
-            android:id="@+id/email_settings_box_layout_box_password_frame">
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:id="@+id/email_settings_box_layout_box"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.5">
-
-                <TextView
-                    android:id="@+id/email_settings_box_layout_box_textBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Почтовый ящик"
-                    style="@style/Text_Email_Settings" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <EditText
-                        android:layout_width="0dp"
-                        android:layout_weight="0.5"
-                        style="@style/Text_Email_Settings"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/email_settings_edit_email" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        style="@style/Text_Email_Settings"
-                        android:text=" @gmail.com" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:orientation="vertical"
-                android:layout_below="@+id/email_settings_box_layout_box"
-                android:id="@+id/email_settings_box_layout_password"
-                android:layout_weight="0.5">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Text_Email_Settings"
-                    android:text="Пароль" />
-
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/Text_Email_Settings"
-                    android:inputType="textPassword"
-                    android:id="@+id/email_settings_edit_password" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
-            android:layout_weight="0.3"
-            android:layout_height="match_parent"
-            android:id="@+id/email_settings_box_layout_check">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.6"
-                android:src="@drawable/mail_logo_rgb_web" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:padding="15dp"
-        android:id="@+id/email_settings_mail_content_layout"
-        android:background="#f8ffe9"
-        android:layout_marginTop="15dp"
-        android:layout_weight="0.5">
+        <com.example.ivsmirnov.keyregistrator.custom_views.RoundImageView
+            android:id="@+id/dialog_email_account_information_image"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"
+            android:foregroundGravity="center"
+            android:src="@drawable/person_blue"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:contentDescription="image_account_dialog"/>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Text_Email_Settings"
-            android:text="Получатели (через запятую)" />
-
-        <EditText
-            android:layout_width="match_parent"
-            style="@style/Text_Email_Settings"
-            android:layout_height="wrap_content"
-            android:id="@+id/email_settings_edit_recipients"
-            android:layout_marginBottom="15dp" />
+            android:id="@+id/dialog_email_account_information_name"
+            android:layout_toRightOf="@+id/dialog_email_account_information_image"
+            android:text="AccountName"
+            android:textColor="@color/black"
+            style="@style/NavigationDrawerAccountInfoText" />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Text_Email_Settings"
-            android:text="Текст письма" />
+            android:id="@+id/dialog_email_account_information_email"
+            android:layout_toRightOf="@id/dialog_email_account_information_image"
+            android:layout_below="@id/dialog_email_account_information_name"
+            android:textColor="@color/black"
+            android:text="AccountEmail@gmail.ru"
+            style="@style/NavigationDrawerAccountInfoText" />
 
-        <EditText
-            android:layout_width="match_parent"
-            style="@style/Text_Email_Settings"
-            android:layout_height="wrap_content"
-            android:id="@+id/email_settings_edit_body"
-            android:layout_marginBottom="15dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Text_Email_Settings"
-            android:text="Тема" />
-
-        <EditText
-            android:layout_width="match_parent"
-            style="@style/Text_Email_Settings"
-            android:layout_height="wrap_content"
-            android:id="@+id/email_settings_edit_email_theme"
-            android:layout_marginBottom="15dp" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <CheckBox
-                android:layout_width="0dp"
-                android:layout_weight="0.5"
-                android:layout_height="wrap_content"
-                style="@style/Text_Email_Settings"
-                android:text="Журнал"
-                android:id="@+id/email_settings_mail_content_checkJournal" />
-
-            <CheckBox
-                android:layout_width="0dp"
-                android:layout_weight="0.5"
-                android:layout_height="wrap_content"
-                style="@style/Text_Email_Settings"
-                android:text="Преподаватели"
-                android:id="@+id/email_settings_mail_content_checkTeachers" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:id="@+id/email_settings_mail_buttons_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:showDividers="middle"
-        android:layout_marginTop="15dp">
-
-        <Button
-            android:id="@+id/email_settings_button_send"
-            android:layout_width="0dp"
-            android:layout_weight="0.3"
-            android:layout_height="wrap_content"
-            android:text="Отправить сейчас"
-            android:background="#00ffffff" />
-
-        <Button
-            android:id="@+id/email_settings_button_save"
-            android:layout_width="0dp"
-            android:layout_weight="0.3"
-            android:layout_height="wrap_content"
-            android:text="Сохранить"
-            android:background="#00ffffff" />
-
-    </LinearLayout>-->
+    </RelativeLayout>
 
 
 </LinearLayout>

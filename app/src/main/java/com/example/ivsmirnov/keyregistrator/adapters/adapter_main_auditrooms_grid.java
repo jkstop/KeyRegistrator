@@ -92,7 +92,7 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
     */
     @Override
     public int getItemViewType(int position) {
-        return mRoomItems.get(position).Status;
+        return mRoomItems.get(position).getStatus();
     }
 
     @Override
@@ -151,11 +151,11 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()){
             case 1:
-                ((auditroomFreeViewHolder) holder).mFreeTextAuditroom.setText(mRoomItems.get(position).Auditroom);
+                ((auditroomFreeViewHolder) holder).mFreeTextAuditroom.setText(mRoomItems.get(position).getAuditroom());
                 break;
             case 0:
-                ((auditroomBusyViewHolder)holder).mBusyTextAuditroom.setText(mRoomItems.get(position).Auditroom);
-                ((auditroomBusyViewHolder)holder).mBusyTextPerson.setText(mRoomItems.get(position).LastVisiter);
+                ((auditroomBusyViewHolder)holder).mBusyTextAuditroom.setText(mRoomItems.get(position).getAuditroom());
+                ((auditroomBusyViewHolder)holder).mBusyTextPerson.setText(mRoomItems.get(position).getLastVisiter());
 
                 RelativeLayout.LayoutParams imageKeyParams = (RelativeLayout.LayoutParams) ((auditroomBusyViewHolder)holder).mBusyImageKey.getLayoutParams();
                 imageKeyParams.width = imageKeyParams.height = (int)(getItemScaleHeight()/5.6);
@@ -165,8 +165,8 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
 
                 ((auditroomBusyViewHolder)holder).mBusyImagePerson.setLayoutParams(imagePersonParams);
                 ((auditroomBusyViewHolder)holder).mBusyImageKey.setLayoutParams(imageKeyParams);
-                if (mRoomItems.get(position).Photo!=null){
-                    byte[] decodedString = Base64.decode(mRoomItems.get(position).Photo, Base64.DEFAULT);
+                if (mRoomItems.get(position).getPhoto()!=null){
+                    byte[] decodedString = Base64.decode(mRoomItems.get(position).getPhoto(), Base64.DEFAULT);
                     ((auditroomBusyViewHolder)holder).mBusyImagePerson.
                             setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, new BitmapFactory.Options()));
                 }

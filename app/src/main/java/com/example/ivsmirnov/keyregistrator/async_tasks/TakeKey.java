@@ -18,21 +18,16 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 public class TakeKey extends AsyncTask<TakeKeyParams,Void,Void> {
 
     private Context mContext;
-    private ProgressDialog mProgressDialog;
     private KeyInterface mListener;
 
     public TakeKey(Context context){
         this.mContext = context;
-        mProgressDialog = new ProgressDialog(mContext);
+
     }
 
     @Override
     protected void onPreExecute() {
         Values.showFullscreenToast(mContext, mContext.getString(R.string.text_toast_take_key), Values.TOAST_POSITIVE);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialog.setMessage("Подождите...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
     }
 
     @Override
@@ -49,11 +44,6 @@ public class TakeKey extends AsyncTask<TakeKeyParams,Void,Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
-
-       if (mProgressDialog.isShowing()){
-           mProgressDialog.cancel();
-       }
-
         if (mListener!=null){
             mListener.onTakeKey();
         }

@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
+import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,28 +33,62 @@ public class DataBaseRooms {
 
     public void writeInRoomsDB (RoomItem roomItem) {
         ContentValues cv = new ContentValues();
-        cv.put(DataBaseRoomsRegist.COLUMN_ROOM, roomItem.Auditroom);
-        cv.put(DataBaseRoomsRegist.COLUMN_STATUS, roomItem.Status);
-        cv.put(DataBaseRoomsRegist.COLUMN_ACCESS,roomItem.Access);
-        cv.put(DataBaseRoomsRegist.COLUMN_POSITION_IN_BASE, roomItem.PositionInBase);
-        cv.put(DataBaseRoomsRegist.COLUMN_LAST_VISITER, roomItem.LastVisiter);
-        cv.put(DataBaseRoomsRegist.COLUMN_TAG,roomItem.Tag);
-        cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, roomItem.Photo);
+        cv.put(DataBaseRoomsRegist.COLUMN_ROOM, roomItem.getAuditroom());
+        cv.put(DataBaseRoomsRegist.COLUMN_STATUS, roomItem.getStatus());
+        cv.put(DataBaseRoomsRegist.COLUMN_ACCESS,roomItem.getAccessType());
+        cv.put(DataBaseRoomsRegist.COLUMN_POSITION_IN_BASE, roomItem.getPositionInBase());
+        cv.put(DataBaseRoomsRegist.COLUMN_LAST_VISITER, roomItem.getLastVisiter());
+        cv.put(DataBaseRoomsRegist.COLUMN_TAG,roomItem.getTag());
+        cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, roomItem.getPhoto());
         sqLiteDatabase.insert(DataBaseRoomsRegist.TABLE_ROOMS, null, cv);
     }
 
-    public void updateRoom(RoomItem roomItem){
+    public int updateRoom(RoomItem roomItem){
+        int updatedRooms = 0;
+        String roomPosition;
+        if (!roomItem.getAuditroom().equals(Values.EMPTY)){
+           roomPosition = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseRoomsRegist.TABLE_ROOMS +
+                    " WHERE " + DataBaseRoomsRegist.COLUMN_ROOM + " = " + roomItem.getAuditroom()).simpleQueryForString();
+        }else{
+            roomPosition = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseRoomsRegist.TABLE_ROOMS +
+                    " WHERE " + DataBaseRoomsRegist.COLUMN_TAG + " = " + roomItem.getTag()).simpleQueryForString();
+        }
 
-        String roomPositionInBase = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseRoomsRegist.TABLE_ROOMS + " WHERE " + DataBaseRoomsRegist.COLUMN_ROOM + " = " + roomItem.Auditroom).simpleQueryForString();
-        ContentValues cv = new ContentValues();
-        cv.put(DataBaseRoomsRegist.COLUMN_STATUS,roomItem.Status);
-        cv.put(DataBaseRoomsRegist.COLUMN_POSITION_IN_BASE,roomItem.PositionInBase);
-        cv.put(DataBaseRoomsRegist.COLUMN_LAST_VISITER,roomItem.LastVisiter);
-        cv.put(DataBaseRoomsRegist.COLUMN_ACCESS,roomItem.Access);
-        cv.put(DataBaseRoomsRegist.COLUMN_TAG,roomItem.Tag);
-        cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, roomItem.Photo);
-        sqLiteDatabase.update(DataBaseRoomsRegist.TABLE_ROOMS,cv,DataBaseRoomsRegist._ID + "=" + roomPositionInBase, null);
+        if (roomPosition!=null){
+            ContentValues cv = new ContentValues();
+            cv.put(DataBaseRoomsRegist.COLUMN_STATUS,roomItem.getStatus());
+            cv.put(DataBaseRoomsRegist.COLUMN_POSITION_IN_BASE,roomItem.getPositionInBase());
+            cv.put(DataBaseRoomsRegist.COLUMN_LAST_VISITER,roomItem.getLastVisiter());
+            cv.put(DataBaseRoomsRegist.COLUMN_ACCESS,roomItem.getAccessType());
+            cv.put(DataBaseRoomsRegist.COLUMN_TAG,roomItem.getTag());
+            cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, roomItem.getPhoto());
+            sqLiteDatabase.update(DataBaseRoomsRegist.TABLE_ROOMS,cv,DataBaseRoomsRegist._ID + "=" + roomPosition, null);
+            updatedRooms++;
+        }
+        return updatedRooms;
     }
+
+    public RoomItem getRoomItemForCurrentUser(String tag){
+        if (tag!=null){
+            cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseRoomsRegist.TABLE_ROOMS
+                            + " WHERE " + DataBaseRoomsRegist.COLUMN_TAG + " =?",
+                    new String[]{tag});
+            if (cursor.getCount() > 0){
+                cursor.moveToFirst();
+                return new RoomItem().setAuditroom(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM)))
+                        .setStatus(cursor.getInt(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_STATUS)))
+                        .setAccessType(cursor.getInt(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ACCESS)))
+                        .setLastVisiter(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_LAST_VISITER)))
+                        .setPositionInBase(cursor.getLong(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_POSITION_IN_BASE)))
+                        .setTag(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_TAG))); /* photo is null for speed*/
+            }else{
+                return null;
+            }
+        }else{
+            return null;
+        }
+    }
+
 
 
     public void deleteFromRoomsDB(String aud){
@@ -73,13 +108,13 @@ public class DataBaseRooms {
         ArrayList<RoomItem> roomItems = new ArrayList<>();
         cursor.moveToPosition(-1);
         while (cursor.moveToNext()){
-            roomItems.add(new RoomItem(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM)),
-                    cursor.getInt(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_STATUS)),
-                    cursor.getInt(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ACCESS)),
-                    cursor.getLong(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_POSITION_IN_BASE)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_LAST_VISITER)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_TAG)),
-                    cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_PHOTO_PATH))));
+            roomItems.add(new RoomItem().setAuditroom(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM)))
+            .setStatus(cursor.getInt(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_STATUS)))
+            .setAccessType(cursor.getInt(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ACCESS)))
+            .setPositionInBase(cursor.getLong(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_POSITION_IN_BASE)))
+            .setLastVisiter(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_LAST_VISITER)))
+            .setTag(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_TAG)))
+            .setPhoto(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_PHOTO_PATH))));
         }
         return roomItems;
     }

@@ -20,6 +20,14 @@ public class Settings {
         mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
     }
 
+    public void setAuthToken(String token){
+        mPreferencesEditor.putString(Values.AUTH_TOKEN,token).apply();
+    }
+
+    public String getAuthToken(){
+        return mPreferences.getString(Values.AUTH_TOKEN,Values.EMPTY);
+    }
+
     public void setLastClickedAuditroom(String auditroom){
         mPreferencesEditor.putString(Values.AUDITROOM, auditroom).apply();
     }

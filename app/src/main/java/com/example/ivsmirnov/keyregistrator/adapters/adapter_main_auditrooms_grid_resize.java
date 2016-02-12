@@ -52,7 +52,7 @@ public class adapter_main_auditrooms_grid_resize extends RecyclerView.Adapter<Re
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((cardViewHolder)holder).mTextAuditroomName.setText(mRoomItems.get(position).Auditroom);
+        ((cardViewHolder)holder).mTextAuditroomName.setText(mRoomItems.get(position).getAuditroom());
     }
 
     @Override

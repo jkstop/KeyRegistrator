@@ -42,6 +42,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.fragments.Search_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.ReaderResponse;
@@ -62,11 +63,13 @@ import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
+import com.example.ivsmirnov.keyregistrator.others.GMailOauthSender;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
 import com.example.ivsmirnov.keyregistrator.services.NFC_Reader;
+import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
@@ -74,16 +77,30 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.plus.Account;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Properties;
+
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 public class Launcher extends AppCompatActivity implements Get_Account_Information_Interface,
         KeyInterface, RoomInterface, GoogleApiClient.OnConnectionFailedListener{
@@ -107,6 +124,10 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     private GoogleApiClient mGoogleApiClient;
 
     private static long back_pressed;
+
+    public static final String MAIL_GOOGLE_COM = "https://mail.google.com";
+    public static final String GMAIL_COMPOSE = "https://www.googleapis.com/auth/gmail.compose";
+    public static final String GMAIL_MODIFY = "https://www.googleapis.com/auth/gmail.modify";
 
 
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
@@ -202,8 +223,13 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                     setToolbarTitle(R.string.toolbar_title_shedule);
                     showFragment(Shedule_Fragment.newInstance(),R.string.fragment_tag_shedule);
                 }else if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_mail))){
-                    setToolbarTitle(R.string.toolbar_title_email);
-                    showFragment(Email_Fragment.newInstance(),R.string.fragment_tag_email);
+                    Dialog_Fragment dialog_email = new Dialog_Fragment();
+                    Bundle bundle_email = new Bundle();
+                    bundle_email.putInt(Values.DIALOG_TYPE, Values.DIALOG_EMAIL);
+                    dialog_email.setArguments(bundle_email);
+                    dialog_email.show(getSupportFragmentManager(),"email");
+                    //setToolbarTitle(R.string.toolbar_title_email);
+                    //showFragment(Email_Fragment.newInstance(),R.string.fragment_tag_email);
                 }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_sql))){
                     Dialog_Fragment dialog_sql = new Dialog_Fragment();
                     Bundle bundle_sql = new Bundle();
@@ -279,8 +305,9 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         if (resultCode == Activity.RESULT_OK){
             if (requestCode == Values.REQUEST_CODE_LOG_ON){
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+
                 if (result.isSuccess()) {
-                    GoogleSignInAccount acct = result.getSignInAccount();
+                    final GoogleSignInAccount acct = result.getSignInAccount();
                     AccountItem accountItem = new AccountItem().setLastname(acct.getDisplayName())
                             .setEmail(acct.getEmail())
                             .setPhoto(acct.getPhotoUrl().toString())
@@ -288,7 +315,50 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                     DataBaseAccount dbAccount = new DataBaseAccount(mContext);
                     dbAccount.writeAccount(accountItem);
                     dbAccount.closeDB();
+
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+
+                                String token = GoogleAuthUtil.getToken(mContext,acct.getEmail(),"oauth2:https://mail.google.com/");
+                                Log.d("token",String.valueOf(token)); //TOKEN!!!
+                                Properties props = new Properties();
+                                props.put("mail.smtp.ssl.enable", "true"); // required for Gmail
+                                props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
+                                Session session = Session.getInstance(props);
+                                session.setDebug(true);
+                                //Store store = session.getStore("imap");
+                                //store.connect("imap.gmail.com",acct.getEmail(),token);
+                                //Log.d("connect",String.valueOf(store.isConnected()));///////wooooooooork!!!
+
+                                MimeMessage mimeMessage = new MimeMessage(session);
+                                mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse("ivsmirnov@fa.ru"));
+                                mimeMessage.setText("dfkjdkjfjkdfbg");
+
+                                Transport transport = session.getTransport("smtp");
+                                transport.connect("imap.gmail.com",acct.getEmail(),token);
+                                transport.sendMessage(mimeMessage,mimeMessage.getAllRecipients());
+                                transport.close();
+
+                            } catch (UserRecoverableAuthException e) {
+                                startActivityForResult(e.getIntent(),222);
+                            } catch (GoogleAuthException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (NoSuchProviderException e) {
+                                e.printStackTrace();
+                            } catch (MessagingException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    thread.start();
+
+
                     mSettings.setActiveAccountID(acct.getId());
+                    mSettings.setAuthToken(acct.getIdToken());
                     initNavigationDrawer(getMainNavigationItems());
                 } else {
                     Toast.makeText(mContext,"Не удалось подключиться", Toast.LENGTH_SHORT).show();
@@ -379,6 +449,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
     @Override
     public void onUserRecoverableAuthException(UserRecoverableAuthException e) {
+
     }
 
     @Override
@@ -544,9 +615,16 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                                         }
 
                                     } else if (main_fragment != null && main_fragment.isVisible()) {
-                                        new CloseRooms(mContext).execute(new CloseRoomsParams()
-                                                .setTag(tag)
-                                                .setRoomInterface(mRoomInterface));
+                                        DataBaseRooms dataBaseRooms = new DataBaseRooms(mContext);
+                                        if (dataBaseRooms.getRoomItemForCurrentUser(tag)!=null){
+                                            new CloseRooms(mContext).execute(new CloseRoomsParams()
+                                                    .setTag(tag)
+                                                    .setRoomInterface(mRoomInterface));
+                                        }else{
+                                            Values.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_choise_room_in_first), Values.TOAST_NEGATIVE);
+                                        }
+                                        dataBaseRooms.closeDB();
+
                                     } else {
                                         Log.d("not","one");
                                     }
@@ -570,12 +648,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     }
 
     @Override
-    public void onRoomClosed(int closedRooms) {
-        if (closedRooms!=0){
-            showFragment(Main_Fragment.newInstance(), R.string.fragment_tag_main);
-        }else{
-            Values.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_choise_room_in_first), Values.TOAST_NEGATIVE);
-        }
+    public void onRoomClosed() {
+        showFragment(Main_Fragment.newInstance(), R.string.fragment_tag_main);
     }
 
     private Fragment getFragmentByTag(int resID){

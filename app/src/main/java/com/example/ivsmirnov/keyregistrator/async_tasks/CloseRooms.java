@@ -21,39 +21,31 @@ public class CloseRooms extends AsyncTask<CloseRoomsParams,Integer,Integer> {
 
     private Context mContext;
     private RoomInterface mRoomInterface;
-    private ProgressDialog mProgressDialog;
 
     public CloseRooms (Context context){
         this.mContext = context;
-        mProgressDialog = new ProgressDialog(mContext);
     }
 
     @Override
     protected void onPreExecute() {
         Values.showFullscreenToast(mContext, mContext.getString(R.string.text_toast_thanks), Values.TOAST_POSITIVE);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialog.setMessage("Подождите...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+
     }
 
     @Override
     protected Integer doInBackground(CloseRoomsParams... params) {
         mRoomInterface = params[0].getRoomInterface();
-        int closedRooms = 0;
+        String tag = params[0].getTag();
 
         DataBaseJournal dataBaseJournal = new DataBaseJournal(mContext);
         DataBaseRooms dataBaseRooms = new DataBaseRooms(mContext);
-        ArrayList<RoomItem> roomItemArrayList = dataBaseRooms.readRoomsDB();
-        for (RoomItem roomItem : roomItemArrayList){
-            if (roomItem.Tag!=null && roomItem.Tag.equals(params[0].getTag())){
-                dataBaseJournal.updateDB(roomItem.PositionInBase);
-                roomItem.Status = Values.ROOM_IS_FREE;
-                roomItem.Tag = Values.EMPTY;
-                dataBaseRooms.updateRoom(roomItem);
-                closedRooms++;
-            }
-        }
+
+        RoomItem currentRoomItem = dataBaseRooms.getRoomItemForCurrentUser(tag);
+        int closedRooms = dataBaseRooms.updateRoom(currentRoomItem
+                .setTag(Values.EMPTY)
+                .setStatus(Values.ROOM_IS_FREE));
+        dataBaseJournal.updateDB(currentRoomItem.getPositionInBase());
+
         dataBaseJournal.closeDB();
         dataBaseRooms.closeDB();
         return closedRooms;
@@ -61,12 +53,8 @@ public class CloseRooms extends AsyncTask<CloseRoomsParams,Integer,Integer> {
 
     @Override
     protected void onPostExecute(Integer closedRooms) {
-        if (mProgressDialog.isShowing()){
-            mProgressDialog.cancel();
-        }
-
         if (mRoomInterface!=null){
-            mRoomInterface.onRoomClosed(closedRooms);
+            mRoomInterface.onRoomClosed();
         }
     }
 }

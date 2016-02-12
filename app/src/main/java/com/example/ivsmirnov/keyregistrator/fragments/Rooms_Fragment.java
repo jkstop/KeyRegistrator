@@ -118,7 +118,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
         dbRooms.closeDB();
 
         for (int i=0;i<mRoomItems.size();i++){
-            mRoomItems.get(i).Status = Values.ROOM_IS_FREE;
+            mRoomItems.get(i).setStatus(Values.ROOM_IS_FREE);
         }
 
         mAdapter = new adapter_main_auditrooms_grid(mContext,mRoomItems,this);
@@ -185,7 +185,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
     public void onItemClick(View v, int position) {
         Dialog_Fragment dialog = new Dialog_Fragment();
         Bundle b = new Bundle();
-        b.putString("aud", mRoomItems.get(position).Auditroom);
+        b.putString("aud", mRoomItems.get(position).getAuditroom());
         b.putInt(Values.DIALOG_TYPE,Values.DELETE_ROOM_DIALOG);
         dialog.setArguments(b);
         dialog.setTargetFragment(Rooms_Fragment.this,0);

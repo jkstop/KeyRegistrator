@@ -172,7 +172,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
     public static String getPersonInitials (String lastname, String firstname, String midname){
         String initials = "-";
-        if (lastname.length() != 0 && firstname.length() != 1 && midname.length() != 1) {
+        if (lastname.length() != 0 && firstname.length() != 1 && firstname.length()!=0 && midname.length() != 1 && midname.length() != 0) {
             initials = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";
         } else {
             if (lastname.length() != 1 && firstname.length() != 1) {

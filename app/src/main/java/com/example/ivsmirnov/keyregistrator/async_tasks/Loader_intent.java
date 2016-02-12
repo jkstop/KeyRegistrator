@@ -153,14 +153,12 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                             if (!lines.contains(line)){
                                 String [] split = line.split(";");
                                 if(split.length==6){
-                                    dbRooms.writeInRoomsDB(new RoomItem(
-                                            split[0],
-                                            Integer.parseInt(split[1]),
-                                            Integer.parseInt(split[2]),
-                                            0,
-                                            split[3],
-                                            split[4],
-                                            split[5]));
+                                    dbRooms.writeInRoomsDB(new RoomItem().setAuditroom(split[0])
+                                            .setStatus(Integer.parseInt(split[1]))
+                                            .setAccessType(Integer.parseInt(split[2]))
+                                            .setLastVisiter(split[3])
+                                            .setTag(split[4])
+                                            .setPhoto(split[5]));
                                     publishProgress(i);
                                     i++;
                                 }

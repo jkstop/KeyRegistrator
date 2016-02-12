@@ -84,6 +84,7 @@ public class Values{
     public static final int PERSONS_FRAGMENT_SELECTOR = 116;
     public static final int PERSONS_FRAGMENT_HEAD_NOT_FOUND_USER = 117;
     public static final String EMAIL = "email";
+    public static final String AUTH_TOKEN = "auth_token";
     public static final String PASSWORD = "password";
     public static final String RECIPIENTS = "recipients";
     public static final String BODY = "body";
@@ -104,6 +105,7 @@ public class Values{
     public static final int DIALOG_CLOSE_ROOM_TYPE_ROOMS = 128;
     public static final int DIALOG_DELETE_JOURNAL_ITEM = 129;
     public static final int DIALOG_RESIZE_ITEMS = 130;
+    public static final int DIALOG_EMAIL = 132;
     public static final String ACTIVE_ACCOUNT_ID = "active_account_id";
 
     public static final int ROOM_IS_BUSY = 0;
@@ -242,13 +244,13 @@ public class Values{
 
     public static void writeRoom (Context context, JournalItem journalItem, PersonItem personItem, long positionInBase){
         DataBaseRooms dataBaseRooms = new DataBaseRooms(context);
-        dataBaseRooms.updateRoom(new RoomItem(journalItem.getAuditroom(),
-                Values.ROOM_IS_BUSY,
-                journalItem.getAccessType(),
-                positionInBase,
-                Persons_Fragment.getPersonInitials(journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()),
-                personItem.getRadioLabel(),
-                personItem.getPhotoOriginal()));
+        dataBaseRooms.updateRoom(new RoomItem().setAuditroom(journalItem.getAuditroom())
+                .setStatus(Values.ROOM_IS_BUSY)
+                .setAccessType(journalItem.getAccessType())
+                .setPositionInBase(positionInBase)
+                .setLastVisiter(Persons_Fragment.getPersonInitials(journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()))
+                .setTag(personItem.getRadioLabel())
+                .setPhoto(personItem.getPhotoOriginal()));
         dataBaseRooms.closeDB();
     }
 
@@ -270,12 +272,12 @@ public class Values{
         DataBaseJournal dataBaseJournal = new DataBaseJournal(context);
         ArrayList<RoomItem> rooms = dataBaseRooms.readRoomsDB();
         for (RoomItem roomItem : rooms){
-            if (roomItem.Status==Values.ROOM_IS_BUSY){
-                roomItem.Status = Values.ROOM_IS_FREE;
-                roomItem.Tag = Values.EMPTY;
+            if (roomItem.getStatus() == Values.ROOM_IS_BUSY){
+                roomItem.setStatus(Values.ROOM_IS_FREE);
+                roomItem.setTag(Values.EMPTY);
 
                 dataBaseRooms.updateRoom(roomItem);
-                dataBaseJournal.updateDB(roomItem.PositionInBase);
+                dataBaseJournal.updateDB(roomItem.getPositionInBase());
 
                 closedRooms++;
             }

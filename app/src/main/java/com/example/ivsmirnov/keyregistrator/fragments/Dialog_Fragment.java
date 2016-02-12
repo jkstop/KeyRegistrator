@@ -282,14 +282,9 @@ public class Dialog_Fragment extends DialogFragment{
                         String inputText = enterAuditroomText.getText().toString();
                         if (!inputText.isEmpty()){
                             DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                            dbRooms.writeInRoomsDB(new RoomItem(
-                                    inputText,
-                                    Values.ROOM_IS_FREE,
-                                    Values.ACCESS_BY_CLICK,
-                                    0,
-                                    null,
-                                    null,
-                                    null));
+                            dbRooms.writeInRoomsDB(new RoomItem().setAuditroom(inputText)
+                                    .setStatus(Values.ROOM_IS_FREE)
+                                    .setAccessType(Values.ACCESS_BY_CLICK));
                             dbRooms.closeDB();
 
                             enterAuditroomText.getText().clear();
@@ -506,6 +501,12 @@ public class Dialog_Fragment extends DialogFragment{
                                 dialog.cancel();
                             }
                         })
+                        .create();
+            case Values.DIALOG_EMAIL:
+                View dialogEmailView = mInflater.inflate(R.layout.layout_dialog_email_settings,null);
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle("E-mail рассылка")
+                        .setView(dialogEmailView)
                         .create();
             default:
                 return null;
