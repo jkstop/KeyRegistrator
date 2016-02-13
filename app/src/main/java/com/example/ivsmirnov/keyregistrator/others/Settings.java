@@ -7,6 +7,10 @@ import android.preference.PreferenceManager;
 
 import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by ivsmirnov on 30.01.2016.
  */
@@ -18,6 +22,21 @@ public class Settings {
     public Settings (Context context){
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+    }
+
+    public void setRecepients(ArrayList<String> recepients){
+        Set<String> stringSet = new HashSet<>();
+        stringSet.addAll(recepients);
+        mPreferencesEditor.putStringSet(Values.MAIL_RECEPIENTS, stringSet).apply();
+    }
+
+    public ArrayList<String> getRecepients(){
+        ArrayList<String> items = new ArrayList<>();
+        Set<String> sets = mPreferences.getStringSet(Values.MAIL_RECEPIENTS, null);
+        if (sets!=null){
+            items.addAll(sets);
+        }
+        return items;
     }
 
     public void setAuthToken(String token){

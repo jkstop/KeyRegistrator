@@ -4,7 +4,7 @@ import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
-import android.support.annotation.StringDef;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -19,7 +19,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
@@ -36,10 +38,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_email_attach;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
+import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
+import com.example.ivsmirnov.keyregistrator.custom_views.RecyclerWrapContentHeightManager;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
+import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
@@ -48,10 +55,10 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateTeachers;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -63,6 +70,7 @@ public class Dialog_Fragment extends DialogFragment{
     private Settings mSettings;
     private LayoutInflater mInflater;
     private Resources mResources;
+
 
     public static FrameLayout mFrameGrid;
 
@@ -503,11 +511,45 @@ public class Dialog_Fragment extends DialogFragment{
                         })
                         .create();
             case Values.DIALOG_EMAIL:
-                View dialogEmailView = mInflater.inflate(R.layout.layout_dialog_email_settings,null);
-                return new AlertDialog.Builder(getActivity())
+                /*View dialogEmailView = mInflater.inflate(R.layout.layout_dialog_email_settings,null);
+                mAccountImage = (ImageView)dialogEmailView.findViewById(R.id.dialog_email_account_information_image);
+                TextView mAccountName = (TextView)dialogEmailView.findViewById(R.id.dialog_email_account_information_name);
+                TextView mAccountEmail = (TextView)dialogEmailView.findViewById(R.id.dialog_email_account_information_email);
+
+                final AccountItem mActiveAccount = new DataBaseAccount(mContext).getAccount(mSettings.getActiveAccountID());
+                if (mActiveAccount!=null){
+                    mAccountName.setText(mActiveAccount.getLastname());
+                    mAccountEmail.setText(mActiveAccount.getEmail());
+                    new LoadImageFromWeb(mActiveAccount.getPhoto(), this).execute();
+                }else{
+                    mAccountName.setText("Войдите в аккаунт");
+                    mAccountEmail.setText(Values.EMPTY);
+                    mAccountImage.setImageDrawable(null);
+                }
+
+                mRecepientList = mSettings.getRecepients();
+                if (mRecepientList == null){
+                    mRecepientList.add(getString(R.string.dialog_email_add_recipient));
+                }
+
+                RecyclerView mRecipients = (RecyclerView)dialogEmailView.findViewById(R.id.dialog_email_recipients);
+                mRecipients.setLayoutManager(new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false));
+                mRecipients.setAdapter(new adapter_email_attach(mContext, this, adapter_email_attach.RECIPIENTS, mRecepientList));
+
+                ArrayList <String> items1 = new ArrayList<>();
+
+                items1.add("Добавить исчо");
+                RecyclerView mAttachments = (RecyclerView)dialogEmailView.findViewById(R.id.dialog_email_attachments);
+                mAttachments.setLayoutManager(new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false));
+                mAttachments.setAdapter(new adapter_email_attach(mContext, this, 0, items1));*/
+                dialogEmail dialogEmail = new dialogEmail(mContext);
+                dialogEmail.setTitle("email")
+                        .setView(dialogEmail.createDialogView());
+                return dialogEmail.create();
+            /*new AlertDialog.Builder(getActivity())
                         .setTitle("E-mail рассылка")
                         .setView(dialogEmailView)
-                        .create();
+                        .create();*/
             default:
                 return null;
         }
@@ -547,4 +589,94 @@ public class Dialog_Fragment extends DialogFragment{
         updateInterface.updateInformation();
     }
 
+
+    public class dialogEmail extends AlertDialog.Builder implements Get_Account_Information_Interface, RecycleItemClickListener{
+
+        private ImageView mAccountImage;
+        private ArrayList<String> mRecepientList;
+        private Button mAddRecipient;
+        private adapter_email_attach mAdapter;
+        private RecyclerView mRecipientRecycler;
+
+        protected dialogEmail(Context context) {
+            super(context);
+
+        }
+
+        public View createDialogView(){
+            View dialogEmailView = mInflater.inflate(R.layout.layout_dialog_email_settings,null);
+            mAccountImage = (ImageView)dialogEmailView.findViewById(R.id.dialog_email_account_information_image);
+            mAddRecipient = (Button)dialogEmailView.findViewById(R.id.dialog_email_add_recipient);
+
+            TextView mAccountName = (TextView)dialogEmailView.findViewById(R.id.dialog_email_account_information_name);
+            TextView mAccountEmail = (TextView)dialogEmailView.findViewById(R.id.dialog_email_account_information_email);
+
+            final AccountItem mActiveAccount = new DataBaseAccount(mContext).getAccount(mSettings.getActiveAccountID());
+            if (mActiveAccount!=null){
+                mAccountName.setText(mActiveAccount.getLastname());
+                mAccountEmail.setText(mActiveAccount.getEmail());
+                new LoadImageFromWeb(mActiveAccount.getPhoto(), this).execute();
+            }else{
+                mAccountName.setText("Войдите в аккаунт");
+                mAccountEmail.setText(Values.EMPTY);
+                mAccountImage.setImageDrawable(null);
+            }
+
+            mAddRecipient.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mRecepientList.add("add_new");
+                    mSettings.setRecepients(mRecepientList);
+                    mAdapter.notifyDataSetChanged();
+                }
+            });
+
+            mRecepientList = mSettings.getRecepients();
+            mAdapter = new adapter_email_attach(mContext, this, adapter_email_attach.RECIPIENTS, mRecepientList);
+            mRecipientRecycler = (RecyclerView)dialogEmailView.findViewById(R.id.dialog_email_recipients);
+            mRecipientRecycler.setItemAnimator(new DefaultItemAnimator());
+            mRecipientRecycler.setLayoutManager(new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false));
+            mRecipientRecycler.setAdapter(mAdapter);
+
+            ArrayList <String> items1 = new ArrayList<>();
+
+            items1.add("Добавить исчо");
+            RecyclerView mAttachments = (RecyclerView)dialogEmailView.findViewById(R.id.dialog_email_attachments);
+            mAttachments.setLayoutManager(new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false));
+            mAttachments.setAdapter(new adapter_email_attach(mContext, this, 0, items1));
+            return dialogEmailView;
+        }
+
+
+        @Override
+        public void onUserRecoverableAuthException(UserRecoverableAuthException e) {
+
+        }
+
+        @Override
+        public void onChangeAccount() {
+
+        }
+
+        @Override
+        public void onAccountImageLoaded(Drawable drawable) {
+            if (mAccountImage!=null){
+                mAccountImage.setImageDrawable(drawable);
+            }
+        }
+
+        @Override
+        public void onItemClick(View v, int position) {
+            //delete item
+            mRecepientList.remove(position);
+            mSettings.setRecepients(mRecepientList);
+            mAdapter.notifyDataSetChanged();
+
+        }
+
+        @Override
+        public void onItemLongClick(View v, int position, long timeIn) {
+
+        }
+    }
 }

@@ -4,6 +4,7 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -250,6 +251,11 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
 
     @Override
     public void onChangeAccount() {
+    }
+
+    @Override
+    public void onAccountImageLoaded(Drawable drawable) {
+
     }
 
     @Override

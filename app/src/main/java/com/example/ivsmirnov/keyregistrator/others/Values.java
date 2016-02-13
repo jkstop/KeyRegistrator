@@ -107,6 +107,7 @@ public class Values{
     public static final int DIALOG_RESIZE_ITEMS = 130;
     public static final int DIALOG_EMAIL = 132;
     public static final String ACTIVE_ACCOUNT_ID = "active_account_id";
+    public static final String MAIL_RECEPIENTS = "mail_recepients";
 
     public static final int ROOM_IS_BUSY = 0;
     public static final int ROOM_IS_FREE = 1;

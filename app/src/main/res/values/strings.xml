@@ -145,6 +145,9 @@
 
     <string name="dialog_log_out_message">Вы точно хотите отсоединить этот аккаунт? Все введенные данные останутся невредимы.</string>
 
+    <string name="dialog_email_add_recipient">Добавить получателя</string>
+    <string name="dialog_email_add_attachment">Добавить вложение</string>
+
 
 
 

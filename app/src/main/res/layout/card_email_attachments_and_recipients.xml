@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:contentPadding="5dp"
+    app:cardElevation="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.example.ivsmirnov.keyregistrator.custom_views.RoundImageView
+            android:id="@+id/card_email_attach_image"
+            android:contentDescription="fddgbdfvssddvdf"
+            android:layout_centerInParent="true"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/ic_backup_black_24dp"/>
+
+        <TextView
+            android:id="@+id/card_email_attach_text"
+            android:layout_toRightOf="@+id/card_email_attach_image"
+            android:layout_marginLeft="16dp"
+            android:textSize="20dp"
+            android:layout_centerInParent="true"
+            android:text="text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/card_email_attach_delete"
+            android:contentDescription="fjvdlkfkldfkdf"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

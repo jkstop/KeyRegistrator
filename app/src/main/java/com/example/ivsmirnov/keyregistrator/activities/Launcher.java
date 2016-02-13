@@ -40,6 +40,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
@@ -377,7 +378,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
             String text = mAccount.getLastname();
             mAccountName.setText(text);
             mAccountEmail.setText(mAccount.getEmail());
-            new loadImageFromWeb(mAccount.getPhoto()).execute();
+            new LoadImageFromWeb(mAccount.getPhoto(), this).execute();
         } else {
             mAccountName.setText(getStringFromResources(R.string.navigation_drawer_account_info_text_user));
             mAccountEmail.setText(Values.EMPTY);
@@ -388,33 +389,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-    }
-
-    private class loadImageFromWeb extends AsyncTask<Void,Drawable,Drawable>{
-
-        private String mUrl;
-
-        private loadImageFromWeb(String url){
-            this.mUrl = url;
-        }
-
-        @Override
-        protected Drawable doInBackground(Void... params) {
-            try{
-                InputStream inputStream = (InputStream)new URL(mUrl).getContent();
-                return Drawable.createFromStream(inputStream,"photo");
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Drawable drawable) {
-            if (drawable!=null){
-                mPersonAccountImage.setImageDrawable(drawable);
-            }
-        }
     }
 
 
@@ -466,6 +440,11 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         });
         mSettings.setActiveAccountID("localAccount");
         getUserActiveAccount();
+    }
+
+    @Override
+    public void onAccountImageLoaded(Drawable drawable) {
+        mPersonAccountImage.setImageDrawable(drawable);
     }
 
     //закрытие всех позиций в 22.01
