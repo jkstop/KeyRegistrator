@@ -178,7 +178,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     }
 
     @Override
-    public void onItemClick(View v, int position) {
+    public void onItemClick(View v, int position, int viewID) {
         addUserInFavorite(mContext, mPersonItems.get(position));
     }
 

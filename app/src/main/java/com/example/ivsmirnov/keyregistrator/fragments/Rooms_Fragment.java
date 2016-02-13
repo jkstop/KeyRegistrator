@@ -182,7 +182,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
     }
 
     @Override
-    public void onItemClick(View v, int position) {
+    public void onItemClick(View v, int position, int viewID) {
         Dialog_Fragment dialog = new Dialog_Fragment();
         Bundle b = new Bundle();
         b.putString("aud", mRoomItems.get(position).getAuditroom());

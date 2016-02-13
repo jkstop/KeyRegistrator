@@ -96,7 +96,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         if (type==Values.PERSONS_FRAGMENT_EDITOR){
             mAdapter = new adapter_persons_grid(mContext, mAllItems, Values.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
                 @Override
-                public void onItemClick(View v, int position) {
+                public void onItemClick(View v, int position, int viewID) {
 
                     ArrayList <String> valuesForDialog = new ArrayList<>();
                     valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME, mAllItems.get(position).getLastname());
@@ -123,7 +123,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         }else if (type==Values.PERSONS_FRAGMENT_SELECTOR){
             mAdapter = new adapter_persons_grid(mContext, mAllItems, Values.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
                 @Override
-                public void onItemClick(View v, int position) {
+                public void onItemClick(View v, int position, int viewID) {
                     if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
                         return;
                     }

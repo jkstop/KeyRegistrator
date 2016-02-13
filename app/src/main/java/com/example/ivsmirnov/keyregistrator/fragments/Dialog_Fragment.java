@@ -666,12 +666,15 @@ public class Dialog_Fragment extends DialogFragment{
         }
 
         @Override
-        public void onItemClick(View v, int position) {
-            //delete item
-            mRecepientList.remove(position);
-            mSettings.setRecepients(mRecepientList);
-            mAdapter.notifyDataSetChanged();
-
+        public void onItemClick(View v, int position, int viewID) {
+            if (viewID == R.id.card_email_add_new_recepient_save){
+                Log.d("save","click"); //do
+            }else{
+                //delete item
+                mRecepientList.remove(position);
+                mSettings.setRecepients(mRecepientList);
+                mAdapter.notifyDataSetChanged();
+            }
         }
 
         @Override

@@ -111,7 +111,7 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
                 rootViewFree.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mListener.onItemClick(v, finalViewHolder.getLayoutPosition());
+                        mListener.onItemClick(v, finalViewHolder.getLayoutPosition(),0);
                     }
                 });
                 final RecyclerView.ViewHolder finalViewHolder1 = viewHolder;
@@ -131,7 +131,7 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
                 rootViewBusy.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mListener.onItemClick(v, finalViewHolder2.getLayoutPosition());
+                        mListener.onItemClick(v, finalViewHolder2.getLayoutPosition(),0);
                     }
                 });
                 rootViewBusy.setOnLongClickListener(new View.OnLongClickListener() {

@@ -68,7 +68,7 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onItemClick(v,viewHolder.getLayoutPosition());
+                mListener.onItemClick(v,viewHolder.getLayoutPosition(),0);
             }
         });
         rowView.setOnLongClickListener(new View.OnLongClickListener() {

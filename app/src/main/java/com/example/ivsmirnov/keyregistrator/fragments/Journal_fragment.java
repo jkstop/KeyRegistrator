@@ -213,7 +213,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     private void initializeJournal(){
         mAdapterjournallist = new adapter_journal_list(mContext, new RecycleItemClickListener() {
             @Override
-            public void onItemClick(View v, int position) {
+            public void onItemClick(View v, int position, int viewID) {
 
             }
 

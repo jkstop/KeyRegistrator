@@ -198,7 +198,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
 
 
     @Override
-    public void onItemClick(View v, int position) {
+    public void onItemClick(View v, int position, int viewID) {
         if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
             return;
         }

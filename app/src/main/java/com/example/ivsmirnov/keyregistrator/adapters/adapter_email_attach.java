@@ -2,6 +2,7 @@ package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 
 import java.util.ArrayList;
@@ -51,17 +53,35 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
                 deleteItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mListener.onItemClick(v, finalViewHolder.getLayoutPosition());
+                        mListener.onItemClick(v, finalViewHolder.getLayoutPosition(),v.getId());
                     }
                 });
                 break;
             case VIEW_RECEPIENTS_ADD_NEW:
                 View rowViewNEW = layoutInflater.inflate(R.layout.card_email_add_new_recipient,parent,false);
                 viewHolder = new viewHolderAddNew(rowViewNEW);
+                ImageView save = (ImageView)rowViewNEW.findViewById(R.id.card_email_add_new_recepient_save);
+                ImageView delete = (ImageView)rowViewNEW.findViewById(R.id.card_email_add_new_recepient_delete);
+
+                final RecyclerView.ViewHolder finalViewHolder1 = viewHolder;
+                save.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mListener.onItemClick(v, finalViewHolder1.getLayoutPosition(),v.getId());
+                    }
+                });
+                delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mListener.onItemClick(v, finalViewHolder1.getLayoutPosition(),v.getId());
+                    }
+                });
+
                 break;
         }
         return viewHolder;
     }
+
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -117,9 +137,14 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
     }
 
     static class viewHolderAddNew extends RecyclerView.ViewHolder{
-//определить кнопки, сделать обработчики при нажатии
+
+        public ImageView mSave;
+        public ImageView mDelete;
+
         public viewHolderAddNew(View itemView) {
             super(itemView);
+            mSave = (ImageView)itemView.findViewById(R.id.card_email_add_new_recepient_save);
+            mDelete = (ImageView)itemView.findViewById(R.id.card_email_add_new_recepient_delete);
         }
     }
 }
