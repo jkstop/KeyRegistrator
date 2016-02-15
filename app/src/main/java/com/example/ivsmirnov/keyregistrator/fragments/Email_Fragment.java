@@ -1,31 +1,63 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_email_attach;
+import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
+import com.example.ivsmirnov.keyregistrator.custom_views.RecyclerWrapContentHeightManager;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
+import com.example.ivsmirnov.keyregistrator.interfaces.EmailClickItemsInterface;
+import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
+import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.items.AccountItem;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.nononsenseapps.filepicker.FilePickerActivity;
+
+import java.util.ArrayList;
 
 /**
  * Created by IVSmirnov on 03.09.2015.
  */
-public class Email_Fragment extends Fragment {
+public class Email_Fragment extends Fragment implements Get_Account_Information_Interface, EmailClickItemsInterface{
 
     private Context mContext;
-    private SharedPreferences mSharedPreferences;
-    private SharedPreferences.Editor mSharedPreferencesEditor;
+    private ImageView mAccountImage;
+    private ArrayList<String> mRecepientList, mAttachmentList;
+    private ImageView mAddRecipient, mAddAttachment;
+    private adapter_email_attach mAdapterRecipients, mAdapterAttachments;
+    private RecyclerView mRecipientRecycler, mAttachmentsRecycler;
+    private TextInputLayout mInputThemeMessage, mInputBodyMessage;
+    private Settings mSettings;
+    private FloatingActionButton mSendButton;
 
 
     public static Email_Fragment newInstance(){
@@ -38,75 +70,160 @@ public class Email_Fragment extends Fragment {
 
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == Values.REQUEST_CODE_SELECT_EMAIL_ATTACHMENT){
+            if (data!=null){
+                mAttachmentList.add(data.getData().getPath());
+                mSettings.setAttachments(mAttachmentList);
+                mAdapterAttachments.notifyItemInserted(mAttachmentList.size());
+            }
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.layout_dialog_email_settings,container,false);
-       /* mContext = rootView.getContext();
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        View rootView = inflater.inflate(R.layout.layout_email_fragment,container,false);
+        mContext = rootView.getContext();
+        mSettings = new Settings(mContext);
 
-        String emailText = mSharedPreferences.getString(Values.EMAIL, "");
-        String passwordText = mSharedPreferences.getString(Values.PASSWORD, "");
-        String recipientsText = mSharedPreferences.getString(Values.RECIPIENTS, "");
-        String bodyText = mSharedPreferences.getString(Values.BODY, "");
-        String themeText = mSharedPreferences.getString(Values.THEME, "");
+        mAccountImage = (ImageView)rootView.findViewById(R.id.dialog_email_account_information_image);
+        mAddRecipient = (ImageView)rootView.findViewById(R.id.email_fragment_add_recipient);
+        mAddAttachment = (ImageView) rootView.findViewById(R.id.email_fragment_add_attachment);
 
-        final EditText email = (EditText) rootView.findViewById(R.id.email_settings_edit_email);
-        final EditText pass = (EditText) rootView.findViewById(R.id.email_settings_edit_password);
-        final EditText recipient = (EditText) rootView.findViewById(R.id.email_settings_edit_recipients);
-        final EditText body = (EditText) rootView.findViewById(R.id.email_settings_edit_body);
-        final EditText theme = (EditText) rootView.findViewById(R.id.email_settings_edit_email_theme);
-        final CheckBox checkJournal = (CheckBox)rootView.findViewById(R.id.email_settings_mail_content_checkJournal);
-        final CheckBox checkTeachers = (CheckBox)rootView.findViewById(R.id.email_settings_mail_content_checkTeachers);
-        final Button sendNowButton = (Button)rootView.findViewById(R.id.email_settings_button_send);
-        final Button saveButton = (Button)rootView.findViewById(R.id.email_settings_button_save);
+        mInputThemeMessage = (TextInputLayout)rootView.findViewById(R.id.dialog_email_message_theme);
+        mInputBodyMessage = (TextInputLayout)rootView.findViewById(R.id.dialog_email_message_body);
 
-        View.OnClickListener onClickListener = new View.OnClickListener() {
+        mSendButton = (FloatingActionButton)rootView.findViewById(R.id.email_fragment_send_fab);
+
+        TextView mAccountName = (TextView)rootView.findViewById(R.id.dialog_email_account_information_name);
+        TextView mAccountEmail = (TextView)rootView.findViewById(R.id.dialog_email_account_information_email);
+
+        final AccountItem mActiveAccount = new DataBaseAccount(mContext).getAccount(mSettings.getActiveAccountID());
+        if (mActiveAccount!=null){
+            mAccountName.setText(mActiveAccount.getLastname());
+            mAccountEmail.setText(mActiveAccount.getEmail());
+            new LoadImageFromWeb(mActiveAccount.getPhoto(), this).execute();
+        }else{
+            mAccountName.setText("Войдите в аккаунт");
+            mAccountEmail.setText(Values.EMPTY);
+            mAccountImage.setImageDrawable(null);
+        }
+
+        mInputThemeMessage.getEditText().setText(mSettings.getMessageTheme());
+        mInputBodyMessage.getEditText().setText(mSettings.getMessageBody());
+
+        mInputBodyMessage.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+                mSettings.setMessageBody(s.toString());
+            }
+        });
+        mInputThemeMessage.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+                mSettings.setMessageTheme(s.toString());
+            }
+        });
+
+        mAddRecipient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (v.getId()){
-                    case R.id.email_settings_button_save:
-                        mSharedPreferencesEditor.putString(Values.EMAIL, email.getText().toString());
-                        mSharedPreferencesEditor.putString(Values.PASSWORD, pass.getText().toString());
-                        mSharedPreferencesEditor.putString(Values.RECIPIENTS, recipient.getText().toString());
-                        mSharedPreferencesEditor.putString(Values.BODY, body.getText().toString());
-                        mSharedPreferencesEditor.putString(Values.THEME, theme.getText().toString());
-                        mSharedPreferencesEditor.putBoolean(Values.CHECK_JOURNAL, checkJournal.isChecked());
-                        mSharedPreferencesEditor.putBoolean(Values.CHECK_TEACHERS, checkTeachers.isChecked());
-                        mSharedPreferencesEditor.commit();
-                        Toast.makeText(mContext,"Сохранено",Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.email_settings_button_send:
-                        mSharedPreferencesEditor.putString(Values.EMAIL, email.getText().toString());
-                        mSharedPreferencesEditor.putString(Values.PASSWORD, pass.getText().toString());
-                        mSharedPreferencesEditor.putString(Values.RECIPIENTS, recipient.getText().toString());
-                        mSharedPreferencesEditor.putString(Values.BODY, body.getText().toString());
-                        mSharedPreferencesEditor.putString(Values.THEME, theme.getText().toString());
-                        mSharedPreferencesEditor.putBoolean(Values.CHECK_JOURNAL, checkJournal.isChecked());
-                        mSharedPreferencesEditor.putBoolean(Values.CHECK_TEACHERS, checkTeachers.isChecked());
-                        mSharedPreferencesEditor.commit();
-                        Send_Email send_email = new Send_Email(mContext,new String[]{email.getText().toString() + "@gmail.com",
-                                pass.getText().toString(), recipient.getText().toString(), body.getText().toString(), theme.getText().toString()});
-                        send_email.execute();
-                        Toast.makeText(mContext,"Отправка...",Toast.LENGTH_SHORT).show();
-                        break;
-                    default:
-                        break;
-                }
+                mRecepientList.add("add_new");
+                mSettings.setRecepients(mRecepientList);
+                mAdapterRecipients.notifyItemInserted(mRecepientList.size());
             }
-        };
+        });
 
-        sendNowButton.setOnClickListener(onClickListener);
-        saveButton.setOnClickListener(onClickListener);
+        mAddAttachment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentAddAttachment = new Intent(Intent.ACTION_GET_CONTENT);
+                intentAddAttachment.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+                intentAddAttachment.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getAbsolutePath());
+                startActivityForResult(intentAddAttachment, Values.REQUEST_CODE_SELECT_EMAIL_ATTACHMENT);
+            }
+        });
 
-        email.setText(emailText);
-        pass.setText(passwordText);
-        recipient.setText(recipientsText);
-        body.setText(bodyText);
-        theme.setText(themeText);
-        checkJournal.setChecked(mSharedPreferences.getBoolean(Values.CHECK_JOURNAL, false));
-        checkTeachers.setChecked(mSharedPreferences.getBoolean(Values.CHECK_TEACHERS,false));*/
+        mRecepientList = mSettings.getRecepients();
+        mAttachmentList = mSettings.getAttachments();
+
+        mAdapterRecipients = new adapter_email_attach(mContext, this, adapter_email_attach.RECIPIENTS, mRecepientList);
+        mAdapterAttachments = new adapter_email_attach(mContext, this, adapter_email_attach.ATTACHMENTS, mAttachmentList);
+
+        mRecipientRecycler = (RecyclerView)rootView.findViewById(R.id.dialog_email_recipients);
+        mRecipientRecycler.setItemAnimator(new DefaultItemAnimator());
+        mRecipientRecycler.setLayoutManager(/*new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false)*/new LinearLayoutManager(mContext));
+        mRecipientRecycler.setAdapter(mAdapterRecipients);
+
+        mAttachmentsRecycler = (RecyclerView)rootView.findViewById(R.id.dialog_email_attachments);
+        mAttachmentsRecycler.setLayoutManager(/*new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false)*/new LinearLayoutManager(mContext));
+        mAttachmentsRecycler.setAdapter(mAdapterAttachments);
+
+        mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         return rootView;
+    }
+
+    @Override
+    public void onUserRecoverableAuthException(UserRecoverableAuthException e) {
+
+    }
+
+    @Override
+    public void onChangeAccount() {
+
+    }
+
+    @Override
+    public void onAccountImageLoaded(Drawable drawable) {
+        if (mAccountImage!=null){
+            mAccountImage.setImageDrawable(drawable);
+        }
+    }
+
+    private void removeRecipient(int position){
+        mRecepientList.remove(position);
+        mSettings.setRecepients(mRecepientList);
+        mAdapterRecipients.notifyItemRemoved(position);
+    }
+
+
+    @Override
+    public void onAddRecepient(View v, int position, int view_id) {
+        if (view_id == R.id.card_email_add_new_recepient_save){
+            mRecepientList.add(v.getTag().toString());
+        }
+        removeRecipient(position);
+    }
+
+    @Override
+    public void onDeleteRecepient(int position, int view_id) {
+        removeRecipient(position);
+    }
+
+    @Override
+    public void onDeleteAttachment(int position, int view_id) {
+        mAttachmentList.remove(position);
+        mSettings.setAttachments(mAttachmentList);
+        mAdapterAttachments.notifyItemRemoved(position);
     }
 }

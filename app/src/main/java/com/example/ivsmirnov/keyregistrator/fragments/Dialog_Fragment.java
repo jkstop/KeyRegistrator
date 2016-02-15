@@ -1,10 +1,13 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.os.Environment;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -23,6 +26,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,6 +64,7 @@ import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -70,6 +76,8 @@ public class Dialog_Fragment extends DialogFragment{
     private Settings mSettings;
     private LayoutInflater mInflater;
     private Resources mResources;
+
+    public ArrayList<String> mAttachmentList;
 
 
     public static FrameLayout mFrameGrid;
@@ -589,14 +597,22 @@ public class Dialog_Fragment extends DialogFragment{
         updateInterface.updateInformation();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == Values.REQUEST_CODE_SELECT_EMAIL_ATTACHMENT){
+
+        }
+    }
+
 
     public class dialogEmail extends AlertDialog.Builder implements Get_Account_Information_Interface, RecycleItemClickListener{
 
         private ImageView mAccountImage;
-        private ArrayList<String> mRecepientList;
-        private Button mAddRecipient;
-        private adapter_email_attach mAdapter;
-        private RecyclerView mRecipientRecycler;
+        public ArrayList<String> mRecepientList, mAttachmentList;
+        private Button mAddRecipient, mAddAttachment;
+        private adapter_email_attach mAdapterRecipients, mAdapterAttachments;
+        private RecyclerView mRecipientRecycler, mAttachmentsRecycler;
+        private TextInputLayout mInputThemeMessage, mInputBodyMessage;
 
         protected dialogEmail(Context context) {
             super(context);
@@ -606,7 +622,12 @@ public class Dialog_Fragment extends DialogFragment{
         public View createDialogView(){
             View dialogEmailView = mInflater.inflate(R.layout.layout_dialog_email_settings,null);
             mAccountImage = (ImageView)dialogEmailView.findViewById(R.id.dialog_email_account_information_image);
+
             mAddRecipient = (Button)dialogEmailView.findViewById(R.id.dialog_email_add_recipient);
+            mAddAttachment = (Button)dialogEmailView.findViewById(R.id.dialog_email_add_attachment);
+
+            mInputThemeMessage = (TextInputLayout)dialogEmailView.findViewById(R.id.dialog_email_message_theme);
+            mInputBodyMessage = (TextInputLayout)dialogEmailView.findViewById(R.id.dialog_email_message_body);
 
             TextView mAccountName = (TextView)dialogEmailView.findViewById(R.id.dialog_email_account_information_name);
             TextView mAccountEmail = (TextView)dialogEmailView.findViewById(R.id.dialog_email_account_information_email);
@@ -622,40 +643,77 @@ public class Dialog_Fragment extends DialogFragment{
                 mAccountImage.setImageDrawable(null);
             }
 
+            mInputThemeMessage.getEditText().setText(mSettings.getMessageTheme());
+            mInputBodyMessage.getEditText().setText(mSettings.getMessageBody());
+
+            mInputBodyMessage.getEditText().addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+                @Override
+                public void afterTextChanged(Editable s) {
+                    mSettings.setMessageBody(s.toString());
+                }
+            });
+            mInputThemeMessage.getEditText().addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+                @Override
+                public void afterTextChanged(Editable s) {
+                    mSettings.setMessageTheme(s.toString());
+                }
+            });
+
             mAddRecipient.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mRecepientList.add("add_new");
                     mSettings.setRecepients(mRecepientList);
-                    mAdapter.notifyDataSetChanged();
+                    mAdapterRecipients.notifyDataSetChanged();
+                }
+            });
+
+            mAddAttachment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intentAddAttachment = new Intent(Intent.ACTION_GET_CONTENT);
+                    intentAddAttachment.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+                    intentAddAttachment.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getAbsolutePath());
+                    startActivityForResult(intentAddAttachment, Values.REQUEST_CODE_SELECT_EMAIL_ATTACHMENT);
                 }
             });
 
             mRecepientList = mSettings.getRecepients();
-            mAdapter = new adapter_email_attach(mContext, this, adapter_email_attach.RECIPIENTS, mRecepientList);
+            mAttachmentList = mSettings.getAttachments();
+
+            //mAdapterRecipients = new adapter_email_attach(mContext, this, adapter_email_attach.RECIPIENTS, mRecepientList);
+            //mAdapterAttachments = new adapter_email_attach(mContext, this, adapter_email_attach.ATTACHMENTS, mAttachmentList);
+
             mRecipientRecycler = (RecyclerView)dialogEmailView.findViewById(R.id.dialog_email_recipients);
             mRecipientRecycler.setItemAnimator(new DefaultItemAnimator());
             mRecipientRecycler.setLayoutManager(new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false));
-            mRecipientRecycler.setAdapter(mAdapter);
+            mRecipientRecycler.setAdapter(mAdapterRecipients);
 
-            ArrayList <String> items1 = new ArrayList<>();
-
-            items1.add("Добавить исчо");
-            RecyclerView mAttachments = (RecyclerView)dialogEmailView.findViewById(R.id.dialog_email_attachments);
-            mAttachments.setLayoutManager(new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false));
-            mAttachments.setAdapter(new adapter_email_attach(mContext, this, 0, items1));
+            mAttachmentsRecycler = (RecyclerView)dialogEmailView.findViewById(R.id.dialog_email_attachments);
+            mAttachmentsRecycler.setLayoutManager(new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false));
+            mAttachmentsRecycler.setAdapter(mAdapterAttachments);
             return dialogEmailView;
         }
 
 
         @Override
         public void onUserRecoverableAuthException(UserRecoverableAuthException e) {
-
         }
 
         @Override
         public void onChangeAccount() {
-
         }
 
         @Override
@@ -668,18 +726,17 @@ public class Dialog_Fragment extends DialogFragment{
         @Override
         public void onItemClick(View v, int position, int viewID) {
             if (viewID == R.id.card_email_add_new_recepient_save){
-                Log.d("save","click"); //do
-            }else{
-                //delete item
-                mRecepientList.remove(position);
-                mSettings.setRecepients(mRecepientList);
-                mAdapter.notifyDataSetChanged();
+                mRecepientList.add(v.getTag().toString());
             }
+            mRecepientList.remove(position);
+            mSettings.setRecepients(mRecepientList);
+            mAdapterRecipients.notifyDataSetChanged();
         }
 
         @Override
         public void onItemLongClick(View v, int position, long timeIn) {
 
         }
+
     }
 }

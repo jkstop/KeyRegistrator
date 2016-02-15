@@ -24,6 +24,37 @@ public class Settings {
         mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
     }
 
+    public void setMessageTheme (String theme){
+        mPreferencesEditor.putString(Values.MAIL_THEME, theme).apply();
+    }
+
+    public String getMessageTheme(){
+        return mPreferences.getString(Values.MAIL_THEME, null);
+    }
+
+    public void setMessageBody(String body){
+        mPreferencesEditor.putString(Values.MAIL_BODY, body).apply();
+    }
+
+    public String getMessageBody(){
+        return mPreferences.getString(Values.MAIL_BODY, null);
+    }
+
+    public void setAttachments(ArrayList<String>attachments){
+        Set<String> stringSet = new HashSet<>();
+        stringSet.addAll(attachments);
+        mPreferencesEditor.putStringSet(Values.MAIL_ATTACHMENTS,stringSet).apply();
+    }
+
+    public ArrayList<String> getAttachments(){
+        ArrayList<String> items = new ArrayList<>();
+        Set<String> attach = mPreferences.getStringSet(Values.MAIL_ATTACHMENTS,null);
+        if (attach!=null){
+            items.addAll(attach);
+        }
+        return items;
+    }
+
     public void setRecepients(ArrayList<String> recepients){
         Set<String> stringSet = new HashSet<>();
         stringSet.addAll(recepients);

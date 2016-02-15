@@ -108,6 +108,9 @@ public class Values{
     public static final int DIALOG_EMAIL = 132;
     public static final String ACTIVE_ACCOUNT_ID = "active_account_id";
     public static final String MAIL_RECEPIENTS = "mail_recepients";
+    public static final String MAIL_ATTACHMENTS = "mail_attachments";
+    public static final String MAIL_THEME = "mail_theme";
+    public static final String MAIL_BODY = "mail_body";
 
     public static final int ROOM_IS_BUSY = 0;
     public static final int ROOM_IS_FREE = 1;
@@ -125,6 +128,7 @@ public class Values{
     public static final int REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION = 203;
     public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
     public static final int REQUEST_CODE_LOG_ON = 205;
+    public static final int REQUEST_CODE_SELECT_EMAIL_ATTACHMENT = 206;
 
     public static final String KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION = "values_for_dialog_person_information";
     public static final String KEY_USER_FOR_DIALOG_PERSON_INFORMATION = "values_for_dialog_person_information";

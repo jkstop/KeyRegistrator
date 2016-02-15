@@ -86,12 +86,26 @@
 
         </RelativeLayout>
 
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/dialog_email_attachments"
-            android:background="@color/fab_material_light_blue_500"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/dialog_email_attachments"
+                android:background="@color/fab_material_light_blue_500"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:layout_below="@+id/dialog_email_attachments"
+                android:id="@+id/dialog_email_add_attachment"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                style="@style/ButtonMaterial"
+                android:text="Добавить вложение"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
+
 
         <Button
             android:id="@+id/dialog_email_sendButton"

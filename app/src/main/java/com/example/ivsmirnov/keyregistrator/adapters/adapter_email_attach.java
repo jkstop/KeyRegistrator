@@ -1,6 +1,9 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
+import com.example.ivsmirnov.keyregistrator.interfaces.EmailClickItemsInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 
 import java.util.ArrayList;
@@ -29,13 +33,13 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
     private Context mContext;
     private int mType;
     private ArrayList<String> mItems;
-    private RecycleItemClickListener mListener;
+    private EmailClickItemsInterface mListener;
 
-    public adapter_email_attach (Context context, RecycleItemClickListener recycleItemClickListener, int type, ArrayList<String> items){
+    public adapter_email_attach (Context context, EmailClickItemsInterface emailClickItemsInterface, int type, ArrayList<String> items){
         this.mContext = context;
         this.mType = type;
         this.mItems = items;
-        this.mListener = recycleItemClickListener;
+        this.mListener = emailClickItemsInterface;
     }
 
     @Override
@@ -46,14 +50,18 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
 
         switch (viewType){
             case VIEW_RECEPIENTS_SIMPLE:
-                View rowView = layoutInflater.inflate(R.layout.card_email_attachments_and_recipients,parent,false);
+                final View rowView = layoutInflater.inflate(R.layout.card_email_attachments_and_recipients,parent,false);
                 viewHolder = new viewHolderEmailAttach(rowView);
                 ImageView deleteItem = (ImageView)rowView.findViewById(R.id.card_email_attach_delete);
                 final RecyclerView.ViewHolder finalViewHolder = viewHolder;
                 deleteItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mListener.onItemClick(v, finalViewHolder.getLayoutPosition(),v.getId());
+                        if (mType == RECIPIENTS){
+                            mListener.onDeleteRecepient(finalViewHolder.getLayoutPosition(), v.getId());
+                        }else if (mType == ATTACHMENTS){
+                            mListener.onDeleteAttachment(finalViewHolder.getLayoutPosition(), v.getId());
+                        }
                     }
                 });
                 break;
@@ -62,18 +70,26 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
                 viewHolder = new viewHolderAddNew(rowViewNEW);
                 ImageView save = (ImageView)rowViewNEW.findViewById(R.id.card_email_add_new_recepient_save);
                 ImageView delete = (ImageView)rowViewNEW.findViewById(R.id.card_email_add_new_recepient_delete);
+                final TextInputLayout textInputLayout = (TextInputLayout)rowViewNEW.findViewById(R.id.card_email_add_new_recepient_input);
 
                 final RecyclerView.ViewHolder finalViewHolder1 = viewHolder;
                 save.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mListener.onItemClick(v, finalViewHolder1.getLayoutPosition(),v.getId());
+                        String inputText = textInputLayout.getEditText().getText().toString();
+                        if (inputText.contains("@") && inputText.contains(".")){
+                            v.setTag(textInputLayout.getEditText().getText().toString());
+                            mListener.onAddRecepient(v, finalViewHolder1.getLayoutPosition(), v.getId());
+                        }else{
+                            textInputLayout.setError("Должен быть введен e-mail");
+                        }
+
                     }
                 });
                 delete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mListener.onItemClick(v, finalViewHolder1.getLayoutPosition(),v.getId());
+                        mListener.onDeleteRecepient(finalViewHolder1.getLayoutPosition(), v.getId());
                     }
                 });
 
@@ -91,7 +107,7 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
 
             }else{
                 ((viewHolderEmailAttach)holder).mText.setText(mItems.get(position));
-                ((viewHolderEmailAttach)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.person_male_colored));
+                ((viewHolderEmailAttach)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.person));
                 ((viewHolderEmailAttach)holder).mImageDelete.setImageDrawable(mContext.getResources().getDrawable(android.R.drawable.ic_menu_delete));
             }
 
@@ -102,7 +118,10 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
 
             //}
         }else if (mType == ATTACHMENTS){
+            ((viewHolderEmailAttach)holder).mText.setText(mItems.get(position));
 
+            ((viewHolderEmailAttach)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_attach_file_black_24dp));
+            ((viewHolderEmailAttach)holder).mImageDelete.setImageDrawable(mContext.getResources().getDrawable(android.R.drawable.ic_menu_delete));
         }
     }
 

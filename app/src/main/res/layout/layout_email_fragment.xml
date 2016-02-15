@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/email_fragment_layout_information"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/email_fragment_card_account"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            app:contentPadding="5dp"
+            android:elevation="5dp"
+            android:layout_margin="16dp"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:id="@+id/dialog_email_account_information"
+                android:layout_margin="16dp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <com.example.ivsmirnov.keyregistrator.custom_views.RoundImageView
+                    android:id="@+id/dialog_email_account_information_image"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerInParent="true"
+                    android:scaleType="centerCrop"
+                    android:foregroundGravity="center"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:contentDescription="image_account_dialog"/>
+
+                <TextView
+                    android:id="@+id/dialog_email_account_information_name"
+                    android:layout_toRightOf="@+id/dialog_email_account_information_image"
+                    android:text="AccountName"
+                    android:textColor="@color/black"
+                    style="@style/NavigationDrawerAccountInfoText" />
+
+                <TextView
+                    android:id="@+id/dialog_email_account_information_email"
+                    android:layout_toRightOf="@id/dialog_email_account_information_image"
+                    android:layout_below="@id/dialog_email_account_information_name"
+                    android:textColor="@color/black"
+                    android:text="AccountEmail@gmail.ru"
+                    style="@style/NavigationDrawerAccountInfoText" />
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_margin="16dp"
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/dialog_email_message_theme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:hint="Тема"
+                    android:focusable="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/dialog_email_message_body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:hint="Текст"
+                    android:focusable="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_below="@+id/email_fragment_layout_information"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_margin="16dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_alignParentLeft="true"
+                android:textSize="20dp"
+                android:textColor="@color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Получатели"/>
+
+            <ImageView
+                android:id="@+id/email_fragment_add_recipient"
+                android:contentDescription="dfvsdvsv"
+                android:src="@android:drawable/ic_input_add"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/dialog_email_recipients"
+                android:layout_below="@+id/email_fragment_add_recipient"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_margin="16dp"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_alignParentLeft="true"
+                android:textSize="20dp"
+                android:textColor="@color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Вложения"/>
+
+            <ImageView
+                android:id="@+id/email_fragment_add_attachment"
+                android:contentDescription="dfvsdvsv"
+                android:src="@android:drawable/ic_input_add"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/dialog_email_attachments"
+                android:layout_below="@+id/email_fragment_add_attachment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:layout_below="@+id/dialog_email_attachments"
+                android:id="@+id/dialog_email_add_attachment"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                style="@style/ButtonMaterial"
+                android:text="Добавить вложение"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/email_fragment_send_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:backgroundTint="@color/colorAccent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        app:elevation="5dp"
+        android:src="@drawable/mail_send_48" />
+
+</RelativeLayout>

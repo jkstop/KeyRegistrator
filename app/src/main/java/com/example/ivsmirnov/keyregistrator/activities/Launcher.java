@@ -224,13 +224,13 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                     setToolbarTitle(R.string.toolbar_title_shedule);
                     showFragment(Shedule_Fragment.newInstance(),R.string.fragment_tag_shedule);
                 }else if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_mail))){
-                    Dialog_Fragment dialog_email = new Dialog_Fragment();
-                    Bundle bundle_email = new Bundle();
-                    bundle_email.putInt(Values.DIALOG_TYPE, Values.DIALOG_EMAIL);
-                    dialog_email.setArguments(bundle_email);
-                    dialog_email.show(getSupportFragmentManager(),"email");
-                    //setToolbarTitle(R.string.toolbar_title_email);
-                    //showFragment(Email_Fragment.newInstance(),R.string.fragment_tag_email);
+                    //Dialog_Fragment dialog_email = new Dialog_Fragment();
+                    //Bundle bundle_email = new Bundle();
+                    //bundle_email.putInt(Values.DIALOG_TYPE, Values.DIALOG_EMAIL);
+                    //dialog_email.setArguments(bundle_email);
+                    //dialog_email.show(getSupportFragmentManager(),"email");
+                    setToolbarTitle(R.string.toolbar_title_email);
+                    showFragment(Email_Fragment.newInstance(),R.string.fragment_tag_email);
                 }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_sql))){
                     Dialog_Fragment dialog_sql = new Dialog_Fragment();
                     Bundle bundle_sql = new Bundle();
