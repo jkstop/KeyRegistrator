@@ -24,6 +24,14 @@ public class Settings {
         mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
     }
 
+    public void setToken (String token){
+        mPreferencesEditor.putString(Values.TOKEN, token).apply();
+    }
+
+    public String getToken(){
+        return mPreferences.getString(Values.TOKEN, null);
+    }
+
     public void setMessageTheme (String theme){
         mPreferencesEditor.putString(Values.MAIL_THEME, theme).apply();
     }

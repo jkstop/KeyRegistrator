@@ -111,6 +111,7 @@ public class Values{
     public static final String MAIL_ATTACHMENTS = "mail_attachments";
     public static final String MAIL_THEME = "mail_theme";
     public static final String MAIL_BODY = "mail_body";
+    public static final String TOKEN = "token";
 
     public static final int ROOM_IS_BUSY = 0;
     public static final int ROOM_IS_FREE = 1;

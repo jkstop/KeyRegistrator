@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -65,6 +66,7 @@ import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
 import com.example.ivsmirnov.keyregistrator.others.GMailOauthSender;
+import com.example.ivsmirnov.keyregistrator.others.GoogleAuthenticator;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -118,11 +120,12 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     private Context mContext;
     private Resources mResources;
     private Settings mSettings;
+    private FragmentActivity mFragmentActivity;
 
     private KeyInterface mKeyInterface;
     private RoomInterface mRoomInterface;
 
-    private GoogleApiClient mGoogleApiClient;
+    public static GoogleApiClient mGoogleApiClient;
 
     private static long back_pressed;
 
@@ -157,12 +160,13 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         mSettings = new Settings(mContext);
         mKeyInterface = this;
         mRoomInterface = this;
+        mFragmentActivity = this;
 
         SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
 
         initNavigationDrawer(getMainNavigationItems());
-        initGoogleAPI();
 
+        initGoogleAPI();
         new initReader().execute();
     }
 
@@ -173,7 +177,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(mContext)
-                .enableAutoManage(this /* FragmentActivity */,this /* OnConnectionFailedListener */)
+                .enableAutoManage(this,this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
     }
@@ -297,6 +301,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         public void onClick(View v) {
             Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
             startActivityForResult(signInIntent, Values.REQUEST_CODE_LOG_ON);
+
         }
     };
 
@@ -355,7 +360,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                             }
                         }
                     });
-                    thread.start();
+                    //thread.start();
 
 
                     mSettings.setActiveAccountID(acct.getId());

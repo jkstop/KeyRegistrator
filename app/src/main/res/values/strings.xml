@@ -120,6 +120,10 @@
     <string name="auditroom_grid_busy_image_key_description">auditroom_grid_busy_image_key_description</string>
     <string name="navigation_drawer_change_account_image_descritpion">navigation_drawer_change_account_image_descritpion</string>
     <string name="navigation_drawer_person_image_descritpion">navigation_drawer_person_image_descritpion</string>
+    <string name="image_description_email_fragment_account_image">image_description_email_fragment_account_image</string>
+    <string name="image_description_email_fragment_add_recipient">email_fragment_add_recipient</string>
+    <string name="image_description_email_fragment_add_attachment">email_fragment_add_attachment</string>
+
 
     <string name="view_enter_password_hint_password">Пароль</string>
     <string name="view_enter_password_title">Введите пароль</string>
@@ -147,6 +151,11 @@
 
     <string name="dialog_email_add_recipient">Добавить получателя</string>
     <string name="dialog_email_add_attachment">Добавить вложение</string>
+    <string name="email_fragment_input_theme_hint">Тема</string>
+    <string name="email_fragment_input_message_hint">Текст сообщения</string>
+    <string name="email_fragment_recepients_text">Получатели</string>
+    <string name="email_fragment_attachments_text">Вложения</string>
+    <string name="email_fragment_logon">Для отправки писем сначала войдите в аккаунт</string>
 
 
 

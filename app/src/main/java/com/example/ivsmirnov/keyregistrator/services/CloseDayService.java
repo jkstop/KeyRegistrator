@@ -15,6 +15,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Close_day_task;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseDayInterface;
+import com.example.ivsmirnov.keyregistrator.items.MailParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.activities.CloseDay;
@@ -44,15 +45,14 @@ public class CloseDayService extends Service implements CloseDayInterface {
         mSettings.setAutoClosedRoomsCount(Values.closeAllRooms(context));
         new Close_day_task(context, this).execute();
 
-        /*Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
         if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-            Send_Email send_email = new Send_Email(context, new String[]{preferences.getString(Values.EMAIL + "@gmail.com", ""),
-                    preferences.getString(Values.PASSWORD, ""),
-                    preferences.getString(Values.RECIPIENTS, ""),
-                    preferences.getString(Values.BODY, ""),
-                    preferences.getString(Values.THEME, "")});
-            send_email.execute();
-        }*/
+           new Send_Email(context).execute(new MailParams()
+                   .setTheme(mSettings.getMessageTheme())
+                   .setBody(mSettings.getMessageBody())
+                   .setAttachments(mSettings.getAttachments())
+                   .setRecepients(mSettings.getRecepients()));
+        }
 
         mSettings.setAutoCloseStatus(false);
 

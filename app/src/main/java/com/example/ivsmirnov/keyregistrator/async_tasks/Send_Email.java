@@ -3,65 +3,160 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.example.ivsmirnov.keyregistrator.mail_sender.GMailSender;
-import com.example.ivsmirnov.keyregistrator.others.Values;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
+import com.example.ivsmirnov.keyregistrator.items.AccountItem;
+import com.example.ivsmirnov.keyregistrator.items.MailParams;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Properties;
 
-import javax.mail.AuthenticationFailedException;
+import javax.activation.CommandMap;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.MailcapCommandMap;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * Created by IVSmirnov on 26.08.2015.
  */
-public class Send_Email extends AsyncTask<Void, Void, Void> {
+public class Send_Email extends AsyncTask<MailParams, Void, Void> {
 
-    private String[] items;
+
     private Context mContext;
-    private SharedPreferences mSharedPreferences;
-    private SharedPreferences.Editor mSharedPreferencesEditor;
+    private Settings mSettings;
 
-    public Send_Email(Context c, String[] i) {
+    public Send_Email(Context c) {
         this.mContext = c;
-        this.items = i;
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        mSettings = new Settings(mContext);
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Void doInBackground(MailParams... params) {
 
-        File[] attachments;
-        if (mSharedPreferences.getBoolean(Values.CHECK_JOURNAL, false) && mSharedPreferences.getBoolean(Values.CHECK_TEACHERS, false)) {
-            attachments = new File[2];
-            attachments[0] = new File(Environment.getExternalStorageDirectory().getPath() + "/Journal.txt");
-            attachments[1] = new File(Environment.getExternalStorageDirectory().getPath() + "/Teachers.csv");
-        } else if (mSharedPreferences.getBoolean(Values.CHECK_JOURNAL, false) && !mSharedPreferences.getBoolean(Values.CHECK_TEACHERS, false)) {
-            attachments = new File[1];
-            attachments[0] = new File(Environment.getExternalStorageDirectory().getPath() + "/Journal.txt");
-        } else if (!mSharedPreferences.getBoolean(Values.CHECK_JOURNAL, false) && mSharedPreferences.getBoolean(Values.CHECK_TEACHERS, false)) {
-            attachments = new File[1];
-            attachments[0] = new File(Environment.getExternalStorageDirectory().getPath() + "/Teachers.csv");
-        } else {
-            attachments = new File[0];
-        }
-
-        GMailSender sender = new GMailSender(items[0], items[1]);
         try {
-            sender.sendMail(items[4],
-                    items[3] + Values.showDate(),
-                    items[1],
-                    items[2],
-                    attachments);
-        } catch (AuthenticationFailedException e) {
-            e.printStackTrace();
-            Log.d("auth", "error");
+            DataBaseAccount dataBaseAccount = new DataBaseAccount(mContext);
+            AccountItem accountItem = dataBaseAccount.getAccount(mSettings.getActiveAccountID());
+            dataBaseAccount.closeDB();
+            String token = GoogleAuthUtil.getToken(mContext, accountItem.getEmail(),"oauth2:https://mail.google.com/");
+            String mTheme = params[0].getTheme();
+            String mBody = params[0].getBody();
+            ArrayList<String> mAttachments = params[0].getAttachments();
+
+            Properties props = new Properties();
+            props.put("mail.smtp.ssl.enable", "true");
+            props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
+            Session session = Session.getInstance(props);
+            session.setDebug(true);
+
+            MimeMessage mimeMessage = new MimeMessage(session);
+            DataHandler handler = new DataHandler(new ByteArrayDataSource(mBody.getBytes(), "multipart/mixed"));
+
+            mimeMessage.setSubject(mTheme);
+            mimeMessage.setDataHandler(handler);
+
+            for (String recepient : params[0].getRecepients()){
+                mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(recepient));
+            }
+
+            MimeBodyPart mimeBodyPartText = new MimeBodyPart();
+            mimeBodyPartText.setText(mBody);
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(mimeBodyPartText);
+            if (mAttachments.size()!=0){
+                for (String s : mAttachments){
+                    MimeBodyPart mimeBodyPartAttach = new MimeBodyPart();
+                    mimeBodyPartAttach.attachFile(new File(s));
+                    mimeBodyPartAttach.setHeader("Content-Type", "text/plain; charset=\"us-ascii\"; name=\"mail.txt\"");
+                    multipart.addBodyPart(mimeBodyPartAttach);
+                }
+            }
+
+            mimeMessage.setContent(multipart);
+
+            addMailCap();
+
+            Transport transport = session.getTransport("smtp");
+            transport.connect("imap.gmail.com",accountItem.getEmail(),token);
+            transport.sendMessage(mimeMessage,mimeMessage.getAllRecipients());
+            transport.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return null;
     }
+
+    private void addMailCap() {
+        MailcapCommandMap mc = (MailcapCommandMap) CommandMap.getDefaultCommandMap();
+        mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
+        mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");
+        mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
+        mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
+        mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822");
+        CommandMap.setDefaultCommandMap(mc);
+    }
+
+    public class ByteArrayDataSource implements DataSource {
+        private byte[] data;
+        private String type;
+
+        public ByteArrayDataSource(byte[] data, String type) {
+            super();
+            this.data = data;
+            this.type = type;
+        }
+
+        public ByteArrayDataSource(byte[] data) {
+            super();
+            this.data = data;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getContentType() {
+            if (type == null)
+                return "application/octet-stream";
+            else
+                return type;
+        }
+
+        public InputStream getInputStream() throws IOException {
+            return new ByteArrayInputStream(data);
+        }
+
+        public String getName() {
+            return "ByteArrayDataSource";
+        }
+
+        public OutputStream getOutputStream() throws IOException {
+            throw new IOException("Not Supported");
+        }
+    }
+
+
 }
