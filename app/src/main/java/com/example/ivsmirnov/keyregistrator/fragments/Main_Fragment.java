@@ -2,9 +2,11 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -29,7 +31,10 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
@@ -64,6 +69,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Main_Fragment extends Fragment implements UpdateInterface,RecycleItemClickListener, Get_Account_Information_Interface, RoomInterface{
 
@@ -176,12 +182,58 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                 dialog_resize.setTargetFragment(this,0);
                 dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
-            //case R.id.test:
-            //    return true;
+            case R.id.test:
+                new insert(mContext).execute();
+                return true;
             //case R.id.test2:
             //    return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private class insert extends AsyncTask<Void,Integer,Void>{
+
+        private Context context;
+        private ProgressDialog progressDialog;
+
+        private insert(Context context){
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(context);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
+            //dataBaseFavorite.clearTeachersDB();
+            for (int i=0;i<1000;i++){
+                dataBaseFavorite.writeInDBTeachers(new PersonItem().setLastname("rrrrrrrr")
+                        .setFirstname("rrrr")
+                        .setMidname("rrrrrr")
+                        .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1)
+                        .setDivision("rrrrrrr")
+                        .setPhotoOriginal(dataBaseFavorite.getPersonPhotoBase64("99 77 DC 1A 00 00", GetPersonPhoto.ORIGINAL_IMAGE,GetPersonPhoto.LOCAL_PHOTO))
+                        .setPhotoPreview(DataBaseFavorite.getPhotoPreview(dataBaseFavorite.getPersonPhotoBase64("99 77 DC 1A 00 00", GetPersonPhoto.ORIGINAL_IMAGE, GetPersonPhoto.LOCAL_PHOTO)))
+                        .setSex("V"));
+                publishProgress(i);
+            }
+            dataBaseFavorite.closeDB();
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            progressDialog.setMessage(String.valueOf(values[0]));
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            progressDialog.cancel();
         }
     }
 

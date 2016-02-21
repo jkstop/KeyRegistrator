@@ -87,6 +87,7 @@
     <dimen name="email_account_account_name_size">28sp</dimen>
     <dimen name="email_account_account_mail_size">20sp</dimen>
     <dimen name="email_account_extra_text_size">20sp</dimen>
+    <dimen name="email_account_extra_attach_text_size">24sp</dimen>
 
     <dimen name="card_default_elevation">7dp</dimen>
     <dimen name="card_default_content_padding">5dp</dimen>

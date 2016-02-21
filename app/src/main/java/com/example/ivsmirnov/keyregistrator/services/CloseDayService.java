@@ -47,7 +47,7 @@ public class CloseDayService extends Service implements CloseDayInterface {
 
         Calendar calendar = Calendar.getInstance();
         if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-           new Send_Email(context).execute(new MailParams()
+           new Send_Email(context, Send_Email.DIALOG_DISABLED).execute(new MailParams()
                    .setTheme(mSettings.getMessageTheme())
                    .setBody(mSettings.getMessageBody())
                    .setAttachments(mSettings.getAttachments())

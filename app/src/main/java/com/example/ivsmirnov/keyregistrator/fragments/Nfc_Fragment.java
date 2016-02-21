@@ -21,6 +21,8 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
+import java.util.Random;
+
 /**
  * Created by ivsmirnov on 05.11.2015.
  */
@@ -62,6 +64,7 @@ public class Nfc_Fragment extends Fragment {
 
             PersonItem personItem = new PersonItem()
                     .setLastname(((Button)v).getText().toString())
+                    .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1)
                     .setPhotoPreview(DataBaseFavorite.getPhotoPreview(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext)))
                     .setPhotoOriginal(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext));
 

@@ -46,6 +46,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_email_attach;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
 import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.custom_views.RecyclerWrapContentHeightManager;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
@@ -155,7 +156,7 @@ public class Dialog_Fragment extends DialogFragment{
 
                 final View dialogView = mInflater.inflate(R.layout.layout_person_information, null);
                 final ImageView personImage = (ImageView) dialogView.findViewById(R.id.person_information_image);
-                final ArrayList<String> valuesForEdits = getArguments().getStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION);
+                //final ArrayList<String> valuesForEdits = getArguments().getStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION);
                 final DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
 
                 final TextInputLayout inputLastname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_lastname_layout);
@@ -163,37 +164,47 @@ public class Dialog_Fragment extends DialogFragment{
                 final TextInputLayout inputMidname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_midname_layout);
                 final TextInputLayout inputDivision = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_division_layout);
 
-                String tag = Values.EMPTY;
-                if (valuesForEdits!=null){
+                final String tag = getArguments().getString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG);
+
+                final DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
+                final PersonItem personItem = dataBaseFavorite.getPersonItem(tag, DataBaseFavorite.LOCAL_USER, DataBaseFavorite.FULLSIZE_PHOTO);
+
+                inputLastname.getEditText().setText(personItem.getLastname());
+                inputFirstname.getEditText().setText(personItem.getFirstname());
+                inputMidname.getEditText().setText(personItem.getMidname());
+                inputDivision.getEditText().setText(personItem.getDivision());
+
+                byte [] decodedString = Base64.decode(personItem.getPhotoOriginal(), Base64.DEFAULT);
+                personImage.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+
+               /* if (valuesForEdits!=null){
                     inputLastname.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME));
                     inputFirstname.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME));
                     inputMidname.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME));
                     inputDivision.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION));
 
-                    byte[] decodedString = Base64.decode(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL), Base64.DEFAULT);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                    personImage.setImageBitmap(bitmap);
+//                    byte[] decodedString = Base64.decode(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL), Base64.DEFAULT);
+//                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+                    personImage.setImageBitmap(new DataBaseFavorite(mContext).getPersonPhoto(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_TAG),
+                            GetPersonPhoto.LOCAL_PHOTO,GetPersonPhoto.ORIGINAL_IMAGE));
 
                     tag = valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_TAG);
-                }
-
-
-
+                }*/
 
                 AlertDialog.Builder builderEdit = new AlertDialog.Builder(getActivity());
                 builderEdit.setView(dialogView);
 
-                final DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
                 if (dataBaseFavorite.isAccountInBase(tag)){
                     builderEdit.setNeutralButton(getResources().getString(R.string.delete), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if (valuesForEdits!=null){
+                            if (tag!=null){
                                 dbFavorite.deleteFromTeachersDB(new PersonItem()
-                                        .setLastname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME))
-                                        .setFirstname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME))
-                                        .setMidname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME))
-                                        .setDivision(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION)));
+                                        .setLastname(personItem.getLastname())
+                                        .setFirstname(personItem.getFirstname())
+                                        .setMidname(personItem.getMidname())
+                                        .setDivision(personItem.getDivision()));
                                 dbFavorite.closeDB();
                                 updateInformation();
                             }
@@ -215,7 +226,7 @@ public class Dialog_Fragment extends DialogFragment{
                             valuesEdited.add(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME, inputMidname.getEditText().getText().toString());
                             valuesEdited.add(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION, inputDivision.getEditText().getText().toString());
 
-                            dbFavorite.updateTeachersDB(valuesForEdits, valuesEdited);
+                            //dbFavorite.updateTeachersDB(valuesForEdits, valuesEdited);
                             dbFavorite.closeDB();
 
                             updateInformation();
@@ -225,14 +236,14 @@ public class Dialog_Fragment extends DialogFragment{
                     builderEdit.setNeutralButton(getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            dataBaseFavorite.writeInDBTeachers(new PersonItem().setLastname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME))
-                                    .setFirstname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME))
-                                    .setMidname(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME))
-                                    .setDivision(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION))
-                                    .setPhotoOriginal(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL))
-                                    .setPhotoPreview(DataBaseFavorite.getPhotoPreview(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL)))
-                                    .setSex(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_SEX))
-                                    .setRadioLabel(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_TAG)));
+                            dataBaseFavorite.writeInDBTeachers(new PersonItem().setLastname(personItem.getLastname())
+                                    .setFirstname(personItem.getFirstname())
+                                    .setMidname(personItem.getMidname())
+                                    .setDivision(personItem.getDivision())
+                                    //.setPhotoOriginal(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL))
+                                    //.setPhotoPreview(DataBaseFavorite.getPhotoPreview(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL)))
+                                    .setSex(personItem.getSex())
+                                    .setRadioLabel(personItem.getRadioLabel()));
                             updateInformation();
                         }
                     });

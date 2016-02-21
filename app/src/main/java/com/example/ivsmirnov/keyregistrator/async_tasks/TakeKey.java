@@ -32,7 +32,7 @@ public class TakeKey extends AsyncTask<TakeKeyParams,Void,Void> {
 
     @Override
     protected Void doInBackground(TakeKeyParams... params) {
-        mListener = params[0].getPublicInterface();
+        mListener = params[0].getPublicInterface();//запрос фото из базы
         JournalItem journalItem = Values.createNewItemForJournal(mContext,
                 params[0].getPersonItem(),
                 params[0].getAuditroom(),

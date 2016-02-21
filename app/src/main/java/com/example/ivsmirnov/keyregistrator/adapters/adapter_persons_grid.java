@@ -2,22 +2,30 @@ package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_grid.ViewHolder>{
@@ -28,11 +36,13 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
     private Context context;
     private LayoutInflater inflater;
     private RecycleItemClickListener mListener;
+    public  DataBaseFavorite dataBaseFavorite;
 
     public adapter_persons_grid(Context c, ArrayList<PersonItem> all,int type,RecycleItemClickListener listener) {
         allItems = all;
         context = c;
         mType = type;
+        dataBaseFavorite = new DataBaseFavorite(context);
         this.mListener = listener;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -40,18 +50,20 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
 
     static class ViewHolder extends RecyclerView.ViewHolder{
         public ImageView imageView;
-        public TextView textSurname;
-        public TextView textMidname;
         public TextView textLastname;
+        public TextView textFirstname;
+        public TextView textMidname;
         public TextView textDivision;
+        public CardView personCard;
 
         public ViewHolder(View itemView) {
             super(itemView);
             imageView = (ImageView)itemView.findViewById(R.id.image_sql);
-            textSurname = (TextView) itemView.findViewById(R.id.person_card_text_lastname);
-            textMidname = (TextView)itemView.findViewById(R.id.person_card_text_firstname);
-            textLastname = (TextView)itemView.findViewById(R.id.person_card_text_midname);
+            textLastname = (TextView) itemView.findViewById(R.id.person_card_text_lastname);
+            textFirstname = (TextView)itemView.findViewById(R.id.person_card_text_firstname);
+            textMidname = (TextView)itemView.findViewById(R.id.person_card_text_midname);
             textDivision = (TextView)itemView.findViewById(R.id.person_card_text_division);
+            personCard = (CardView)itemView.findViewById(R.id.person_card);
         }
     }
 
@@ -60,10 +72,6 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
         View rowView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_person,parent,false);
         final ViewHolder viewHolder = new ViewHolder(rowView);
 
-        //WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
-        //Display display = windowManager.getDefaultDisplay();
-        //int gridHeight = display.getHeight();
-        //int buttonHeight = gridHeight / 6;
         rowView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,117 +90,80 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.textSurname.setText(allItems.get(position).getLastname());
-        holder.textMidname.setText(allItems.get(position).getFirstname());
-        holder.textLastname.setText(allItems.get(position).getMidname());
-        holder.textDivision.setText(allItems.get(position).getDivision());
-
-
-        Bitmap bitmap = null;
-        String photo = null;
-
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
+        //holder.textLastname.setText(allItems.get(position).getLastname());
+        //holder.textFirstname.setText(allItems.get(position).getFirstname());
+        //holder.textMidname.setText(allItems.get(position).getMidname());
+        //holder.textDivision.setText(allItems.get(position).getDivision());
+        Animation fadeInanimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
         if (mType== Values.SHOW_FAVORITE_PERSONS){
-            photo = allItems.get(position).getPhotoPreview();
+            new GetPersons(holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(allItems.get(position).getRadioLabel())
+            .setDatabase(dataBaseFavorite)
+            .setPersonImageView(holder.imageView)
+            .setPersonLastname(holder.textLastname)
+            .setPersonFirstname(holder.textFirstname)
+            .setPersonMidname(holder.textMidname)
+            .setPersonDivision(holder.textDivision)
+            .setPersonLocation(DataBaseFavorite.LOCAL_USER)
+            .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
+            //new GetPersonPhoto(context,allItems.get(position).getRadioLabel(), dataBaseFavorite, holder.imageView, GetPersonPhoto.PREVIEW_IMAGE, GetPersonPhoto.LOCAL_PHOTO).execute();
+            //new getPhoto(holder.imageView).execute(allItems.get(position).getRadioLabel());
+            //photo = allItems.get(position).getPhotoPreview();
         }else if (mType==Values.SHOW_ALL_PERSONS){
-            photo = allItems.get(position).getPhotoOriginal();
+            new GetPersons(holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(allItems.get(position).getRadioLabel())
+                    .setDatabase(dataBaseFavorite)
+                    .setPersonImageView(holder.imageView)
+                    .setPersonLastname(holder.textLastname)
+                    .setPersonFirstname(holder.textFirstname)
+                    .setPersonMidname(holder.textMidname)
+                    .setPersonDivision(holder.textDivision)
+                    .setPersonLocation(DataBaseFavorite.SERVER_USER)
+                    .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
+            //new GetPersonPhoto(context,allItems.get(position).getRadioLabel(), dataBaseFavorite, holder.imageView, GetPersonPhoto.PREVIEW_IMAGE, GetPersonPhoto.SERVER_PHOTO).execute();
+            //new GetPersonPhoto(allItems.get(position).getRadioLabel(), dataBaseFavorite, holder.imageView, GetPersonPhoto.ORIGINAL_IMAGE).execute();
+            //photo = allItems.get(position).getPhotoOriginal();
         }
 
-        if (photo!=null){
+  /*      if (photo!=null){
             byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
             bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
             holder.imageView.setImageBitmap(bitmap);
 
-        }/*else{
-            //if(allItems.get(position).Sex.equals("Ж")){
-            //    bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.person_female_colored);
-            //}else{
-            //    bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.person_male_colored);
-            //}
-            //options.inSampleSize = DataBaseFavorite.calculateInSampleSize(options, 120, 160);
-            //options.inJustDecodeBounds = false;
         }*/
 
 
     }
-
-
 
     @Override
     public int getItemCount() {
         return allItems.size();
     }
 
+    private class getPhoto extends AsyncTask<String, Void, Bitmap>{
 
+        WeakReference<ImageView> viewWeakReference;
 
-/*
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-        View rowView = convertView;
-
-
-        if (rowView==null){
-            rowView = inflater.inflate(R.layout.cell_for_base_sql, null);
-
-            holder.textSurname = (TextView) rowView.findViewById(R.id.text_familia);
-            holder.textMidname = (TextView)rowView.findViewById(R.id.text_imya);
-            holder.textLastname = (TextView)rowView.findViewById(R.id.otchestvo);
-            holder.textDivision = (TextView)rowView.findViewById(R.id.kafedra);
-            holder.imageView = (ImageView)rowView.findViewById(R.id.image_sql);
-            rowView.setTag(holder);
-        }else{
-            holder = (ViewHolder)rowView.getTag();
+        public getPhoto (ImageView imageView){
+            viewWeakReference = new WeakReference<ImageView>(imageView);
         }
 
+        @Override
+        protected Bitmap doInBackground(String... params) {
 
-
-
-        rowView.setTag(R.string.grid_item_tag_lastname,card.get(0));
-        rowView.setTag(R.string.grid_item_tag_firstname,card.get(1));
-        rowView.setTag(R.string.grid_item_tag_midname,card.get(2));
-        rowView.setTag(R.string.grid_item_tag_division,card.get(3));
-        rowView.setTag(R.string.grid_item_tag_sex,card.get(4));
-        rowView.setTag(R.string.grid_item_tag_radio_label,card.get(6));
-
-        if (mType==1){
-            ImageLoader imageLoader = ImageLoader.getInstance();
-            if (!imageLoader.isInited()){
-                imageLoader.init(ImageLoaderConfiguration.createDefault(context));
-            }
-            imageLoader.displayImage("file://"+card.get(5), holder.imageView);
-        }else{
-            Bitmap bitmap;
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-
-            if (card.get(5)!=null){
-                Log.d("card5",card.get(5));
-                byte[] decodedString = Base64.decode(card.get(5), Base64.DEFAULT);
-                BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
-                options.inSampleSize = DataBaseFavorite.calculateInSampleSize(options, 120, 160);
-                options.inJustDecodeBounds = false;
-                bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
-
-            }else{
-                //decodedString = Base64.decode("",Base64.DEFAULT);
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_male_colored);
-                options.inSampleSize = DataBaseFavorite.calculateInSampleSize(options, 120, 160);
-                options.inJustDecodeBounds = false;
-                //image.setImageBitmap(bitmap);
-            }
-            holder.imageView.setImageBitmap(bitmap);
-
+            return dataBaseFavorite.getPersonPhoto(params[0],GetPersonPhoto.SERVER_PHOTO, GetPersonPhoto.ORIGINAL_IMAGE);
         }
 
-        WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = windowManager.getDefaultDisplay();
-        int gridHeight = display.getHeight();
-        int buttonHeight = gridHeight / 6;
-        rowView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, buttonHeight));
-        return rowView;
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            Log.d("size", String.valueOf(bitmap.getByteCount() / 1024));
+            ImageView imageView = viewWeakReference.get();
+            if (imageView!=null){
+                imageView.setImageBitmap(bitmap);
+                //bitmap.recycle();
+            }
+        }
     }
-*/
+
 
 }

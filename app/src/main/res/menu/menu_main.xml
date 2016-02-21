@@ -7,12 +7,12 @@
         android:title="Размер элеметов"
         app:showAsAction="never"/>
 
-    <!--<item
+    <item
         android:id="@+id/test"
         android:title="test"
         app:showAsAction="never"/>
 
-    <item
+    <!--<item
         android:id="@+id/test2"
         android:title="test2"
         app:showAsAction="never"/>-->

@@ -24,6 +24,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.Find_User_in_SQL_Server_Interface;
@@ -179,6 +180,10 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
     @Override
     public void onItemClick(View v, int position, int viewID) {
+        DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
+        PersonItem selectedPerson = mPersonItems.get(position);
+        selectedPerson.setPhotoOriginal(dataBaseFavorite.getPersonPhotoBase64(selectedPerson.getRadioLabel(),GetPersonPhoto.ORIGINAL_IMAGE,GetPersonPhoto.SERVER_PHOTO));
+        selectedPerson.setPhotoPreview(dataBaseFavorite.getPersonPhotoBase64(selectedPerson.getRadioLabel(),GetPersonPhoto.PREVIEW_IMAGE, GetPersonPhoto.SERVER_PHOTO));
         addUserInFavorite(mContext, mPersonItems.get(position));
     }
 

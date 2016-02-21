@@ -41,11 +41,11 @@ public class Find_User_in_SQL_Server extends AsyncTask<ResultSet,Void,ArrayList<
         ArrayList<PersonItem> mItems = new ArrayList<>();
         try {
             while (params[0].next()){
-                String photo = params[0].getString("PHOTO");
+                //String photo = params[0].getString("PHOTO");
 
-                if (photo==null){
-                    photo = getBase64DefaultPhotoFromResources(mContext);
-                }
+                //if (photo==null){
+                //    photo = getBase64DefaultPhotoFromResources(mContext);
+                //}
 
                 mItems.add(new PersonItem()
                         .setLastname(params[0].getString("LASTNAME"))
@@ -53,8 +53,8 @@ public class Find_User_in_SQL_Server extends AsyncTask<ResultSet,Void,ArrayList<
                         .setMidname(params[0].getString("MIDNAME"))
                         .setDivision(params[0].getString("NAME_DIVISION"))
                         .setSex(params[0].getString("SEX"))
-                        .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo))
-                        .setPhotoOriginal(photo)
+                       // .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo))
+                       // .setPhotoOriginal(photo)
                         .setRadioLabel(params[0].getString("RADIO_LABEL")));
             }
         } catch (SQLException e) {

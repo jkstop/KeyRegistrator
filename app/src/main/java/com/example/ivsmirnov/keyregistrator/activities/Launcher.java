@@ -564,19 +564,20 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
                                     if (persons_fragment != null && persons_fragment.isVisible()) {
                                         PersonItem personItem = DataBaseFavorite.findInServer(mContext, tag);
-                                        ArrayList <String> valuesForDialog = new ArrayList<>();
+                                        //ArrayList <String> valuesForDialog = new ArrayList<>();
                                         if (personItem!=null){
-                                            valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME, personItem.getLastname());
-                                            valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME, personItem.getFirstname());
-                                            valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME, personItem.getMidname());
-                                            valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION, personItem.getDivision());
-                                            valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL, personItem.getPhotoOriginal());
-                                            valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, personItem.getRadioLabel());
-                                            valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_SEX, personItem.getSex());
+                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME, personItem.getLastname());
+                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME, personItem.getFirstname());
+                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME, personItem.getMidname());
+                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION, personItem.getDivision());
+                                           // valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL, personItem.getPhotoOriginal());
+                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, personItem.getRadioLabel());
+                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_SEX, personItem.getSex());
 
                                             Bundle b = new Bundle();
                                             b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
-                                            b.putStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION, valuesForDialog);
+                                            b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG,tag);
+                                           // b.putStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION, valuesForDialog);
                                             Dialog_Fragment dialog = new Dialog_Fragment();
                                             dialog.setArguments(b);
                                             dialog.setTargetFragment(persons_fragment, 0);

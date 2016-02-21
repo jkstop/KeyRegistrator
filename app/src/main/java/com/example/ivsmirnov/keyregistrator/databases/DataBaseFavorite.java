@@ -12,6 +12,8 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
@@ -31,6 +33,11 @@ import java.util.ArrayList;
  * Created by ivsmirnov on 05.11.2015.
  */
 public class DataBaseFavorite {
+
+    public static final int LOCAL_USER = 0;
+    public static final int SERVER_USER = 1;
+    public static final int FULLSIZE_PHOTO = 2;
+    public static final int PREVIEW_PHOTO = 3;
 
     public DataBaseFavoriteRegist dataBaseFavoriteRegist;
     public SQLiteDatabase sqLiteDatabase;
@@ -81,6 +88,61 @@ public class DataBaseFavorite {
         Log.d("durable",String.valueOf(end - start));
 
         return personItem;
+    }
+
+    public PersonItem getPersonItem(String tag, int userLocation, int photoSize){
+        PersonItem personItem;
+        if (userLocation == LOCAL_USER){
+            cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
+                personItem = new PersonItem().setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
+                        .setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))
+                        .setMidname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))
+                        .setDivision(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))
+                        .setSex(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE)))
+                        .setRadioLabel(tag);
+                if (photoSize == FULLSIZE_PHOTO){
+                    personItem.setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
+                }else if (photoSize == PREVIEW_PHOTO){
+                    personItem.setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)));
+                }
+                return personItem;
+            }
+        }else if (userLocation == SERVER_USER){
+            Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
+            if (connection!=null){
+                try {
+                    Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [RADIO_LABEL] = '" + tag + "'");
+                    while (resultSet.next()){
+                        personItem = new PersonItem().setLastname(resultSet.getString("LASTNAME"))
+                                .setFirstname(resultSet.getString("FIRSTNAME"))
+                                .setMidname(resultSet.getString("MIDNAME"))
+                                .setDivision(resultSet.getString("NAME_DIVISION"))
+                                .setSex(resultSet.getString("SEX"))
+                                .setRadioLabel(resultSet.getString("RADIO_LABEL"));
+                        String photo = resultSet.getString("PHOTO");
+                        if (photo == null){
+                            photo = Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext);
+                        }
+                        if (photoSize == FULLSIZE_PHOTO){
+                            personItem.setPhotoOriginal(photo);
+                        } else {
+                            personItem.setPhotoPreview(getPhotoPreview(photo));
+                        }
+                       return personItem;
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        }
+        return null;
     }
 
     public static PersonItem findInServer(Context context,String tag){
@@ -183,10 +245,33 @@ public class DataBaseFavorite {
     }
 
     public ArrayList<PersonItem> readTeachersFromDB(){
+        cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,
+        DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE,DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE,
+        DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE,DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE,
+        DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null,null);
         cursor.moveToPosition(-1);
         ArrayList <PersonItem> mPerson = new ArrayList<>();
         while (cursor.moveToNext()){
             mPerson.add(new PersonItem()
+                    //.setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
+                    //.setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))
+                    //.setMidname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))
+                    //.setDivision(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))
+                    //.setSex(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE)))
+                    /*.setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)))
+                    .setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)))*/
+                    .setRadioLabel(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE))));
+        }
+        return mPerson;
+    }
+
+    public int getPersonsCount(){
+        return cursor.getCount();
+    }
+
+    public PersonItem readTeacherItem(int position){
+        cursor.moveToPosition(position);
+        return new PersonItem()
                     .setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
                     .setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))
                     .setMidname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))
@@ -194,9 +279,118 @@ public class DataBaseFavorite {
                     .setSex(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE)))
                     .setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)))
                     .setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)))
-                    .setRadioLabel(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE))));
+                    .setRadioLabel(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE)));
+    }
+
+    public Bitmap getPersonPhoto(String tag, int photoSource, int photoSize){
+
+        if (photoSource == GetPersonPhoto.LOCAL_PHOTO){
+            cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
+            cursor.moveToFirst();
+            String photo = null;
+            if (photoSize == GetPersonPhoto.ORIGINAL_IMAGE){
+                photo = cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE));
+            }else if (photoSize == GetPersonPhoto.PREVIEW_IMAGE){
+                photo = cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE));
+            }
+            if (photo!=null){
+                byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
+                return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            }else{
+                return null;
+            }
+
+        }else if (photoSource == GetPersonPhoto.SERVER_PHOTO){
+            Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
+            if (connection!=null){
+                try {
+                    Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [RADIO_LABEL] = '" + tag + "'");
+                    while (resultSet.next()){
+                        String photo = resultSet.getString("PHOTO");
+                        if (photo == null){
+                            photo = Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext);
+                        }
+                        if (photoSize == GetPersonPhoto.PREVIEW_IMAGE){
+                            photo = getPhotoPreview(photo);
+                        }
+                        byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
+                        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
+            }
+            return null;
+        }else{
+            return null;
         }
-        return mPerson;
+    }
+
+
+
+    public String getPersonPhotoBase64 (String tag, int photoSize, int photoSource){
+        if (photoSource == GetPersonPhoto.LOCAL_PHOTO){
+            cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
+            cursor.moveToFirst();
+            if (photoSize == GetPersonPhoto.ORIGINAL_IMAGE){
+                return cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE));
+            }else if (photoSize == GetPersonPhoto.PREVIEW_IMAGE){
+                return cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE));
+            }else{
+                return null;
+            }
+        }else if (photoSource == GetPersonPhoto.SERVER_PHOTO){
+            Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
+            if (connection!=null){
+                try {
+                    Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [RADIO_LABEL] = '" + tag + "'");
+                    while (resultSet.next()){
+                        String photo = resultSet.getString("PHOTO");
+                        if (photo == null){
+                            photo = Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext);
+                        }
+                        if (photoSize == GetPersonPhoto.PREVIEW_IMAGE){
+                            photo = getPhotoPreview(photo);
+                        }
+                        return photo;
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
+            }
+            return null;
+        }else{
+            return null;
+        }
+    }
+
+
+
+
+    public void deleteuser(String tag){
+        cursor.moveToPosition(-1);
+
+        cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
+        if (cursor.getCount()>0){
+            cursor.moveToFirst();
+            while (cursor.moveToNext()){
+                sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + cursor.getPosition(), null);
+                Log.d("deleted", String.valueOf(cursor.getPosition()));
+            }
+        }
+
+
+
+
     }
 
 
@@ -241,13 +435,15 @@ public class DataBaseFavorite {
         byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
         BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
 
-        options.inSampleSize = calculateInSampleSize(options, 120, 160);
+        options.inSampleSize = calculateInSampleSize(options, 240, 320);
         options.inJustDecodeBounds = false;
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        options.inDither = true;
 
         Bitmap bitmapPrew = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmapPrew.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
+        bitmapPrew.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
 
         return Base64.encodeToString(byteArray,Base64.NO_WRAP);

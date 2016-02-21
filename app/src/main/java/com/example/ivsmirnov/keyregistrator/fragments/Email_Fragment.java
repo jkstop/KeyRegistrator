@@ -42,6 +42,8 @@ import java.util.ArrayList;
  */
 public class Email_Fragment extends Fragment implements Get_Account_Information_Interface, EmailClickItemsInterface{
 
+    public static final String ADD_NEW_RECIPIENT = "add_new_recipient";
+
     private Context mContext;
     private ImageView mAccountImage;
     private ArrayList<String> mRecepientList, mAttachmentList;
@@ -51,6 +53,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
     private TextInputLayout mInputThemeMessage, mInputBodyMessage;
     private Settings mSettings;
     private FloatingActionButton mSendButton;
+    private AccountItem mAccount;
 
 
     public static Email_Fragment newInstance(){
@@ -93,19 +96,15 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
         TextView mAccountName = (TextView)rootView.findViewById(R.id.email_fragment_account_information_name);
         TextView mAccountEmail = (TextView)rootView.findViewById(R.id.email_fragment_account_information_email);
 
-        final AccountItem mActiveAccount = new DataBaseAccount(mContext).getAccount(mSettings.getActiveAccountID());
-        if (mActiveAccount!=null){
-            mAccountName.setText(mActiveAccount.getLastname());
-            mAccountEmail.setText(mActiveAccount.getEmail());
-            new LoadImageFromWeb(mActiveAccount.getPhoto(), this).execute();
-            if (mSendButton.getVisibility() == View.INVISIBLE){
-                mSendButton.setVisibility(View.VISIBLE);
-            }
+        mAccount = new DataBaseAccount(mContext).getAccount(mSettings.getActiveAccountID());
+        if (mAccount!=null){
+            mAccountName.setText(mAccount.getLastname());
+            mAccountEmail.setText(mAccount.getEmail());
+            new LoadImageFromWeb(mAccount.getPhoto(), this).execute();
         }else{
             mAccountName.setText(getResources().getString(R.string.email_fragment_logon));
             mAccountEmail.setText(Values.EMPTY);
             mAccountImage.setImageDrawable(null);
-            mSendButton.setVisibility(View.INVISIBLE);
         }
 
         mInputThemeMessage.getEditText().setText(mSettings.getMessageTheme());
@@ -139,9 +138,10 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
         mAddRecipient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRecepientList.add("add_new");
+                mRecepientList.add(ADD_NEW_RECIPIENT);
                 mSettings.setRecepients(mRecepientList);
                 mAdapterRecipients.notifyItemInserted(mRecepientList.size());
+                checkSendButtonVisibility();
             }
         });
 
@@ -156,6 +156,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
         });
 
         mRecepientList = mSettings.getRecepients();
+        checkSendButtonVisibility();
         mAttachmentList = mSettings.getAttachments();
 
         mAdapterRecipients = new adapter_email_attach(mContext, this, adapter_email_attach.RECIPIENTS, mRecepientList);
@@ -173,7 +174,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Send_Email(mContext)
+                new Send_Email(mContext, Send_Email.DIALOG_ENABLED)
                         .execute(new MailParams()
                         .setTheme(mSettings.getMessageTheme())
                         .setBody(mSettings.getMessageBody())
@@ -183,6 +184,27 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
         });
 
         return rootView;
+    }
+
+    private void checkSendButtonVisibility(){
+        if (mAccount!=null){
+            if (mSendButton!=null) {
+                if (mRecepientList != null &&
+                        mRecepientList.size() != 0) {
+                    if (mRecepientList.size() == 1 && mRecepientList.contains(ADD_NEW_RECIPIENT)) {
+                        mSendButton.setVisibility(View.INVISIBLE);
+                    } else {
+                        mSendButton.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    mSendButton.setVisibility(View.INVISIBLE);
+                }
+            }
+        }else{
+            if (mSendButton!=null){
+                mSendButton.setVisibility(View.INVISIBLE);
+            }
+        }
     }
 
     @Override
@@ -206,6 +228,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
         mRecepientList.remove(position);
         mSettings.setRecepients(mRecepientList);
         mAdapterRecipients.notifyItemRemoved(position);
+        checkSendButtonVisibility();
     }
 
 

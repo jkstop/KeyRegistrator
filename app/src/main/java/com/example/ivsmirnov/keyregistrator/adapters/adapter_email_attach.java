@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
+import com.example.ivsmirnov.keyregistrator.fragments.Email_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.EmailClickItemsInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 
@@ -81,7 +82,7 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
                             v.setTag(textInputLayout.getEditText().getText().toString());
                             mListener.onAddRecepient(v, finalViewHolder1.getLayoutPosition(), v.getId());
                         }else{
-                            textInputLayout.setError("Должен быть введен e-mail");
+                            textInputLayout.setError(mContext.getResources().getString(R.string.email_fragment_error_not_email_entered));
                         }
 
                     }
@@ -102,32 +103,22 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (mType == RECIPIENTS){
-
-            if (mItems.get(position).equals("add_new")){
-
-            }else{
+            if (!mItems.get(position).equals(Email_Fragment.ADD_NEW_RECIPIENT)){
                 ((viewHolderEmailAttach)holder).mText.setText(mItems.get(position));
-                ((viewHolderEmailAttach)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.person));
+                ((viewHolderEmailAttach)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_assignment_ind_black_48dp));
                 ((viewHolderEmailAttach)holder).mImageDelete.setImageDrawable(mContext.getResources().getDrawable(android.R.drawable.ic_menu_delete));
             }
-
-            //if (mItems.get(position).equals(mContext.getResources().getString(R.string.dialog_email_add_recipient))){
-            //    holder.mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_add_black_24dp));
-            //    holder.mImageDelete.setImageDrawable(null);
-            //}else{
-
-            //}
         }else if (mType == ATTACHMENTS){
-            ((viewHolderEmailAttach)holder).mText.setText(mItems.get(position));
-
-            ((viewHolderEmailAttach)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_attach_file_black_24dp));
+            String [] split = mItems.get(position).split("/");
+            ((viewHolderEmailAttach)holder).mText.setText(split[split.length -1]);
+            ((viewHolderEmailAttach)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_assignment_black_48dp));
             ((viewHolderEmailAttach)holder).mImageDelete.setImageDrawable(mContext.getResources().getDrawable(android.R.drawable.ic_menu_delete));
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (mItems.get(position).equals("add_new")){
+        if (mItems.get(position).equals(Email_Fragment.ADD_NEW_RECIPIENT)){
             return VIEW_RECEPIENTS_ADD_NEW;
         }else{
             return VIEW_RECEPIENTS_SIMPLE;

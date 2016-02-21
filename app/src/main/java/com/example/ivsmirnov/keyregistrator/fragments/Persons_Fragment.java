@@ -3,10 +3,13 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -14,6 +17,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,11 +27,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
@@ -42,6 +49,7 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -60,6 +68,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     private KeyInterface mKeyInterface;
 
     private ArrayList<String> mListCharacters;
+
+    private ProgressBar mLoadingBar;
 
     private Settings mSettings;
 
@@ -98,18 +108,19 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                 @Override
                 public void onItemClick(View v, int position, int viewID) {
 
-                    ArrayList <String> valuesForDialog = new ArrayList<>();
-                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME, mAllItems.get(position).getLastname());
-                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME, mAllItems.get(position).getFirstname());
-                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME, mAllItems.get(position).getMidname());
-                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION, mAllItems.get(position).getDivision());
-                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL, mAllItems.get(position).getPhotoOriginal());
-                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, mAllItems.get(position).getRadioLabel());
-                    valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_SEX, mAllItems.get(position).getSex());
+                    //ArrayList <String> valuesForDialog = new ArrayList<>();
+                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME, mAllItems.get(position).getLastname());
+                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME, mAllItems.get(position).getFirstname());
+                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME, mAllItems.get(position).getMidname());
+                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION, mAllItems.get(position).getDivision());
+                   // valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL, mAllItems.get(position).getPhotoOriginal());
+                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, mAllItems.get(position).getRadioLabel());
+                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_SEX, mAllItems.get(position).getSex());
 
                     Bundle b = new Bundle();
                     b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
-                    b.putStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION, valuesForDialog);
+                    b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, mAllItems.get(position).getRadioLabel());
+                   // b.putStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION, valuesForDialog);
                     Dialog_Fragment dialog = new Dialog_Fragment();
                     dialog.setArguments(b);
                     dialog.setTargetFragment(Persons_Fragment.this, 0);
@@ -127,6 +138,15 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                     if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
                         return;
                     }
+
+                    //mAllItems.get(position).setPhotoOriginal(
+                     //       dbFavorite.getPersonPhotoBase64(mAllItems.get(position).getRadioLabel(),
+                     //               GetPersonPhoto.ORIGINAL_IMAGE,
+                      //              GetPersonPhoto.LOCAL_PHOTO));
+                    //mAllItems.get(position).setPhotoPreview(
+                    // /       dbFavorite.getPersonPhotoBase64(mAllItems.get(position).getRadioLabel(),
+                     //               GetPersonPhoto.PREVIEW_IMAGE,
+                     //               GetPersonPhoto.LOCAL_PHOTO));
 
                     new TakeKey(mContext).execute(new TakeKeyParams()
                             .setAccessType(Values.ACCESS_BY_CLICK)
@@ -207,18 +227,13 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                 getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Search_Fragment.new_Instance(), getResources().getString(R.string.fragment_tag_search)).commit();
             }
         });
-        DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
-        mAllItems = dbFavorite.readTeachersFromDB();
-        dbFavorite.closeDB();
-
-        sortByABC();
 
         mListView = (ListView)rootView.findViewById(R.id.list_for_base_sql);
+        mLoadingBar = (ProgressBar)rootView.findViewById(R.id.layout_persons_fragment_loading_progress_bar);
 
-        initListCharacters();
 
-        mListAdapter = new adapter_list_characters(mContext,mListCharacters);
-        mListView.setAdapter(mListAdapter);
+
+
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -233,9 +248,13 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new GridLayoutManager(mContext,3));
 
-        initializeRecyclerAdapter();
-
+        new getPersons().execute();
         return rootView;
+    }
+
+    private void setmListCharactersAdapter(){
+        mListAdapter = new adapter_list_characters(mContext,mListCharacters);
+        mListView.setAdapter(mListAdapter);
     }
 
     private void move (String symbol){
@@ -261,39 +280,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
             }
         }
     }
-
-   /* public static void writeIt(Context context,String aud, String name, Long time, String path, String tag, String cardOrHandle) {
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        Calendar calendar = Calendar.getInstance();
-        today = calendar.get(Calendar.DATE);
-        lastDate = preferences.getLong(Values.DATE, 0);
-
-        DataBaseJournal dbJournal = new DataBaseJournal(context);
-        if (today == lastDate) {
-            dbJournal.writeInDBJournal(aud, name, time, (long) 0, false);
-            editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, dbJournal.cursor.getCount());
-        } else {
-            dbJournal.writeInDBJournalHeaderDate();
-            editor.putInt(Values.CURSOR_POSITION, dbJournal.cursor.getCount());
-            editor.apply();
-            dbJournal.writeInDBJournal(aud, name, time, (long) 0, false);
-            editor.putInt(Values.POSITION_IN_LIST_FOR_ROOM + aud, dbJournal.cursor.getCount() + 1);
-        }
-        dbJournal.closeDB();
-
-        DataBaseRooms dbRooms = new DataBaseRooms(context);
-        dbRooms.updateStatusRooms(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), "false");
-        dbRooms.updateLastVisitersRoom(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), name);
-        dbRooms.updatePhotoPath(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), path);
-        dbRooms.updateTagRoom(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), tag);
-        dbRooms.updateCardOrHandle(preferences.getInt(Values.POSITION_IN_ROOMS_BASE_FOR_ROOM + aud, -1), cardOrHandle);
-        dbRooms.closeDB();
-
-        editor.putLong(Values.DATE, today);
-        editor.apply();
-    }*/
 
     private void sortByABC(){
         Collections.sort(mAllItems, new Comparator<PersonItem>() {
@@ -379,23 +365,41 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
     @Override
     public void updateInformation() {
-        DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
-        mAllItems = dbFavorite.readTeachersFromDB();
-        dbFavorite.closeDB();
 
-        sortByABC();
+        new getPersons().execute();
 
-        initializeRecyclerAdapter();
-
-        initListCharacters();
-
-        mListAdapter = new adapter_list_characters(mContext,mListCharacters);
-        mListView.setAdapter(mListAdapter);
     }
 
     @Override
     public void onTakeKey() {
         //Values.showFullscreenToast(mContext, getResources().getString(R.string.text_toast_take_key), Values.TOAST_POSITIVE);
         showMainAuditroomsGrid();
+    }
+
+    private class getPersons extends AsyncTask<Void,PersonItem,Void>{
+
+        @Override
+        protected void onPreExecute() {
+            mLoadingBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
+            mAllItems  = dataBaseFavorite.readTeachersFromDB();
+            dataBaseFavorite.closeDB();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            initializeRecyclerAdapter();
+            sortByABC();
+            initListCharacters();
+            setmListCharactersAdapter();
+            mLoadingBar.setVisibility(View.INVISIBLE);
+        }
     }
 }

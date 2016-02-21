@@ -1,5 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -42,13 +43,34 @@ import javax.mail.internet.MimeMultipart;
  */
 public class Send_Email extends AsyncTask<MailParams, Void, Void> {
 
+    public static final boolean DIALOG_ENABLED = true;
+    public static final boolean DIALOG_DISABLED = false;
 
     private Context mContext;
     private Settings mSettings;
+    private boolean isDialogShow;
+    private ProgressDialog mProgressDialog;
 
-    public Send_Email(Context c) {
+    public Send_Email(Context c, boolean isDialogShow) {
         this.mContext = c;
+        this.isDialogShow = isDialogShow;
         mSettings = new Settings(mContext);
+    }
+
+    @Override
+    protected void onPreExecute() {
+        if (isDialogShow){
+            mProgressDialog = new ProgressDialog(mContext);
+            mProgressDialog.setMessage("Отправка сообщения");
+            mProgressDialog.show();
+        }
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        if (mProgressDialog!=null && mProgressDialog.isShowing()){
+            mProgressDialog.cancel();
+        }
     }
 
     @Override
@@ -67,7 +89,6 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
             props.put("mail.smtp.ssl.enable", "true");
             props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
             Session session = Session.getInstance(props);
-            session.setDebug(true);
 
             MimeMessage mimeMessage = new MimeMessage(session);
             DataHandler handler = new DataHandler(new ByteArrayDataSource(mBody.getBytes(), "multipart/mixed"));

@@ -123,6 +123,8 @@
     <string name="image_description_email_fragment_account_image">image_description_email_fragment_account_image</string>
     <string name="image_description_email_fragment_add_recipient">email_fragment_add_recipient</string>
     <string name="image_description_email_fragment_add_attachment">email_fragment_add_attachment</string>
+    <string name="image_description_email_fragment_icon_attachment">image_description_email_fragment_icon_attachment</string>
+    <string name="image_description_email_fragment_icon_delete_attachment">image_description_email_fragment_icon_delete_attachment</string>
 
 
     <string name="view_enter_password_hint_password">Пароль</string>
@@ -156,6 +158,7 @@
     <string name="email_fragment_recepients_text">Получатели</string>
     <string name="email_fragment_attachments_text">Вложения</string>
     <string name="email_fragment_logon">Для отправки писем сначала войдите в аккаунт</string>
+    <string name="email_fragment_error_not_email_entered">Некорректный e-mail </string>
 
 
 

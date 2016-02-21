@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
@@ -137,9 +138,9 @@ public class Values{
     public static final int DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME = 1;
     public static final int DIALOG_PERSON_INFORMATION_KEY_MIDNAME = 2;
     public static final int DIALOG_PERSON_INFORMATION_KEY_DIVISION = 3;
-    public static final int DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL = 4;
-    public static final int DIALOG_PERSON_INFORMATION_KEY_TAG = 5;
-    public static final int DIALOG_PERSON_INFORMATION_KEY_SEX = 6;
+   // public static final int DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL = 4;
+    public static final String DIALOG_PERSON_INFORMATION_KEY_TAG = "DIALOG_PERSON_INFORMATION_KEY_TAG";
+    public static final int DIALOG_PERSON_INFORMATION_KEY_SEX = 5;
 
     public static final String EMPTY = " ";
 
@@ -256,20 +257,22 @@ public class Values{
                 .setPositionInBase(positionInBase)
                 .setLastVisiter(Persons_Fragment.getPersonInitials(journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()))
                 .setTag(personItem.getRadioLabel())
-                .setPhoto(personItem.getPhotoOriginal()));
+                .setPhoto(journalItem.getPersonPhoto()));
         dataBaseRooms.closeDB();
     }
 
     public static JournalItem createNewItemForJournal (Context context, PersonItem personItem, String auditroom, int accessType){
         Settings settings = new Settings(context);
+        DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(context);
+        PersonItem person = dataBaseFavorite.getPersonItem(personItem.getRadioLabel(), DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
         return new JournalItem().setAccountID(settings.getActiveAccountID())
                 .setAuditroom(auditroom)
                 .setAccessType(accessType)
                 .setTimeIn(System.currentTimeMillis())
-                .setPersonLastname(personItem.getLastname())
-                .setPersonFirstname(personItem.getFirstname())
-                .setPersonMidname(personItem.getMidname())
-                .setPersonPhoto(personItem.getPhotoPreview());
+                .setPersonLastname(person.getLastname())
+                .setPersonFirstname(person.getFirstname())
+                .setPersonMidname(person.getMidname())
+                .setPersonPhoto(person.getPhotoPreview());
     }
 
     public static int closeAllRooms(Context context){

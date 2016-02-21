@@ -6,7 +6,8 @@
     android:foreground="?android:attr/selectableItemBackground"
     app:cardElevation="@dimen/person_card_elevation"
     app:cardBackgroundColor="@color/person_card"
-    app:contentPadding="@dimen/person_card_content_padding">
+    app:contentPadding="@dimen/person_card_content_padding"
+    android:id="@+id/person_card">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -17,6 +18,7 @@
             android:layout_alignParentLeft="true"
             android:layout_width="@dimen/person_card_image_width"
             android:layout_height="@dimen/person_card_image_height">
+
 
             <ImageView
                 android:id="@+id/image_sql"
