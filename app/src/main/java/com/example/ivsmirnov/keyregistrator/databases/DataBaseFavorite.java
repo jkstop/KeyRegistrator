@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
+import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
@@ -143,6 +144,39 @@ public class DataBaseFavorite {
             }
         }
         return null;
+    }
+
+    public ArrayList<String> getTagForCurrentCharacter(String character){
+        ArrayList <String> mTags = new ArrayList<>();
+        cursor = sqLiteDatabase.rawQuery("SELECT * FROM '" + DataBaseFavoriteRegist.TABLE_TEACHER +
+                "' WHERE '" + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + "' LIKE?",
+                new String[]{"И%"});
+        Log.d("countCursor", String.valueOf(cursor.getCount())); // =0 !!!!!!!!!!!!!!!!!!!!!
+        if (cursor.getCount()>0){
+            cursor.moveToFirst();
+            while (cursor.moveToNext()){
+                mTags.add(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE)));
+            }
+        }
+        return mTags;
+    }
+
+    public ArrayList<CharacterItem> getPersonsCharacters(){
+        ArrayList <CharacterItem> characters = new ArrayList<>();
+        characters.add(new CharacterItem().setCharacter("Все").setSelection(true));
+        cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE},null,null,null,null,null,null);
+        cursor.moveToFirst();
+        ArrayList<String> uniqueCharacters = new ArrayList<>();
+        while (cursor.moveToNext()){
+            String firstSymbol = cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)).substring(0,1).toUpperCase();
+            if (!uniqueCharacters.contains(firstSymbol)){
+                uniqueCharacters.add(firstSymbol);
+            }
+        }
+        for (String character : uniqueCharacters){
+            characters.add(new CharacterItem().setCharacter(character).setSelection(false));
+        }
+        return characters;
     }
 
     public static PersonItem findInServer(Context context,String tag){

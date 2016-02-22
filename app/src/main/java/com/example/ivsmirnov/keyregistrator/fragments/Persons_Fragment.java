@@ -39,6 +39,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
 import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
+import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
@@ -61,13 +62,15 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     private ListView mListView;
     private FloatingActionButton mAddFAB;
 
+    private DataBaseFavorite mDataBaseFavorite;
+
     private static ArrayList<PersonItem> mAllItems;
     public adapter_persons_grid mAdapter;
     private adapter_list_characters mListAdapter;
 
     private KeyInterface mKeyInterface;
 
-    private ArrayList<String> mListCharacters;
+    private ArrayList<CharacterItem> mListCharacters;
 
     private ProgressBar mLoadingBar;
 
@@ -216,6 +219,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_persons_fragment, container, false);
         mContext = rootView.getContext();
+        mDataBaseFavorite = new DataBaseFavorite(mContext);
 
         mSettings = new Settings(mContext);
         mKeyInterface = this;
@@ -232,12 +236,16 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         mLoadingBar = (ProgressBar)rootView.findViewById(R.id.layout_persons_fragment_loading_progress_bar);
 
 
-
-
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                move(mListCharacters.get(i));
+                mListCharacters.get(i).setSelection(true);
+                setmListCharactersAdapter();
+                ArrayList<String> tags = mDataBaseFavorite.getTagForCurrentCharacter(mListCharacters.get(i).getCharacter());
+                for (String tag : tags){
+                    Log.d("tag", tag);
+                }
+        //        move(mListCharacters.get(i));
             }
         });
 
@@ -271,14 +279,14 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     }
 
     private void initListCharacters(){
-        mListCharacters = new ArrayList<>();
-        for (int i=0;i<mAllItems.size();i++){
-            String surname = mAllItems.get(i).getLastname();
-            String startChar = surname.substring(0,1).toUpperCase();
-            if (!mListCharacters.contains(startChar)){
-                mListCharacters.add(startChar);
-            }
-        }
+        mListCharacters = mDataBaseFavorite.getPersonsCharacters();
+        //for (int i=0;i<mAllItems.size();i++){
+        //    String surname = mAllItems.get(i).getLastname();
+        //    String startChar = surname.substring(0,1).toUpperCase();
+        //    if (!mListCharacters.contains(startChar)){
+        //        mListCharacters.add(startChar);
+        //    }
+       // }
     }
 
     private void sortByABC(){
@@ -386,9 +394,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         @Override
         protected Void doInBackground(Void... params) {
 
-            DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
-            mAllItems  = dataBaseFavorite.readTeachersFromDB();
-            dataBaseFavorite.closeDB();
+
+            mAllItems  = mDataBaseFavorite.readTeachersFromDB();
 
             return null;
         }
@@ -396,7 +403,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         @Override
         protected void onPostExecute(Void aVoid) {
             initializeRecyclerAdapter();
-            sortByABC();
+            //sortByABC();
             initListCharacters();
             setmListCharactersAdapter();
             mLoadingBar.setVisibility(View.INVISIBLE);

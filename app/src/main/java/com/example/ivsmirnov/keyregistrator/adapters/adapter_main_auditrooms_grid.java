@@ -39,6 +39,8 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
+    
+
     static class auditroomFreeViewHolder extends RecyclerView.ViewHolder{
 
         public ImageView mFreeImageKey;
