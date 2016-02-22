@@ -29,6 +29,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by ivsmirnov on 05.11.2015.
@@ -148,12 +150,15 @@ public class DataBaseFavorite {
 
     public ArrayList<String> getTagForCurrentCharacter(String character){
         ArrayList <String> mTags = new ArrayList<>();
-        cursor = sqLiteDatabase.rawQuery("SELECT * FROM '" + DataBaseFavoriteRegist.TABLE_TEACHER +
-                "' WHERE '" + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + "' LIKE?",
-                new String[]{"И%"});
-        Log.d("countCursor", String.valueOf(cursor.getCount())); // =0 !!!!!!!!!!!!!!!!!!!!!
+        if (character.equals("Все")){
+            cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null,null);
+        } else{
+            cursor = sqLiteDatabase.rawQuery("SELECT " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " FROM " + DataBaseFavoriteRegist.TABLE_TEACHER +
+                            " WHERE " + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + " LIKE?",
+                    new String[]{character+"%"});
+        }
         if (cursor.getCount()>0){
-            cursor.moveToFirst();
+            cursor.moveToPosition(-1);
             while (cursor.moveToNext()){
                 mTags.add(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE)));
             }
@@ -163,7 +168,6 @@ public class DataBaseFavorite {
 
     public ArrayList<CharacterItem> getPersonsCharacters(){
         ArrayList <CharacterItem> characters = new ArrayList<>();
-        characters.add(new CharacterItem().setCharacter("Все").setSelection(true));
         cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE},null,null,null,null,null,null);
         cursor.moveToFirst();
         ArrayList<String> uniqueCharacters = new ArrayList<>();
@@ -176,6 +180,13 @@ public class DataBaseFavorite {
         for (String character : uniqueCharacters){
             characters.add(new CharacterItem().setCharacter(character).setSelection(false));
         }
+        Collections.sort(characters, new Comparator<CharacterItem>() {
+            @Override
+            public int compare(CharacterItem lhs, CharacterItem rhs) {
+                return lhs.getCharacter().compareTo(rhs.getCharacter());
+            }
+        });
+        characters.add(0,new CharacterItem().setCharacter("Все").setSelection(true));
         return characters;
     }
 
@@ -280,14 +291,12 @@ public class DataBaseFavorite {
 
     public ArrayList<PersonItem> readTeachersFromDB(){
         cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,
-        DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE,DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE,
-        DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE,DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE,
         DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null,null);
         cursor.moveToPosition(-1);
         ArrayList <PersonItem> mPerson = new ArrayList<>();
         while (cursor.moveToNext()){
             mPerson.add(new PersonItem()
-                    //.setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
+                    .setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
                     //.setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))
                     //.setMidname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))
                     //.setDivision(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))
@@ -296,6 +305,12 @@ public class DataBaseFavorite {
                     .setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)))*/
                     .setRadioLabel(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE))));
         }
+        Collections.sort(mPerson, new Comparator<PersonItem>() {
+            @Override
+            public int compare(PersonItem lhs, PersonItem rhs) {
+                return lhs.getLastname().compareToIgnoreCase(rhs.getLastname());
+            }
+        });
         return mPerson;
     }
 

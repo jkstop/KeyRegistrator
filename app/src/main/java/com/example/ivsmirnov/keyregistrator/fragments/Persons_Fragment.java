@@ -239,13 +239,17 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                for (CharacterItem characterItem : mListCharacters){
+                    characterItem.setSelection(false);
+                }
                 mListCharacters.get(i).setSelection(true);
                 setmListCharactersAdapter();
                 ArrayList<String> tags = mDataBaseFavorite.getTagForCurrentCharacter(mListCharacters.get(i).getCharacter());
+                mAllItems.clear();
                 for (String tag : tags){
-                    Log.d("tag", tag);
+                    mAllItems.add(new PersonItem().setRadioLabel(tag));
                 }
-        //        move(mListCharacters.get(i));
+                initializeRecyclerAdapter();
             }
         });
 

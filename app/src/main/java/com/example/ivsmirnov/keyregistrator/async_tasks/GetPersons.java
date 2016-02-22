@@ -87,8 +87,8 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
         if (textDivision!=null){
             textDivision.setText(personItem.getDivision());
         }
+
         personCard.setVisibility(View.VISIBLE);
-        personCard.startAnimation(mAnimation);
     }
 
 }
