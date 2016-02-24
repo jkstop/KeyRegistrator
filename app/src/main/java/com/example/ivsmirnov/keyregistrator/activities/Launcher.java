@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
@@ -22,6 +24,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -88,6 +91,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.Account;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -117,6 +121,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     private TextView mAccountName, mAccountEmail;
     private ImageView mChangeAccount, mPersonAccountImage;
 
+    private DataBaseFavorite mDataBaseFavorite;
+
     private Context mContext;
     private Resources mResources;
     private Settings mSettings;
@@ -128,10 +134,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     public static GoogleApiClient mGoogleApiClient;
 
     private static long back_pressed;
-
-    public static final String MAIL_GOOGLE_COM = "https://mail.google.com";
-    public static final String GMAIL_COMPOSE = "https://www.googleapis.com/auth/gmail.compose";
-    public static final String GMAIL_MODIFY = "https://www.googleapis.com/auth/gmail.modify";
 
 
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
@@ -157,6 +159,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         mContext = this;
         mResources = getResources();
+        mDataBaseFavorite = new DataBaseFavorite(mContext);
         mSettings = new Settings(mContext);
         mKeyInterface = this;
         mRoomInterface = this;
@@ -301,7 +304,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         public void onClick(View v) {
             Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
             startActivityForResult(signInIntent, Values.REQUEST_CODE_LOG_ON);
-
         }
     };
 
@@ -322,45 +324,10 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                     dbAccount.writeAccount(accountItem);
                     dbAccount.closeDB();
 
-                    Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
 
-                                String token = GoogleAuthUtil.getToken(mContext,acct.getEmail(),"oauth2:https://mail.google.com/");
-                                Log.d("token",String.valueOf(token)); //TOKEN!!!
-                                Properties props = new Properties();
-                                props.put("mail.smtp.ssl.enable", "true"); // required for Gmail
-                                props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
-                                Session session = Session.getInstance(props);
-                                session.setDebug(true);
-                                //Store store = session.getStore("imap");
-                                //store.connect("imap.gmail.com",acct.getEmail(),token);
-                                //Log.d("connect",String.valueOf(store.isConnected()));///////wooooooooork!!!
-
-                                MimeMessage mimeMessage = new MimeMessage(session);
-                                mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse("ivsmirnov@fa.ru"));
-                                mimeMessage.setText("dfkjdkjfjkdfbg");
-
-                                Transport transport = session.getTransport("smtp");
-                                transport.connect("imap.gmail.com",acct.getEmail(),token);
-                                transport.sendMessage(mimeMessage,mimeMessage.getAllRecipients());
-                                transport.close();
-
-                            } catch (UserRecoverableAuthException e) {
-                                startActivityForResult(e.getIntent(),222);
-                            } catch (GoogleAuthException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (NoSuchProviderException e) {
-                                e.printStackTrace();
-                            } catch (MessagingException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                    //thread.start();
+                    mDataBaseFavorite.writeInDBTeachers(new PersonItem()
+                            .setLastname(acct.getDisplayName())
+                            .setRadioLabel(acct.getId()));
 
 
                     mSettings.setActiveAccountID(acct.getId());
@@ -448,8 +415,17 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     }
 
     @Override
-    public void onAccountImageLoaded(Drawable drawable) {
-        mPersonAccountImage.setImageDrawable(drawable);
+    public void onAccountImageLoaded(Bitmap bitmap) {
+        mPersonAccountImage.setImageBitmap(bitmap);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        String photo = Base64.encodeToString(byteArray,Base64.NO_WRAP);
+
+        mDataBaseFavorite.writeInDBTeachers(mDataBaseFavorite.getPersonItem(mSettings.getActiveAccountID(),DataBaseFavorite.LOCAL_USER, -1)
+                .setPhotoOriginal(photo)
+                .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo)));
     }
 
     //закрытие всех позиций в 22.01
@@ -495,6 +471,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     protected void onDestroy() {
         super.onDestroy();
         mSettings.cleanAutoCloseStatus();
+        mDataBaseFavorite.closeDB();
 
         mReader.close();
         unregisterReceiver(mReceiver);
@@ -563,7 +540,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                                     Main_Fragment main_fragment = (Main_Fragment) getFragmentByTag(R.string.fragment_tag_main);
 
                                     if (persons_fragment != null && persons_fragment.isVisible()) {
-                                        PersonItem personItem = DataBaseFavorite.findInServer(mContext, tag);
+                                        PersonItem personItem = mDataBaseFavorite.getPersonItem(tag, DataBaseFavorite.SERVER_USER, -1);
                                         //ArrayList <String> valuesForDialog = new ArrayList<>();
                                         if (personItem!=null){
                                             //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME, personItem.getLastname());
@@ -586,9 +563,17 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
 
                                     } else if (nfc_fragment != null && nfc_fragment.isVisible()) {
-                                        DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
-                                        PersonItem personItem = dataBaseFavorite.findUserByTag(tag);
-                                        dataBaseFavorite.closeDB();
+
+                                        PersonItem personItem = mDataBaseFavorite.getPersonItem(tag, DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
+
+                                        if (personItem == null){
+                                            personItem = mDataBaseFavorite.getPersonItem(tag, DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
+                                            personItem.setPhotoPreview(DataBaseFavorite.getPhotoPreview(personItem.getPhotoOriginal()));
+                                            mDataBaseFavorite.writeInDBTeachers(personItem);
+
+                                            personItem = mDataBaseFavorite.getPersonItem(tag, DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
+                                        }
+
                                         if (personItem!=null&&!personItem.isEmpty()){
                                             new TakeKey(mContext).execute(new TakeKeyParams()
                                                     .setPersonItem(personItem)

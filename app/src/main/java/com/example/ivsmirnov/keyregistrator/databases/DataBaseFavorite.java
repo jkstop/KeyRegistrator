@@ -9,11 +9,9 @@ import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
-import android.util.SparseArray;
 import android.widget.Toast;
 
-import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
-import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
@@ -128,7 +126,7 @@ public class DataBaseFavorite {
                                 .setRadioLabel(resultSet.getString("RADIO_LABEL"));
                         String photo = resultSet.getString("PHOTO");
                         if (photo == null){
-                            photo = Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext);
+                            photo = getBase64DefaultPhotoFromResources(mContext, resultSet.getString("SEX"));
                         }
                         if (photoSize == FULLSIZE_PHOTO){
                             personItem.setPhotoOriginal(photo);
@@ -146,6 +144,41 @@ public class DataBaseFavorite {
             }
         }
         return null;
+    }
+
+    public void updatePersonItem(String tag, PersonItem personItem){
+        cursor = sqLiteDatabase.rawQuery("SELECT "
+                + DataBaseFavoriteRegist._ID + ","
+                + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + ","
+                + DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE + ","
+                + DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE + ","
+                + DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE
+                + " FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE
+                + " =?",
+                new String[]{tag});
+        if (cursor.getCount()>0){
+            cursor.moveToFirst();
+            ContentValues cv = new ContentValues();
+            if (!personItem.getLastname().equals(Values.EMPTY)){
+                cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,personItem.getLastname());
+            }
+            if (!personItem.getFirstname().equals(Values.EMPTY)){
+                cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
+            }
+            if (!personItem.getMidname().equals(Values.EMPTY)){
+                cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE,personItem.getMidname());
+            }
+            if (!personItem.getDivision().equals(Values.EMPTY)){
+                cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
+            }
+            if (cv.size()!=0){
+                sqLiteDatabase.update(DataBaseFavoriteRegist.TABLE_TEACHER,
+                        cv,
+                        DataBaseFavoriteRegist._ID + "=" + cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID)),
+                        null);
+            }
+        }
     }
 
     public ArrayList<String> getTagForCurrentCharacter(String character){
@@ -222,16 +255,14 @@ public class DataBaseFavorite {
         cursor.close();
     }
 
-    public boolean isAccountInBase (String tag){
-        String userInBase = null;
+    public boolean isUserInBase(String tag){
         try {
-            userInBase = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+            sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
                     + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " = '" + tag + "'").simpleQueryForString();
+            return true;
         }catch (Exception e){
-            e.printStackTrace();
+            return false;
         }
-
-        return userInBase != null;
     }
 
 
@@ -252,6 +283,11 @@ public class DataBaseFavorite {
             cv.put(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE, personItem.getSex());
             cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE, personItem.getPhotoPreview());
             cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE, personItem.getPhotoOriginal());
+
+            if (isUserInBase(personItem.getRadioLabel())){
+                deleteUser(personItem.getRadioLabel());
+            }
+
             sqLiteDatabase.insert(DataBaseFavoriteRegist.TABLE_TEACHER, null, cv);
         }
     }
@@ -313,7 +349,7 @@ public class DataBaseFavorite {
         });
         return mPerson;
     }
-
+/*
     public int getPersonsCount(){
         return cursor.getCount();
     }
@@ -421,24 +457,19 @@ public class DataBaseFavorite {
         }
     }
 
+*/
 
 
-
-    public void deleteuser(String tag){
-        cursor.moveToPosition(-1);
-
+    public void deleteUser(String tag){
         cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
                     + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
         if (cursor.getCount()>0){
-            cursor.moveToFirst();
+            cursor.moveToPosition(-1);
             while (cursor.moveToNext()){
-                sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + cursor.getPosition(), null);
-                Log.d("deleted", String.valueOf(cursor.getPosition()));
+                Log.d("delete", cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)));
+                sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID)), null);
             }
         }
-
-
-
 
     }
 
@@ -520,5 +551,19 @@ public class DataBaseFavorite {
         }
 
         return inSampleSize;
+    }
+
+    public static String getBase64DefaultPhotoFromResources(Context context, String sex){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        Bitmap bitmap;
+        if (sex.equalsIgnoreCase("М")){
+            bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_male_colored, options);
+        } else {
+            bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_female_colored, options);
+        }
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(byteArray,Base64.NO_WRAP);
     }
 }

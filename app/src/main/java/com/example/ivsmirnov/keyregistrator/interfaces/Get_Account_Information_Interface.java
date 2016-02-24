@@ -1,5 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.interfaces;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -10,5 +11,5 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 public interface Get_Account_Information_Interface {
     void onUserRecoverableAuthException(UserRecoverableAuthException e);
     void onChangeAccount();
-    void onAccountImageLoaded(Drawable drawable);
+    void onAccountImageLoaded(Bitmap bitmap);
 }

@@ -1,11 +1,8 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
@@ -25,7 +21,6 @@ import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_grid.ViewHolder>{
@@ -90,12 +85,17 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
     }
 
     @Override
+    public void onViewDetachedFromWindow(ViewHolder holder) {
+        holder.personCard.clearAnimation();
+    }
+
+    @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         //holder.textLastname.setText(allItems.get(position).getLastname());
         //holder.textFirstname.setText(allItems.get(position).getFirstname());
         //holder.textMidname.setText(allItems.get(position).getMidname());
         //holder.textDivision.setText(allItems.get(position).getDivision());
-        Animation fadeInanimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+        Animation fadeInanimation = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
         if (mType== Values.SHOW_FAVORITE_PERSONS){
             new GetPersons(holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(allItems.get(position).getRadioLabel())
             .setDatabase(dataBaseFavorite)
@@ -139,31 +139,5 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
     public int getItemCount() {
         return allItems.size();
     }
-
-    private class getPhoto extends AsyncTask<String, Void, Bitmap>{
-
-        WeakReference<ImageView> viewWeakReference;
-
-        public getPhoto (ImageView imageView){
-            viewWeakReference = new WeakReference<ImageView>(imageView);
-        }
-
-        @Override
-        protected Bitmap doInBackground(String... params) {
-
-            return dataBaseFavorite.getPersonPhoto(params[0],GetPersonPhoto.SERVER_PHOTO, GetPersonPhoto.ORIGINAL_IMAGE);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            Log.d("size", String.valueOf(bitmap.getByteCount() / 1024));
-            ImageView imageView = viewWeakReference.get();
-            if (imageView!=null){
-                imageView.setImageBitmap(bitmap);
-                //bitmap.recycle();
-            }
-        }
-    }
-
 
 }

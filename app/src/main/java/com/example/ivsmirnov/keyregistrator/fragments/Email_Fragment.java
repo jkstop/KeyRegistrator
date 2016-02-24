@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -218,9 +219,9 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
     }
 
     @Override
-    public void onAccountImageLoaded(Drawable drawable) {
+    public void onAccountImageLoaded(Bitmap bitmap) {
         if (mAccountImage!=null){
-            mAccountImage.setImageDrawable(drawable);
+            mAccountImage.setImageBitmap(bitmap);
         }
     }
 

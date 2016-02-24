@@ -1,5 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 
@@ -12,7 +14,7 @@ import java.net.URL;
 /**
  * Created by ivsmirnov on 13.02.2016.
  */
-public class LoadImageFromWeb extends AsyncTask<Void,Drawable,Drawable> {
+public class LoadImageFromWeb extends AsyncTask<Void,Bitmap,Bitmap> {
     private String mUrl;
     private Get_Account_Information_Interface mListener;
 
@@ -22,10 +24,10 @@ public class LoadImageFromWeb extends AsyncTask<Void,Drawable,Drawable> {
     }
 
     @Override
-    protected Drawable doInBackground(Void... params) {
+    protected Bitmap doInBackground(Void... params) {
         try{
             InputStream inputStream = (InputStream)new URL(mUrl).getContent();
-            return Drawable.createFromStream(inputStream,"photo");
+            return BitmapFactory.decodeStream(inputStream);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -34,9 +36,9 @@ public class LoadImageFromWeb extends AsyncTask<Void,Drawable,Drawable> {
     }
 
     @Override
-    protected void onPostExecute(Drawable drawable) {
-        if (drawable!=null){
-            mListener.onAccountImageLoaded(drawable);
+    protected void onPostExecute(Bitmap bitmap) {
+        if (bitmap!=null){
+            mListener.onAccountImageLoaded(bitmap);
         }
     }
 }

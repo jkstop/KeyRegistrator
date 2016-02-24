@@ -89,6 +89,7 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
         }
 
         personCard.setVisibility(View.VISIBLE);
+        personCard.startAnimation(mAnimation);
     }
 
 }

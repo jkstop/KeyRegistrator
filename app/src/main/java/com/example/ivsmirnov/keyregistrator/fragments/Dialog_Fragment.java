@@ -1,13 +1,8 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
-import android.os.Environment;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -22,12 +17,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,16 +34,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_email_attach;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
-import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
-import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
-import com.example.ivsmirnov.keyregistrator.custom_views.RecyclerWrapContentHeightManager;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
-import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
@@ -64,8 +48,6 @@ import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -77,6 +59,9 @@ public class Dialog_Fragment extends DialogFragment{
     private Settings mSettings;
     private LayoutInflater mInflater;
     private Resources mResources;
+    private DataBaseFavorite mDataBaseFavorite;
+    private DataBaseRooms mDataBaseRooms;
+    private DataBaseJournal mDataBaseJournal;
 
     public ArrayList<String> mAttachmentList;
 
@@ -99,8 +84,20 @@ public class Dialog_Fragment extends DialogFragment{
         mSettings = new Settings(mContext);
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResources = mContext.getResources();
+
+        if (dialog_id == Values.DIALOG_CLEAR_TEACHERS |
+                dialog_id == Values.DIALOG_EDIT){
+            mDataBaseFavorite = new DataBaseFavorite(mContext);
+        }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mDataBaseFavorite !=null){
+            mDataBaseFavorite.closeDB();
+        }
+    }
 
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -142,9 +139,8 @@ public class Dialog_Fragment extends DialogFragment{
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
-                                dbFavorite.clearTeachersDB();
-                                dbFavorite.closeDB();
+
+                                mDataBaseFavorite.clearTeachersDB();
 
                                 updateInformation();
 
@@ -157,7 +153,6 @@ public class Dialog_Fragment extends DialogFragment{
                 final View dialogView = mInflater.inflate(R.layout.layout_person_information, null);
                 final ImageView personImage = (ImageView) dialogView.findViewById(R.id.person_information_image);
                 //final ArrayList<String> valuesForEdits = getArguments().getStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION);
-                final DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
 
                 final TextInputLayout inputLastname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_lastname_layout);
                 final TextInputLayout inputFirstname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_firstname_layout);
@@ -166,8 +161,7 @@ public class Dialog_Fragment extends DialogFragment{
 
                 final String tag = getArguments().getString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG);
 
-                final DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
-                final PersonItem personItem = dataBaseFavorite.getPersonItem(tag, DataBaseFavorite.LOCAL_USER, DataBaseFavorite.FULLSIZE_PHOTO);
+                final PersonItem personItem = mDataBaseFavorite.getPersonItem(tag, DataBaseFavorite.LOCAL_USER, DataBaseFavorite.FULLSIZE_PHOTO);
 
                 inputLastname.getEditText().setText(personItem.getLastname());
                 inputFirstname.getEditText().setText(personItem.getFirstname());
@@ -195,17 +189,17 @@ public class Dialog_Fragment extends DialogFragment{
                 AlertDialog.Builder builderEdit = new AlertDialog.Builder(getActivity());
                 builderEdit.setView(dialogView);
 
-                if (dataBaseFavorite.isAccountInBase(tag)){
+                if (mDataBaseFavorite.isUserInBase(tag)){
                     builderEdit.setNeutralButton(getResources().getString(R.string.delete), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (tag!=null){
-                                dbFavorite.deleteFromTeachersDB(new PersonItem()
+                                mDataBaseFavorite.deleteFromTeachersDB(new PersonItem()
                                         .setLastname(personItem.getLastname())
                                         .setFirstname(personItem.getFirstname())
                                         .setMidname(personItem.getMidname())
                                         .setDivision(personItem.getDivision()));
-                                dbFavorite.closeDB();
+
                                 updateInformation();
                             }
                         }
@@ -214,20 +208,17 @@ public class Dialog_Fragment extends DialogFragment{
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
-                            dbFavorite.closeDB();
                         }
                     });
                     builderEdit.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ArrayList<String> valuesEdited = new ArrayList<String>();
-                            valuesEdited.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME,inputLastname.getEditText().getText().toString());
-                            valuesEdited.add(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME, inputFirstname.getEditText().getText().toString());
-                            valuesEdited.add(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME, inputMidname.getEditText().getText().toString());
-                            valuesEdited.add(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION, inputDivision.getEditText().getText().toString());
 
-                            //dbFavorite.updateTeachersDB(valuesForEdits, valuesEdited);
-                            dbFavorite.closeDB();
+                            mDataBaseFavorite.updatePersonItem(tag, new PersonItem()
+                                    .setLastname(inputLastname.getEditText().getText().toString())
+                                    .setFirstname(inputFirstname.getEditText().getText().toString())
+                                    .setMidname(inputMidname.getEditText().getText().toString())
+                                    .setDivision(inputDivision.getEditText().getText().toString()));
 
                             updateInformation();
                         }
@@ -236,7 +227,7 @@ public class Dialog_Fragment extends DialogFragment{
                     builderEdit.setNeutralButton(getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            dataBaseFavorite.writeInDBTeachers(new PersonItem().setLastname(personItem.getLastname())
+                            mDataBaseFavorite.writeInDBTeachers(new PersonItem().setLastname(personItem.getLastname())
                                     .setFirstname(personItem.getFirstname())
                                     .setMidname(personItem.getMidname())
                                     .setDivision(personItem.getDivision())

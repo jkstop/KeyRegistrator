@@ -1,22 +1,18 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
-import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,15 +27,11 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
-import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
@@ -47,27 +39,7 @@ import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInApi;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.plus.Plus;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -210,16 +182,13 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         @Override
         protected Void doInBackground(Void... params) {
             DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
+            //dataBaseFavorite.deleteUser("C9 87 D1 1A 00 00");
             //dataBaseFavorite.clearTeachersDB();
             for (int i=0;i<1000;i++){
-                dataBaseFavorite.writeInDBTeachers(new PersonItem().setLastname("rrrrrrrr")
-                        .setFirstname("rrrr")
-                        .setMidname("rrrrrr")
+                PersonItem personItem = dataBaseFavorite.getPersonItem("99 77 DC 1A 00 00",DataBaseFavorite.SERVER_USER,DataBaseFavorite.FULLSIZE_PHOTO);
+                dataBaseFavorite.writeInDBTeachers(personItem
                         .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1)
-                        .setDivision("rrrrrrr")
-                        .setPhotoOriginal(dataBaseFavorite.getPersonPhotoBase64("99 77 DC 1A 00 00", GetPersonPhoto.ORIGINAL_IMAGE,GetPersonPhoto.LOCAL_PHOTO))
-                        .setPhotoPreview(DataBaseFavorite.getPhotoPreview(dataBaseFavorite.getPersonPhotoBase64("99 77 DC 1A 00 00", GetPersonPhoto.ORIGINAL_IMAGE, GetPersonPhoto.LOCAL_PHOTO)))
-                        .setSex("V"));
+                        .setPhotoPreview(DataBaseFavorite.getPhotoPreview(personItem.getPhotoOriginal())));
                 publishProgress(i);
             }
             dataBaseFavorite.closeDB();
@@ -306,7 +275,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     }
 
     @Override
-    public void onAccountImageLoaded(Drawable drawable) {
+    public void onAccountImageLoaded(Bitmap bitmap) {
 
     }
 
