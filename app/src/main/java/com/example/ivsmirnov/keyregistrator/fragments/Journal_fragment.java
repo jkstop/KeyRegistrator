@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -278,7 +277,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
         @Override
         protected Void doInBackground(Void... params) {
             DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-            mJournalItems = dbJournal.readJournalFromDB(mDate);
+            mJournalItems = dbJournal.getJournalItemTags(mDate);
             dbJournal.closeDB();
             return null;
         }
@@ -286,6 +285,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
         @Override
         protected void onPostExecute(Void aVoid) {
             mLoadingBar.setVisibility(View.INVISIBLE);
+
             initializeJournal();
         }
     }

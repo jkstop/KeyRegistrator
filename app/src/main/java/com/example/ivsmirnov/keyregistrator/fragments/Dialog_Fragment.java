@@ -302,7 +302,7 @@ public class Dialog_Fragment extends DialogFragment{
                             DataBaseRooms dbRooms = new DataBaseRooms(mContext);
                             dbRooms.writeInRoomsDB(new RoomItem().setAuditroom(inputText)
                                     .setStatus(Values.ROOM_IS_FREE)
-                                    .setAccessType(Values.ACCESS_BY_CLICK));
+                                    .setAccessType(DataBaseJournal.ACCESS_BY_CLICK));
                             dbRooms.closeDB();
 
                             enterAuditroomText.getText().clear();

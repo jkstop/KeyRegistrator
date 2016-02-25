@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.adapters;
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
@@ -31,13 +33,19 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
     private Context context;
     private LayoutInflater inflater;
     private RecycleItemClickListener mListener;
-    public  DataBaseFavorite dataBaseFavorite;
+    public  DataBaseFavorite mDataBaseFavorite;
 
     public adapter_persons_grid(Context c, ArrayList<PersonItem> all,int type,RecycleItemClickListener listener) {
         allItems = all;
         context = c;
         mType = type;
-        dataBaseFavorite = new DataBaseFavorite(context);
+        if (Launcher.mDataBaseFavorite!=null){
+            mDataBaseFavorite = Launcher.mDataBaseFavorite;
+            Log.d("database","getFromMain");
+        }else{
+            mDataBaseFavorite = new DataBaseFavorite(context);
+            Log.d("database","createNew");
+        }
         this.mListener = listener;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -98,7 +106,7 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
         Animation fadeInanimation = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
         if (mType== Values.SHOW_FAVORITE_PERSONS){
             new GetPersons(holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(allItems.get(position).getRadioLabel())
-            .setDatabase(dataBaseFavorite)
+            .setDatabase(mDataBaseFavorite)
             .setPersonImageView(holder.imageView)
             .setPersonLastname(holder.textLastname)
             .setPersonFirstname(holder.textFirstname)
@@ -106,12 +114,12 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
             .setPersonDivision(holder.textDivision)
             .setPersonLocation(DataBaseFavorite.LOCAL_USER)
             .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
-            //new GetPersonPhoto(context,allItems.get(position).getRadioLabel(), dataBaseFavorite, holder.imageView, GetPersonPhoto.PREVIEW_IMAGE, GetPersonPhoto.LOCAL_PHOTO).execute();
+            //new GetPersonPhoto(context,allItems.get(position).getRadioLabel(), mDataBaseFavorite, holder.imageView, GetPersonPhoto.PREVIEW_IMAGE, GetPersonPhoto.LOCAL_PHOTO).execute();
             //new getPhoto(holder.imageView).execute(allItems.get(position).getRadioLabel());
             //photo = allItems.get(position).getPhotoPreview();
         }else if (mType==Values.SHOW_ALL_PERSONS){
             new GetPersons(holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(allItems.get(position).getRadioLabel())
-                    .setDatabase(dataBaseFavorite)
+                    .setDatabase(mDataBaseFavorite)
                     .setPersonImageView(holder.imageView)
                     .setPersonLastname(holder.textLastname)
                     .setPersonFirstname(holder.textFirstname)
@@ -119,8 +127,8 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
                     .setPersonDivision(holder.textDivision)
                     .setPersonLocation(DataBaseFavorite.SERVER_USER)
                     .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
-            //new GetPersonPhoto(context,allItems.get(position).getRadioLabel(), dataBaseFavorite, holder.imageView, GetPersonPhoto.PREVIEW_IMAGE, GetPersonPhoto.SERVER_PHOTO).execute();
-            //new GetPersonPhoto(allItems.get(position).getRadioLabel(), dataBaseFavorite, holder.imageView, GetPersonPhoto.ORIGINAL_IMAGE).execute();
+            //new GetPersonPhoto(context,allItems.get(position).getRadioLabel(), mDataBaseFavorite, holder.imageView, GetPersonPhoto.PREVIEW_IMAGE, GetPersonPhoto.SERVER_PHOTO).execute();
+            //new GetPersonPhoto(allItems.get(position).getRadioLabel(), mDataBaseFavorite, holder.imageView, GetPersonPhoto.ORIGINAL_IMAGE).execute();
             //photo = allItems.get(position).getPhotoOriginal();
         }
 

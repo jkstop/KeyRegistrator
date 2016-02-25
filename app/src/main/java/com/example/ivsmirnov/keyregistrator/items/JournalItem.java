@@ -1,5 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
+import com.example.ivsmirnov.keyregistrator.others.Values;
+
 import java.sql.Time;
 
 /**
@@ -7,13 +9,13 @@ import java.sql.Time;
  */
 public class JournalItem {
     private String AccountID;
-    private String Auditroom;
+    private String Auditroom = Values.EMPTY;
     private Long TimeIn;
     private Long TimeOut;
     private int AccessType;
-    private String PersonLastname = " ";
-    private String PersonFirstname = " ";
-    private String PersonMidname = " ";
+    private String PersonLastname = Values.EMPTY;
+    private String PersonFirstname = Values.EMPTY;
+    private String PersonMidname = Values.EMPTY;
     private String PersonPhoto;
 
     public JournalItem setAccountID(String accountID){

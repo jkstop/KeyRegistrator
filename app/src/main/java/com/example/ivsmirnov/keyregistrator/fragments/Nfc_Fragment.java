@@ -15,6 +15,7 @@ import android.widget.Button;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
@@ -58,7 +59,7 @@ public class Nfc_Fragment extends Fragment {
                     .setAccountID(mSettings.getActiveAccountID())
                     .setAuditroom(mSettings.getLastClickedAuditroom())
                     .setTimeIn(System.currentTimeMillis())
-                    .setAccessType(Values.ACCESS_BY_CLICK)
+                    .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
                     .setPersonLastname(((Button)v).getText().toString())
                     .setPersonPhoto(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext));
 

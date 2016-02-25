@@ -1,16 +1,13 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 
 import java.util.ArrayList;
@@ -36,7 +33,7 @@ public class adapter_list_characters extends ArrayAdapter<CharacterItem> {
         TextView text = (TextView)rootView.findViewById(R.id.text_for_row_character_list);
         text.setText(mCharacters.get(position).getCharacter());
         if (mCharacters.get(position).getSelection()){
-            rootView.setBackgroundColor(mContext.getResources().getColor(R.color.primary));
+            rootView.setBackgroundResource(R.drawable.character_background);
         }
         return rootView;
     }

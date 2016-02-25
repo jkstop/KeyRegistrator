@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
@@ -41,18 +42,23 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-        ArrayList<JournalItem> mItems = dbJournal.realAllJournalFromDB();
-        dbJournal.closeDB();
+        DataBaseJournal mDataBaseJournal;
+        if (Launcher.mDataBaseJournal!=null){
+            mDataBaseJournal = Launcher.mDataBaseJournal;
+        } else {
+            mDataBaseJournal = new DataBaseJournal(mContext);
+        }
+
+        ArrayList<JournalItem> mItems = mDataBaseJournal.realAllJournalFromDB();
 
         try {
             Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
             if (connection!=null){
                 PreparedStatement trunacteTable = connection.prepareStatement("TRUNCATE TABLE Journal_recycler");
                 trunacteTable.execute();
+                JournalItem journalItem;
                 for (int i=0;i<mItems.size();i++){
-                    JournalItem journalItem = mItems.get(i);
-
+                    journalItem = mDataBaseJournal.getJournalItem(mItems.get(i).getTimeIn());
                     PreparedStatement preparedStatement  = connection.prepareStatement("INSERT INTO Journal_recycler VALUES ('"
                             +journalItem.getAccountID()+"','"
                             +journalItem.getAuditroom()+"','"
@@ -64,6 +70,7 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
                             +journalItem.getPersonMidname()+"','"
                             +journalItem.getPersonPhoto()+"')");
                     preparedStatement.execute();
+
                 }
             }
         } catch (SQLException e) {

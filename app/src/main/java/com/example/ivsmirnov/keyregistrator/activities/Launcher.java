@@ -47,6 +47,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
 import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.fragments.Search_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
@@ -121,7 +122,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     private TextView mAccountName, mAccountEmail;
     private ImageView mChangeAccount, mPersonAccountImage;
 
-    private DataBaseFavorite mDataBaseFavorite;
+    public static DataBaseFavorite mDataBaseFavorite;
+    public static DataBaseJournal mDataBaseJournal;
 
     private Context mContext;
     private Resources mResources;
@@ -160,6 +162,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         mContext = this;
         mResources = getResources();
         mDataBaseFavorite = new DataBaseFavorite(mContext);
+        mDataBaseJournal = new DataBaseJournal(mContext);
         mSettings = new Settings(mContext);
         mKeyInterface = this;
         mRoomInterface = this;
@@ -471,7 +474,9 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     protected void onDestroy() {
         super.onDestroy();
         mSettings.cleanAutoCloseStatus();
+
         mDataBaseFavorite.closeDB();
+        mDataBaseJournal.closeDB();
 
         mReader.close();
         unregisterReceiver(mReceiver);
@@ -578,7 +583,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                                             new TakeKey(mContext).execute(new TakeKeyParams()
                                                     .setPersonItem(personItem)
                                                     .setAuditroom(mSettings.getLastClickedAuditroom())
-                                                    .setAccessType(Values.ACCESS_BY_CARD)
+                                                    .setAccessType(DataBaseJournal.ACCESS_BY_CARD)
                                                     .setPublicInterface(mKeyInterface));
                                         }else{
                                             Log.d("wrong","card!!!");

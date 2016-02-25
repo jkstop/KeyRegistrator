@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
@@ -120,8 +122,8 @@ public class Values{
     public static final int SHOW_FAVORITE_PERSONS = 0;
     public static final int SHOW_ALL_PERSONS = 1;
 
-    public static final int ACCESS_BY_CLICK = 0;
-    public static final int ACCESS_BY_CARD = 1;
+    //public static final int ACCESS_BY_CLICK = 0;
+    //public static final int ACCESS_BY_CARD = 1;
 
     //request codes
     public static final int REQUEST_CODE_LOAD_FAVORITE_STAFF = 200;
@@ -263,8 +265,16 @@ public class Values{
 
     public static JournalItem createNewItemForJournal (Context context, PersonItem personItem, String auditroom, int accessType){
         Settings settings = new Settings(context);
-        DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(context);
-        PersonItem person = dataBaseFavorite.getPersonItem(personItem.getRadioLabel(), DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
+        DataBaseFavorite mDataBaseFavorite;
+        if (Launcher.mDataBaseFavorite!=null){
+            mDataBaseFavorite = Launcher.mDataBaseFavorite;
+            Log.d("database","getFromMain");
+        }else{
+            mDataBaseFavorite = new DataBaseFavorite(context);
+            Log.d("database","createNew");
+        }
+
+        PersonItem person = mDataBaseFavorite.getPersonItem(personItem.getRadioLabel(), DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
         return new JournalItem().setAccountID(settings.getActiveAccountID())
                 .setAuditroom(auditroom)
                 .setAccessType(accessType)

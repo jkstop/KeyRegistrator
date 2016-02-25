@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,8 +29,10 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
+import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
@@ -41,16 +44,18 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 
 public class Main_Fragment extends Fragment implements UpdateInterface,RecycleItemClickListener, Get_Account_Information_Interface, RoomInterface{
-
 
 
     public static RecyclerView mAuditroomGrid;
 
     private Context mContext;
     private Settings mSettings;
+
+    private DataBaseFavorite mDataBaseFavorite;
 
     private ArrayList<RoomItem> mRoomItems;
 
@@ -83,11 +88,11 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_main_fragment,container,false);
         mContext = rootView.getContext();
+        mDataBaseFavorite = Launcher.mDataBaseFavorite;
 
         DataBaseRooms dbRooms = new DataBaseRooms(mContext);
         mRoomItems = dbRooms.readRoomsDB();
         dbRooms.closeDB();
-
 
         roomInterface = this;
 
@@ -181,17 +186,23 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
 
         @Override
         protected Void doInBackground(Void... params) {
-            DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
-            //dataBaseFavorite.deleteUser("C9 87 D1 1A 00 00");
-            //dataBaseFavorite.clearTeachersDB();
+
             for (int i=0;i<1000;i++){
-                PersonItem personItem = dataBaseFavorite.getPersonItem("99 77 DC 1A 00 00",DataBaseFavorite.SERVER_USER,DataBaseFavorite.FULLSIZE_PHOTO);
-                dataBaseFavorite.writeInDBTeachers(personItem
+                /*PersonItem personItem = mDataBaseFavorite.getPersonItem("99 77 DC 1A 00 00",DataBaseFavorite.SERVER_USER,DataBaseFavorite.FULLSIZE_PHOTO);
+                mDataBaseFavorite.writeInDBTeachers(personItem
                         .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1)
-                        .setPhotoPreview(DataBaseFavorite.getPhotoPreview(personItem.getPhotoOriginal())));
+                        .setPhotoPreview(DataBaseFavorite.getPhotoPreview(personItem.getPhotoOriginal())));*/
+                long timeIN = System.currentTimeMillis();
+                Launcher.mDataBaseJournal.writeInDBJournal(new JournalItem().setAccessType(DataBaseJournal.ACCESS_BY_CARD)
+                        .setAccountID(mSettings.getActiveAccountID())
+                        .setAuditroom("111")
+                        .setPersonLastname("testUser")
+                        .setPersonFirstname("testUser")
+                        .setTimeIn(timeIN)
+                        .setTimeOut(System.currentTimeMillis()+100)
+                        .setPersonPhoto(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext,"М")));
                 publishProgress(i);
             }
-            dataBaseFavorite.closeDB();
             return null;
         }
 
@@ -231,7 +242,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
             nfc_fragment.setArguments(bundle);
             getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, nfc_fragment, getResources().getString(R.string.fragment_tag_nfc)).commit();
         } else {
-            if (mRoomItems.get(position).getAccessType()==Values.ACCESS_BY_CLICK) {
+            if (mRoomItems.get(position).getAccessType()==DataBaseJournal.ACCESS_BY_CLICK) {
                 new CloseRooms(mContext).execute(new CloseRoomsParams()
                         .setTag(mRoomItems.get(position).getTag())
                         .setRoomInterface(roomInterface));
@@ -244,7 +255,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
 
     @Override
     public void onItemLongClick(View v, int position, long timeIn) {
-        if (mRoomItems.get(position).getAccessType()==Values.ACCESS_BY_CARD){
+        if (mRoomItems.get(position).getAccessType()==DataBaseJournal.ACCESS_BY_CARD){
             Dialog_Fragment dialog_fragment = new Dialog_Fragment();
             Bundle bundle = new Bundle();
             bundle.putLong(Values.POSITION_IN_BASE_FOR_ROOM,mRoomItems.get(position).getPositionInBase());

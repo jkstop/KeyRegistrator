@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +32,7 @@ import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
@@ -93,7 +95,12 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         if (actionBar != null) {
             actionBar.setTitle(getResources().getString(R.string.toolbar_title_persons));
         }
-        setHasOptionsMenu(true);
+        if (type == Values.PERSONS_FRAGMENT_SELECTOR){
+            setHasOptionsMenu(false);
+        }else{
+            setHasOptionsMenu(true);
+        }
+
     }
 
     private void initializeRecyclerAdapter(){
@@ -102,19 +109,12 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                 @Override
                 public void onItemClick(View v, int position, int viewID) {
 
-                    //ArrayList <String> valuesForDialog = new ArrayList<>();
-                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME, mAllItems.get(position).getLastname());
-                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME, mAllItems.get(position).getFirstname());
-                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME, mAllItems.get(position).getMidname());
-                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION, mAllItems.get(position).getDivision());
-                   // valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL, mAllItems.get(position).getPhotoOriginal());
-                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, mAllItems.get(position).getRadioLabel());
-                    //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_SEX, mAllItems.get(position).getSex());
+
 
                     Bundle b = new Bundle();
                     b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
                     b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, mAllItems.get(position).getRadioLabel());
-                   // b.putStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION, valuesForDialog);
+
                     Dialog_Fragment dialog = new Dialog_Fragment();
                     dialog.setArguments(b);
                     dialog.setTargetFragment(Persons_Fragment.this, 0);
@@ -133,21 +133,13 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                         return;
                     }
 
-                    //mAllItems.get(position).setPhotoOriginal(
-                     //       dbFavorite.getPersonPhotoBase64(mAllItems.get(position).getRadioLabel(),
-                     //               GetPersonPhoto.ORIGINAL_IMAGE,
-                      //              GetPersonPhoto.LOCAL_PHOTO));
-                    //mAllItems.get(position).setPhotoPreview(
-                    // /       dbFavorite.getPersonPhotoBase64(mAllItems.get(position).getRadioLabel(),
-                     //               GetPersonPhoto.PREVIEW_IMAGE,
-                     //               GetPersonPhoto.LOCAL_PHOTO));
 
                     new TakeKey(mContext).execute(new TakeKeyParams()
-                            .setAccessType(Values.ACCESS_BY_CLICK)
+                            .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
                             .setAuditroom(mSettings.getLastClickedAuditroom())
                             .setPersonItem(mAllItems.get(position))
                             .setPublicInterface(mKeyInterface));
-                    //takeKey(Values.ACCESS_BY_CLICK, position);
+
 
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
@@ -159,11 +151,11 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                     }
 
                     new TakeKey(mContext).execute(new TakeKeyParams()
-                            .setAccessType(Values.ACCESS_BY_CARD)
+                            .setAccessType(DataBaseJournal.ACCESS_BY_CARD)
                             .setAuditroom(mSettings.getLastClickedAuditroom())
                             .setPersonItem(mAllItems.get(position))
                             .setPublicInterface(mKeyInterface));
-                    //takeKey(Values.ACCESS_BY_CARD, position);
+
 
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
@@ -172,17 +164,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
         mRecyclerView.setAdapter(mAdapter);
     }
-/*
-    private void takeKey(int accessType, int position){
-        JournalItem journalItem  = Values.createNewItemForJournal(mContext,
-                mAllItems.get(position),
-                getArguments().getString(Values.AUDITROOM),
-                accessType);
-        long positionInBase = Values.writeInJournal(mContext, journalItem);
-        Values.writeRoom(mContext,journalItem,mAllItems.get(position),positionInBase);
-        showMainAuditroomsGrid();
-    }
-*/
+
 
     public static String getPersonInitials (String lastname, String firstname, String midname){
         String initials = "-";
@@ -210,7 +192,14 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_persons_fragment, container, false);
         mContext = rootView.getContext();
-        mDataBaseFavorite = new DataBaseFavorite(mContext);
+
+        if (Launcher.mDataBaseFavorite!=null){
+            mDataBaseFavorite = Launcher.mDataBaseFavorite;
+            Log.d("database","getFromMain");
+        }else{
+            mDataBaseFavorite = new DataBaseFavorite(mContext);
+            Log.d("database","createNew");
+        }
 
         mSettings = new Settings(mContext);
         mKeyInterface = this;
@@ -260,40 +249,12 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         mListView.setAdapter(mListAdapter);
     }
 
-    private void move (String symbol){
-
-        for (int i=0;i<mAllItems.size();i++){
-            String lastname = mAllItems.get(i).getLastname();
-            String startChar = lastname.substring(0,1);
-            if (symbol.equalsIgnoreCase(startChar)){
-                mRecyclerView.scrollToPosition(i);
-                break;
-            }
-        }
-
-    }
 
     private void initListCharacters(){
         mListCharacters = mDataBaseFavorite.getPersonsCharacters();
-        //for (int i=0;i<mAllItems.size();i++){
-        //    String surname = mAllItems.get(i).getLastname();
-        //    String startChar = surname.substring(0,1).toUpperCase();
-        //    if (!mListCharacters.contains(startChar)){
-        //        mListCharacters.add(startChar);
-        //    }
-       // }
+
     }
 
-    private void sortByABC(){
-        Collections.sort(mAllItems, new Comparator<PersonItem>() {
-            @Override
-            public int compare(PersonItem lhs, PersonItem rhs) {
-                String first = String.valueOf(lhs.getLastname());
-                String second = String.valueOf(rhs.getLastname());
-                return first.compareToIgnoreCase(second);
-            }
-        });
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -370,12 +331,11 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     public void updateInformation() {
 
         new getPersons().execute();
-
     }
 
     @Override
     public void onTakeKey() {
-        //Values.showFullscreenToast(mContext, getResources().getString(R.string.text_toast_take_key), Values.TOAST_POSITIVE);
+
         showMainAuditroomsGrid();
     }
 
@@ -389,7 +349,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         @Override
         protected Void doInBackground(Void... params) {
 
-
             mAllItems  = mDataBaseFavorite.readTeachersFromDB();
 
             return null;
@@ -398,7 +357,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         @Override
         protected void onPostExecute(Void aVoid) {
             initializeRecyclerAdapter();
-            //sortByABC();
             initListCharacters();
             setmListCharactersAdapter();
             mLoadingBar.setVisibility(View.INVISIBLE);
