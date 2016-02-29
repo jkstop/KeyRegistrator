@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -35,6 +36,7 @@ public class adapter_list_characters extends ArrayAdapter<CharacterItem> {
         if (mCharacters.get(position).getSelection()){
             rootView.setBackgroundResource(R.drawable.character_background);
         }
+
         return rootView;
     }
 }

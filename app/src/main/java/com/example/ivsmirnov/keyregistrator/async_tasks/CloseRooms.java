@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
@@ -37,17 +38,26 @@ public class CloseRooms extends AsyncTask<CloseRoomsParams,Integer,Integer> {
         mRoomInterface = params[0].getRoomInterface();
         String tag = params[0].getTag();
 
-        DataBaseJournal dataBaseJournal = new DataBaseJournal(mContext);
-        DataBaseRooms dataBaseRooms = new DataBaseRooms(mContext);
+        DataBaseJournal mDataBaseJournal;
+        if (Launcher.mDataBaseJournal!=null){
+            mDataBaseJournal = Launcher.mDataBaseJournal;
+        } else {
+            mDataBaseJournal = new DataBaseJournal(mContext);
+        }
 
-        RoomItem currentRoomItem = dataBaseRooms.getRoomItemForCurrentUser(tag);
-        int closedRooms = dataBaseRooms.updateRoom(currentRoomItem
+        DataBaseRooms mDataBaseRooms;
+        if (Launcher.mDataBaseRooms!=null){
+            mDataBaseRooms = Launcher.mDataBaseRooms;
+        } else {
+            mDataBaseRooms = new DataBaseRooms(mContext);
+        }
+
+        RoomItem currentRoomItem = mDataBaseRooms.getRoomItemForCurrentUser(tag);
+        int closedRooms = mDataBaseRooms.updateRoom(currentRoomItem
                 .setTag(Values.EMPTY)
                 .setStatus(Values.ROOM_IS_FREE));
-        dataBaseJournal.updateDB(currentRoomItem.getPositionInBase());
+        mDataBaseJournal.updateDB(currentRoomItem.getPositionInBase());
 
-        dataBaseJournal.closeDB();
-        dataBaseRooms.closeDB();
         return closedRooms;
     }
 

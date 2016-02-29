@@ -13,6 +13,7 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -52,14 +53,18 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
         ArrayList<JournalItem> mItems = mDataBaseJournal.realAllJournalFromDB();
 
         try {
-            Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
+            Connection connection = SQL_Connector.SQL_connection;
             if (connection!=null){
+
                 PreparedStatement trunacteTable = connection.prepareStatement("TRUNCATE TABLE Journal_recycler");
                 trunacteTable.execute();
+                trunacteTable.close();
+
                 JournalItem journalItem;
+                PreparedStatement preparedStatement;
                 for (int i=0;i<mItems.size();i++){
                     journalItem = mDataBaseJournal.getJournalItem(mItems.get(i).getTimeIn());
-                    PreparedStatement preparedStatement  = connection.prepareStatement("INSERT INTO Journal_recycler VALUES ('"
+                    preparedStatement  = connection.prepareStatement("INSERT INTO Journal_recycler VALUES ('"
                             +journalItem.getAccountID()+"','"
                             +journalItem.getAuditroom()+"','"
                             +journalItem.getTimeIn()+"','"
@@ -70,7 +75,7 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
                             +journalItem.getPersonMidname()+"','"
                             +journalItem.getPersonPhoto()+"')");
                     preparedStatement.execute();
-
+                    preparedStatement.close();
                 }
             }
         } catch (SQLException e) {

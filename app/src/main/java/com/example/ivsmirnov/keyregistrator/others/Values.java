@@ -176,9 +176,9 @@ public class Values{
     }
 
     public static String showDate() {
-        Date currentDate =  new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM",new Locale("ru"));
-        return String.valueOf(dateFormat.format(currentDate));
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy",new Locale("ru"));
+        return String.valueOf(dateFormat.format(new Date())) + " г.";
     }
 
     public static void showFullscreenToast(Context context, String message, int type){
@@ -200,67 +200,33 @@ public class Values{
         toast.show();
     }
 
-    public static ArrayList<String> getListStaffForSearchFromServer(Context context){
-        SharedPreferences mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        ArrayList<String> items = new ArrayList<>();
-        String ip = mPreferences.getString(Values.SQL_SERVER,"");
-        String classs = "net.sourceforge.jtds.jdbc.Driver";
-        String db = "KeyRegistratorBase";
-        String user = mPreferences.getString(Values.SQL_USER,"");
-        String password = mPreferences.getString(Values.SQL_PASSWORD,"");
-
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        Connection conn = null;
-        String ConnURL = null;
-
-        try {
-            Class.forName(classs);
-            ConnURL = "jdbc:jtds:sqlserver://" + ip + ";"
-                    + "database=" + db +";user=" + user + ";password="
-                    + password + ";";
-            conn = DriverManager.getConnection(ConnURL);
-            Statement statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery("select [LASTNAME],[FIRSTNAME],[MIDNAME],[NAME_DIVISION],[SEX],[RADIO_LABEL] from STAFF");
-            while (resultSet.next()){
-                String nameDivision = resultSet.getString("NAME_DIVISION");
-                String lastname = resultSet.getString("LASTNAME");
-                String firstname = resultSet.getString("FIRSTNAME");
-                String midname = resultSet.getString("MIDNAME");
-                String sex = resultSet.getString("SEX");
-                String radioLabel = resultSet.getString("RADIO_LABEL");
-                items.add(lastname+";"+firstname+";"+midname+";"+nameDivision+";"+sex+";"+resultSet.getRow()+";"+radioLabel);
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-
-        }
-        return items;
-    }
 
     public static long writeInJournal(Context context, JournalItem journalItem){
 
-        DataBaseJournal dbJournal = new DataBaseJournal(context);
-        Long journalItemID = dbJournal.writeInDBJournal(journalItem);
-        dbJournal.closeDB();
+        DataBaseJournal mDataBaseJournal;
+        if (Launcher.mDataBaseJournal!=null){
+            mDataBaseJournal = Launcher.mDataBaseJournal;
+        } else {
+            mDataBaseJournal = new DataBaseJournal(context);
+        }
 
-        return journalItemID;
+        return mDataBaseJournal.writeInDBJournal(journalItem);
     }
 
     public static void writeRoom (Context context, JournalItem journalItem, PersonItem personItem, long positionInBase){
-        DataBaseRooms dataBaseRooms = new DataBaseRooms(context);
-        dataBaseRooms.updateRoom(new RoomItem().setAuditroom(journalItem.getAuditroom())
+        DataBaseRooms mDataBaseRooms;
+        if (Launcher.mDataBaseRooms!=null){
+            mDataBaseRooms = Launcher.mDataBaseRooms;
+        } else {
+            mDataBaseRooms = new DataBaseRooms(context);
+        }
+        mDataBaseRooms.updateRoom(new RoomItem().setAuditroom(journalItem.getAuditroom())
                 .setStatus(Values.ROOM_IS_BUSY)
                 .setAccessType(journalItem.getAccessType())
                 .setPositionInBase(positionInBase)
                 .setLastVisiter(Persons_Fragment.getPersonInitials(journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()))
                 .setTag(personItem.getRadioLabel())
                 .setPhoto(journalItem.getPersonPhoto()));
-        dataBaseRooms.closeDB();
     }
 
     public static JournalItem createNewItemForJournal (Context context, PersonItem personItem, String auditroom, int accessType){
@@ -268,10 +234,10 @@ public class Values{
         DataBaseFavorite mDataBaseFavorite;
         if (Launcher.mDataBaseFavorite!=null){
             mDataBaseFavorite = Launcher.mDataBaseFavorite;
-            Log.d("database","getFromMain");
+            Log.d("databaseF","getFromMain");
         }else{
             mDataBaseFavorite = new DataBaseFavorite(context);
-            Log.d("database","createNew");
+            Log.d("databaseF","createNew");
         }
 
         PersonItem person = mDataBaseFavorite.getPersonItem(personItem.getRadioLabel(), DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
@@ -287,16 +253,27 @@ public class Values{
 
     public static int closeAllRooms(Context context){
         int closedRooms = 0;
-        DataBaseRooms dataBaseRooms = new DataBaseRooms(context);
-        DataBaseJournal dataBaseJournal = new DataBaseJournal(context);
-        ArrayList<RoomItem> rooms = dataBaseRooms.readRoomsDB();
+        DataBaseRooms mDataBaseRooms;
+        if (Launcher.mDataBaseRooms!=null){
+            mDataBaseRooms = Launcher.mDataBaseRooms;
+        } else {
+            mDataBaseRooms = new DataBaseRooms(context);
+        }
+
+        DataBaseJournal mDataBaseJournal;
+        if (Launcher.mDataBaseJournal!=null){
+            mDataBaseJournal = Launcher.mDataBaseJournal;
+        } else {
+            mDataBaseJournal = new DataBaseJournal(context);
+        }
+        ArrayList<RoomItem> rooms = mDataBaseRooms.readRoomsDB();
         for (RoomItem roomItem : rooms){
             if (roomItem.getStatus() == Values.ROOM_IS_BUSY){
                 roomItem.setStatus(Values.ROOM_IS_FREE);
                 roomItem.setTag(Values.EMPTY);
 
-                dataBaseRooms.updateRoom(roomItem);
-                dataBaseJournal.updateDB(roomItem.getPositionInBase());
+                mDataBaseRooms.updateRoom(roomItem);
+                mDataBaseJournal.updateDB(roomItem.getPositionInBase());
 
                 closedRooms++;
             }

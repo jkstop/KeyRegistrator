@@ -6,8 +6,10 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Display;
 
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
@@ -26,6 +28,9 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
     private String mPathExternal;
     private boolean isShowDialog;
 
+    private DataBaseJournal mDataBaseJournal;
+    private DataBaseFavorite mDataBaseFavorite;
+
     private static final String JOURNAL = "/Journal.xls";
     private static final String TEACHERS = "/Teachers.csv";
 
@@ -36,6 +41,18 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
         mSettings = new Settings(mContext);
         mPathExternal = Environment.getExternalStorageDirectory().getPath();
         mProgressDialog = new ProgressDialog(mContext);
+
+        if (Launcher.mDataBaseJournal != null){
+            mDataBaseJournal = Launcher.mDataBaseJournal;
+        } else {
+            mDataBaseJournal = new DataBaseJournal(mContext);
+        }
+
+        if (Launcher.mDataBaseFavorite!=null){
+            mDataBaseFavorite = Launcher.mDataBaseFavorite;
+        }else{
+            mDataBaseFavorite = new DataBaseFavorite(mContext);
+        }
     }
 
     @Override
@@ -52,28 +69,31 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
     protected Void doInBackground(Void... params) {
         switch (mType){
             case Values.WRITE_JOURNAL:
-                DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-                dbJournal.backupJournalToXLS();
-                dbJournal.backupJournalToCSV();
-                dbJournal.closeDB();
+
+                mDataBaseJournal.backupJournalToXLS();
+                mDataBaseJournal.backupJournalToCSV();
 
                 String srFileJournal = mPathExternal + JOURNAL;
                 String dtFileJournal = mSettings.getJournalBackupLocation() + JOURNAL;
                 Values.copyfile(mContext, srFileJournal, dtFileJournal);
                 break;
             case Values.WRITE_TEACHERS:
-                DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
-                dbFavorite.backupFavoriteStaffToFile();
-                dbFavorite.closeDB();
+
+                mDataBaseFavorite.backupFavoriteStaffToFile();
 
                 String srFileTeachers = mPathExternal + TEACHERS;
                 String dtFileTeachers = mSettings.getPersonsBackupLocation() + TEACHERS;
                 Values.copyfile(mContext, srFileTeachers, dtFileTeachers);
                 break;
             case Values.WRITE_ROOMS:
-                DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                dbRooms.backupRoomsToFile();
-                dbRooms.closeDB();
+                DataBaseRooms mDataBaseRooms;
+                if (Launcher.mDataBaseRooms!=null){
+                    mDataBaseRooms = Launcher.mDataBaseRooms;
+                } else {
+                    mDataBaseRooms = new DataBaseRooms(mContext);
+                }
+
+                mDataBaseRooms.backupRoomsToFile();
                 break;
         }
         return null;

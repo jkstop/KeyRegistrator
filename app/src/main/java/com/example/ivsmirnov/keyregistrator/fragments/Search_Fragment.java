@@ -50,6 +50,8 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
     private ArrayList<PersonItem> mPersonItems;
 
+    private DataBaseFavorite mDataBaseFavorite;
+
     private ProgressBar mProgressBar;
     private RecyclerView mPersonsRecycler;
     private Button mAddButton;
@@ -73,6 +75,12 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
         mProgressBar = (ProgressBar)rootView.findViewById(R.id.layout_add_new_staff_progress);
         mProgressBar.setVisibility(View.INVISIBLE);
 
+        if (Launcher.mDataBaseFavorite!=null){
+            mDataBaseFavorite = Launcher.mDataBaseFavorite;
+        } else {
+            mDataBaseFavorite = new DataBaseFavorite(mContext);
+        }
+
         mListener = this;
 
         mPersonsRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_search_persons);
@@ -80,7 +88,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
         mAddButton = (Button)rootView.findViewById(R.id.layout_add_new_staff_input_button);
 
-        final Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
+        final Connection connection = SQL_Connector.SQL_connection;
         final TextInputLayout mInputLayout = (TextInputLayout)rootView.findViewById(R.id.layout_add_new_staff_input);
         final AppCompatEditText mInputText = (AppCompatEditText) rootView.findViewById(R.id.layout_add_new_staff_input_text);
         if (mInputText.requestFocus()){
@@ -96,11 +104,9 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                 if (s.length()>=3){
                     if (connection!=null){
                         try {
-                            Statement statement = connection.createStatement();
-                            ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [LASTNAME] like '"+s+"%'");
-                            Find_User_in_SQL_Server find_user_in_sql_server = new Find_User_in_SQL_Server(mContext, mListener);
-                            find_user_in_sql_server.execute(resultSet);
-                        } catch (SQLException e) {
+                            Find_User_in_SQL_Server find_user_in_sql_server = new Find_User_in_SQL_Server(mContext, s,  mListener);
+                            find_user_in_sql_server.execute(connection);
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }else{
@@ -122,11 +128,11 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                     mInputLayout.setError(getResources().getString(R.string.input_empty_error));
                 }else{
                     String[] split = source.split("\\s+");
-                    String lastname = " ";
-                    String firstname = " ";
-                    String midname = " ";
+                    String lastname = Values.EMPTY;
+                    String firstname = Values.EMPTY;
+                    String midname = Values.EMPTY;
 
-                    String photo = Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext);
+                    String photo = DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext,"М");
                     try {
                         lastname = split[0];
                         firstname = split[1];
@@ -134,6 +140,8 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+
+                    lastname = lastname.substring(0,1).toUpperCase() + lastname.substring(1,lastname.length());
 
                     addUserInFavorite(mContext, new PersonItem().setLastname(lastname)
                             .setFirstname(firstname)
@@ -179,8 +187,8 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
     @Override
     public void onItemClick(View v, int position, int viewID) {
-        DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(mContext);
-        PersonItem selectedPerson = dataBaseFavorite.getPersonItem(mPersonItems.get(position).getRadioLabel(), DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
+
+        PersonItem selectedPerson = mDataBaseFavorite.getPersonItem(mPersonItems.get(position).getRadioLabel(), DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
         selectedPerson.setPhotoPreview(DataBaseFavorite.getPhotoPreview(selectedPerson.getPhotoOriginal()));
         addUserInFavorite(mContext, selectedPerson);
     }
@@ -190,18 +198,17 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     }
 
     private void addUserInFavorite(final Context context, final PersonItem personItem){
-        DataBaseFavorite dbFavorite = new DataBaseFavorite(context);
-        dbFavorite.writeInDBTeachers(personItem);
-        dbFavorite.closeDB();
+
+        mDataBaseFavorite.writeInDBTeachers(personItem);
+
 
         if (getView()!=null){
             Snackbar.make(getView(),R.string.snack_user_added,Snackbar.LENGTH_LONG)
                     .setAction(R.string.snack_cancel, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            DataBaseFavorite dataBaseFavorite = new DataBaseFavorite(context);
-                            dataBaseFavorite.deleteFromTeachersDB(personItem);
-                            dataBaseFavorite.closeDB();
+
+                            mDataBaseFavorite.deleteFromTeachersDB(personItem);
                             Snackbar.make(getView(),R.string.snack_cancelled,Snackbar.LENGTH_LONG).show();
                         }
                     })

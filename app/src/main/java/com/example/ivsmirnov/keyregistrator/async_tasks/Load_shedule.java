@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseShedule;
 import com.example.ivsmirnov.keyregistrator.interfaces.Shedule_Load;
@@ -64,9 +65,13 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
         ArrayList<String> auditroomsList = new ArrayList<>();
         result = 0;
 
-        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
+        DataBaseRooms mDataBaseRooms;
+        if (Launcher.mDataBaseRooms!=null){
+            mDataBaseRooms = Launcher.mDataBaseRooms;
+        } else {
+            mDataBaseRooms = new DataBaseRooms(mContext);
+        }
         //ArrayList<SparseArray<String>> mItems = dbRooms.readRoomsDB();
-        dbRooms.closeDB();
 /*
         for (int i=0;i<mItems.size();i++){
             auditroomsList.add(mItems.get(i).get(0));

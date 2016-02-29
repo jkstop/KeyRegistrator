@@ -26,8 +26,6 @@ public class CloseDay_stat_Fragment extends Fragment {
         Context context = root.getContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-
-
         TextView textDate = (TextView) root.findViewById(R.id.close_day_date);
         TextView textItems = (TextView) root.findViewById(R.id.close_day_items_in_journal);
         TextView textClosed = (TextView) root.findViewById(R.id.close_day_autoclosed_items);
@@ -35,7 +33,7 @@ public class CloseDay_stat_Fragment extends Fragment {
 
 
         textDate.setText(preferences.getString(Values.TODAY, Values.showDate()));
-        textItems.setText(String.valueOf(new DataBaseJournal(context).getItemCountForToday()));
+        //textItems.setText(String.valueOf(new DataBaseJournal(context).getItemCountForToday()));
         textClosed.setText(String.valueOf(new Settings(context).getAutoClosedRoomsCount()));
         textTotal.setText(String.valueOf(new Settings(context).getTotalJournalCount()));
 

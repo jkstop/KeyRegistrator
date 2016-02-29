@@ -61,13 +61,13 @@ public class Nfc_Fragment extends Fragment {
                     .setTimeIn(System.currentTimeMillis())
                     .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
                     .setPersonLastname(((Button)v).getText().toString())
-                    .setPersonPhoto(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext));
+                    .setPersonPhoto(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, "М"));
 
             PersonItem personItem = new PersonItem()
                     .setLastname(((Button)v).getText().toString())
                     .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1)
-                    .setPhotoPreview(DataBaseFavorite.getPhotoPreview(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext)))
-                    .setPhotoOriginal(Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext));
+                    .setPhotoPreview(DataBaseFavorite.getPhotoPreview(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, "М")))
+                    .setPhotoOriginal(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, "М"));
 
             long positionInBase = Values.writeInJournal(mContext, journalItem);
             Values.writeRoom(mContext,journalItem,personItem,positionInBase);

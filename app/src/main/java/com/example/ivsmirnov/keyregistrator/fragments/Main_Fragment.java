@@ -56,6 +56,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     private Settings mSettings;
 
     private DataBaseFavorite mDataBaseFavorite;
+    private DataBaseRooms mDataBaseRooms;
 
     private ArrayList<RoomItem> mRoomItems;
 
@@ -90,9 +91,13 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         mContext = rootView.getContext();
         mDataBaseFavorite = Launcher.mDataBaseFavorite;
 
-        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-        mRoomItems = dbRooms.readRoomsDB();
-        dbRooms.closeDB();
+        if (Launcher.mDataBaseRooms!=null){
+            mDataBaseRooms = Launcher.mDataBaseRooms;
+        } else {
+            mDataBaseRooms = new DataBaseRooms(mContext);
+        }
+        mRoomItems = mDataBaseRooms.readRoomsDB();
+
 
         roomInterface = this;
 
@@ -133,9 +138,13 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     public void onResume() {
         super.onResume();
 
-        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-        mRoomItems = dbRooms.readRoomsDB();
-        dbRooms.closeDB();
+        if (Launcher.mDataBaseRooms!=null){
+            mDataBaseRooms = Launcher.mDataBaseRooms;
+        } else {
+            mDataBaseRooms = new DataBaseRooms(mContext);
+        }
+        mRoomItems = mDataBaseRooms.readRoomsDB();
+
 
         setLayoutsWeight();
 

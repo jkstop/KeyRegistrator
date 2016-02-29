@@ -33,7 +33,7 @@
     <string name="toolbar_title_shedule">Расписание</string>
     <string name="toolbar_title_persons_select">Выберите преподавателя</string>
     <string name="toolbar_title_email">E-mail рассылка</string>
-    <string name="title_activity_close_day_dialog"> </string>
+    <string name="title_activity_close_day_dialog">Занятия завершены!</string>
     <string name="title_activity_rooms">Список аудиторий: </string>
     <string name="title_delete_room_dialog">Удаление</string>
     <string name="title_add_new_staff">Добавление нового пользователя</string>

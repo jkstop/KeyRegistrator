@@ -54,6 +54,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     private ArrayList<String> mDates;
     private adapter_journal_list mAdapterjournallist;
     private ArrayList <JournalItem> mJournalItems;
+    private DataBaseJournal mDataBaseJournal;
 
     private ProgressBar mLoadingBar;
 
@@ -80,10 +81,14 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     }
 
     public static ArrayList<String> getDates(Context context){
-        DataBaseJournal dbJournal = new DataBaseJournal(context);
-        ArrayList<String>dates = dbJournal.readJournalDatesFromDB();
-        dbJournal.closeDB();
-        return dates;
+
+        DataBaseJournal mDataBaseJournal;
+        if (Launcher.mDataBaseJournal!=null){
+            mDataBaseJournal = Launcher.mDataBaseJournal;
+        } else {
+            mDataBaseJournal = new DataBaseJournal(context);
+        }
+        return mDataBaseJournal.readJournalDatesFromDB();
     }
 
     private void showDateSpinner(){
@@ -115,6 +120,12 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
         View rootView = inflater.inflate(R.layout.layout_journal_fragment,container,false);
         mContext = rootView.getContext();
         mSettings = new Settings(mContext);
+
+        if (Launcher.mDataBaseJournal!=null){
+            mDataBaseJournal = Launcher.mDataBaseJournal;
+        } else {
+            mDataBaseJournal = new DataBaseJournal(mContext);
+        }
 
         mJournalRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_journal);
         mLoadingBar = (ProgressBar)rootView.findViewById(R.id.layout_journal_fragment_loading_progress_bar);
@@ -233,9 +244,8 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
                                 mJournalItems.remove(position);
                                 mAdapterjournallist.notifyItemRemoved(position);
 
-                                DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-                                dbJournal.deleteFromDB(timeIn);
-                                dbJournal.closeDB();
+                                mDataBaseJournal.deleteFromDB(timeIn);
+
                             }
                         })
                         .setCancelable(true);
@@ -276,9 +286,9 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
 
         @Override
         protected Void doInBackground(Void... params) {
-            DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-            mJournalItems = dbJournal.getJournalItemTags(mDate);
-            dbJournal.closeDB();
+
+            mJournalItems = mDataBaseJournal.getJournalItemTags(mDate);
+
             return null;
         }
 

@@ -109,8 +109,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                 @Override
                 public void onItemClick(View v, int position, int viewID) {
 
-
-
                     Bundle b = new Bundle();
                     b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
                     b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, mAllItems.get(position).getRadioLabel());

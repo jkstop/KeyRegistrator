@@ -113,9 +113,13 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
     private void initializeAuditroomsGrid(){
         mRoomsGrid.setLayoutManager(new GridLayoutManager(mContext, mSettings.getAuditroomColumnsCount()));
 
-        DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-        mRoomItems = dbRooms.readRoomsDB();
-        dbRooms.closeDB();
+        DataBaseRooms mDataBaseRooms;
+        if (Launcher.mDataBaseRooms!=null){
+            mDataBaseRooms = Launcher.mDataBaseRooms;
+        } else {
+            mDataBaseRooms = new DataBaseRooms(mContext);
+        }
+        mRoomItems = mDataBaseRooms.readRoomsDB();
 
         for (int i=0;i<mRoomItems.size();i++){
             mRoomItems.get(i).setStatus(Values.ROOM_IS_FREE);

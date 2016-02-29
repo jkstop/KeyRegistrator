@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
@@ -79,8 +80,14 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
 
         switch (mLoadType){
             case Values.REQUEST_CODE_LOAD_FAVORITE_STAFF:
-                DataBaseFavorite dbFavorite = new DataBaseFavorite(mContext);
-                dbFavorite.clearTeachersDB();
+                DataBaseFavorite mDataBaseFavorite;
+                if (Launcher.mDataBaseFavorite!=null){
+                    mDataBaseFavorite = Launcher.mDataBaseFavorite;
+                } else {
+                    mDataBaseFavorite = new DataBaseFavorite(mContext);
+                }
+
+                mDataBaseFavorite.clearTeachersDB();
                 try {
                     while ((line = fin.readLine())!=null){
                         if (i<count){
@@ -88,7 +95,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                 try {
                                     String [] split = line.split(";");
 
-                                    dbFavorite.writeInDBTeachers( new PersonItem()
+                                    mDataBaseFavorite.writeInDBTeachers( new PersonItem()
                                             .setLastname(split[0])
                                             .setFirstname(split[1])
                                             .setMidname(split[2])
@@ -106,14 +113,18 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                             }
                         }
                     }
-                    dbFavorite.closeDB();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 break;
             case Values.REQUEST_CODE_LOAD_JOURNAL:
-                DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-                dbJournal.clearJournalDB();
+                DataBaseJournal mDataBaseJournal;
+                if (Launcher.mDataBaseJournal!=null){
+                    mDataBaseJournal = Launcher.mDataBaseJournal;
+                } else {
+                    mDataBaseJournal = new DataBaseJournal(mContext);
+                }
+                mDataBaseJournal.clearJournalDB();
                 try {
                     if (fin != null) {
                         while ((line = fin.readLine())!=null){
@@ -121,7 +132,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                 try {
                                     String [] split = line.split(";");
 
-                                    dbJournal.writeInDBJournal(new JournalItem()
+                                    mDataBaseJournal.writeInDBJournal(new JournalItem()
                                     .setAccountID(split[0])
                                     .setAuditroom(split[1])
                                     .setTimeIn(Long.parseLong(split[2]))
@@ -139,21 +150,25 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                             }
                         }
                     }
-                    dbJournal.closeDB();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 break;
             case Values.REQUEST_CODE_LOAD_ROOMS:
-                DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                dbRooms.clearRoomsDB();
+                DataBaseRooms mDataBaseRooms;
+                if (Launcher.mDataBaseRooms!=null){
+                    mDataBaseRooms = Launcher.mDataBaseRooms;
+                } else {
+                    mDataBaseRooms = new DataBaseRooms(mContext);
+                }
+                mDataBaseRooms.clearRoomsDB();
                 try {
                     while ((line = fin.readLine())!=null){
                         if (i<count){
                             if (!lines.contains(line)){
                                 String [] split = line.split(";");
                                 if(split.length==6){
-                                    dbRooms.writeInRoomsDB(new RoomItem().setAuditroom(split[0])
+                                    mDataBaseRooms.writeInRoomsDB(new RoomItem().setAuditroom(split[0])
                                             .setStatus(Integer.parseInt(split[1]))
                                             .setAccessType(Integer.parseInt(split[2]))
                                             .setLastVisiter(split[3])
@@ -165,7 +180,6 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                             }
                         }
                     }
-                    dbRooms.closeDB();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

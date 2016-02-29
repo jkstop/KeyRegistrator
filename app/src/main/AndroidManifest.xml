@@ -29,6 +29,7 @@
         <activity
             android:name=".activities.CloseDay"
             android:label="@string/title_activity_close_day_dialog"
+            android:theme="@style/CloseDayTheme"
             >
         </activity>
 

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
@@ -29,6 +30,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Locale;
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by ivsmirnov on 05.11.2015.
@@ -51,174 +55,189 @@ public class DataBaseFavorite {
         this.mContext = context;
         dataBaseFavoriteRegist = new DataBaseFavoriteRegist(mContext);
         sqLiteDatabase = dataBaseFavoriteRegist.getWritableDatabase();
-        cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER,null,null,null,null,null,null);
+
         mSettings = new Settings(mContext);
-        Log.d("createDataBase", context.toString());
+        Log.d("CreateFavoriteDatabase!", context.toString());
     }
 
 
     public PersonItem getPersonItem(String tag, int userLocation, int photoSize){
-        PersonItem personItem;
-        if (userLocation == LOCAL_USER){
-            cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
-                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
-            if (cursor.getCount()>0){
-                cursor.moveToFirst();
-                personItem = new PersonItem().setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
-                        .setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))
-                        .setMidname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))
-                        .setDivision(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))
-                        .setSex(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE)))
-                        .setRadioLabel(tag);
-                if (photoSize == FULLSIZE_PHOTO){
-                    personItem.setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
-                }else if (photoSize == PREVIEW_PHOTO){
-                    personItem.setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)));
-                }
-                return personItem;
-            }
-        }else if (userLocation == SERVER_USER){
-            Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
-            if (connection!=null){
-                try {
-                    Statement statement = connection.createStatement();
-                    ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [RADIO_LABEL] = '" + tag + "'");
-                    while (resultSet.next()){
-                        personItem = new PersonItem().setLastname(resultSet.getString("LASTNAME"))
-                                .setFirstname(resultSet.getString("FIRSTNAME"))
-                                .setMidname(resultSet.getString("MIDNAME"))
-                                .setDivision(resultSet.getString("NAME_DIVISION"))
-                                .setSex(resultSet.getString("SEX"))
-                                .setRadioLabel(resultSet.getString("RADIO_LABEL"));
-                        String photo = resultSet.getString("PHOTO");
-                        if (photo == null){
-                            photo = getBase64DefaultPhotoFromResources(mContext, resultSet.getString("SEX"));
-                        }
-                        if (photoSize == FULLSIZE_PHOTO){
-                            personItem.setPhotoOriginal(photo);
-                        } else {
-                            personItem.setPhotoPreview(getPhotoPreview(photo));
-                        }
-                       return personItem;
+        try {
+            PersonItem personItem;
+            if (userLocation == LOCAL_USER){
+                cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                        + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
+                if (cursor.getCount()>0){
+                    cursor.moveToFirst();
+                    personItem = new PersonItem().setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
+                            .setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))
+                            .setMidname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))
+                            .setDivision(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))
+                            .setSex(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE)))
+                            .setRadioLabel(tag);
+                    if (photoSize == FULLSIZE_PHOTO){
+                        personItem.setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
+                    }else{
+                        personItem.setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)));
                     }
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                    return personItem;
+                } else {
+                    return new PersonItem();
                 }
-            }else{
-                Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
-                return null;
+            }else if (userLocation == SERVER_USER){
+                Connection connection = /*SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());*/
+                SQL_Connector.SQL_connection;
+
+                if (connection!=null){
+                    try {
+                        Statement statement = connection.createStatement();
+                        ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [RADIO_LABEL] = '" + tag + "'");
+                        while (resultSet.next()){
+                            personItem = new PersonItem().setLastname(resultSet.getString("LASTNAME"))
+                                    .setFirstname(resultSet.getString("FIRSTNAME"))
+                                    .setMidname(resultSet.getString("MIDNAME"))
+                                    .setDivision(resultSet.getString("NAME_DIVISION"))
+                                    .setSex(resultSet.getString("SEX"))
+                                    .setRadioLabel(resultSet.getString("RADIO_LABEL"));
+                            String photo = resultSet.getString("PHOTO");
+                            if (photo == null){
+                                photo = getBase64DefaultPhotoFromResources(mContext, resultSet.getString("SEX"));
+                            }
+                            if (photoSize == FULLSIZE_PHOTO){
+                                personItem.setPhotoOriginal(photo);
+                            } else {
+                                personItem.setPhotoPreview(getPhotoPreview(photo));
+                            }
+                            return personItem;
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        return new PersonItem();
+                    }
+                }else{
+                    Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
+                    return new PersonItem();
+                }
             }
+            return new PersonItem().setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new PersonItem();
+        } finally {
+            closeCursor();
         }
-        return null;
     }
 
     public void updatePersonItem(String tag, PersonItem personItem){
-        cursor = sqLiteDatabase.rawQuery("SELECT "
-                + DataBaseFavoriteRegist._ID + ","
-                + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + ","
-                + DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE + ","
-                + DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE + ","
-                + DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE
-                + " FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
-                + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE
-                + " =?",
-                new String[]{tag});
-        if (cursor.getCount()>0){
-            cursor.moveToFirst();
-            ContentValues cv = new ContentValues();
-            if (!personItem.getLastname().equals(Values.EMPTY)){
-                cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,personItem.getLastname());
+        try {
+            cursor = sqLiteDatabase.rawQuery("SELECT "
+                            + DataBaseFavoriteRegist._ID + ","
+                            + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + ","
+                            + DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE + ","
+                            + DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE + ","
+                            + DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE
+                            + " FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                            + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE
+                            + " =?",
+                    new String[]{tag});
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
+                ContentValues cv = new ContentValues();
+                if (!personItem.getLastname().equals(Values.EMPTY)){
+                    cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,personItem.getLastname());
+                }
+                if (!personItem.getFirstname().equals(Values.EMPTY)){
+                    cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
+                }
+                if (!personItem.getMidname().equals(Values.EMPTY)){
+                    cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE,personItem.getMidname());
+                }
+                if (!personItem.getDivision().equals(Values.EMPTY)){
+                    cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
+                }
+                if (cv.size()!=0){
+                    sqLiteDatabase.update(DataBaseFavoriteRegist.TABLE_TEACHER,
+                            cv,
+                            DataBaseFavoriteRegist._ID + "=" + cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID)),
+                            null);
+                }
             }
-            if (!personItem.getFirstname().equals(Values.EMPTY)){
-                cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
-            }
-            if (!personItem.getMidname().equals(Values.EMPTY)){
-                cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE,personItem.getMidname());
-            }
-            if (!personItem.getDivision().equals(Values.EMPTY)){
-                cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
-            }
-            if (cv.size()!=0){
-                sqLiteDatabase.update(DataBaseFavoriteRegist.TABLE_TEACHER,
-                        cv,
-                        DataBaseFavoriteRegist._ID + "=" + cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID)),
-                        null);
-            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor();
         }
+
     }
 
     public ArrayList<String> getTagForCurrentCharacter(String character){
-        ArrayList <String> mTags = new ArrayList<>();
-        if (character.equals("Все")){
-            cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null,null);
-        } else{
-            cursor = sqLiteDatabase.rawQuery("SELECT " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " FROM " + DataBaseFavoriteRegist.TABLE_TEACHER +
-                            " WHERE " + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + " LIKE?",
-                    new String[]{character+"%"});
-        }
-        if (cursor.getCount()>0){
-            cursor.moveToPosition(-1);
-            while (cursor.moveToNext()){
-                mTags.add(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE)));
+        try {
+            ArrayList <String> mTags = new ArrayList<>();
+            if (character.equalsIgnoreCase("Все")){
+                cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null,null);
+            } else{
+                cursor = sqLiteDatabase.rawQuery("SELECT " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " FROM " + DataBaseFavoriteRegist.TABLE_TEACHER +
+                                " WHERE " + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE+ " LIKE?",
+                        new String[]{character + "%"});
             }
+            if (cursor.getCount()>0){
+                cursor.moveToPosition(-1);
+                while (cursor.moveToNext()){
+                    mTags.add(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE)));
+                }
+            }
+            return mTags;
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ArrayList<>();
+        } finally {
+            closeCursor();
         }
-        return mTags;
     }
 
     public ArrayList<CharacterItem> getPersonsCharacters(){
-        ArrayList <CharacterItem> characters = new ArrayList<>();
-        cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE},null,null,null,null,null,null);
-        cursor.moveToFirst();
-        ArrayList<String> uniqueCharacters = new ArrayList<>();
-        while (cursor.moveToNext()){
-            String firstSymbol = cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)).substring(0,1).toUpperCase();
-            if (!uniqueCharacters.contains(firstSymbol)){
-                uniqueCharacters.add(firstSymbol);
-            }
-        }
-        for (String character : uniqueCharacters){
-            characters.add(new CharacterItem().setCharacter(character).setSelection(false));
-        }
-        Collections.sort(characters, new Comparator<CharacterItem>() {
-            @Override
-            public int compare(CharacterItem lhs, CharacterItem rhs) {
-                return lhs.getCharacter().compareTo(rhs.getCharacter());
-            }
-        });
-        characters.add(0,new CharacterItem().setCharacter("Все").setSelection(true));
-        return characters;
-    }
-
-    public static PersonItem findInServer(Context context,String tag){
-        PersonItem personItem = null;
         try {
-            Connection connection = SQL_Connector.check_sql_connection(context, new Settings(context).getServerConnectionParams());
-            if (connection!=null){
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [RADIO_LABEL] = '"+tag+"'");
-                while(resultSet.next()){
-                    //String namePosition = resultSet.getString("NAME_POSITION");
-                    personItem = new PersonItem()
-                            .setLastname(resultSet.getString("LASTNAME"))
-                            .setFirstname(resultSet.getString("FIRSTNAME"))
-                            .setMidname(resultSet.getString("MIDNAME"))
-                            .setDivision(resultSet.getString("NAME_DIVISION"))
-                            .setSex(resultSet.getString("SEX"))
-                            .setPhotoPreview(getPhotoPreview(resultSet.getString("PHOTO")))
-                            .setPhotoOriginal(resultSet.getString("PHOTO"))
-                            .setRadioLabel(resultSet.getString("RADIO_LABEL"));
+            ArrayList <CharacterItem> characters = new ArrayList<>();
+            cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE},null,null,null,null,null,null);
+            cursor.moveToFirst();
+            ArrayList<String> uniqueCharacters = new ArrayList<>();
+            while (cursor.moveToNext()){
+                String firstSymbol = cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)).substring(0,1).toUpperCase();
+                if (!uniqueCharacters.contains(firstSymbol)){
+                    uniqueCharacters.add(firstSymbol);
                 }
             }
-        } catch (SQLException e) {
+            for (String character : uniqueCharacters){
+                characters.add(new CharacterItem().setCharacter(character).setSelection(false));
+            }
+            Collections.sort(characters, new Comparator<CharacterItem>() {
+                @Override
+                public int compare(CharacterItem lhs, CharacterItem rhs) {
+                    return lhs.getCharacter().compareTo(rhs.getCharacter());
+                }
+            });
+            characters.add(0,new CharacterItem().setCharacter("Все").setSelection(true));
+            return characters;
+        } catch (Exception e){
             e.printStackTrace();
+            return new ArrayList<>();
+        } finally {
+            closeCursor();
         }
-        return personItem;
+
     }
 
+
+
     public void closeDB(){
-        dataBaseFavoriteRegist.close();
-        sqLiteDatabase.close();
-        cursor.close();
+        if (dataBaseFavoriteRegist!=null){
+            dataBaseFavoriteRegist.close();
+            Log.d("DBFavoriteClose!","!!!!!!!!!!!!!!!!!");
+        }
+
+        if (sqLiteDatabase!=null){
+            sqLiteDatabase.close();
+        }
     }
 
     public boolean isUserInBase(String tag){
@@ -232,35 +251,38 @@ public class DataBaseFavorite {
     }
 
     public void writeInDBTeachers(PersonItem personItem) {
-        if (personItem!=null){
-            ContentValues cv = new ContentValues();
-            cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
-            cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
-            cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE, personItem.getMidname());
-            cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
-            cv.put(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE, personItem.getRadioLabel());
-            cv.put(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE, personItem.getSex());
-            cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE, personItem.getPhotoPreview());
-            cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE, personItem.getPhotoOriginal());
+        try {
+            if (personItem!=null){
+                ContentValues cv = new ContentValues();
+                cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
+                cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
+                cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE, personItem.getMidname());
+                cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
+                cv.put(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE, personItem.getRadioLabel());
+                cv.put(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE, personItem.getSex());
+                cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE, personItem.getPhotoPreview());
+                cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE, personItem.getPhotoOriginal());
 
-            if (isUserInBase(personItem.getRadioLabel())){
-                deleteUser(personItem.getRadioLabel());
+                if (isUserInBase(personItem.getRadioLabel())){
+                    deleteUser(personItem.getRadioLabel());
+                }
+                sqLiteDatabase.insert(DataBaseFavoriteRegist.TABLE_TEACHER, null, cv);
             }
-
-            sqLiteDatabase.insert(DataBaseFavoriteRegist.TABLE_TEACHER, null, cv);
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 
     public void backupFavoriteStaffToFile(){
-        File file = null;
-        FileOutputStream fileOutputStream;
-        String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        file = new File(mPath + "/Teachers.csv");
-
-        cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, null,null,null,null,null,null);
-        cursor.moveToPosition(-1);
-
         try {
+            File file = null;
+            FileOutputStream fileOutputStream;
+            String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+            file = new File(mPath + "/Teachers.csv");
+
+            cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, null,null,null,null,null,null);
+            cursor.moveToPosition(-1);
+
             if (file != null) {
                 fileOutputStream = new FileOutputStream(file);
                 String row;
@@ -281,250 +303,163 @@ public class DataBaseFavorite {
                 fileOutputStream.close();
             }
         }
-        catch (IOException e) {
+        catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            closeCursor();
         }
     }
 
     public ArrayList<PersonItem> readTeachersFromDB(){
-        cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,
-        DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null,null);
-        cursor.moveToPosition(-1);
-        ArrayList <PersonItem> mPerson = new ArrayList<>();
-        while (cursor.moveToNext()){
-            mPerson.add(new PersonItem()
-                    .setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
-                    //.setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))
-                    //.setMidname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))
-                    //.setDivision(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))
-                    //.setSex(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE)))
-                    /*.setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)))
-                    .setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)))*/
-                    .setRadioLabel(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE))));
-        }
-        Collections.sort(mPerson, new Comparator<PersonItem>() {
-            @Override
-            public int compare(PersonItem lhs, PersonItem rhs) {
-                return lhs.getLastname().compareToIgnoreCase(rhs.getLastname());
+        try {
+            cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,
+                    DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null,null);
+            cursor.moveToPosition(-1);
+            ArrayList <PersonItem> mPerson = new ArrayList<>();
+            while (cursor.moveToNext()){
+                mPerson.add(new PersonItem()
+                        .setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
+                        .setRadioLabel(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE))));
             }
-        });
-        return mPerson;
-    }
-/*
-    public int getPersonsCount(){
-        return cursor.getCount();
-    }
-
-    public PersonItem readTeacherItem(int position){
-        cursor.moveToPosition(position);
-        return new PersonItem()
-                    .setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
-                    .setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))
-                    .setMidname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))
-                    .setDivision(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))
-                    .setSex(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE)))
-                    .setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)))
-                    .setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)))
-                    .setRadioLabel(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE)));
-    }
-
-    public Bitmap getPersonPhoto(String tag, int photoSource, int photoSize){
-
-        if (photoSource == GetPersonPhoto.LOCAL_PHOTO){
-            cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
-                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
-            cursor.moveToFirst();
-            String photo = null;
-            if (photoSize == GetPersonPhoto.ORIGINAL_IMAGE){
-                photo = cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE));
-            }else if (photoSize == GetPersonPhoto.PREVIEW_IMAGE){
-                photo = cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE));
-            }
-            if (photo!=null){
-                byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
-                return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-            }else{
-                return null;
-            }
-
-        }else if (photoSource == GetPersonPhoto.SERVER_PHOTO){
-            Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
-            if (connection!=null){
-                try {
-                    Statement statement = connection.createStatement();
-                    ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [RADIO_LABEL] = '" + tag + "'");
-                    while (resultSet.next()){
-                        String photo = resultSet.getString("PHOTO");
-                        if (photo == null){
-                            photo = Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext);
-                        }
-                        if (photoSize == GetPersonPhoto.PREVIEW_IMAGE){
-                            photo = getPhotoPreview(photo);
-                        }
-                        byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
-                        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            Collections.sort(mPerson, new Comparator<PersonItem>() {
+                @Override
+                public int compare(PersonItem lhs, PersonItem rhs) {
+                    return lhs.getLastname().compareToIgnoreCase(rhs.getLastname());
                 }
-            }else{
-                Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
-            }
-            return null;
-        }else{
-            return null;
+            });
+            return mPerson;
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ArrayList<>();
+        } finally {
+            cursor.close();
         }
     }
-
-
-
-    public String getPersonPhotoBase64 (String tag, int photoSize, int photoSource){
-        if (photoSource == GetPersonPhoto.LOCAL_PHOTO){
-            cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
-                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
-            cursor.moveToFirst();
-            if (photoSize == GetPersonPhoto.ORIGINAL_IMAGE){
-                return cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE));
-            }else if (photoSize == GetPersonPhoto.PREVIEW_IMAGE){
-                return cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE));
-            }else{
-                return null;
-            }
-        }else if (photoSource == GetPersonPhoto.SERVER_PHOTO){
-            Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
-            if (connection!=null){
-                try {
-                    Statement statement = connection.createStatement();
-                    ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [RADIO_LABEL] = '" + tag + "'");
-                    while (resultSet.next()){
-                        String photo = resultSet.getString("PHOTO");
-                        if (photo == null){
-                            photo = Find_User_in_SQL_Server.getBase64DefaultPhotoFromResources(mContext);
-                        }
-                        if (photoSize == GetPersonPhoto.PREVIEW_IMAGE){
-                            photo = getPhotoPreview(photo);
-                        }
-                        return photo;
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }else{
-                Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
-            }
-            return null;
-        }else{
-            return null;
-        }
-    }
-
-*/
-
 
     public void deleteUser(String tag){
-        cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+        try{
+            cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
                     + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
-        if (cursor.getCount()>0){
-            cursor.moveToPosition(-1);
-            while (cursor.moveToNext()){
-                Log.d("delete", cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)));
-                sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID)), null);
+            if (cursor.getCount()>0){
+                cursor.moveToPosition(-1);
+                while (cursor.moveToNext()){
+                    Log.d("delete", cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)));
+                    sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID)), null);
+                }
             }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor();
         }
 
     }
 
 
     public void deleteFromTeachersDB(PersonItem personItem){
-        String personPosition = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
-                + " WHERE " + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + " = '" + personItem.getLastname() + "'"
-                + " AND " + DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE + " = '" + personItem.getFirstname() + "'"
-                + " AND " + DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE + " = '" + personItem.getMidname() + "'"
-                + " AND " + DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE + " = '" + personItem.getDivision() + "'" ).simpleQueryForString();
-        if (!personPosition.isEmpty()){
-            sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + personPosition, null);
+        try {
+            String personPosition = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + " = '" + personItem.getLastname() + "'"
+                    + " AND " + DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE + " = '" + personItem.getFirstname() + "'"
+                    + " AND " + DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE + " = '" + personItem.getMidname() + "'"
+                    + " AND " + DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE + " = '" + personItem.getDivision() + "'" ).simpleQueryForString();
+            if (!personPosition.isEmpty()){
+                sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + personPosition, null);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
+
     }
 
     public void clearTeachersDB(){
-        sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, null, null);
-    }
-
-    public void updateTeachersDB(ArrayList<String> source, ArrayList<String> edited){
-        cursor.moveToPosition(-1);
-        while (cursor.moveToNext()){
-            if (source.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME).equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))&&
-                    source.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME).equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))&&
-                    source.get(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME).equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE)))&&
-                    source.get(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION).equals(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))){
-                int row = cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID));
-                ContentValues cv = new ContentValues();
-                cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,edited.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME));
-                cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE,edited.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME));
-                cv.put(DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE,edited.get(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME));
-                cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE,edited.get(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION));
-                sqLiteDatabase.update(DataBaseFavoriteRegist.TABLE_TEACHER, cv, DataBaseFavoriteRegist._ID + "=" + row, null);
-            }
+        try {
+            sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, null, null);
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 
+
     public static String getPhotoPreview(String photo){
 
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
 
-        byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
-        BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
+            byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
+            BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
 
-        options.inSampleSize = calculateInSampleSize(options, 240, 320);
-        options.inJustDecodeBounds = false;
-        options.inPreferredConfig = Bitmap.Config.RGB_565;
-        options.inDither = true;
+            options.inSampleSize = calculateInSampleSize(options, 240, 320);
+            options.inJustDecodeBounds = false;
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            options.inDither = true;
 
-        Bitmap bitmapPrew = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
+            Bitmap bitmapPrew = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmapPrew.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmapPrew.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
 
-        return Base64.encodeToString(byteArray,Base64.NO_WRAP);
+            return Base64.encodeToString(byteArray,Base64.NO_WRAP);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public int getPersonsCount(){
+        try {
+            cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null);
+            if (cursor.getCount()>0){
+                return cursor.getCount();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor();
+        }
+        return 0;
     }
 
 
 
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
 
         if (height > reqHeight || width > reqWidth) {
-
-            // Calculate ratios of height and width to requested height and width
             final int heightRatio = Math.round((float) height / (float) reqHeight);
             final int widthRatio = Math.round((float) width / (float) reqWidth);
-
-            // Choose the smallest ratio as inSampleSize value, this will guarantee
-            // a final image with both dimensions larger than or equal to the
-            // requested height and width.
             inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
         }
-
         return inSampleSize;
     }
 
     public static String getBase64DefaultPhotoFromResources(Context context, String sex){
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        Bitmap bitmap;
-        if (sex.equalsIgnoreCase("М")){
-            bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_male_colored, options);
-        } else {
-            bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_female_colored, options);
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            Bitmap bitmap;
+            if (sex.equalsIgnoreCase("М")){
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_male_colored, options);
+            } else {
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_female_colored, options);
+            }
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            return Base64.encodeToString(byteArray,Base64.NO_WRAP);
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
         }
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(byteArray,Base64.NO_WRAP);
+    }
+
+    private void closeCursor(){
+        if (cursor!=null){
+            cursor.close();
+        }
     }
 }

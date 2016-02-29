@@ -5,6 +5,10 @@
         <item name="alertDialogTheme">@style/Theme.AppCompat.Light.Dialog.Alert</item>
     </style>
 
+    <style name="CloseDayTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <!-- Button Transparent -->
 
     <style name="ButtonTransparent">

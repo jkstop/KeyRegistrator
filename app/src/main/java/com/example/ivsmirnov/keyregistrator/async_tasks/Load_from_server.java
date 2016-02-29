@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
@@ -24,12 +25,19 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
     private ProgressDialog mProgressDialog;
     private UpdateInterface mListener;
     private Settings mSettings;
+    private DataBaseJournal mDataBaseJournal;
 
     public Load_from_server(Context context, UpdateInterface updateInterface){
         this.mContext = context;
         this.mListener = updateInterface;
         mProgressDialog = new ProgressDialog(mContext);
         mSettings = new Settings(mContext);
+
+        if (Launcher.mDataBaseJournal!=null){
+            mDataBaseJournal = Launcher.mDataBaseJournal;
+        } else {
+            mDataBaseJournal = new DataBaseJournal(mContext);
+        }
     }
 
     @Override
@@ -45,14 +53,14 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
     protected Void doInBackground(Void... params) {
 
         try {
-            Connection connection = SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
+            Connection connection = SQL_Connector.SQL_connection;
             if (connection!=null){
-                DataBaseJournal dbjournal = new DataBaseJournal(mContext);
-                dbjournal.clearJournalDB();
+
+                mDataBaseJournal.clearJournalDB();
                 Statement statement = connection.createStatement();
                 ResultSet result = statement.executeQuery("SELECT * FROM Journal_recycler");
                 while (result.next()){
-                    dbjournal.writeInDBJournal(new JournalItem()
+                    mDataBaseJournal.writeInDBJournal(new JournalItem()
                     .setAccountID(result.getString("ACCOUNT_ID"))
                     .setAuditroom(result.getString("AUDITROOM"))
                     .setTimeIn(Long.parseLong(result.getString("TIME_IN")))
@@ -63,7 +71,6 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
                     .setPersonMidname(result.getString("PERSON_MIDNAME"))
                     .setPersonPhoto(result.getString("PERSON_PHOTO")));
                 }
-                dbjournal.closeDB();
             }
         } catch (SQLException e) {
             e.printStackTrace();

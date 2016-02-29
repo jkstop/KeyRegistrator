@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
@@ -60,8 +61,8 @@ public class Dialog_Fragment extends DialogFragment{
     private LayoutInflater mInflater;
     private Resources mResources;
     private DataBaseFavorite mDataBaseFavorite;
-    private DataBaseRooms mDataBaseRooms;
     private DataBaseJournal mDataBaseJournal;
+    private DataBaseRooms mDataBaseRooms;
 
     public ArrayList<String> mAttachmentList;
 
@@ -87,16 +88,38 @@ public class Dialog_Fragment extends DialogFragment{
 
         if (dialog_id == Values.DIALOG_CLEAR_TEACHERS |
                 dialog_id == Values.DIALOG_EDIT){
-            mDataBaseFavorite = new DataBaseFavorite(mContext);
+
+            if (Launcher.mDataBaseFavorite!=null){
+                mDataBaseFavorite = Launcher.mDataBaseFavorite;
+                Log.d("database","getFromMain");
+            }else{
+                mDataBaseFavorite = new DataBaseFavorite(mContext);
+                Log.d("database","createNew");
+            }
+        } else if (dialog_id == Values.DIALOG_CLEAR_JOURNAL){
+
+            if (Launcher.mDataBaseJournal!=null){
+                mDataBaseJournal = Launcher.mDataBaseJournal;
+            }else{
+                mDataBaseJournal = new DataBaseJournal(mContext);
+            }
+        } else if (dialog_id == Values.ADD_ROOM_DIALOG |
+                dialog_id == Values.DIALOG_CLEAR_ROOMS |
+                dialog_id == Values.DELETE_ROOM_DIALOG |
+                dialog_id == Values.DIALOG_RESIZE_ITEMS){
+
+            if (Launcher.mDataBaseRooms!=null){
+                mDataBaseRooms = Launcher.mDataBaseRooms;
+            } else {
+                mDataBaseRooms = new DataBaseRooms(mContext);
+            }
         }
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mDataBaseFavorite !=null){
-            mDataBaseFavorite.closeDB();
-        }
     }
 
     @NonNull
@@ -116,9 +139,8 @@ public class Dialog_Fragment extends DialogFragment{
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                DataBaseJournal dbJournal = new DataBaseJournal(mContext);
-                                dbJournal.clearJournalDB();
-                                dbJournal.closeDB();
+
+                                mDataBaseJournal.clearJournalDB();
 
                                 updateInformation();
 
@@ -251,9 +273,8 @@ public class Dialog_Fragment extends DialogFragment{
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                                dbRooms.deleteFromRoomsDB(aud);
-                                dbRooms.closeDB();
+
+                                mDataBaseRooms.deleteFromRoomsDB(aud);
 
                                 updateInformation();
 
@@ -281,9 +302,8 @@ public class Dialog_Fragment extends DialogFragment{
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                                dbRooms.clearRoomsDB();
-                                dbRooms.closeDB();
+
+                                mDataBaseRooms.clearRoomsDB();
 
                                 updateInformation();
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
@@ -299,11 +319,10 @@ public class Dialog_Fragment extends DialogFragment{
                     public void onClick(View v) {
                         String inputText = enterAuditroomText.getText().toString();
                         if (!inputText.isEmpty()){
-                            DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                            dbRooms.writeInRoomsDB(new RoomItem().setAuditroom(inputText)
+
+                            mDataBaseRooms.writeInRoomsDB(new RoomItem().setAuditroom(inputText)
                                     .setStatus(Values.ROOM_IS_FREE)
                                     .setAccessType(DataBaseJournal.ACCESS_BY_CLICK));
-                            dbRooms.closeDB();
 
                             enterAuditroomText.getText().clear();
                             updateInformation();
@@ -362,9 +381,7 @@ public class Dialog_Fragment extends DialogFragment{
                 final LinearLayout.LayoutParams cardViewLayoutParams = (LinearLayout.LayoutParams)cardView.getLayoutParams();
                 final LinearLayout.LayoutParams frameGridParams = (LinearLayout.LayoutParams)mFrameGrid.getLayoutParams();
 
-                DataBaseRooms dbRooms = new DataBaseRooms(mContext);
-                ArrayList <RoomItem> mRoomsItems = dbRooms.readRoomsDB();
-                dbRooms.closeDB();
+                ArrayList <RoomItem> mRoomsItems = mDataBaseRooms.readRoomsDB();
 
                 RecyclerView mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
                 mRoomsGrid.setClickable(false);
@@ -487,7 +504,7 @@ public class Dialog_Fragment extends DialogFragment{
                                 .setServerName(inputServer.getText().toString())
                                 .setUserName(inputUser.getText().toString())
                                 .setUserPassword(inputPassowrd.getText().toString());
-                        if (SQL_Connector.check_sql_connection(mContext, serverConnectionItem)!=null){
+                        if (SQL_Connector.SQL_connection!=null){
                             connectionStatus.setText(R.string.connected);
                             connectionStatus.setTextColor(Color.GREEN);
                             mSettings.setServerConnectionParams(serverConnectionItem);

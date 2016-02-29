@@ -45,6 +45,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
 //import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
+import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
@@ -74,6 +75,7 @@ import com.example.ivsmirnov.keyregistrator.others.GoogleAuthenticator;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
+import com.example.ivsmirnov.keyregistrator.services.Alarm;
 import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
 import com.example.ivsmirnov.keyregistrator.services.NFC_Reader;
 import com.google.android.gms.auth.GoogleAuthException;
@@ -124,6 +126,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
     public static DataBaseFavorite mDataBaseFavorite;
     public static DataBaseJournal mDataBaseJournal;
+    public static DataBaseRooms mDataBaseRooms;
 
     private Context mContext;
     private Resources mResources;
@@ -150,6 +153,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     String aud = null;
     Boolean isOpened = false;
 
+    private Alarm mAlarm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,14 +166,21 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         mContext = this;
         mResources = getResources();
+
+        mAlarm = new Alarm(getApplicationContext());
+
         mDataBaseFavorite = new DataBaseFavorite(mContext);
         mDataBaseJournal = new DataBaseJournal(mContext);
+        mDataBaseRooms = new DataBaseRooms(mContext);
+
         mSettings = new Settings(mContext);
         mKeyInterface = this;
         mRoomInterface = this;
         mFragmentActivity = this;
 
-        SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());
+        mAlarm.setAlarm(closingTime());
+
+        new SQL_Connection(mContext, mSettings.getServerConnectionParams()).execute();
 
         initNavigationDrawer(getMainNavigationItems());
 
@@ -234,11 +246,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                     setToolbarTitle(R.string.toolbar_title_shedule);
                     showFragment(Shedule_Fragment.newInstance(),R.string.fragment_tag_shedule);
                 }else if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_mail))){
-                    //Dialog_Fragment dialog_email = new Dialog_Fragment();
-                    //Bundle bundle_email = new Bundle();
-                    //bundle_email.putInt(Values.DIALOG_TYPE, Values.DIALOG_EMAIL);
-                    //dialog_email.setArguments(bundle_email);
-                    //dialog_email.show(getSupportFragmentManager(),"email");
                     setToolbarTitle(R.string.toolbar_title_email);
                     showFragment(Email_Fragment.newInstance(),R.string.fragment_tag_email);
                 }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_sql))){
@@ -431,23 +438,16 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                 .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo)));
     }
 
-    //закрытие всех позиций в 22.01
-    public void setAlarm(Calendar calendar){
-        AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(mContext,CloseDayService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(mContext,0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        alarmManager.cancel(pendingIntent);
-        if (Build.VERSION.SDK_INT<Build.VERSION_CODES.KITKAT){
-            alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-        }else{
-            alarmManager.setExact(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent);
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-        mSettings.setAutoCloseStatus(true);
-        Log.d("alarmSet", "ok");
+        if (!mSettings.getAutoCloseStatus()){
+            mAlarm.setAlarm(closingTime());
+        }
     }
 
-    private Calendar closingTime(){
+    public long closingTime(){
         Calendar now = Calendar.getInstance();
         Calendar when = (Calendar)now.clone();
         when.set(Calendar.HOUR_OF_DAY, 22);
@@ -458,25 +458,18 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         if (when.compareTo(now)<=0){
             when.add(Calendar.DATE, 1);
         }
-        return when;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if (!mSettings.getAutoCloseStatus()){
-            setAlarm(closingTime());
-        }
+        return when.getTimeInMillis();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mSettings.cleanAutoCloseStatus();
+
+        mAlarm.cancelAlarm();
 
         mDataBaseFavorite.closeDB();
         mDataBaseJournal.closeDB();
+        mDataBaseRooms.closeDB();
 
         mReader.close();
         unregisterReceiver(mReceiver);
@@ -546,20 +539,13 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
                                     if (persons_fragment != null && persons_fragment.isVisible()) {
                                         PersonItem personItem = mDataBaseFavorite.getPersonItem(tag, DataBaseFavorite.SERVER_USER, -1);
-                                        //ArrayList <String> valuesForDialog = new ArrayList<>();
+
                                         if (personItem!=null){
-                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME, personItem.getLastname());
-                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME, personItem.getFirstname());
-                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME, personItem.getMidname());
-                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION, personItem.getDivision());
-                                           // valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL, personItem.getPhotoOriginal());
-                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, personItem.getRadioLabel());
-                                            //valuesForDialog.add(Values.DIALOG_PERSON_INFORMATION_KEY_SEX, personItem.getSex());
 
                                             Bundle b = new Bundle();
                                             b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
                                             b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG,tag);
-                                           // b.putStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION, valuesForDialog);
+
                                             Dialog_Fragment dialog = new Dialog_Fragment();
                                             dialog.setArguments(b);
                                             dialog.setTargetFragment(persons_fragment, 0);
@@ -590,15 +576,15 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                                         }
 
                                     } else if (main_fragment != null && main_fragment.isVisible()) {
-                                        DataBaseRooms dataBaseRooms = new DataBaseRooms(mContext);
-                                        if (dataBaseRooms.getRoomItemForCurrentUser(tag)!=null){
+
+                                        if (mDataBaseRooms.getRoomItemForCurrentUser(tag)!=null){
                                             new CloseRooms(mContext).execute(new CloseRoomsParams()
                                                     .setTag(tag)
                                                     .setRoomInterface(mRoomInterface));
                                         }else{
                                             Values.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_choise_room_in_first), Values.TOAST_NEGATIVE);
                                         }
-                                        dataBaseRooms.closeDB();
+
 
                                     } else {
                                         Log.d("not","one");
