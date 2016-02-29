@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Close_day_task;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseDayInterface;
+import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
 import com.example.ivsmirnov.keyregistrator.items.MailParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -42,7 +44,6 @@ public class CloseDayService extends Service implements CloseDayInterface {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("DESTROY","TASK");
     }
 
     @Override
@@ -50,10 +51,10 @@ public class CloseDayService extends Service implements CloseDayInterface {
 
         try {
 
-
-
             mSettings.setAutoClosedRoomsCount(Values.closeAllRooms(context));
-            //new Close_day_task(context, this).execute();
+
+            Launcher.mRoomInterface.onRoomClosed();
+
             new Save_to_file(context, Values.WRITE_JOURNAL, false).execute();
             new Save_to_file(context, Values.WRITE_TEACHERS, false).execute();
 
@@ -68,29 +69,27 @@ public class CloseDayService extends Service implements CloseDayInterface {
 
             mAlarm.setAlarm(System.currentTimeMillis() + AlarmManager.INTERVAL_DAY);
 
-            //mSettings.setAutoCloseStatus(false);
         } catch (Exception e){
             e.printStackTrace();
         } finally {
             onClosed();
         }
-
-        return super.onStartCommand(intent, flags, startId);
+        return START_NOT_STICKY;
     }
 
 
 
     @Override
     public IBinder onBind(Intent intent) {
+
         return null;
     }
 
     @Override
     public void onClosed() {
+
         startActivity(new Intent(getApplicationContext(), CloseDay.class)
                 .putExtra(CloseDay.AUTO_CLOSE_ROOMS, mSettings.getAutoClosedRoomsCount())
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
-        //mSettings.setAutoCloseStatus(false);
-        //new Alarm(context).cancelAlarm();
     }
 }

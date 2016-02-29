@@ -45,7 +45,6 @@ public class DataBaseJournal{
     private Context mContext;
     public DataBaseJournalRegist dataBaseJournalRegist;
     public SQLiteDatabase sqLiteDatabase;
-    public Cursor cursor;
     private Settings mSettings;
 
     public DataBaseJournal(Context context){
@@ -58,6 +57,7 @@ public class DataBaseJournal{
     }
 
     public long writeInDBJournal(JournalItem journalItem){
+        Cursor cursor = null;
         try {
             ContentValues cv = new ContentValues();
             cv.put(DataBaseJournalRegist.COLUMN_USER_ID, journalItem.getAccountID());
@@ -79,14 +79,14 @@ public class DataBaseJournal{
             e.printStackTrace();
             return -1;
         }finally {
-            closeCursor();
+            closeCursor(cursor);
         }
     }
-
 
     public ArrayList<JournalItem> getJournalItemTags(Date date){
         DateFormat dateFormat = DateFormat.getDateInstance();
         ArrayList <JournalItem> items = new ArrayList<>();
+        Cursor cursor = null;
         try {
             cursor = sqLiteDatabase.rawQuery("SELECT " + DataBaseJournalRegist.COLUMN_TIME_IN
                     + " FROM " + DataBaseJournalRegist.TABLE_JOURNAL
@@ -105,12 +105,13 @@ public class DataBaseJournal{
         }catch (Exception e){
             e.printStackTrace();
         }finally {
-            closeCursor();
+            closeCursor(cursor);
         }
         return items;
     }
 
     public JournalItem getJournalItem(long timeIn) {
+        Cursor cursor = null;
         try {
             cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseJournalRegist.TABLE_JOURNAL
                             + " WHERE " + DataBaseJournalRegist.COLUMN_TIME_IN + " =?",
@@ -133,14 +134,14 @@ public class DataBaseJournal{
             e.printStackTrace();
             return null;
         } finally {
-            closeCursor();
+            closeCursor(cursor);
         }
     }
-
 
     public int getItemCount(int type){
         int count = 0;
         DateFormat dateFormat = DateFormat.getDateInstance();
+        Cursor cursor = null;
         try {
             cursor = sqLiteDatabase.rawQuery("SELECT " + DataBaseJournalRegist.COLUMN_TIME_IN +" FROM " + DataBaseJournalRegist.TABLE_JOURNAL
                     + " WHERE " + DataBaseJournalRegist.COLUMN_USER_ID + " =?",
@@ -162,13 +163,14 @@ public class DataBaseJournal{
         }catch (Exception e){
             e.printStackTrace();
         }finally {
-           closeCursor();
+           closeCursor(cursor);
         }
         return count;
     }
 
 
     public ArrayList<JournalItem> realAllJournalFromDB(){
+        Cursor cursor = null;
         try {
             cursor = sqLiteDatabase.query(DataBaseJournalRegist.TABLE_JOURNAL,new String[]{DataBaseJournalRegist.COLUMN_TIME_IN},null,null,null,null,null,null);
             cursor.moveToPosition(-1);
@@ -183,7 +185,7 @@ public class DataBaseJournal{
             e.printStackTrace();
             return new ArrayList<>();
         } finally {
-           closeCursor();
+           closeCursor(cursor);
         }
 
     }
@@ -191,17 +193,17 @@ public class DataBaseJournal{
     public ArrayList<String> readJournalDatesFromDB(){
         DateFormat dateFormat = DateFormat.getDateInstance();
         final ArrayList <String> items = new ArrayList<>();
+        Cursor cursor = null;
         try {
             cursor = sqLiteDatabase.rawQuery("SELECT " + DataBaseJournalRegist.COLUMN_USER_ID + ","
                     + DataBaseJournalRegist.COLUMN_TIME_IN + " FROM "
                     + DataBaseJournalRegist.TABLE_JOURNAL + " WHERE "
                     + DataBaseJournalRegist.COLUMN_USER_ID + " =?",
                     new String[]{mSettings.getActiveAccountID()});
-            Log.d("cursorCount",String.valueOf(cursor.getCount()));
-            Log.d("columnCount",String.valueOf(cursor.getColumnCount()));
+            Log.d("CURSOR_OPEN",cursor.toString());
             if (cursor.getCount()>0){
                 cursor.moveToPosition(-1);
-                while (cursor.moveToNext()){ //где-то закрывается
+                while (cursor.moveToNext()){
                     String selectedDate = dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(DataBaseJournalRegist.COLUMN_TIME_IN))));
                     if (!items.contains(selectedDate)){
                         items.add(selectedDate);
@@ -211,7 +213,7 @@ public class DataBaseJournal{
         }catch (Exception e){
             e.printStackTrace();
         }finally {
-            closeCursor();
+            closeCursor(cursor);
         }
 
         Collections.reverse(items);
@@ -237,11 +239,11 @@ public class DataBaseJournal{
     }
 
     public void backupJournalToXLS(){
-        Log.d("backupToXLS","START");
         String fileNameXLS = "Journal"+".xls";
         File sdCard = Environment.getExternalStorageDirectory();
         File directory = new File(sdCard.getAbsolutePath());
         File file = new File(directory,fileNameXLS);
+        Cursor cursor = null;
 
         WorkbookSettings workbookSettings = new WorkbookSettings();
         workbookSettings.setLocale(new Locale("ru","RU"));
@@ -266,6 +268,7 @@ public class DataBaseJournal{
                         new String[]{mSettings.getActiveAccountID()});
 
                 for (int i=0;i<datesString.size();i++){
+                    Log.d("cursor"+String.valueOf(i),String.valueOf(cursor));
 
                     if (cursor.getCount()!=0){
                         cursor.moveToPosition(-1);
@@ -304,16 +307,19 @@ public class DataBaseJournal{
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            closeCursor();
+            closeCursor(cursor);
+
         }
     }
 
     public void backupJournalToCSV(){
+
         String fileName = "Journal.csv";
         File sdCard = Environment.getExternalStorageDirectory();
         File directory = new File(sdCard.getAbsolutePath());
         File file = new File(directory,fileName);
         FileOutputStream fileOutputStream;
+        Cursor cursor = null;
 
         cursor = sqLiteDatabase.query(DataBaseJournalRegist.TABLE_JOURNAL,null,null,null,null,null,null);
         try {
@@ -345,13 +351,19 @@ public class DataBaseJournal{
         catch (IOException e) {
             e.printStackTrace();
         } finally {
-            closeCursor();
+            closeCursor(cursor);
         }
     }
 
     public void closeDB(){
         dataBaseJournalRegist.close();
         sqLiteDatabase.close();
+    }
+
+    private void closeCursor(Cursor cursor){
+        if (cursor!=null){
+            cursor.close();
+        }
     }
 
     public void clearJournalDB(){
@@ -372,10 +384,5 @@ public class DataBaseJournal{
         }
     }
 
-    private void closeCursor(){
-        if (cursor!=null){
-            cursor.close();
-        }
-    }
 
 }

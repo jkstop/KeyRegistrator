@@ -37,6 +37,7 @@ public class CloseDay extends AppCompatActivity {
         setContentView(R.layout.layout_close_day);
 
         mContext = this;
+        Log.d("CloseDayActivity","Create");
 
         if (Launcher.mDataBaseJournal!=null){
             mDataBaseJournal = Launcher.mDataBaseJournal;

@@ -25,16 +25,10 @@ public class Alarm {
     public Alarm(Context context){
         this.mContext = context;
         mSettings = new Settings(mContext);
-        //mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        //mStartAlarmIntent = PendingIntent.getService(mContext,
-        //        1,
-        //        new Intent(mContext, CloseDayService.class),
-        //        PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     public void setAlarm(long closingTime){
 
-        //mAlarmManager.cancel(mStartAlarmIntent);
         mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         mStartAlarmIntent = PendingIntent.getService(mContext,
                 1,
@@ -46,9 +40,6 @@ public class Alarm {
         }else{
             mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, closingTime, mStartAlarmIntent);
         }
-
-        mSettings.setAutoCloseStatus(true);
-        Log.d("SET_ALARM", "OK");
 
     }
 
@@ -63,12 +54,13 @@ public class Alarm {
 
         mAlarmManager.cancel(mStartAlarmIntent);
         mStartAlarmIntent.cancel();
-
-        mSettings.setAutoCloseStatus(false);
-
-        Log.d("CANCEL_ALARM", "OK");
     }
 
-
+    public boolean isAlarmSet(){
+        return (PendingIntent.getService(mContext,
+                1,
+                new Intent(mContext, CloseDayService.class),
+                PendingIntent.FLAG_NO_CREATE) != null);
+    }
 
 }

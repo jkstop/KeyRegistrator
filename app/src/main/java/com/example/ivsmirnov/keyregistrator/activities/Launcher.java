@@ -134,7 +134,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     private FragmentActivity mFragmentActivity;
 
     private KeyInterface mKeyInterface;
-    private RoomInterface mRoomInterface;
+    public static RoomInterface mRoomInterface;
 
     public static GoogleApiClient mGoogleApiClient;
 
@@ -178,7 +178,12 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         mRoomInterface = this;
         mFragmentActivity = this;
 
+        Log.d("Launcher","CREATE");
+        Log.d("CHECK_ALARM", String.valueOf(mAlarm.isAlarmSet()));
+
         mAlarm.setAlarm(closingTime());
+
+        Log.d("CHECK_ALARM", String.valueOf(mAlarm.isAlarmSet()));
 
         new SQL_Connection(mContext, mSettings.getServerConnectionParams()).execute();
 
@@ -442,7 +447,10 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     protected void onResume() {
         super.onResume();
 
-        if (!mSettings.getAutoCloseStatus()){
+        Log.d("Launcher","RESUME");
+        Log.d("CHECK_ALARM", String.valueOf(mAlarm.isAlarmSet()));
+
+        if (!mAlarm.isAlarmSet()){
             mAlarm.setAlarm(closingTime());
         }
     }
@@ -465,7 +473,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     protected void onDestroy() {
         super.onDestroy();
 
-        mAlarm.cancelAlarm();
+        Log.d("Launcher","DESTROY");
+
 
         mDataBaseFavorite.closeDB();
         mDataBaseJournal.closeDB();
@@ -473,6 +482,18 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         mReader.close();
         unregisterReceiver(mReceiver);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mAlarm!=null){
+            mAlarm.cancelAlarm();
+        }
+
+        Log.d("CHECK_ALARM", String.valueOf(mAlarm.isAlarmSet()));
+        Log.d("Launcher","STOP");
     }
 
     @Override
