@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -37,7 +38,6 @@ public class CloseDay extends AppCompatActivity {
         setContentView(R.layout.layout_close_day);
 
         mContext = this;
-        Log.d("CloseDayActivity","Create");
 
         if (Launcher.mDataBaseJournal!=null){
             mDataBaseJournal = Launcher.mDataBaseJournal;
@@ -57,38 +57,43 @@ public class CloseDay extends AppCompatActivity {
         }
 
         View actionBarView = getLayoutInflater().inflate(R.layout.action_bar_close_day, null);
+
         TextView textTitle = (TextView)actionBarView.findViewById(R.id.action_bar_close_day_title);
 
+        if (getSupportActionBar()!=null){
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            actionBar.setCustomView(actionBarView, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        }
 
+        ((TextView) findViewById(R.id.layout_close_day_card_stat_head)).setText(Values.showDate());
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        actionBar.setCustomView(actionBarView, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        ((TextView) findViewById(R.id.layout_close_day_card_stat_value_today)).setText(String.valueOf(mDataBaseJournal.getItemCount(DataBaseJournal.COUNT_TODAY)));
 
-        TextView textDate = (TextView)findViewById(R.id.layout_close_day_card_stat_head);
-        textDate.setText(Values.showDate());
+        ((TextView) findViewById(R.id.layout_close_day_card_stat_value_journal_items)).setText(String.valueOf(mDataBaseJournal.getItemCount(DataBaseJournal.COUNT_TOTAL)));
 
-        TextView textTodayCount = (TextView)findViewById(R.id.layout_close_day_card_stat_value_today);
-        textTodayCount.setText(String.valueOf(mDataBaseJournal.getItemCount(DataBaseJournal.COUNT_TODAY)));
+        ((TextView) findViewById(R.id.layout_close_day_card_stat_value_person_items)).setText(String.valueOf(mDataBaseFavorite.getPersonsCount()));
 
-        TextView textTotalJournalCount = (TextView)findViewById(R.id.layout_close_day_card_stat_value_journal_items);
-        textTotalJournalCount.setText(String.valueOf(mDataBaseJournal.getItemCount(DataBaseJournal.COUNT_TOTAL)));
-
-        TextView textTotalPersonCount = (TextView)findViewById(R.id.layout_close_day_card_stat_value_person_items);
-        textTotalPersonCount.setText(String.valueOf(mDataBaseFavorite.getPersonsCount()));
 
         TextView textAutoCloseCount = (TextView)findViewById(R.id.layout_close_day_card_stat_value_autoclose);
+
+        findViewById(R.id.layout_close_day_button_ok).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
 
         int titleType = getIntent().getIntExtra(AUTO_CLOSE_ROOMS, -1);
         if (titleType == -1){
-            textTitle.setText("Статистика!!!");
+            textTitle.setText(R.string.card_statistic_head_stat);
         } else {
-            textTitle.setText("Занятия завершены!");
+            textTitle.setText(R.string.card_statistic_head_close);
+            textTitle.setTextColor(getResources().getColor(R.color.colorAccent));
             textAutoCloseCount.setText(String.valueOf(new Settings(mContext).getAutoClosedRoomsCount()));
         }
-
     }
 
     @Override
@@ -108,7 +113,4 @@ public class CloseDay extends AppCompatActivity {
         super.onResume();
     }
 
-   // public void okClick(View view) {
-   //     finish();
-   // }
 }

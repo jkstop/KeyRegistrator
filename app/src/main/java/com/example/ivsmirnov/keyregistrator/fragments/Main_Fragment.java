@@ -168,9 +168,9 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                 dialog_resize.setTargetFragment(this,0);
                 dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
-            case R.id.test:
-                new insert(mContext).execute();
-                return true;
+            //case R.id.test:
+            //    new insert(mContext).execute();
+            //    return true;
             //case R.id.test2:
             //    return true;
             default:

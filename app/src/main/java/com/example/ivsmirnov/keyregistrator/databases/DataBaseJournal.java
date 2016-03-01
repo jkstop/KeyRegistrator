@@ -53,7 +53,7 @@ public class DataBaseJournal{
         dataBaseJournalRegist = new DataBaseJournalRegist(mContext);
         sqLiteDatabase = dataBaseJournalRegist.getWritableDatabase();
         mSettings = new Settings(mContext);
-        Log.d("CreateJournalDataBase!!",mContext.toString());
+        Log.d("JOURNAL_DB","-------------CREATE---------------");
     }
 
     public long writeInDBJournal(JournalItem journalItem){

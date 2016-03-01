@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_email_attach;
 import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
@@ -55,6 +56,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
     private Settings mSettings;
     private FloatingActionButton mSendButton;
     private AccountItem mAccount;
+    private DataBaseAccount mDataBaseAccount;
 
 
     public static Email_Fragment newInstance(){
@@ -85,6 +87,12 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
         mContext = rootView.getContext();
         mSettings = new Settings(mContext);
 
+        if (Launcher.mDataBaseAccount !=null){
+            mDataBaseAccount = Launcher.mDataBaseAccount;
+        } else {
+            mDataBaseAccount = new DataBaseAccount(mContext);
+        }
+
         mAccountImage = (ImageView)rootView.findViewById(R.id.email_fragment_account_information_image);
         mAddRecipient = (ImageView)rootView.findViewById(R.id.email_fragment_add_recipient);
         mAddAttachment = (ImageView) rootView.findViewById(R.id.email_fragment_add_attachment);
@@ -97,7 +105,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
         TextView mAccountName = (TextView)rootView.findViewById(R.id.email_fragment_account_information_name);
         TextView mAccountEmail = (TextView)rootView.findViewById(R.id.email_fragment_account_information_email);
 
-        mAccount = new DataBaseAccount(mContext).getAccount(mSettings.getActiveAccountID());
+        mAccount = mDataBaseAccount.getAccount(mSettings.getActiveAccountID());
         if (mAccount!=null){
             mAccountName.setText(mAccount.getLastname());
             mAccountEmail.setText(mAccount.getEmail());

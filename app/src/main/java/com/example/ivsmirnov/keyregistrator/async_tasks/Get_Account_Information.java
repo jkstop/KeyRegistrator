@@ -5,9 +5,11 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -39,13 +41,20 @@ public class Get_Account_Information extends AsyncTask<Void,AccountItem,AccountI
     private Context mContext;
     private String mAccountName;
     private Get_Account_Information_Interface mListener;
-    private SharedPreferences.Editor mSharedPreferencesEditor;
+    private Settings mSettings;
+    private DataBaseAccount mDataBaseAccount;
 
     public Get_Account_Information (Context context, String accountName, Get_Account_Information_Interface get_account_information_interface){
         this.mContext = context;
         this.mAccountName = accountName;
         this.mListener = get_account_information_interface;
-        mSharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        mSettings = new Settings(mContext);
+
+        if (Launcher.mDataBaseAccount !=null){
+            mDataBaseAccount = Launcher.mDataBaseAccount;
+        } else {
+            mDataBaseAccount = new DataBaseAccount(mContext);
+        }
     }
 
     @Override
@@ -93,12 +102,11 @@ public class Get_Account_Information extends AsyncTask<Void,AccountItem,AccountI
     protected void onPostExecute(AccountItem accountItem) {
         super.onPostExecute(accountItem);
         if (accountItem!=null){
-            DataBaseAccount dbAccount = new DataBaseAccount(mContext);
-            dbAccount.writeAccount(accountItem);
-            dbAccount.closeDB();
 
-            mSharedPreferencesEditor.putString(Values.ACTIVE_ACCOUNT_ID, accountItem.getAccountID());
-            mSharedPreferencesEditor.apply();
+            mDataBaseAccount.writeAccount(accountItem);
+
+            mSettings.setActiveAccountID(accountItem.getAccountID());
+
             mListener.onChangeAccount();
         }
     }

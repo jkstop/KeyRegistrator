@@ -48,7 +48,6 @@ public class Find_User_in_SQL_Server extends AsyncTask<Connection,Void,ArrayList
             ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [LASTNAME] like '"+ mSearchString +"%'");
             while (resultSet.next()){
 
-
                 mItems.add(new PersonItem()
                         .setLastname(resultSet.getString("LASTNAME"))
                         .setFirstname(resultSet.getString("FIRSTNAME"))

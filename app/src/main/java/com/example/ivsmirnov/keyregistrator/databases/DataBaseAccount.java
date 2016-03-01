@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 
@@ -16,7 +17,6 @@ public class DataBaseAccount {
 
     private DataBaseAccountRegist dataBaseAccountRegist;
     private SQLiteDatabase sqLiteDatabase;
-    private Cursor cursor;
 
     private Context mContext;
 
@@ -24,7 +24,7 @@ public class DataBaseAccount {
         this.mContext = context;
         dataBaseAccountRegist = new DataBaseAccountRegist(mContext);
         sqLiteDatabase = dataBaseAccountRegist.getWritableDatabase();
-        cursor = sqLiteDatabase.query(DataBaseAccountRegist.TABLE_ACCOUNTS,null,null,null,null,null,null);
+        Log.d("ACCOUNT_DB","-------------CREATE---------------");
     }
 
     public void writeAccount(AccountItem accountItem){
@@ -51,37 +51,58 @@ public class DataBaseAccount {
         sqLiteDatabase.insert(DataBaseAccountRegist.TABLE_ACCOUNTS,null,cv);
     }
 
+    private void closeCursor(Cursor cursor){
+        if (cursor!=null){
+            cursor.close();
+        }
+    }
+
     public AccountItem getAccount(String accountId){
+        Cursor cursor = null;
         AccountItem accountItem = null;
-        cursor.moveToPosition(-1);
-        while (cursor.moveToNext()){
-            if (accountId.equals(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_ID)))){
+        try {
+
+            cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseAccountRegist.TABLE_ACCOUNTS + " WHERE " + DataBaseAccountRegist.COLUMN_ACCOUNT_ID + " =?",new String[]{accountId});
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
                 accountItem = new AccountItem().setLastname(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_PERSON_LASTNAME)))
                         .setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_PERSON_FIRSTNAME)))
                         .setEmail(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_NAME)))
                         .setPhoto(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_PERSON_PHOTO)))
                         .setAccountID(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_ID)));
             }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
         }
         return accountItem;
     }
 
     public ArrayList<AccountItem> getAllAccounts(){
+        Cursor cursor = null;
         ArrayList<AccountItem> items = new ArrayList<>();
-        cursor.moveToPosition(-1);
-        while (cursor.moveToNext()){
-            items.add(new AccountItem().setLastname(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_PERSON_LASTNAME)))
-                    .setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_PERSON_FIRSTNAME)))
-                    .setEmail(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_NAME)))
-                    .setPhoto(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_PERSON_PHOTO)))
-                    .setAccountID(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_ID))));
+        try {
+            cursor = sqLiteDatabase.query(DataBaseAccountRegist.TABLE_ACCOUNTS,null,null,null,null,null,null);
+            cursor.moveToPosition(-1);
+            while (cursor.moveToNext()){
+                items.add(new AccountItem().setLastname(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_PERSON_LASTNAME)))
+                        .setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_PERSON_FIRSTNAME)))
+                        .setEmail(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_NAME)))
+                        .setPhoto(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_PERSON_PHOTO)))
+                        .setAccountID(cursor.getString(cursor.getColumnIndex(DataBaseAccountRegist.COLUMN_ACCOUNT_ID))));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
         }
+
         return items;
     }
 
     public void closeDB(){
         sqLiteDatabase.close();
         dataBaseAccountRegist.close();
-        cursor.close();
     }
 }

@@ -1,6 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -186,11 +187,10 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     }
 
     @Override
-    public void onItemClick(View v, int position, int viewID) {
+    public void onItemClick(View v, final int position, int viewID) {
 
-        PersonItem selectedPerson = mDataBaseFavorite.getPersonItem(mPersonItems.get(position).getRadioLabel(), DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
-        selectedPerson.setPhotoPreview(DataBaseFavorite.getPhotoPreview(selectedPerson.getPhotoOriginal()));
-        addUserInFavorite(mContext, selectedPerson);
+       new getPersonFromServer().execute(position);
+
     }
 
     @Override
@@ -200,7 +200,6 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     private void addUserInFavorite(final Context context, final PersonItem personItem){
 
         mDataBaseFavorite.writeInDBTeachers(personItem);
-
 
         if (getView()!=null){
             Snackbar.make(getView(),R.string.snack_user_added,Snackbar.LENGTH_LONG)
@@ -214,7 +213,23 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                     })
                     .show();
         }
+    }
 
+    private class getPersonFromServer extends AsyncTask<Integer,Void,PersonItem>{
+
+        @Override
+        protected PersonItem doInBackground(Integer... params) {
+            PersonItem selectedPerson = mDataBaseFavorite.getPersonItem(mPersonItems.get(params[0]).getRadioLabel(), DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
+            selectedPerson.setPhotoPreview(DataBaseFavorite.getPhotoPreview(selectedPerson.getPhotoOriginal()));
+            return selectedPerson;
+        }
+
+        @Override
+        protected void onPostExecute(PersonItem personItem) {
+            if (personItem != null) {
+                addUserInFavorite(mContext, personItem);
+            }
+        }
     }
 
 }

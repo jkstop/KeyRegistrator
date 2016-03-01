@@ -13,12 +13,12 @@
         android:id="@+id/layout_close_day_card_stat"
         android:layout_below="@id/layout_close_day_text_head"
         android:layout_centerHorizontal="true"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/layout_default_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/blue_500"
-        app:contentPadding="16dp"
-        app:cardElevation="10dp">
+        app:cardBackgroundColor="@color/primary"
+        app:contentPadding="@dimen/layout_default_margin"
+        app:cardElevation="@dimen/card_default_elevation">
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -29,28 +29,27 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:textColor="@color/black"
-                android:textSize="28sp"
-                android:layout_marginBottom="16dp"
-                android:text="26 февраля 2016 г."
+                android:textSize="@dimen/card_statistic_text_head"
+                android:layout_marginBottom="@dimen/layout_default_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <TextView
-            android:id="@+id/layout_close_day_card_stat_text_today"
-            android:layout_below="@id/layout_close_day_card_stat_head"
-            android:text="Посещений за день:"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+                android:id="@+id/layout_close_day_card_stat_text_today"
+                android:layout_below="@id/layout_close_day_card_stat_head"
+                android:text="@string/card_statistic_today_count"
+                android:textSize="@dimen/card_statistic_text_primary"
+                android:textColor="@color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/layout_close_day_card_stat_value_today"
-                android:text="22"
-                android:textSize="16sp"
+                android:textSize="@dimen/card_statistic_text_primary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="@dimen/default_content_margin"
+                android:layout_marginLeft="@dimen/default_content_margin"
                 android:layout_alignBottom="@+id/layout_close_day_card_stat_text_today"
                 android:layout_toRightOf="@+id/layout_close_day_card_stat_text_today"
                 android:layout_toEndOf="@+id/layout_close_day_card_stat_text_today" />
@@ -58,26 +57,26 @@
             <TextView
                 android:id="@+id/layout_close_day_card_stat_text_autoclose"
                 android:layout_below="@id/layout_close_day_card_stat_text_today"
-                android:text="Закрыто автоматически:"
-                android:textSize="18sp"
+                android:text="@string/card_statistic_autoclose_count"
+                android:textSize="@dimen/card_statistic_text_primary"
                 android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/layout_close_day_card_stat_value_autoclose"
-                android:textSize="16sp"
+                android:textSize="@dimen/card_statistic_text_primary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="@dimen/default_content_margin"
+                android:layout_marginLeft="@dimen/default_content_margin"
                 android:layout_alignBottom="@id/layout_close_day_card_stat_text_autoclose"
                 android:layout_toRightOf="@id/layout_close_day_card_stat_text_autoclose"
                 android:layout_toEndOf="@id/layout_close_day_card_stat_text_autoclose" />
 
             <TextView
                 android:id="@+id/layout_close_day_card_stat_value_journal_items"
-                android:text="1256"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/layout_default_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/layout_close_day_card_stat_value_autoclose"
@@ -86,30 +85,32 @@
 
             <ImageView
                 android:id="@+id/layout_close_day_card_stat_icon_journal_items"
-                android:contentDescription="jvkjdfkjvgdfkjvdkfjbvdkj"
+                android:contentDescription="@string/image_description_statistic_image_journal"
                 android:src="@drawable/ic_format_list_bulleted_black_18dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/layout_close_day_card_stat_value_journal_items"
                 android:layout_toLeftOf="@id/layout_close_day_card_stat_value_journal_items"
-                android:layout_alignBottom="@id/layout_close_day_card_stat_value_journal_items"
-                />
+                android:layout_alignBottom="@id/layout_close_day_card_stat_value_journal_items" />
 
             <TextView
                 android:id="@+id/layout_close_day_card_stat_value_person_items"
-                android:text="150"
+                android:layout_toStartOf="@id/layout_close_day_card_stat_icon_journal_items"
                 android:layout_toLeftOf="@id/layout_close_day_card_stat_icon_journal_items"
                 android:layout_alignBottom="@id/layout_close_day_card_stat_icon_journal_items"
-                android:layout_marginRight="16dp"
+                android:layout_marginRight="@dimen/layout_default_margin"
+                android:layout_marginEnd="@dimen/layout_default_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <ImageView
                 android:id="@+id/layout_close_day_card_stat_icon_person_items"
                 android:src="@drawable/ic_person_black_18dp"
+                android:layout_toStartOf="@id/layout_close_day_card_stat_value_person_items"
                 android:layout_toLeftOf="@id/layout_close_day_card_stat_value_person_items"
                 android:layout_alignBottom="@id/layout_close_day_card_stat_value_person_items"
                 android:layout_width="wrap_content"
-                android:contentDescription="dsfsdgfkjdskjfhdskjjhkdsfhd"
+                android:contentDescription="@string/image_description_statistic_image_persons"
                 android:layout_height="wrap_content" />
 
         </RelativeLayout>
@@ -118,6 +119,7 @@
 
     <Button
         android:id="@+id/layout_close_day_button_ok"
+        android:layout_toEndOf="@id/layout_close_day_card_stat"
         android:layout_toRightOf="@id/layout_close_day_card_stat"
         android:layout_below="@id/layout_close_day_card_stat"
         android:text="@android:string/ok"

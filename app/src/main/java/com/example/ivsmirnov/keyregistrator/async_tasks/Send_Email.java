@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.items.MailParams;
@@ -50,11 +51,17 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
     private Settings mSettings;
     private boolean isDialogShow;
     private ProgressDialog mProgressDialog;
+    private DataBaseAccount mDataBaseAccount;
 
     public Send_Email(Context c, boolean isDialogShow) {
         this.mContext = c;
         this.isDialogShow = isDialogShow;
         mSettings = new Settings(mContext);
+        if (Launcher.mDataBaseAccount !=null){
+            mDataBaseAccount = Launcher.mDataBaseAccount;
+        } else {
+            mDataBaseAccount = new DataBaseAccount(mContext);
+        }
     }
 
     @Override
@@ -77,9 +84,9 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
     protected Void doInBackground(MailParams... params) {
 
         try {
-            DataBaseAccount dataBaseAccount = new DataBaseAccount(mContext);
-            AccountItem accountItem = dataBaseAccount.getAccount(mSettings.getActiveAccountID());
-            dataBaseAccount.closeDB();
+
+            AccountItem accountItem = mDataBaseAccount.getAccount(mSettings.getActiveAccountID());
+
             String token = GoogleAuthUtil.getToken(mContext, accountItem.getEmail(),"oauth2:https://mail.google.com/");
             String mTheme = params[0].getTheme();
             String mBody = params[0].getBody();

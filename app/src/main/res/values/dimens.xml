@@ -94,4 +94,10 @@
 
     <dimen name="layout_default_margin">16dp</dimen>
 
+    <dimen name="card_statistic_text_head">32sp</dimen>
+    <dimen name="card_statistic_text_primary">18sp</dimen>
+    <dimen name="card_statistic_text_toolbar">42sp</dimen>
+
+    <dimen name="default_content_margin">6dp</dimen>
+
 </resources>

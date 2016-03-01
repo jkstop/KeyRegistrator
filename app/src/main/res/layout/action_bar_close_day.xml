@@ -6,10 +6,8 @@
 
     <TextView
         android:id="@+id/action_bar_close_day_title"
-        android:text="STATISTICS"
         android:gravity="center"
-        android:textColor="@color/fab_material_red_900"
-        android:textSize="38sp"
+        android:textSize="@dimen/card_statistic_text_toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

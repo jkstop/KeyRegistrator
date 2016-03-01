@@ -14,12 +14,12 @@
         <RelativeLayout
             android:id="@+id/navigation_drawer_account_view"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/navigation_drawer_account_selection_height"
-            android:clickable="false">
+            android:layout_height="@dimen/navigation_drawer_account_selection_height">
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:clickable="true"
                 android:background="@drawable/splash_account_info">
             </FrameLayout>
 

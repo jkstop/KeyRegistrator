@@ -125,6 +125,8 @@
     <string name="image_description_email_fragment_add_attachment">email_fragment_add_attachment</string>
     <string name="image_description_email_fragment_icon_attachment">image_description_email_fragment_icon_attachment</string>
     <string name="image_description_email_fragment_icon_delete_attachment">image_description_email_fragment_icon_delete_attachment</string>
+    <string name="image_description_statistic_image_persons">image_description_statistic_image_person</string>
+    <string name="image_description_statistic_image_journal">image_description_statistic_image_journal</string>
 
 
     <string name="view_enter_password_hint_password">Пароль</string>
@@ -160,9 +162,9 @@
     <string name="email_fragment_logon">Для отправки писем сначала войдите в аккаунт</string>
     <string name="email_fragment_error_not_email_entered">Некорректный e-mail </string>
 
-
-
-
-
+    <string name="card_statistic_today_count">Посещений за день:</string>
+    <string name="card_statistic_autoclose_count">Закрыто автоматически:</string>
+    <string name="card_statistic_head_stat">Статистика</string>
+    <string name="card_statistic_head_close">Занятия завершены!</string>
 
 </resources>

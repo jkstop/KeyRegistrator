@@ -23,13 +23,12 @@ public class DataBaseRooms {
     private Context mContext;
     private DataBaseRoomsRegist dataBaseRoomsRegist;
     private SQLiteDatabase sqLiteDatabase;
-    private Cursor cursor;
 
     public DataBaseRooms(Context context){
         this.mContext = context;
         dataBaseRoomsRegist = new DataBaseRoomsRegist(mContext);
         sqLiteDatabase = dataBaseRoomsRegist.getWritableDatabase();
-        Log.d("ROOMS_DB","created!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        Log.d("ROOMS_DB","-------------CREATE---------------");
     }
 
     public void writeInRoomsDB (RoomItem roomItem) {
@@ -78,6 +77,7 @@ public class DataBaseRooms {
     }
 
     public RoomItem getRoomItemForCurrentUser(String tag){
+        Cursor cursor = null;
         try {
             if (tag!=null){
                 cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseRoomsRegist.TABLE_ROOMS
@@ -101,13 +101,14 @@ public class DataBaseRooms {
             e.printStackTrace();
             return new RoomItem();
         } finally {
-            closeCursor();
+            closeCursor(cursor);
         }
     }
 
 
 
     public void deleteFromRoomsDB(String aud){
+        Cursor cursor = null;
         try {
             cursor = sqLiteDatabase.query(DataBaseRoomsRegist.TABLE_ROOMS,new String[]{DataBaseRoomsRegist._ID,DataBaseRoomsRegist.COLUMN_ROOM},
                     null,null,null,null,null);
@@ -122,12 +123,13 @@ public class DataBaseRooms {
         }catch (Exception e){
             e.printStackTrace();
         } finally {
-            cursor.close();
+            closeCursor(cursor);
         }
 
     }
 
     public ArrayList<RoomItem> readRoomsDB(){
+        Cursor cursor = null;
         try {
             ArrayList<RoomItem> roomItems = new ArrayList<>();
             cursor = sqLiteDatabase.query(DataBaseRoomsRegist.TABLE_ROOMS,null,null,null,null,null,null);
@@ -146,12 +148,13 @@ public class DataBaseRooms {
             e.printStackTrace();
             return new ArrayList<>();
         } finally {
-            closeCursor();
+            closeCursor(cursor);
         }
 
     }
 
     public void backupRoomsToFile(){
+        Cursor cursor = null;
         try {
             File file = null;
             ArrayList <String> itemList = new ArrayList<>();
@@ -187,7 +190,7 @@ public class DataBaseRooms {
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            closeCursor();
+            closeCursor(cursor);
         }
 
     }
@@ -198,7 +201,6 @@ public class DataBaseRooms {
         } catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
     public void closeDB(){
@@ -211,7 +213,7 @@ public class DataBaseRooms {
          }
     }
 
-    private void closeCursor(){
+    private void closeCursor(Cursor cursor){
         if (cursor!=null){
             cursor.close();
         }

@@ -71,7 +71,6 @@ import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
 import com.example.ivsmirnov.keyregistrator.others.GMailOauthSender;
-import com.example.ivsmirnov.keyregistrator.others.GoogleAuthenticator;
 import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -127,6 +126,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     public static DataBaseFavorite mDataBaseFavorite;
     public static DataBaseJournal mDataBaseJournal;
     public static DataBaseRooms mDataBaseRooms;
+    public static DataBaseAccount mDataBaseAccount;
 
     private Context mContext;
     private Resources mResources;
@@ -139,7 +139,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     public static GoogleApiClient mGoogleApiClient;
 
     private static long back_pressed;
-
 
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
     private static final String[] stateStrings = { "Unknown", "Absent",
@@ -172,18 +171,15 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         mDataBaseFavorite = new DataBaseFavorite(mContext);
         mDataBaseJournal = new DataBaseJournal(mContext);
         mDataBaseRooms = new DataBaseRooms(mContext);
+        mDataBaseAccount = new DataBaseAccount(mContext);
 
         mSettings = new Settings(mContext);
         mKeyInterface = this;
         mRoomInterface = this;
         mFragmentActivity = this;
 
-        Log.d("Launcher","CREATE");
-        Log.d("CHECK_ALARM", String.valueOf(mAlarm.isAlarmSet()));
 
         mAlarm.setAlarm(closingTime());
-
-        Log.d("CHECK_ALARM", String.valueOf(mAlarm.isAlarmSet()));
 
         new SQL_Connection(mContext, mSettings.getServerConnectionParams()).execute();
 
@@ -203,6 +199,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                 .enableAutoManage(this,this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+        Log.d("google_api","inited");
     }
 
     // Navigation Drawer initialization; Toolbar initialization
@@ -327,6 +324,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         super.onActivityResult(requestCode,resultCode,data);
         if (resultCode == Activity.RESULT_OK){
             if (requestCode == Values.REQUEST_CODE_LOG_ON){
+                Log.d("request","logon");
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
 
                 if (result.isSuccess()) {
@@ -335,13 +333,12 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                             .setEmail(acct.getEmail())
                             .setPhoto(acct.getPhotoUrl().toString())
                             .setAccountID(acct.getId());
-                    DataBaseAccount dbAccount = new DataBaseAccount(mContext);
-                    dbAccount.writeAccount(accountItem);
-                    dbAccount.closeDB();
 
+                    mDataBaseAccount.writeAccount(accountItem);
 
                     mDataBaseFavorite.writeInDBTeachers(new PersonItem()
                             .setLastname(acct.getDisplayName())
+                            .setDivision(acct.getEmail())
                             .setRadioLabel(acct.getId()));
 
 
@@ -357,9 +354,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
     private void getUserActiveAccount(){
 
-        DataBaseAccount dbAccount = new DataBaseAccount(mContext);
-        AccountItem mAccount = dbAccount.getAccount(mSettings.getActiveAccountID());
-        dbAccount.closeDB();
+
+        AccountItem mAccount = mDataBaseAccount.getAccount(mSettings.getActiveAccountID());
 
         if (mAccount!=null){
             String text = mAccount.getLastname();
@@ -438,9 +434,21 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         String photo = Base64.encodeToString(byteArray,Base64.NO_WRAP);
 
-        mDataBaseFavorite.writeInDBTeachers(mDataBaseFavorite.getPersonItem(mSettings.getActiveAccountID(),DataBaseFavorite.LOCAL_USER, -1)
-                .setPhotoOriginal(photo)
-                .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo)));
+        if (mDataBaseFavorite.getPersonItem(mSettings.getActiveAccountID(), DataBaseFavorite.LOCAL_USER, -1)!=null){
+            mDataBaseFavorite.writeInDBTeachers(mDataBaseFavorite.getPersonItem(mSettings.getActiveAccountID(),DataBaseFavorite.LOCAL_USER, -1)
+                    .setPhotoOriginal(photo)
+                    .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo)));
+        } else {
+            AccountItem account = mDataBaseAccount.getAccount(mSettings.getActiveAccountID());
+            mDataBaseFavorite.writeInDBTeachers(new PersonItem()
+                    .setRadioLabel(account.getAccountID())
+                    .setLastname(account.getLastname())
+                    .setDivision(account.getEmail())
+                    .setPhotoOriginal(photo)
+                    .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo)));
+        }
+
+
     }
 
     @Override
@@ -452,6 +460,19 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         if (!mAlarm.isAlarmSet()){
             mAlarm.setAlarm(closingTime());
+        }
+
+        if (mDataBaseFavorite == null){
+            mDataBaseFavorite = new DataBaseFavorite(mContext);
+        }
+        if (mDataBaseJournal == null){
+            mDataBaseJournal = new DataBaseJournal(mContext);
+        }
+        if (mDataBaseRooms == null){
+            mDataBaseRooms = new DataBaseRooms(mContext);
+        }
+        if (mDataBaseAccount == null){
+            mDataBaseAccount = new DataBaseAccount(mContext);
         }
     }
 
@@ -479,6 +500,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         mDataBaseFavorite.closeDB();
         mDataBaseJournal.closeDB();
         mDataBaseRooms.closeDB();
+        mDataBaseAccount.closeDB();
 
         mReader.close();
         unregisterReceiver(mReceiver);
@@ -559,42 +581,12 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                                     Main_Fragment main_fragment = (Main_Fragment) getFragmentByTag(R.string.fragment_tag_main);
 
                                     if (persons_fragment != null && persons_fragment.isVisible()) {
-                                        PersonItem personItem = mDataBaseFavorite.getPersonItem(tag, DataBaseFavorite.SERVER_USER, -1);
 
-                                        if (personItem!=null){
-
-                                            Bundle b = new Bundle();
-                                            b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
-                                            b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG,tag);
-
-                                            Dialog_Fragment dialog = new Dialog_Fragment();
-                                            dialog.setArguments(b);
-                                            dialog.setTargetFragment(persons_fragment, 0);
-                                            dialog.show(persons_fragment.getChildFragmentManager(), "edit");
-                                        }
-
+                                        new getPerson(getPerson.PERSONS).execute(tag);
 
                                     } else if (nfc_fragment != null && nfc_fragment.isVisible()) {
 
-                                        PersonItem personItem = mDataBaseFavorite.getPersonItem(tag, DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
-
-                                        if (personItem == null){
-                                            personItem = mDataBaseFavorite.getPersonItem(tag, DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
-                                            personItem.setPhotoPreview(DataBaseFavorite.getPhotoPreview(personItem.getPhotoOriginal()));
-                                            mDataBaseFavorite.writeInDBTeachers(personItem);
-
-                                            personItem = mDataBaseFavorite.getPersonItem(tag, DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
-                                        }
-
-                                        if (personItem!=null&&!personItem.isEmpty()){
-                                            new TakeKey(mContext).execute(new TakeKeyParams()
-                                                    .setPersonItem(personItem)
-                                                    .setAuditroom(mSettings.getLastClickedAuditroom())
-                                                    .setAccessType(DataBaseJournal.ACCESS_BY_CARD)
-                                                    .setPublicInterface(mKeyInterface));
-                                        }else{
-                                            Log.d("wrong","card!!!");
-                                        }
+                                        new getPerson(getPerson.NFS).execute(tag);
 
                                     } else if (main_fragment != null && main_fragment.isVisible()) {
 
@@ -605,7 +597,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                                         }else{
                                             Values.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_choise_room_in_first), Values.TOAST_NEGATIVE);
                                         }
-
 
                                     } else {
                                         Log.d("not","one");
@@ -653,5 +644,63 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
             }
         }
     };
+
+    private class getPerson extends AsyncTask <String, Void, PersonItem> {
+
+        public static final int NFS = 0;
+        public static final int PERSONS = 1;
+
+        private int mType;
+
+        public getPerson(int type){
+            this.mType = type;
+        };
+
+
+        @Override
+        protected PersonItem doInBackground(String... params) {
+
+            PersonItem personItem = mDataBaseFavorite.getPersonItem(params[0], DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
+
+            if (personItem == null){
+                personItem = mDataBaseFavorite.getPersonItem(params[0], DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
+                personItem.setPhotoPreview(DataBaseFavorite.getPhotoPreview(personItem.getPhotoOriginal()));
+
+                mDataBaseFavorite.writeInDBTeachers(personItem);
+                personItem = mDataBaseFavorite.getPersonItem(params[0], DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
+
+            }
+
+            return personItem;
+        }
+
+        @Override
+        protected void onPostExecute(PersonItem personItem) {
+
+            if (personItem!=null&&!personItem.isEmpty()){
+                if (mType == NFS){
+                    new TakeKey(mContext).execute(new TakeKeyParams()
+                            .setPersonItem(personItem)
+                            .setAuditroom(mSettings.getLastClickedAuditroom())
+                            .setAccessType(DataBaseJournal.ACCESS_BY_CARD)
+                            .setPublicInterface(mKeyInterface));
+                } else if (mType == PERSONS){
+                    Persons_Fragment persons_fragment = (Persons_Fragment) getFragmentByTag(R.string.fragment_tag_persons);
+
+                    Bundle b = new Bundle();
+                    b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
+                    b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, personItem.getRadioLabel());
+
+                    Dialog_Fragment dialog = new Dialog_Fragment();
+                    dialog.setArguments(b);
+                    dialog.setTargetFragment(persons_fragment, 0);
+                    dialog.show(persons_fragment.getChildFragmentManager(), "edit");
+                }
+
+            }else{
+                Log.d("wrong","card!!!");
+            }
+        }
+    }
 
 }

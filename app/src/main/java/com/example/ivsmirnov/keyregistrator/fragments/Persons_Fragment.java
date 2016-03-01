@@ -191,6 +191,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         View rootView = inflater.inflate(R.layout.layout_persons_fragment, container, false);
         mContext = rootView.getContext();
 
+        mAllItems = new ArrayList<>();
+
         if (Launcher.mDataBaseFavorite!=null){
             mDataBaseFavorite = Launcher.mDataBaseFavorite;
             Log.d("database","getFromMain");
@@ -221,12 +223,9 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                     characterItem.setSelection(false);
                 }
                 mListCharacters.get(i).setSelection(true);
+
                 setmListCharactersAdapter();
-                ArrayList<String> tags = mDataBaseFavorite.getTagForCurrentCharacter(mListCharacters.get(i).getCharacter());
-                mAllItems.clear();
-                for (String tag : tags){
-                    mAllItems.add(new PersonItem().setRadioLabel(tag));
-                }
+                getTagsForSelectedCharacher(i);
                 initializeRecyclerAdapter();
             }
         });
@@ -250,7 +249,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
     private void initListCharacters(){
         mListCharacters = mDataBaseFavorite.getPersonsCharacters();
-
     }
 
 
@@ -337,6 +335,16 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         showMainAuditroomsGrid();
     }
 
+    private void getTagsForSelectedCharacher(int position){
+        ArrayList<String> tags = mDataBaseFavorite.getTagForCurrentCharacter(mListCharacters.get(position).getCharacter());
+        if (!mAllItems.isEmpty()){
+            mAllItems.clear();
+        }
+        for (String tag : tags){
+            mAllItems.add(new PersonItem().setRadioLabel(tag));
+        }
+    }
+
     private class getPersons extends AsyncTask<Void,PersonItem,Void>{
 
         @Override
@@ -347,16 +355,22 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         @Override
         protected Void doInBackground(Void... params) {
 
-            mAllItems  = mDataBaseFavorite.readTeachersFromDB();
+            initListCharacters();
+
+
+            //setmListCharactersAdapter();
+            //initializeRecyclerAdapter();
+            //mAllItems  = mDataBaseFavorite.readTeachersFromDB();
 
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            initializeRecyclerAdapter();
-            initListCharacters();
+
             setmListCharactersAdapter();
+            getTagsForSelectedCharacher(0);
+            initializeRecyclerAdapter();
             mLoadingBar.setVisibility(View.INVISIBLE);
         }
     }
