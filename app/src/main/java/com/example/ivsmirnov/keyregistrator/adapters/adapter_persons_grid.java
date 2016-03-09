@@ -1,6 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
+import android.media.Image;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,6 +22,7 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
     private LayoutInflater inflater;
     private RecycleItemClickListener mListener;
     public  DataBaseFavorite mDataBaseFavorite;
+    private ArrayList<String> isFreeUsers;
 
     public adapter_persons_grid(Context c, ArrayList<PersonItem> all,int type,RecycleItemClickListener listener) {
         allItems = all;
@@ -48,11 +51,12 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
         }
         this.mListener = listener;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        isFreeUsers = new Settings(context).getFreeUsers();
     }
 
 
     static class ViewHolder extends RecyclerView.ViewHolder{
-        public ImageView imageView;
+        public ImageView imageView, accessImageView;
         public TextView textLastname;
         public TextView textFirstname;
         public TextView textMidname;
@@ -62,6 +66,7 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
         public ViewHolder(View itemView) {
             super(itemView);
             imageView = (ImageView)itemView.findViewById(R.id.image_sql);
+            accessImageView = (ImageView) itemView.findViewById(R.id.person_card_icon_access);
             textLastname = (TextView) itemView.findViewById(R.id.person_card_text_lastname);
             textFirstname = (TextView)itemView.findViewById(R.id.person_card_text_firstname);
             textMidname = (TextView)itemView.findViewById(R.id.person_card_text_midname);
@@ -99,25 +104,25 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        //holder.textLastname.setText(allItems.get(position).getLastname());
-        //holder.textFirstname.setText(allItems.get(position).getFirstname());
-        //holder.textMidname.setText(allItems.get(position).getMidname());
-        //holder.textDivision.setText(allItems.get(position).getDivision());
+
         Animation fadeInanimation = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
         if (mType== Values.SHOW_FAVORITE_PERSONS){
-            new GetPersons(holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(allItems.get(position).getRadioLabel())
-            .setDatabase(mDataBaseFavorite)
-            .setPersonImageView(holder.imageView)
-            .setPersonLastname(holder.textLastname)
-            .setPersonFirstname(holder.textFirstname)
-            .setPersonMidname(holder.textMidname)
-            .setPersonDivision(holder.textDivision)
-            .setPersonLocation(DataBaseFavorite.LOCAL_USER)
-            .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
-            //new GetPersonPhoto(context,allItems.get(position).getRadioLabel(), mDataBaseFavorite, holder.imageView, GetPersonPhoto.PREVIEW_IMAGE, GetPersonPhoto.LOCAL_PHOTO).execute();
-            //new getPhoto(holder.imageView).execute(allItems.get(position).getRadioLabel());
-            //photo = allItems.get(position).getPhotoPreview();
+
+            new GetPersons(holder.personCard, fadeInanimation).execute(new GetPersonParams()
+                    .setPersonTag(allItems.get(position).getRadioLabel())
+                    .setDatabase(mDataBaseFavorite)
+                    .setPersonImageView(holder.imageView)
+                    .setPersonLastname(holder.textLastname)
+                    .setPersonFirstname(holder.textFirstname)
+                    .setPersonMidname(holder.textMidname)
+                    .setPersonDivision(holder.textDivision)
+                    .setAccessImageView(holder.accessImageView)
+                    .setFreeUser(isFreeUsers.contains(allItems.get(position).getRadioLabel()))
+                    .setPersonLocation(DataBaseFavorite.LOCAL_USER)
+                    .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
+
         }else if (mType==Values.SHOW_ALL_PERSONS){
+
             new GetPersons(holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(allItems.get(position).getRadioLabel())
                     .setDatabase(mDataBaseFavorite)
                     .setPersonImageView(holder.imageView)
@@ -127,20 +132,8 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
                     .setPersonDivision(holder.textDivision)
                     .setPersonLocation(DataBaseFavorite.SERVER_USER)
                     .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
-            //new GetPersonPhoto(context,allItems.get(position).getRadioLabel(), mDataBaseFavorite, holder.imageView, GetPersonPhoto.PREVIEW_IMAGE, GetPersonPhoto.SERVER_PHOTO).execute();
-            //new GetPersonPhoto(allItems.get(position).getRadioLabel(), mDataBaseFavorite, holder.imageView, GetPersonPhoto.ORIGINAL_IMAGE).execute();
-            //photo = allItems.get(position).getPhotoOriginal();
+
         }
-
-  /*      if (photo!=null){
-            byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
-            bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-            holder.imageView.setImageBitmap(bitmap);
-
-        }*/
-
-
     }
 
     @Override

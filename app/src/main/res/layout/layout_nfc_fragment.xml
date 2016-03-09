@@ -1,44 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/nfc_fragment_head"
+        android:layout_alignParentTop="true"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:text="Приложите свою кампусную карту к считывателю"
-        android:layout_weight="0.2"
-        android:textColor="#000000"
-        android:textSize="50dp"
+        android:layout_height="wrap_content"
+        android:text="@string/nfc_fragment_head"
+        android:textColor="@color/black"
+        android:textSize="48sp"
         android:gravity="center" />
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.6"
-        android:src="@drawable/ic_nfc_acs_resize" />
+        android:id="@+id/nfc_fragment_reader_image"
+        android:layout_below="@id/nfc_fragment_head"
+        android:layout_margin="@dimen/layout_default_margin"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/arrow_down_anim" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.08"
-        android:orientation="horizontal">
+    <Button
+        android:id="@+id/nfc_fragment_free_users_button"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/layout_default_margin"
+        style="@style/ButtonMaterial"
+        android:text="@string/nfc_fragment_free_users"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/nfc_fragment_button_dekanat_pmit"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Деканат ПМиИТ"
-            android:layout_gravity="center_horizontal|right"
-            android:layout_margin="5dp" />
-        <Button
-            android:id="@+id/nfc_fragment_button_dekanat_ar"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Деканат АРиЭБ"
-            android:layout_gravity="center_horizontal|right"
-            android:layout_margin="5dp" />
-    </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>

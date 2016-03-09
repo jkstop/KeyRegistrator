@@ -100,4 +100,8 @@
 
     <dimen name="default_content_margin">6dp</dimen>
 
+    <dimen name="card_free_user_initials">28sp</dimen>
+    <dimen name="card_free_user_width">250dp</dimen>
+    <dimen name="card_free_user_height">90dp</dimen>
+
 </resources>

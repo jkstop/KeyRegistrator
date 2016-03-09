@@ -15,7 +15,6 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -58,15 +57,16 @@ public class DataBaseFavorite {
         Log.d("FAVORITE_DB","-------------CREATE---------------");
     }
 
-
     public PersonItem getPersonItem(String tag, int userLocation, int photoSize){
         Cursor cursor = null;
         try {
             PersonItem personItem;
             if (userLocation == LOCAL_USER){
-                cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
-                        + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
-                if (cursor.getCount()>0){
+                if (sqLiteDatabase!=null){
+                    cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                            + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
+                }
+                if (cursor!=null && cursor.getCount()>0){
                     cursor.moveToFirst();
                     personItem = new PersonItem().setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
                             .setFirstname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE)))
@@ -76,7 +76,7 @@ public class DataBaseFavorite {
                             .setRadioLabel(tag);
                     if (photoSize == FULLSIZE_PHOTO){
                         personItem.setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
-                    }else{
+                    }else if (photoSize == PREVIEW_PHOTO){
                         personItem.setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)));
                     }
                     return personItem;
@@ -85,7 +85,7 @@ public class DataBaseFavorite {
                 }
             }else if (userLocation == SERVER_USER){
                 Connection connection = /*SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());*/
-                SQL_Connector.SQL_connection;
+                        SQL_Connection.SQLconnect;
 
                 if (connection!=null){
                     try {

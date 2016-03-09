@@ -8,7 +8,7 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
-import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
+
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.sql.Connection;
@@ -53,7 +53,7 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
     protected Void doInBackground(Void... params) {
 
         try {
-            Connection connection = SQL_Connector.SQL_connection;
+            Connection connection = SQL_Connection.SQLconnect;
             if (connection!=null){
 
                 mDataBaseJournal.clearJournalDB();

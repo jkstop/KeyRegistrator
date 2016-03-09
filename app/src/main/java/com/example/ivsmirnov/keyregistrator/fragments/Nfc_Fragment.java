@@ -1,9 +1,16 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.content.Context;
+import android.graphics.Point;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,17 +18,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.ScrollView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
+import com.example.ivsmirnov.keyregistrator.adapters.adapter_free_users;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
+import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
+import com.example.ivsmirnov.keyregistrator.custom_views.RecyclerWrapContentHeightManager;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
+import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
+import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -33,6 +51,8 @@ public class Nfc_Fragment extends Fragment {
     private Button mSelectButton;
     private Settings mSettings;
     private Button mDekanatPmit,mDekanatAR;
+    private RecyclerView mFreeUsersRecycler;
+    private ArrayList<String> mTags;
 
     public static Nfc_Fragment newInstance(){
         return new Nfc_Fragment();
@@ -40,40 +60,71 @@ public class Nfc_Fragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.layout_nfc_fragment,container,false);
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.layout_nfc_fragment,container,false);
         mContext = rootView.getContext();
         mSettings = new Settings(mContext);
-        mDekanatPmit = (Button)rootView.findViewById(R.id.nfc_fragment_button_dekanat_pmit);
-        mDekanatAR = (Button)rootView.findViewById(R.id.nfc_fragment_button_dekanat_ar);
-        mDekanatPmit.setOnClickListener(clickDekanat);
-        mDekanatAR.setOnClickListener(clickDekanat);
+        mTags = mSettings.getFreeUsers();
+
+        ImageView imageView = (ImageView)rootView.findViewById(R.id.nfc_fragment_reader_image);
+        AnimationDrawable animationDrawable = (AnimationDrawable)imageView.getDrawable();
+        animationDrawable.start();
+
+        final Button showPopupButton = (Button)rootView.findViewById(R.id.nfc_fragment_free_users_button);
+        showPopupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ScrollView viewGroup = (ScrollView) rootView.findViewById(R.id.layout_popup_free_persons);
+                View layout = inflater.inflate(R.layout.layout_popup_free_persons, viewGroup);
+
+                mFreeUsersRecycler = (RecyclerView)layout.findViewById(R.id.nfc_fragment_free_users_recycler);
+                mFreeUsersRecycler.setLayoutManager(new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false));
+                mFreeUsersRecycler.setHasFixedSize(true);
+
+
+                // Creating the PopupWindow
+                final PopupWindow popup = new PopupWindow(mContext);
+                popup.setContentView(layout);
+                popup.setHeight(getResources().getDimensionPixelOffset(R.dimen.layout_default_margin)*5);
+                popup.setFocusable(true);
+                popup.setWindowLayoutMode(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                // Clear the default translucent background
+                popup.setBackgroundDrawable(new BitmapDrawable());
+
+                popup.showAsDropDown(showPopupButton, 0, 0);
+
+                mFreeUsersRecycler.setAdapter(new adapter_free_users(mContext, mTags, new RecycleItemClickListener() {
+                    @Override
+                    public void onItemClick(View v, int position, int viewID) {
+
+                        new TakeKey(mContext).execute(new TakeKeyParams()
+                                .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
+                                .setAuditroom(mSettings.getLastClickedAuditroom())
+                                .setPersonItem(new PersonItem().setRadioLabel(mTags.get(position)))
+                                .setPublicInterface(new KeyInterface() {
+                                    @Override
+                                    public void onTakeKey() {
+                                        popup.dismiss();
+                                        getFragmentManager().beginTransaction()
+                                                .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main))
+                                                .commit();
+                                    }
+                                }));
+                    }
+
+                    @Override
+                    public void onItemLongClick(View v, int position, long timeIn) {
+
+                    }
+                }));
+            }
+        });
+
         return rootView;
     }
 
-    View.OnClickListener clickDekanat = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-
-            JournalItem journalItem = new JournalItem()
-                    .setAccountID(mSettings.getActiveAccountID())
-                    .setAuditroom(mSettings.getLastClickedAuditroom())
-                    .setTimeIn(System.currentTimeMillis())
-                    .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
-                    .setPersonLastname(((Button)v).getText().toString())
-                    .setPersonPhoto(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, "М"));
-
-            PersonItem personItem = new PersonItem()
-                    .setLastname(((Button)v).getText().toString())
-                    .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1)
-                    .setPhotoPreview(DataBaseFavorite.getPhotoPreview(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, "М")))
-                    .setPhotoOriginal(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, "М"));
-
-            long positionInBase = Values.writeInJournal(mContext, journalItem);
-            Values.writeRoom(mContext,journalItem,personItem,positionInBase);
-            getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
-        }
-    };
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -99,23 +150,24 @@ public class Nfc_Fragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_nfc_all_persons:
-                /*Dialog_Fragment dialog_fragment = new Dialog_Fragment();
+                Dialog_Fragment dialog_fragment = new Dialog_Fragment();
                 Bundle bundle = new Bundle();
                 bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
                 bundle.putInt(Values.DIALOG_CLOSE_ROOM_TYPE,Values.DIALOG_CLOSE_ROOM_TYPE_PERSONS);
                 bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLOSE_ROOM);
                 dialog_fragment.setArguments(bundle);
-                dialog_fragment.show(getChildFragmentManager(),"enter_pin");*/
-                Bundle bundle = new Bundle();
-                bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
-                Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
-                persons_fragment.setArguments(bundle);
+                dialog_fragment.show(getChildFragmentManager(),"enter_pin");
+                //Bundle bundle = new Bundle();
+                //bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
+                //Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+                //persons_fragment.setArguments(bundle);
 
-               getActivity().getSupportFragmentManager()
-                       .beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
+               //getActivity().getSupportFragmentManager()
+               //        .beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
 }

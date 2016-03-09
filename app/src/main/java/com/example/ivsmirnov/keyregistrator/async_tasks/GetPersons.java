@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -15,6 +16,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.lang.ref.WeakReference;
 
@@ -23,16 +25,16 @@ import java.lang.ref.WeakReference;
  */
 public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
-    private WeakReference<ImageView> mWeakPersonImage;
-    private WeakReference<TextView> mWeakPersonLastname, mWeakPersonFirstname, mWeakPersonMidname, mWeakPersonDivision;
-    private WeakReference<CardView> mWeakPersonCard;
-    private int userLocation, photoDimension;
+    private int  photoDimension;
     private CardView personCard;
     private Animation mAnimation;
+    private boolean isFreeUser;
+
+    private ImageView mPersonImage, mAccessImage;
+    private TextView mPersonLastname, mPersonFirstname, mPersonMidname, mPersonDivision;
 
     public GetPersons(CardView personCard, Animation fadeInAnimation){
-        mWeakPersonCard = new WeakReference<CardView>(personCard);
-        this.personCard = mWeakPersonCard.get();
+        this.personCard = new WeakReference<CardView>(personCard).get();
         this.mAnimation = fadeInAnimation;
     }
 
@@ -43,50 +45,48 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
     @Override
     protected PersonItem doInBackground(GetPersonParams... params) {
-        userLocation = params[0].getPersonLocation();
+
         photoDimension = params[0].getPersonPhotoDimension();
         DataBaseFavorite dataBaseFavorite = params[0].getDataBaseFavorite();
-        PersonItem personItem = dataBaseFavorite.getPersonItem(params[0].getPersonTag(), userLocation, photoDimension);
-        this.mWeakPersonImage = new WeakReference<ImageView>(params[0].getPersonImageView());
-        this.mWeakPersonLastname = new WeakReference<TextView>(params[0].getPersonLastname());
-        this.mWeakPersonFirstname = new WeakReference<TextView>(params[0].getPersonFirstname());
-        this.mWeakPersonMidname = new WeakReference<TextView>(params[0].getPersonMidname());
-        this.mWeakPersonDivision = new WeakReference<TextView>(params[0].getPersonDivision());
+        PersonItem personItem = dataBaseFavorite.getPersonItem(params[0].getPersonTag(), params[0].getPersonLocation(), photoDimension);
+
+        mPersonImage = new WeakReference<ImageView>(params[0].getPersonImageView()).get();
+        mAccessImage = new WeakReference<ImageView>(params[0].getAccessImageView()).get();
+        mPersonLastname = new WeakReference<TextView>(params[0].getPersonLastname()).get();
+        mPersonFirstname = new WeakReference<TextView>(params[0].getPersonFirstname()).get();
+        mPersonMidname = new WeakReference<TextView>(params[0].getPersonMidname()).get();
+        mPersonDivision = new WeakReference<TextView>(params[0].getPersonDivision()).get();
+
+        isFreeUser = params[0].getFreeUser();
+
         return personItem;
     }
 
     @Override
     protected void onPostExecute(PersonItem personItem) {
-        ImageView personImage = mWeakPersonImage.get();
-        if (personImage!=null){
+
+        if (mPersonImage!=null){
             byte[] decodedString;
             if (photoDimension == DataBaseFavorite.FULLSIZE_PHOTO){
                 decodedString = Base64.decode(personItem.getPhotoOriginal(), Base64.DEFAULT);
             }else{
                 decodedString = Base64.decode(personItem.getPhotoPreview(), Base64.DEFAULT);
             }
-            personImage.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+            mPersonImage.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
         }
 
-        TextView textLastname = mWeakPersonLastname.get();
-        if (textLastname!=null){
-            textLastname.setText(personItem.getLastname());
-        }
+        if (mAccessImage!=null)
+            if (isFreeUser) mAccessImage.setImageResource(R.drawable.ic_touch_app_black_24dp);
+            else  mAccessImage.setImageResource(R.drawable.ic_credit_card_black_24dp);
 
-        TextView textFirstname = mWeakPersonFirstname.get();
-        if (textFirstname!=null){
-            textFirstname.setText(personItem.getFirstname());
-        }
+        if (mPersonLastname!=null) mPersonLastname.setText(personItem.getLastname());
 
-        TextView textMidname = mWeakPersonMidname.get();
-        if (textMidname!=null){
-            textMidname.setText(personItem.getMidname());
-        }
+        if (mPersonFirstname!=null) mPersonFirstname.setText(personItem.getFirstname());
 
-        TextView textDivision = mWeakPersonDivision.get();
-        if (textDivision!=null){
-            textDivision.setText(personItem.getDivision());
-        }
+        if (mPersonMidname!=null) mPersonMidname.setText(personItem.getMidname());
+
+        if (mPersonDivision!=null) mPersonDivision.setText(personItem.getDivision());
+
 
         personCard.setVisibility(View.VISIBLE);
         personCard.startAnimation(mAnimation);

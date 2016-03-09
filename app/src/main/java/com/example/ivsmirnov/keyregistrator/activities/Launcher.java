@@ -71,7 +71,7 @@ import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
 import com.example.ivsmirnov.keyregistrator.others.GMailOauthSender;
-import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
+
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.Alarm;
@@ -447,8 +447,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                     .setPhotoOriginal(photo)
                     .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo)));
         }
-
-
     }
 
     @Override
@@ -464,15 +462,19 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         if (mDataBaseFavorite == null){
             mDataBaseFavorite = new DataBaseFavorite(mContext);
+            Log.d("recreate","favorite");
         }
         if (mDataBaseJournal == null){
             mDataBaseJournal = new DataBaseJournal(mContext);
+            Log.d("recreate","journal");
         }
         if (mDataBaseRooms == null){
             mDataBaseRooms = new DataBaseRooms(mContext);
+            Log.d("recreate","rooms");
         }
         if (mDataBaseAccount == null){
             mDataBaseAccount = new DataBaseAccount(mContext);
+            Log.d("recreate","account");
         }
     }
 
@@ -502,8 +504,10 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         mDataBaseRooms.closeDB();
         mDataBaseAccount.closeDB();
 
-        mReader.close();
-        unregisterReceiver(mReceiver);
+        if (mReader!=null){
+            mReader.close();
+            unregisterReceiver(mReceiver);
+        }
     }
 
     @Override

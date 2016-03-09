@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
@@ -24,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -37,6 +39,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
@@ -46,12 +49,13 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
-import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+
+import jxl.biff.drawing.CheckBox;
 
 public class Dialog_Fragment extends DialogFragment{
 
@@ -180,6 +184,7 @@ public class Dialog_Fragment extends DialogFragment{
                 final TextInputLayout inputFirstname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_firstname_layout);
                 final TextInputLayout inputMidname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_midname_layout);
                 final TextInputLayout inputDivision = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_division_layout);
+                AppCompatCheckBox accessType = (AppCompatCheckBox) dialogView.findViewById(R.id.person_information_access_type);
 
                 final String tag = getArguments().getString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG);
 
@@ -189,6 +194,16 @@ public class Dialog_Fragment extends DialogFragment{
                 inputFirstname.getEditText().setText(personItem.getFirstname());
                 inputMidname.getEditText().setText(personItem.getMidname());
                 inputDivision.getEditText().setText(personItem.getDivision());
+
+                if (mSettings.getFreeUsers().contains(personItem.getRadioLabel())) accessType.setChecked(true);
+
+                accessType.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) mSettings.addFreeUser(personItem.getRadioLabel());
+                                else mSettings.deleteFreeUser(personItem.getRadioLabel());
+                    }
+                });
 
                 byte [] decodedString = Base64.decode(personItem.getPhotoOriginal(), Base64.DEFAULT);
                 personImage.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
@@ -216,11 +231,15 @@ public class Dialog_Fragment extends DialogFragment{
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (tag!=null){
+
                                 mDataBaseFavorite.deleteFromTeachersDB(new PersonItem()
                                         .setLastname(personItem.getLastname())
                                         .setFirstname(personItem.getFirstname())
                                         .setMidname(personItem.getMidname())
                                         .setDivision(personItem.getDivision()));
+
+                                //удаление метки в free_users
+                                mSettings.deleteFreeUser(tag);
 
                                 updateInformation();
                             }
@@ -504,13 +523,19 @@ public class Dialog_Fragment extends DialogFragment{
                                 .setServerName(inputServer.getText().toString())
                                 .setUserName(inputUser.getText().toString())
                                 .setUserPassword(inputPassowrd.getText().toString());
-                        if (SQL_Connector.SQL_connection!=null){
-                            connectionStatus.setText(R.string.connected);
-                            connectionStatus.setTextColor(Color.GREEN);
-                            mSettings.setServerConnectionParams(serverConnectionItem);
-                        }else{
-                            connectionStatus.setText(R.string.disconnected);
-                            connectionStatus.setTextColor(Color.RED);
+                        try {
+                            new SQL_Connection(mContext, serverConnectionItem).execute();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }finally {
+                            if (mSettings.getServerStatus()){
+                                connectionStatus.setText(R.string.connected);
+                                connectionStatus.setTextColor(Color.GREEN);
+                                mSettings.setServerConnectionParams(serverConnectionItem);
+                            } else {
+                                connectionStatus.setText(R.string.disconnected);
+                                connectionStatus.setTextColor(Color.RED);
+                            }
                         }
                     }
                 });

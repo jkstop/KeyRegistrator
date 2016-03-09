@@ -2,6 +2,7 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
+import com.example.ivsmirnov.keyregistrator.activities.NFC;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
@@ -168,9 +170,10 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                 dialog_resize.setTargetFragment(this,0);
                 dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
-            //case R.id.test:
-            //    new insert(mContext).execute();
-            //    return true;
+            case R.id.test:
+                startActivity(new Intent(mContext, NFC.class));
+                //new insert(mContext).execute();
+                return true;
             //case R.id.test2:
             //    return true;
             default:
@@ -249,7 +252,10 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
             bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
             Nfc_Fragment nfc_fragment = Nfc_Fragment.newInstance();
             nfc_fragment.setArguments(bundle);
-            getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, nfc_fragment, getResources().getString(R.string.fragment_tag_nfc)).commit();
+            getFragmentManager().beginTransaction()
+                    //.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                    .replace(R.id.main_frame_for_fragment, nfc_fragment, getResources().getString(R.string.fragment_tag_nfc))
+                    .commit();
         } else {
             if (mRoomItems.get(position).getAccessType()==DataBaseJournal.ACCESS_BY_CLICK) {
                 new CloseRooms(mContext).execute(new CloseRoomsParams()

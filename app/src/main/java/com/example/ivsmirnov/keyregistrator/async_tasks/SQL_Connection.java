@@ -7,7 +7,6 @@ import android.os.StrictMode;
 import android.util.Log;
 
 import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
-import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.sql.Connection;
@@ -18,6 +17,8 @@ import java.util.Properties;
  * Created by ivsmirnov on 26.02.2016.
  */
 public class SQL_Connection extends AsyncTask<Void,Void,Connection> {
+
+    public static Connection SQLconnect;
 
     private Context mContext;
     private ServerConnectionItem mServerConnectionItem;
@@ -49,11 +50,11 @@ public class SQL_Connection extends AsyncTask<Void,Void,Connection> {
 
             DriverManager.setLoginTimeout(5);
 
-            if (SQL_Connector.SQL_connection == null){
-                SQL_Connector.SQL_connection = DriverManager.getConnection(ConnURL);
+            if (SQLconnect == null){
+                SQLconnect = DriverManager.getConnection(ConnURL);
             }
 
-            return SQL_Connector.SQL_connection;
+            return SQLconnect;
 
         }catch (Exception e) {
             e.printStackTrace();

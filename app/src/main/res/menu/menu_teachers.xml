@@ -21,10 +21,4 @@
         android:title="Указать путь для копирования на ПК"
         app:showAsAction="never"/>
 
-    <item
-        android:id="@+id/menu_teachers_set_columns_number"
-        android:title="Количество колонок"
-        android:icon="@drawable/ic_view_column_black_24dp"
-        app:showAsAction="never" />
-
 </menu>

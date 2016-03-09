@@ -167,4 +167,7 @@
     <string name="card_statistic_head_stat">Статистика</string>
     <string name="card_statistic_head_close">Занятия завершены!</string>
 
+    <string name="nfc_fragment_head">Приложите свою кампусную карту к считывателю</string>
+    <string name="nfc_fragment_free_users">Нажмите тут, если нет карты</string>
+
 </resources>

@@ -52,6 +52,25 @@
                 android:textSize="@dimen/person_card_text_midname"
                 style="@style/CardPersonText"/>
 
+
+            <!--<RadioGroup
+                android:layout_below="@id/person_card_text_midname"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:text="Доступ по карте"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <RadioButton
+                    android:text="Свободный доступ"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </RadioGroup>-->
+
             <ImageView
                 android:layout_alignParentBottom="true"
                 android:id="@+id/person_card_icon_division"
@@ -65,9 +84,19 @@
             <TextView
                 android:layout_alignParentBottom="true"
                 android:layout_toRightOf="@+id/person_card_icon_division"
+                android:layout_toLeftOf="@+id/person_card_icon_access"
                 android:id="@+id/person_card_text_division"
                 android:textSize="@dimen/person_card_text_division"
                 style="@style/CardPersonText.Division" />
+
+            <ImageView
+                android:layout_alignParentRight="true"
+                android:layout_alignBottom="@id/person_card_text_division"
+                android:id="@id/person_card_icon_access"
+                android:clickable="true"
+                android:contentDescription="hjgdlkjfglkdflk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
 
         </RelativeLayout>

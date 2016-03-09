@@ -14,12 +14,23 @@ public class GetPersonParams{
     private int personLocation;
     private int personPhotoDimension;
     private DataBaseFavorite dataBaseFavorite;
-    private ImageView personImageView;
+    private ImageView personImageView, accessImageView;
     private TextView personLastname, personFirstname, personMidname, personDivision;
     private CardView personCard;
+    private boolean isFreeUser;
+
+    public GetPersonParams setFreeUser(boolean isFreeUser){
+        this.isFreeUser = isFreeUser;
+        return this;
+    }
 
     public GetPersonParams setPersonCard(CardView personCard){
         this.personCard = personCard;
+        return this;
+    }
+
+    public GetPersonParams setAccessImageView(ImageView accessImageView){
+        this.accessImageView = accessImageView;
         return this;
     }
 
@@ -67,6 +78,10 @@ public class GetPersonParams{
         return this;
     }
 
+    public boolean getFreeUser(){
+        return isFreeUser;
+    }
+
     public String getPersonTag(){
         return personTag;
     }
@@ -105,6 +120,10 @@ public class GetPersonParams{
 
     public CardView getPersonCard(){
         return personCard;
+    }
+
+    public ImageView getAccessImageView(){
+        return accessImageView;
     }
 
 }

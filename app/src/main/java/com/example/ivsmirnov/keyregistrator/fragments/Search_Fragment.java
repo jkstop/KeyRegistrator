@@ -13,6 +13,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +26,11 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
+import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.Find_User_in_SQL_Server_Interface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -89,7 +90,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
         mAddButton = (Button)rootView.findViewById(R.id.layout_add_new_staff_input_button);
 
-        final Connection connection = SQL_Connector.SQL_connection;
+        final Connection connection = SQL_Connection.SQLconnect;
         final TextInputLayout mInputLayout = (TextInputLayout)rootView.findViewById(R.id.layout_add_new_staff_input);
         final AppCompatEditText mInputText = (AppCompatEditText) rootView.findViewById(R.id.layout_add_new_staff_input_text);
         if (mInputText.requestFocus()){
@@ -102,11 +103,14 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length()>=3){
+                if (s.length()>=3 && s.length()<=6){
                     if (connection!=null){
                         try {
-                            Find_User_in_SQL_Server find_user_in_sql_server = new Find_User_in_SQL_Server(mContext, s,  mListener);
-                            find_user_in_sql_server.execute(connection);
+                            Find_User_in_SQL_Server find_user_in_sql_server;
+                            if (count == 1){
+                                find_user_in_sql_server = new Find_User_in_SQL_Server(mContext, s,  mListener);
+                                find_user_in_sql_server.execute(connection);
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

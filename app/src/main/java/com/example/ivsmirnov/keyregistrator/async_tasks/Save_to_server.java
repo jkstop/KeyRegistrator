@@ -8,7 +8,6 @@ import android.util.Log;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
-import com.example.ivsmirnov.keyregistrator.others.SQL_Connector;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.sql.Connection;
@@ -53,7 +52,7 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
         ArrayList<JournalItem> mItems = mDataBaseJournal.realAllJournalFromDB();
 
         try {
-            Connection connection = SQL_Connector.SQL_connection;
+            Connection connection = SQL_Connection.SQLconnect;
             if (connection!=null){
 
                 PreparedStatement trunacteTable = connection.prepareStatement("TRUNCATE TABLE Journal_recycler");

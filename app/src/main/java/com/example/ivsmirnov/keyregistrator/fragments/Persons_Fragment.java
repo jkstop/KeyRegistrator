@@ -131,7 +131,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                         return;
                     }
 
-
                     new TakeKey(mContext).execute(new TakeKeyParams()
                             .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
                             .setAuditroom(mSettings.getLastClickedAuditroom())
@@ -209,6 +208,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
             @Override
             public void onClick(View v) {
                 getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Search_Fragment.new_Instance(), getResources().getString(R.string.fragment_tag_search)).commit();
+                //запуск activity для поиска пользователя
+
             }
         });
 
@@ -286,15 +287,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                 iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
                 iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, mSettings.getPersonsBackupLocation());
                 startActivityForResult(iLC,Values.REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
-                return true;
-            case R.id.menu_teachers_set_columns_number:/*
-                Dialog_Fragment dialog_fragment = new Dialog_Fragment();
-                Bundle bundlePersons = new Bundle();
-                bundlePersons.putInt(Values.DIALOG_TYPE, Values.SELECT_COLUMNS_DIALOG);
-                bundlePersons.putString("AudOrPer", "per");
-                dialog_fragment.setArguments(bundlePersons);
-                dialog_fragment.setTargetFragment(this, 0);
-                dialog_fragment.show(getFragmentManager(), "columns");*/
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
