@@ -11,21 +11,24 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
 
 /**
  * Created by ivsmirnov on 26.02.2016.
  */
-public class SQL_Connection extends AsyncTask<Void,Void,Connection> {
+public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
 
     public static Connection SQLconnect;
 
     private Context mContext;
     private ServerConnectionItem mServerConnectionItem;
+    private SQL_Connection_interface mConnectionInterface;
 
-    public SQL_Connection (Context context, ServerConnectionItem serverConnectionItem){
+    public SQL_Connection (Context context, ServerConnectionItem serverConnectionItem, SQL_Connection_interface sql_connection_interface){
         this.mContext = context;
         this.mServerConnectionItem = serverConnectionItem;
+        this.mConnectionInterface = sql_connection_interface;
     }
 
     @Override
@@ -34,7 +37,7 @@ public class SQL_Connection extends AsyncTask<Void,Void,Connection> {
     }
 
     @Override
-    protected Connection doInBackground(Void... params) {
+    protected Exception doInBackground(Void... params) {
         String classs = "net.sourceforge.jtds.jdbc.Driver";
         String db = "KeyRegistratorBase";
 
@@ -54,22 +57,30 @@ public class SQL_Connection extends AsyncTask<Void,Void,Connection> {
                 SQLconnect = DriverManager.getConnection(ConnURL);
             }
 
-            return SQLconnect;
+            return null;
 
         }catch (Exception e) {
-            e.printStackTrace();
-
+            //e.printStackTrace();
+            return e;
         }
-        return null;
+
     }
 
     @Override
-    protected void onPostExecute(Connection connection) {
-        if (connection == null){
+    protected void onPostExecute(Exception e) {
+        if (e != null){
             new Settings(mContext).setServerStatus(false);
+            if (mConnectionInterface!=null) mConnectionInterface.onServerConnectException(e);
+            if (mConnectionInterface!=null) mConnectionInterface.onServerDisconnected();
         } else {
             new Settings(mContext).setServerStatus(true);
+            if (mConnectionInterface!=null) mConnectionInterface.onServerConnected();
         }
-        Log.d("connection", String.valueOf(connection));
+    }
+
+    public interface SQL_Connection_interface{
+        void onServerConnected();
+        void onServerDisconnected();
+        void onServerConnectException(Exception e);
     }
 }

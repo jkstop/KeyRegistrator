@@ -84,8 +84,7 @@ public class DataBaseFavorite {
                     return null;
                 }
             }else if (userLocation == SERVER_USER){
-                Connection connection = /*SQL_Connector.check_sql_connection(mContext, mSettings.getServerConnectionParams());*/
-                        SQL_Connection.SQLconnect;
+                Connection connection = SQL_Connection.SQLconnect;
 
                 if (connection!=null){
                     try {

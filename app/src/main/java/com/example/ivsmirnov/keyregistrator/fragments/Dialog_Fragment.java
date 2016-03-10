@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Dialog;
 import android.graphics.BitmapFactory;
 import android.graphics.Paint;
+import android.os.Build;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -24,6 +25,8 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -53,6 +56,7 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.lang.reflect.Field;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import jxl.biff.drawing.CheckBox;
@@ -496,52 +500,103 @@ public class Dialog_Fragment extends DialogFragment{
                         .setCancelable(false)
                         .create();
             case Values.DIALOG_SQL_CONNECT:
-                LayoutInflater inflater_sql = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View sqlDialogView = inflater_sql.inflate(R.layout.layout_dialog_sql_connect,null);
-                final EditText inputServer = (EditText)sqlDialogView.findViewById(R.id.dialog_sql_connect_input_server);
-                final EditText inputUser = (EditText)sqlDialogView.findViewById(R.id.dialog_sql_connect_input_user);
-                final EditText inputPassowrd = (EditText)sqlDialogView.findViewById(R.id.dialog_sql_connect_input_password);
-                final TextView connectionStatus = (TextView)sqlDialogView.findViewById(R.id.dialog_sql_connect_connection_status);
-                Button mCheckButton = (Button)sqlDialogView.findViewById(R.id.dialog_sql_connect_check_button);
+                View dialogLayout = mInflater.inflate(R.layout.layout_dialog_sql_connect_new,null);
+                final AppCompatEditText inputServer = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_server)).getEditText();
+                final AppCompatEditText inputLogin = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_login)).getEditText();
+                final AppCompatEditText inputPassword = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_password)).getEditText();
+                final ImageView serverStatusImage = (ImageView)dialogLayout.findViewById(R.id.layout_dialog_sql_new_image_status);
+                final TextView serverStatusText = (TextView)dialogLayout.findViewById(R.id.layout_dialog_sql_new_text_status);
+                final ImageView serverCheckConnection = (ImageView)dialogLayout.findViewById(R.id.layout_dialog_sql_new_image_reconnect);
 
-                ServerConnectionItem connectionParams = mSettings.getServerConnectionParams();
-                inputServer.setText(connectionParams.getServerName());
-                inputUser.setText(connectionParams.getUserName());
-                inputPassowrd.setText(connectionParams.getUserPassword());
+                final ServerConnectionItem serverConnectionItem = mSettings.getServerConnectionParams();
+
+                inputServer.setText(serverConnectionItem.getServerName());
+                inputLogin.setText(serverConnectionItem.getUserName());
+                inputPassword.setText(serverConnectionItem.getUserPassword());
+
                 if (mSettings.getServerStatus()){
-                    connectionStatus.setText(R.string.connected);
-                    connectionStatus.setTextColor(Color.GREEN);
-                }else{
-                    connectionStatus.setText(R.string.disconnected);
-                    connectionStatus.setTextColor(Color.RED);
+                    serverStatusImage.setImageResource(R.drawable.ic_cloud_done_black_48dp);
+                    serverStatusText.setText(R.string.dialog_sql_server_connected);
+                    serverStatusText.setTextColor(getResources().getColor(R.color.primary));
+                } else {
+                    serverStatusImage.setImageResource(R.drawable.ic_cloud_off_black_48dp);
+                    serverStatusText.setText(R.string.dialog_sql_server_disconnected);
+                    serverStatusText.setTextColor(getResources().getColor(R.color.colorAccent));
                 }
 
-                mCheckButton.setOnClickListener(new View.OnClickListener() {
+                serverCheckConnection.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ServerConnectionItem serverConnectionItem = new ServerConnectionItem()
+
+                        //анимация поворота
+                        Animation rotationAnim = AnimationUtils.loadAnimation(mContext, R.anim.rotate);
+                        rotationAnim.setRepeatCount(Animation.INFINITE);
+
+                        serverCheckConnection.startAnimation(rotationAnim);
+
+                        //если android по 4.4 включительно, то включаем программное ускорение
+                        //иначе анимация не работает
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT){
+                            serverCheckConnection.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                        }
+
+                        ServerConnectionItem newServerConnectionItem = new ServerConnectionItem()
                                 .setServerName(inputServer.getText().toString())
-                                .setUserName(inputUser.getText().toString())
-                                .setUserPassword(inputPassowrd.getText().toString());
+                                .setUserName(inputLogin.getText().toString())
+                                .setUserPassword(inputPassword.getText().toString());
                         try {
-                            new SQL_Connection(mContext, serverConnectionItem).execute();
-                        }catch (Exception e){
+                            SQL_Connection.SQLconnect = null;
+                            new SQL_Connection(mContext, newServerConnectionItem, new SQL_Connection.SQL_Connection_interface() {
+                                @Override
+                                public void onServerConnected() {
+                                    serverCheckConnection.clearAnimation();
+                                    serverStatusImage.setImageResource(R.drawable.ic_cloud_done_black_48dp);
+                                    serverStatusText.setText(R.string.dialog_sql_server_connected);
+                                    serverStatusText.setTextColor(getResources().getColor(R.color.primary));
+                                }
+
+                                @Override
+                                public void onServerDisconnected() {
+                                    serverCheckConnection.clearAnimation();
+                                    serverStatusImage.setImageResource(R.drawable.ic_cloud_off_black_48dp);
+                                    serverStatusText.setText(R.string.dialog_sql_server_disconnected);
+                                    serverStatusText.setTextColor(getResources().getColor(R.color.colorAccent));
+                                }
+
+                                @Override
+                                public void onServerConnectException(Exception e) {
+                                    if (e.getLocalizedMessage().contains("Unable to resolve host")) {
+                                        inputServer.setError(e.getLocalizedMessage());
+                                    } else if (e.getLocalizedMessage().contains("Ошибка входа пользователя")) {
+                                        inputLogin.setError(e.getLocalizedMessage());
+                                        inputPassword.setError(e.getLocalizedMessage());
+                                    }
+                                }
+                            }).execute();
+                        } catch (Exception e){
                             e.printStackTrace();
-                        }finally {
-                            if (mSettings.getServerStatus()){
-                                connectionStatus.setText(R.string.connected);
-                                connectionStatus.setTextColor(Color.GREEN);
-                                mSettings.setServerConnectionParams(serverConnectionItem);
-                            } else {
-                                connectionStatus.setText(R.string.disconnected);
-                                connectionStatus.setTextColor(Color.RED);
-                            }
                         }
                     }
                 });
                 return new AlertDialog.Builder(getActivity())
+                        .setView(dialogLayout)
                         .setTitle(R.string.title_check_sql_server_connect)
-                        .setView(sqlDialogView)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ServerConnectionItem newServerConnectionItem = new ServerConnectionItem()
+                                        .setServerName(inputServer.getText().toString())
+                                        .setUserName(inputLogin.getText().toString())
+                                        .setUserPassword(inputPassword.getText().toString());
+                                mSettings.setServerConnectionParams(newServerConnectionItem);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
                         .create();
             case Values.DIALOG_LOG_OUT:
                 return new AlertDialog.Builder(getActivity())

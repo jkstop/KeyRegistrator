@@ -53,7 +53,7 @@ public class CloseDayService extends Service implements CloseDayInterface {
 
             mSettings.setAutoClosedRoomsCount(Values.closeAllRooms(context));
 
-            Launcher.mRoomInterface.onRoomClosed();
+            //Launcher.mRoomInterface.onRoomClosed();
 
             new Save_to_file(context, Values.WRITE_JOURNAL, false).execute();
             new Save_to_file(context, Values.WRITE_TEACHERS, false).execute();

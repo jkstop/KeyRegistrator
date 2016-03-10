@@ -5,7 +5,7 @@
     android:layout_height="@dimen/card_free_user_height"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardElevation="@dimen/person_card_elevation"
-    app:cardBackgroundColor="@color/primary"
+    app:cardBackgroundColor="@color/person_card"
     app:contentPadding="@dimen/person_card_content_padding">
 
     <RelativeLayout

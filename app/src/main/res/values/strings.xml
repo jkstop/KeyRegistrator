@@ -127,6 +127,8 @@
     <string name="image_description_email_fragment_icon_delete_attachment">image_description_email_fragment_icon_delete_attachment</string>
     <string name="image_description_statistic_image_persons">image_description_statistic_image_person</string>
     <string name="image_description_statistic_image_journal">image_description_statistic_image_journal</string>
+    <string name="image_description_sql_server_status">image_description_sql_server_status</string>
+    <string name="image_description_sql_server_refresh">image_description_sql_server_refresh</string>
 
 
     <string name="view_enter_password_hint_password">Пароль</string>
@@ -169,5 +171,11 @@
 
     <string name="nfc_fragment_head">Приложите свою кампусную карту к считывателю</string>
     <string name="nfc_fragment_free_users">Нажмите тут, если нет карты</string>
+
+    <string name="dialog_sql_server_connected">Соединение установлено</string>
+    <string name="dialog_sql_server_disconnected">Отключено</string>
+    <string name="dialog_sql_server_hint_server">Сервер</string>
+    <string name="dialog_sql_server_hint_user">Логин</string>
+    <string name="dialog_sql_server_hint_password">Пароль</string>
 
 </resources>

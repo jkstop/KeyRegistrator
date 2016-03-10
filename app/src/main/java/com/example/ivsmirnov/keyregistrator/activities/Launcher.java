@@ -40,17 +40,15 @@ import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_navigation_drawer_list;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Get_Account_Information;
-//import com.example.ivsmirnov.keyregistrator.async_tasks.Power_Reader;
-//import com.example.ivsmirnov.keyregistrator.async_tasks.Protocol_Reader;
-//import com.example.ivsmirnov.keyregistrator.async_tasks.Tag_Reader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
+import com.example.ivsmirnov.keyregistrator.databases.DBinit;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.fragments.Search_Fragment;
+import com.example.ivsmirnov.keyregistrator.interfaces.DBinterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.ReaderResponse;
 import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
@@ -99,20 +97,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Properties;
 
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 public class Launcher extends AppCompatActivity implements Get_Account_Information_Interface,
-        KeyInterface, RoomInterface, GoogleApiClient.OnConnectionFailedListener{
+        KeyInterface, RoomInterface, GoogleApiClient.OnConnectionFailedListener, DBinterface{
 
     private DrawerLayout mDrawerLayout;
     private LinearLayout mLayout_Drawer_root;
@@ -122,7 +110,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     private adapter_navigation_drawer_list mNavigationDrawerListAdapter;
     private TextView mAccountName, mAccountEmail;
     private ImageView mChangeAccount, mPersonAccountImage;
-
     public static DataBaseFavorite mDataBaseFavorite;
     public static DataBaseJournal mDataBaseJournal;
     public static DataBaseRooms mDataBaseRooms;
@@ -181,7 +168,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         mAlarm.setAlarm(closingTime());
 
-        new SQL_Connection(mContext, mSettings.getServerConnectionParams()).execute();
+        new SQL_Connection(mContext, mSettings.getServerConnectionParams(), null).execute();
 
         initNavigationDrawer(getMainNavigationItems());
 
@@ -354,7 +341,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
     private void getUserActiveAccount(){
 
-
         AccountItem mAccount = mDataBaseAccount.getAccount(mSettings.getActiveAccountID());
 
         if (mAccount!=null){
@@ -458,6 +444,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         if (!mAlarm.isAlarmSet()){
             mAlarm.setAlarm(closingTime());
+            Log.d("SET_ALARM", String.valueOf(mAlarm.isAlarmSet()));
         }
 
         if (mDataBaseFavorite == null){
@@ -498,7 +485,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         Log.d("Launcher","DESTROY");
 
-
         mDataBaseFavorite.closeDB();
         mDataBaseJournal.closeDB();
         mDataBaseRooms.closeDB();
@@ -514,9 +500,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     protected void onStop() {
         super.onStop();
 
-        if (mAlarm!=null){
-            mAlarm.cancelAlarm();
-        }
+        if (mAlarm!=null)  mAlarm.cancelAlarm();
 
         Log.d("CHECK_ALARM", String.valueOf(mAlarm.isAlarmSet()));
         Log.d("Launcher","STOP");
@@ -543,6 +527,11 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                 back_pressed = System.currentTimeMillis();
             }
         }
+    }
+
+    @Override
+    public void onDBinited(boolean isInited) {
+
     }
 
     private class initReader extends AsyncTask<Void,Void,Void> {
@@ -607,8 +596,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                                     }
                                 }
                             });
-
-
                         }
                     }catch (Exception e){
                         e.printStackTrace();
