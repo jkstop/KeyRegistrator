@@ -29,7 +29,6 @@ public class adapter_free_users extends RecyclerView.Adapter<adapter_free_users.
 
     private Context mContext;
     private ArrayList<String> mTags;
-    private DataBaseFavorite mDataBaseFavorite;
     private RecycleItemClickListener mListener;
 
     public adapter_free_users (Context context, ArrayList<String> tags, RecycleItemClickListener recycleItemClickListener){
@@ -37,11 +36,6 @@ public class adapter_free_users extends RecyclerView.Adapter<adapter_free_users.
         this.mTags = tags;
         this.mListener = recycleItemClickListener;
 
-        if (Launcher.mDataBaseFavorite!=null){
-            mDataBaseFavorite = Launcher.mDataBaseFavorite;
-        }else{
-            mDataBaseFavorite = new DataBaseFavorite(mContext);
-        }
     }
 
     @Override
@@ -66,8 +60,7 @@ public class adapter_free_users extends RecyclerView.Adapter<adapter_free_users.
                         .setPersonTag(mTags.get(position))
                         .setPersonLastname(holder.mTextLastName)
                         .setPersonLocation(DataBaseFavorite.LOCAL_USER)
-                        .setPersonPhotoDimension(-1)
-                        .setDatabase(mDataBaseFavorite));
+                        .setPersonPhotoDimension(-1));
     }
 
     static class viewHolder extends RecyclerView.ViewHolder {
@@ -104,15 +97,11 @@ public class adapter_free_users extends RecyclerView.Adapter<adapter_free_users.
 
         @Override
         protected PersonItem doInBackground(GetPersonParams... params) {
-            DataBaseFavorite dataBaseFavorite = params[0].getDataBaseFavorite();
-            if (dataBaseFavorite!=null){
-                PersonItem personItem = dataBaseFavorite.getPersonItem(params[0].getPersonTag(), params[0].getPersonLocation(), params[0].getPersonPhotoDimension());
 
-                mPersonInitials = new WeakReference<TextView>(params[0].getPersonLastname()).get();
+            PersonItem personItem = DataBaseFavorite.getPersonItem(mContext, params[0].getPersonTag(), params[0].getPersonLocation(), params[0].getPersonPhotoDimension());
+            mPersonInitials = new WeakReference<TextView>(params[0].getPersonLastname()).get();
 
-                return personItem;
-            }
-            return null;
+            return personItem;
         }
 
         @Override

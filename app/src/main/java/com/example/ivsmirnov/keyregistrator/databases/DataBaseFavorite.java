@@ -1,11 +1,13 @@
 package com.example.ivsmirnov.keyregistrator.databases;
 
+import android.app.Application;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
@@ -43,29 +45,30 @@ public class DataBaseFavorite {
     public static final int FULLSIZE_PHOTO = 2;
     public static final int PREVIEW_PHOTO = 3;
 
-    public DataBaseFavoriteRegist dataBaseFavoriteRegist;
-    public SQLiteDatabase sqLiteDatabase;
-
-    private Context mContext;
-    private Settings mSettings;
-
-    public DataBaseFavorite(Context context){
-        this.mContext = context;
-        dataBaseFavoriteRegist = new DataBaseFavoriteRegist(mContext);
-        sqLiteDatabase = dataBaseFavoriteRegist.getWritableDatabase();
-        mSettings = new Settings(mContext);
-        Log.d("FAVORITE_DB","-------------CREATE---------------");
-    }
-
-    public PersonItem getPersonItem(String tag, int userLocation, int photoSize){
+    public static PersonItem getPersonItem(Context mContext, String tag, int userLocation, int photoSize){
+        //SQLiteDatabase mDataBase = DBinit.getDataBaseFavorite();
         Cursor cursor = null;
         try {
             PersonItem personItem;
             if (userLocation == LOCAL_USER){
-                if (sqLiteDatabase!=null){
-                    cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
-                            + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
-                }
+
+                    //cursor = mDataBase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+                    //        + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
+                    /*cursor = mDataBase.query(DataBaseFavoriteRegist.TABLE_TEACHER,
+                            null,
+                            DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",
+                            new String[]{tag},
+                            null,
+                            null,
+                            null);*/
+                cursor = DBinit.getCursorFavorite(DataBaseFavoriteRegist.TABLE_TEACHER,
+                            null,
+                            DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",
+                            new String[]{tag},
+                            null,
+                            null,
+                        "1");
+
                 if (cursor!=null && cursor.getCount()>0){
                     cursor.moveToFirst();
                     personItem = new PersonItem().setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
@@ -122,14 +125,15 @@ public class DataBaseFavorite {
             e.printStackTrace();
             return null;
         } finally {
-            closeCursor(cursor);
+            //if (cursor!=null) cursor.close();
         }
     }
 
-    public void updatePersonItem(String tag, PersonItem personItem){
+    public static void updatePersonItem(String tag, PersonItem personItem){
+        SQLiteDatabase mDataBase = DBinit.getDataBaseFavorite();
         Cursor cursor = null;
         try {
-            cursor = sqLiteDatabase.rawQuery("SELECT "
+            /*cursor = mDataBase.rawQuery("SELECT "
                             + DataBaseFavoriteRegist._ID + ","
                             + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + ","
                             + DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE + ","
@@ -139,6 +143,20 @@ public class DataBaseFavorite {
                             + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE
                             + " =?",
                     new String[]{tag});
+            cursor = mDataBase.query(DataBaseFavoriteRegist.TABLE_TEACHER,
+                    new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE, DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE},
+                    DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",
+                    new String[]{tag},
+                    null,
+                    null,
+                    null);*/
+            cursor = DBinit.getCursorFavorite(DataBaseFavoriteRegist.TABLE_TEACHER,
+                    new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE, DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE},
+                    DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",
+                    new String[]{tag},
+                    null,
+                    null,
+                    null);
             if (cursor.getCount()>0){
                 cursor.moveToFirst();
                 ContentValues cv = new ContentValues();
@@ -155,7 +173,7 @@ public class DataBaseFavorite {
                     cv.put(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
                 }
                 if (cv.size()!=0){
-                    sqLiteDatabase.update(DataBaseFavoriteRegist.TABLE_TEACHER,
+                    mDataBase.update(DataBaseFavoriteRegist.TABLE_TEACHER,
                             cv,
                             DataBaseFavoriteRegist._ID + "=" + cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID)),
                             null);
@@ -164,11 +182,12 @@ public class DataBaseFavorite {
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            closeCursor(cursor);
+           // if (cursor!=null) cursor.close();
         }
     }
 
-    public ArrayList<String> getTagForCurrentCharacter(String character){
+    public static ArrayList<String> getTagForCurrentCharacter(String character){
+        //SQLiteDatabase mDataBase = DBinit.getDataBaseFavorite();
         Cursor cursor = null;
         try {
             ArrayList <String> mTags = new ArrayList<>();
@@ -182,13 +201,20 @@ public class DataBaseFavorite {
                 selectionArgs = new String[]{character + "%"};
 
             }
-            cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER,
+            /*cursor = mDataBase.query(DataBaseFavoriteRegist.TABLE_TEACHER,
                     new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},
                     selection,
                     selectionArgs,
                     null,
                     null,
-                    DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + " ASC");
+                    DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + " ASC");*/
+            cursor = DBinit.getCursorFavorite(DataBaseFavoriteRegist.TABLE_TEACHER,
+                    new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},
+                    selection,
+                    selectionArgs,
+                    null,
+                    DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + " ASC",
+                    null);
             if (cursor.getCount()>0){
                 cursor.moveToPosition(-1);
                 while (cursor.moveToNext()){
@@ -200,15 +226,21 @@ public class DataBaseFavorite {
             e.printStackTrace();
             return new ArrayList<>();
         } finally {
-            closeCursor(cursor);
+            //if (cursor!=null) cursor.close();
         }
     }
 
-    public ArrayList<CharacterItem> getPersonsCharacters(){
+    public static ArrayList<CharacterItem> getPersonsCharacters(){
+        //SQLiteDatabase mDataBase = DBinit.getDataBaseFavorite();
         Cursor cursor = null;
         try {
             ArrayList <CharacterItem> characters = new ArrayList<>();
-            cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE},null,null,null,null,null,null);
+           // cursor = mDataBase.query(DataBaseFavoriteRegist.TABLE_TEACHER,
+           //         new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE},
+           //         null,null,null,null,null,null);
+            cursor = DBinit.getCursorFavorite(DataBaseFavoriteRegist.TABLE_TEACHER,
+                    new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE},
+                    null,null,null,null,null);
             cursor.moveToPosition(-1);
             ArrayList<String> uniqueCharacters = new ArrayList<>();
             while (cursor.moveToNext()){
@@ -232,26 +264,15 @@ public class DataBaseFavorite {
             e.printStackTrace();
             return new ArrayList<>();
         } finally {
-            closeCursor(cursor);
+            //if (cursor!=null) cursor.close();
         }
     }
 
 
-
-    public void closeDB(){
-        if (dataBaseFavoriteRegist!=null){
-            dataBaseFavoriteRegist.close();
-            Log.d("DBFavoriteClose!","!!!!!!!!!!!!!!!!!");
-        }
-
-        if (sqLiteDatabase!=null){
-            sqLiteDatabase.close();
-        }
-    }
-
-    public boolean isUserInBase(String tag){
+    public static boolean isUserInBase(String tag){
+        SQLiteDatabase mDataBase = DBinit.getDataBaseFavorite();
         try {
-            sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+            mDataBase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
                     + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " = '" + tag + "'").simpleQueryForString();
             return true;
         }catch (Exception e){
@@ -259,7 +280,8 @@ public class DataBaseFavorite {
         }
     }
 
-    public void writeInDBTeachers(PersonItem personItem) {
+    public static void writeInDBTeachers(Context mContext, PersonItem personItem) {
+        SQLiteDatabase mDataBase = DBinit.getDataBaseFavorite();
         try {
             if (personItem!=null){
                 if (personItem.getPhotoOriginal() == null){
@@ -277,24 +299,25 @@ public class DataBaseFavorite {
                 cv.put(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE, personItem.getPhotoOriginal());
 
                 if (isUserInBase(personItem.getRadioLabel())){
-                    deleteUser(personItem.getRadioLabel());
+                    //new deleteUser(mContext).execute(personItem.getRadioLabel());
                 }
-                sqLiteDatabase.insert(DataBaseFavoriteRegist.TABLE_TEACHER, null, cv);
+                mDataBase.insert(DataBaseFavoriteRegist.TABLE_TEACHER, null, cv);
             }
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public void backupFavoriteStaffToFile(){
+    public static void backupFavoriteStaffToFile(){
+        //SQLiteDatabase mDataBase = DBinit.getDataBaseFavorite();
         Cursor cursor = null;
         try {
-            File file = null;
             FileOutputStream fileOutputStream;
             String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-            file = new File(mPath + "/Teachers.csv");
+            File file = new File(mPath + "/Teachers.csv");
 
-            cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, null,null,null,null,null,null);
+            //cursor = mDataBase.query(DataBaseFavoriteRegist.TABLE_TEACHER, null,null,null,null,null,null);
+            cursor = DBinit.getCursorFavorite(DataBaseFavoriteRegist.TABLE_TEACHER, null,null,null,null,null,null);
             cursor.moveToPosition(-1);
 
             if (file != null) {
@@ -320,84 +343,57 @@ public class DataBaseFavorite {
         catch (Exception e) {
             e.printStackTrace();
         } finally {
-            closeCursor(cursor);
+            //if (cursor!=null) cursor.close();
         }
     }
 
-    public ArrayList<PersonItem> readTeachersFromDB(){
-        Cursor cursor = null;
-        try {
-            cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE,
-                    DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null,null);
-            cursor.moveToPosition(-1);
-            ArrayList <PersonItem> mPerson = new ArrayList<>();            while (cursor.moveToNext()){
-
-                mPerson.add(new PersonItem()
-                        .setLastname(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)))
-                        .setRadioLabel(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE))));
-            }
-            Collections.sort(mPerson, new Comparator<PersonItem>() {
-                @Override
-                public int compare(PersonItem lhs, PersonItem rhs) {
-                    return lhs.getLastname().compareToIgnoreCase(rhs.getLastname());
-                }
-            });
-            return mPerson;
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ArrayList<>();
-        } finally {
-            closeCursor(cursor);
-        }
-    }
-
-    public void deleteUser(String tag){
+    public static void deleteUser(String tag){
+        SQLiteDatabase mDataBase = DBinit.getDataBaseFavorite();
         Cursor cursor = null;
         try{
-            cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
-                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
+            //cursor = mDataBase.rawQuery("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+             //       + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",new String[]{tag});
+            /*cursor = mDataBase.query(DataBaseFavoriteRegist.TABLE_TEACHER,
+                    new String[]{DataBaseFavoriteRegist._ID},
+                    DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",
+                    new String[]{tag},
+                    null,
+                    null,
+                    null);*/
+            cursor = DBinit.getCursorFavorite(DataBaseFavoriteRegist.TABLE_TEACHER,
+                    new String[]{DataBaseFavoriteRegist._ID},
+                    DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",
+                    new String[]{tag},
+                    null,
+                    null,
+                    null);
+
             if (cursor.getCount()>0){
                 cursor.moveToPosition(-1);
                 while (cursor.moveToNext()){
-                    Log.d("delete", cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)));
-                    sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID)), null);
+                    //Log.d("delete", cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE)));
+                    mDataBase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + cursor.getInt(cursor.getColumnIndex(DataBaseFavoriteRegist._ID)), null);
                 }
             }
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            closeCursor(cursor);
+            //if (cursor!=null) cursor.close();
         }
-
     }
 
-    public void deleteFromTeachersDB(PersonItem personItem){
-        try {
-            String personPosition = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
-                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE + " = '" + personItem.getLastname() + "'"
-                    + " AND " + DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE + " = '" + personItem.getFirstname() + "'"
-                    + " AND " + DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE + " = '" + personItem.getMidname() + "'"
-                    + " AND " + DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE + " = '" + personItem.getDivision() + "'" ).simpleQueryForString();
-            if (!personPosition.isEmpty()){
-                sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, DataBaseFavoriteRegist._ID + "=" + personPosition, null);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
 
-    }
 
-    public void clearTeachersDB(){
+    public static void clearTeachersDB(){
+        SQLiteDatabase mDataBase = DBinit.getDataBaseFavorite();
         try {
-            sqLiteDatabase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, null, null);
+            mDataBase.delete(DataBaseFavoriteRegist.TABLE_TEACHER, null, null);
         } catch (Exception e){
             e.printStackTrace();
         }
     }
-
 
     public static String getPhotoPreview(String photo){
-
         try {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -423,17 +419,19 @@ public class DataBaseFavorite {
         }
     }
 
-    public int getPersonsCount(){
+    public static int getPersonsCount(){
+        //SQLiteDatabase mDataBase = DBinit.getDataBaseFavorite();
         Cursor cursor = null;
         try {
-            cursor = sqLiteDatabase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null);
+           // cursor = mDataBase.query(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null);
+            cursor = DBinit.getCursorFavorite(DataBaseFavoriteRegist.TABLE_TEACHER, new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},null,null,null,null,null);
             if (cursor.getCount()>0){
                 return cursor.getCount();
             }
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            closeCursor(cursor);
+            //if (cursor!=null) cursor.close();
         }
         return 0;
     }
@@ -470,12 +468,6 @@ public class DataBaseFavorite {
         } catch (Exception e){
             e.printStackTrace();
             return null;
-        }
-    }
-
-    private void closeCursor(Cursor cursor){
-        if (cursor!=null){
-            cursor.close();
         }
     }
 }

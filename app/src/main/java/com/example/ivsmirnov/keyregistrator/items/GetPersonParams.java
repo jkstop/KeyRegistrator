@@ -1,5 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.CardView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,6 +19,12 @@ public class GetPersonParams{
     private TextView personLastname, personFirstname, personMidname, personDivision;
     private CardView personCard;
     private boolean isFreeUser;
+    private AppCompatCheckBox accessTypeContainer;
+
+    public GetPersonParams setAccessTypeContainer(AppCompatCheckBox appCompatCheckBox){
+        this.accessTypeContainer = appCompatCheckBox;
+        return this;
+    }
 
     public GetPersonParams setFreeUser(boolean isFreeUser){
         this.isFreeUser = isFreeUser;
@@ -124,6 +131,10 @@ public class GetPersonParams{
 
     public ImageView getAccessImageView(){
         return accessImageView;
+    }
+
+    public AppCompatCheckBox getAccessTypeContainer(){
+        return accessTypeContainer;
     }
 
 }

@@ -1,8 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.activities;
 
-import android.accounts.AccountManager;
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,12 +8,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -52,7 +47,6 @@ import com.example.ivsmirnov.keyregistrator.interfaces.DBinterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.ReaderResponse;
 import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.NavigationItem;
@@ -68,33 +62,22 @@ import com.example.ivsmirnov.keyregistrator.fragments.Rooms_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Shedule_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
-import com.example.ivsmirnov.keyregistrator.others.GMailOauthSender;
 
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.Alarm;
-import com.example.ivsmirnov.keyregistrator.services.CloseDayService;
 import com.example.ivsmirnov.keyregistrator.services.NFC_Reader;
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.plus.Account;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -110,7 +93,6 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     private adapter_navigation_drawer_list mNavigationDrawerListAdapter;
     private TextView mAccountName, mAccountEmail;
     private ImageView mChangeAccount, mPersonAccountImage;
-    public static DataBaseFavorite mDataBaseFavorite;
     public static DataBaseJournal mDataBaseJournal;
     public static DataBaseRooms mDataBaseRooms;
     public static DataBaseAccount mDataBaseAccount;
@@ -153,9 +135,10 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         mContext = this;
         mResources = getResources();
 
+        new DBinit(mContext);
+
         mAlarm = new Alarm(getApplicationContext());
 
-        mDataBaseFavorite = new DataBaseFavorite(mContext);
         mDataBaseJournal = new DataBaseJournal(mContext);
         mDataBaseRooms = new DataBaseRooms(mContext);
         mDataBaseAccount = new DataBaseAccount(mContext);
@@ -323,7 +306,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
                     mDataBaseAccount.writeAccount(accountItem);
 
-                    mDataBaseFavorite.writeInDBTeachers(new PersonItem()
+                    DataBaseFavorite.writeInDBTeachers(mContext, new PersonItem()
                             .setLastname(acct.getDisplayName())
                             .setDivision(acct.getEmail())
                             .setRadioLabel(acct.getId()));
@@ -414,24 +397,33 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     @Override
     public void onAccountImageLoaded(Bitmap bitmap) {
         mPersonAccountImage.setImageBitmap(bitmap);
+        new updateUserAccount().execute(bitmap);
+    }
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        String photo = Base64.encodeToString(byteArray,Base64.NO_WRAP);
+    //обновление аккаунта в базе
+    private class updateUserAccount extends AsyncTask<Bitmap, Void, Void>{
 
-        if (mDataBaseFavorite.getPersonItem(mSettings.getActiveAccountID(), DataBaseFavorite.LOCAL_USER, -1)!=null){
-            mDataBaseFavorite.writeInDBTeachers(mDataBaseFavorite.getPersonItem(mSettings.getActiveAccountID(),DataBaseFavorite.LOCAL_USER, -1)
-                    .setPhotoOriginal(photo)
-                    .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo)));
-        } else {
-            AccountItem account = mDataBaseAccount.getAccount(mSettings.getActiveAccountID());
-            mDataBaseFavorite.writeInDBTeachers(new PersonItem()
-                    .setRadioLabel(account.getAccountID())
-                    .setLastname(account.getLastname())
-                    .setDivision(account.getEmail())
-                    .setPhotoOriginal(photo)
-                    .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo)));
+        @Override
+        protected Void doInBackground(Bitmap... params) {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            params[0].compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            String photo = Base64.encodeToString(byteArray,Base64.NO_WRAP);
+
+            if (DataBaseFavorite.getPersonItem(mContext, mSettings.getActiveAccountID(), DataBaseFavorite.LOCAL_USER, -1)!=null){
+                DataBaseFavorite.writeInDBTeachers(mContext, DataBaseFavorite.getPersonItem(mContext, mSettings.getActiveAccountID(),DataBaseFavorite.LOCAL_USER, -1)
+                        .setPhotoOriginal(photo)
+                        .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo)));
+            } else {
+                AccountItem account = mDataBaseAccount.getAccount(mSettings.getActiveAccountID());
+                DataBaseFavorite.writeInDBTeachers(mContext,new PersonItem()
+                        .setRadioLabel(account.getAccountID())
+                        .setLastname(account.getLastname())
+                        .setDivision(account.getEmail())
+                        .setPhotoOriginal(photo)
+                        .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo)));
+            }
+            return null;
         }
     }
 
@@ -447,10 +439,10 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
             Log.d("SET_ALARM", String.valueOf(mAlarm.isAlarmSet()));
         }
 
-        if (mDataBaseFavorite == null){
-            mDataBaseFavorite = new DataBaseFavorite(mContext);
-            Log.d("recreate","favorite");
+        if (!DBinit.isFavoriteDBinited()){
+            new DBinit(mContext);
         }
+
         if (mDataBaseJournal == null){
             mDataBaseJournal = new DataBaseJournal(mContext);
             Log.d("recreate","journal");
@@ -485,7 +477,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         Log.d("Launcher","DESTROY");
 
-        mDataBaseFavorite.closeDB();
+        DBinit.closeDB();
+
         mDataBaseJournal.closeDB();
         mDataBaseRooms.closeDB();
         mDataBaseAccount.closeDB();
@@ -651,15 +644,14 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         @Override
         protected PersonItem doInBackground(String... params) {
 
-            PersonItem personItem = mDataBaseFavorite.getPersonItem(params[0], DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
+            PersonItem personItem = DataBaseFavorite.getPersonItem(mContext, params[0], DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
 
             if (personItem == null){
-                personItem = mDataBaseFavorite.getPersonItem(params[0], DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
+                personItem = DataBaseFavorite.getPersonItem(mContext, params[0], DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
                 personItem.setPhotoPreview(DataBaseFavorite.getPhotoPreview(personItem.getPhotoOriginal()));
 
-                mDataBaseFavorite.writeInDBTeachers(personItem);
-                personItem = mDataBaseFavorite.getPersonItem(params[0], DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
-
+                DataBaseFavorite.writeInDBTeachers(mContext, personItem);
+                personItem = DataBaseFavorite.getPersonItem(mContext, params[0], DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
             }
 
             return personItem;

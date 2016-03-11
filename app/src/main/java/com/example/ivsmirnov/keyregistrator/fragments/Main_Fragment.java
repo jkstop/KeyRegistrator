@@ -2,9 +2,7 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -14,7 +12,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +24,6 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.activities.NFC;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
@@ -46,8 +42,6 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Random;
 
 public class Main_Fragment extends Fragment implements UpdateInterface,RecycleItemClickListener, Get_Account_Information_Interface, RoomInterface{
 
@@ -57,7 +51,6 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     private Context mContext;
     private Settings mSettings;
 
-    private DataBaseFavorite mDataBaseFavorite;
     private DataBaseRooms mDataBaseRooms;
 
     private ArrayList<RoomItem> mRoomItems;
@@ -91,7 +84,6 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_main_fragment,container,false);
         mContext = rootView.getContext();
-        mDataBaseFavorite = Launcher.mDataBaseFavorite;
 
         if (Launcher.mDataBaseRooms!=null){
             mDataBaseRooms = Launcher.mDataBaseRooms;
@@ -171,8 +163,8 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                 dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
             case R.id.test:
-                startActivity(new Intent(mContext, NFC.class));
-                //new insert(mContext).execute();
+                //startActivity(new Intent(mContext, NFC.class));
+                new insert(mContext).execute();
                 return true;
             //case R.id.test2:
             //    return true;
@@ -200,11 +192,10 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         protected Void doInBackground(Void... params) {
 
             for (int i=0;i<1000;i++){
-                /*PersonItem personItem = mDataBaseFavorite.getPersonItem("99 77 DC 1A 00 00",DataBaseFavorite.SERVER_USER,DataBaseFavorite.FULLSIZE_PHOTO);
-                mDataBaseFavorite.writeInDBTeachers(personItem
-                        .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1)
-                        .setPhotoPreview(DataBaseFavorite.getPhotoPreview(personItem.getPhotoOriginal())));*/
-                long timeIN = System.currentTimeMillis();
+                PersonItem personItem = DataBaseFavorite.getPersonItem(mContext,"99 77 DC 1A 00 00",DataBaseFavorite.SERVER_USER,DataBaseFavorite.FULLSIZE_PHOTO);
+                DataBaseFavorite.writeInDBTeachers(mContext, personItem
+                        .setPhotoPreview(DataBaseFavorite.getPhotoPreview(personItem.getPhotoOriginal())));
+                /*long timeIN = System.currentTimeMillis();
                 Launcher.mDataBaseJournal.writeInDBJournal(new JournalItem().setAccessType(DataBaseJournal.ACCESS_BY_CARD)
                         .setAccountID(mSettings.getActiveAccountID())
                         .setAuditroom("111")
@@ -212,7 +203,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                         .setPersonFirstname("testUser")
                         .setTimeIn(timeIN)
                         .setTimeOut(System.currentTimeMillis()+100)
-                        .setPersonPhoto(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext,"М")));
+                        .setPersonPhoto(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext,"М")));*/
                 publishProgress(i);
             }
             return null;

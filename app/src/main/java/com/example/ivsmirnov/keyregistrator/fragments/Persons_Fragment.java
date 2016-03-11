@@ -55,8 +55,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     private ListView mListView;
     private FloatingActionButton mAddFAB;
 
-    private DataBaseFavorite mDataBaseFavorite;
-
     private static ArrayList<PersonItem> mAllItems;
     public adapter_persons_grid mAdapter;
     private adapter_list_characters mListAdapter;
@@ -192,14 +190,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
         mAllItems = new ArrayList<>();
 
-        if (Launcher.mDataBaseFavorite!=null){
-            mDataBaseFavorite = Launcher.mDataBaseFavorite;
-            Log.d("database","getFromMain");
-        }else{
-            mDataBaseFavorite = new DataBaseFavorite(mContext);
-            Log.d("database","createNew");
-        }
-
         mSettings = new Settings(mContext);
         mKeyInterface = this;
 
@@ -249,7 +239,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
 
     private void initListCharacters(){
-        mListCharacters = mDataBaseFavorite.getPersonsCharacters();
+        mListCharacters = DataBaseFavorite.getPersonsCharacters();
     }
 
 
@@ -328,7 +318,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     }
 
     private void getTagsForSelectedCharacher(int position){
-        ArrayList<String> tags = mDataBaseFavorite.getTagForCurrentCharacter(mListCharacters.get(position).getCharacter());
+        ArrayList<String> tags = DataBaseFavorite.getTagForCurrentCharacter(mListCharacters.get(position).getCharacter());
         if (!mAllItems.isEmpty()){
             mAllItems.clear();
         }

@@ -42,9 +42,11 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
+import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
@@ -94,17 +96,7 @@ public class Dialog_Fragment extends DialogFragment{
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResources = mContext.getResources();
 
-        if (dialog_id == Values.DIALOG_CLEAR_TEACHERS |
-                dialog_id == Values.DIALOG_EDIT){
-
-            if (Launcher.mDataBaseFavorite!=null){
-                mDataBaseFavorite = Launcher.mDataBaseFavorite;
-                Log.d("database","getFromMain");
-            }else{
-                mDataBaseFavorite = new DataBaseFavorite(mContext);
-                Log.d("database","createNew");
-            }
-        } else if (dialog_id == Values.DIALOG_CLEAR_JOURNAL){
+        if (dialog_id == Values.DIALOG_CLEAR_JOURNAL){
 
             if (Launcher.mDataBaseJournal!=null){
                 mDataBaseJournal = Launcher.mDataBaseJournal;
@@ -170,7 +162,7 @@ public class Dialog_Fragment extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                mDataBaseFavorite.clearTeachersDB();
+                                DataBaseFavorite.clearTeachersDB();
 
                                 updateInformation();
 
@@ -182,65 +174,48 @@ public class Dialog_Fragment extends DialogFragment{
 
                 final View dialogView = mInflater.inflate(R.layout.layout_person_information, null);
                 final ImageView personImage = (ImageView) dialogView.findViewById(R.id.person_information_image);
-                //final ArrayList<String> valuesForEdits = getArguments().getStringArrayList(Values.KEY_VALUES_FOR_DIALOG_PERSON_INFORMATION);
 
                 final TextInputLayout inputLastname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_lastname_layout);
                 final TextInputLayout inputFirstname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_firstname_layout);
                 final TextInputLayout inputMidname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_midname_layout);
                 final TextInputLayout inputDivision = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_division_layout);
                 AppCompatCheckBox accessType = (AppCompatCheckBox) dialogView.findViewById(R.id.person_information_access_type);
-
                 final String tag = getArguments().getString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG);
 
-                final PersonItem personItem = mDataBaseFavorite.getPersonItem(tag, DataBaseFavorite.LOCAL_USER, DataBaseFavorite.FULLSIZE_PHOTO);
-
-                inputLastname.getEditText().setText(personItem.getLastname());
-                inputFirstname.getEditText().setText(personItem.getFirstname());
-                inputMidname.getEditText().setText(personItem.getMidname());
-                inputDivision.getEditText().setText(personItem.getDivision());
-
-                if (mSettings.getFreeUsers().contains(personItem.getRadioLabel())) accessType.setChecked(true);
+                //получаем пользователя и заполняем поля
+                new GetPersons(mContext, null, null).execute(new GetPersonParams()
+                        .setPersonLocation(DataBaseFavorite.LOCAL_USER)
+                        .setPersonPhotoDimension(DataBaseFavorite.FULLSIZE_PHOTO)
+                        .setPersonTag(tag)
+                        .setPersonImageView(personImage)
+                        .setPersonLastname(inputLastname.getEditText())
+                        .setPersonFirstname(inputFirstname.getEditText())
+                        .setPersonMidname(inputMidname.getEditText())
+                        .setAccessTypeContainer(accessType)
+                        .setFreeUser(mSettings.getFreeUsers().contains(tag))
+                        .setPersonDivision(inputDivision.getEditText()));
 
                 accessType.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) mSettings.addFreeUser(personItem.getRadioLabel());
-                                else mSettings.deleteFreeUser(personItem.getRadioLabel());
+                        if (isChecked) mSettings.addFreeUser(tag);
+                                else mSettings.deleteFreeUser(tag);
                     }
                 });
 
-                byte [] decodedString = Base64.decode(personItem.getPhotoOriginal(), Base64.DEFAULT);
-                personImage.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
-
-               /* if (valuesForEdits!=null){
-                    inputLastname.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_LASTNAME));
-                    inputFirstname.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_FIRSTNAME));
-                    inputMidname.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_MIDNAME));
-                    inputDivision.getEditText().setText(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_DIVISION));
-
-//                    byte[] decodedString = Base64.decode(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL), Base64.DEFAULT);
-//                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-                    personImage.setImageBitmap(new DataBaseFavorite(mContext).getPersonPhoto(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_TAG),
-                            GetPersonPhoto.LOCAL_PHOTO,GetPersonPhoto.ORIGINAL_IMAGE));
-
-                    tag = valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_TAG);
-                }*/
 
                 AlertDialog.Builder builderEdit = new AlertDialog.Builder(getActivity());
                 builderEdit.setView(dialogView);
 
-                if (mDataBaseFavorite.isUserInBase(tag)){
+                if (DataBaseFavorite.isUserInBase(tag)){
                     builderEdit.setNeutralButton(getResources().getString(R.string.delete), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (tag!=null){
 
-                                mDataBaseFavorite.deleteFromTeachersDB(new PersonItem()
-                                        .setLastname(personItem.getLastname())
-                                        .setFirstname(personItem.getFirstname())
-                                        .setMidname(personItem.getMidname())
-                                        .setDivision(personItem.getDivision()));
+
+                                //new DataBaseFavorite.deleteUser(mContext).execute(tag);
+                                DataBaseFavorite.deleteUser(tag);
 
                                 //удаление метки в free_users
                                 mSettings.deleteFreeUser(tag);
@@ -259,7 +234,7 @@ public class Dialog_Fragment extends DialogFragment{
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            mDataBaseFavorite.updatePersonItem(tag, new PersonItem()
+                            DataBaseFavorite.updatePersonItem(tag, new PersonItem()
                                     .setLastname(inputLastname.getEditText().getText().toString())
                                     .setFirstname(inputFirstname.getEditText().getText().toString())
                                     .setMidname(inputMidname.getEditText().getText().toString())
@@ -272,14 +247,14 @@ public class Dialog_Fragment extends DialogFragment{
                     builderEdit.setNeutralButton(getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            mDataBaseFavorite.writeInDBTeachers(new PersonItem().setLastname(personItem.getLastname())
-                                    .setFirstname(personItem.getFirstname())
-                                    .setMidname(personItem.getMidname())
-                                    .setDivision(personItem.getDivision())
+                            //DataBaseFavorite.writeInDBTeachers(mContext, new PersonItem().setLastname(personItem.getLastname())
+                            //        .setFirstname(personItem.getFirstname())
+                            //        .setMidname(personItem.getMidname())
+                            //        .setDivision(personItem.getDivision())
                                     //.setPhotoOriginal(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL))
                                     //.setPhotoPreview(DataBaseFavorite.getPhotoPreview(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL)))
-                                    .setSex(personItem.getSex())
-                                    .setRadioLabel(personItem.getRadioLabel()));
+                            //        .setSex(personItem.getSex())
+                            //        .setRadioLabel(personItem.getRadioLabel()));
                             updateInformation();
                         }
                     });

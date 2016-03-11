@@ -29,7 +29,6 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
     private boolean isShowDialog;
 
     private DataBaseJournal mDataBaseJournal;
-    private DataBaseFavorite mDataBaseFavorite;
 
     private static final String JOURNAL = "/Journal.xls";
     private static final String TEACHERS = "/Teachers.csv";
@@ -48,11 +47,6 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
             mDataBaseJournal = new DataBaseJournal(mContext);
         }
 
-        if (Launcher.mDataBaseFavorite!=null){
-            mDataBaseFavorite = Launcher.mDataBaseFavorite;
-        }else{
-            mDataBaseFavorite = new DataBaseFavorite(mContext);
-        }
     }
 
     @Override
@@ -79,7 +73,7 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
                 break;
             case Values.WRITE_TEACHERS:
 
-                mDataBaseFavorite.backupFavoriteStaffToFile();
+                DataBaseFavorite.backupFavoriteStaffToFile();
 
                 String srFileTeachers = mPathExternal + TEACHERS;
                 String dtFileTeachers = mSettings.getPersonsBackupLocation() + TEACHERS;

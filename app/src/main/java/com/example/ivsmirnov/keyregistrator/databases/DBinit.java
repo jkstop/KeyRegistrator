@@ -1,78 +1,54 @@
 package com.example.ivsmirnov.keyregistrator.databases;
 
 import android.content.Context;
-import android.os.AsyncTask;
-
-import com.example.ivsmirnov.keyregistrator.interfaces.DBinterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 /**
- * Created by ivsmirnov on 10.03.2016.
+ * Created by ivsmirnov on 11.03.2016.
  */
-public class DBinit extends AsyncTask<Context, Void, Void> {
+public class DBinit {
 
-    private DataBaseFavorite DataBaseFavorite;
-    private DataBaseJournal DataBaseJournal;
-    private DataBaseRooms DataBaseRooms;
-    private DataBaseAccount DataBaseAccount;
+    private static Context mContext;
 
-    private DBinterface mListener;
+    private static DataBaseFavoriteRegist mDataBaseFavoriteOpenHelper;
+    private static SQLiteDatabase mDataBaseFavorite;
+    private static Cursor mCursorFavorite;
 
-    public DBinit(DBinterface dBinterface){
-        this.mListener = dBinterface;
+    public DBinit (Context context){
+        mContext = context;
+
+        mDataBaseFavoriteOpenHelper = new DataBaseFavoriteRegist(mContext);
+        mDataBaseFavorite = mDataBaseFavoriteOpenHelper.getWritableDatabase();
+
+        Log.d("DB_INIT","*********FAVORITE*********");
     }
 
-    public DataBaseFavorite getDataBaseFavorite(){
-        return DataBaseFavorite;
-    }
-
-    public DataBaseJournal getDataBaseJournal(){
-        return DataBaseJournal;
-    }
-
-    public DataBaseRooms getDataBaseRooms(){
-        return DataBaseRooms;
-    }
-
-    public DataBaseAccount getDataBaseAccount(){
-        return DataBaseAccount;
-    }
-
-    public boolean isDBinited(){
-        if (DataBaseFavorite != null &&
-                DataBaseJournal !=null &&
-                DataBaseAccount !=null &&
-                DataBaseRooms != null){
-            return true;
+    public static SQLiteDatabase getDataBaseFavorite(){
+        if (isFavoriteDBinited()){
+            Log.d("DB_RETURN","*********FAVORITE********");
+            return mDataBaseFavorite;
         } else {
-            return false;
+            Log.d("DB_RECREATE","*********FAVORITE********");
+            mDataBaseFavoriteOpenHelper = new DataBaseFavoriteRegist(mContext);
+            return mDataBaseFavoriteOpenHelper.getWritableDatabase();
         }
     }
 
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
+    public static Cursor getCursorFavorite(String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String orderBy, String limit){
+        mCursorFavorite = getDataBaseFavorite().query(table, columns, selection, selectionArgs, groupBy, null, orderBy, limit);
+        return mCursorFavorite;
     }
 
-    @Override
-    protected Void doInBackground(Context... params) {
-
-        if (DataBaseFavorite == null) DataBaseFavorite = new DataBaseFavorite(params[0]);
-        if (DataBaseJournal == null) DataBaseJournal = new DataBaseJournal(params[0]);
-        if (DataBaseRooms == null) DataBaseRooms = new DataBaseRooms(params[0]);
-        if (DataBaseAccount == null) DataBaseAccount = new DataBaseAccount(params[0]);
-
-        return null;
+    public static boolean isFavoriteDBinited(){
+        return mDataBaseFavorite != null;
     }
 
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        if (DataBaseFavorite != null &&
-                DataBaseJournal !=null &&
-                DataBaseAccount !=null &&
-                DataBaseRooms != null){
-            mListener.onDBinited(true);
-        } else {
-            mListener.onDBinited(false);
-        }
+    public static void closeDB(){
+        Log.d("DB_CLOSE","*********FAVORITE********");
+        if (mDataBaseFavoriteOpenHelper!=null) mDataBaseFavoriteOpenHelper.close();
+        if (mDataBaseFavorite!=null) mDataBaseFavorite.close();
+        if (mCursorFavorite!=null) mCursorFavorite.close();
     }
 }

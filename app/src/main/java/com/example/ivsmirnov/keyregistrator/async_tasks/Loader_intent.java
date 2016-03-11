@@ -80,14 +80,8 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
 
         switch (mLoadType){
             case Values.REQUEST_CODE_LOAD_FAVORITE_STAFF:
-                DataBaseFavorite mDataBaseFavorite;
-                if (Launcher.mDataBaseFavorite!=null){
-                    mDataBaseFavorite = Launcher.mDataBaseFavorite;
-                } else {
-                    mDataBaseFavorite = new DataBaseFavorite(mContext);
-                }
 
-                mDataBaseFavorite.clearTeachersDB();
+                DataBaseFavorite.clearTeachersDB();
                 try {
                     while ((line = fin.readLine())!=null){
                         if (i<count){
@@ -95,7 +89,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                 try {
                                     String [] split = line.split(";");
 
-                                    mDataBaseFavorite.writeInDBTeachers( new PersonItem()
+                                    DataBaseFavorite.writeInDBTeachers(mContext, new PersonItem()
                                             .setLastname(split[0])
                                             .setFirstname(split[1])
                                             .setMidname(split[2])

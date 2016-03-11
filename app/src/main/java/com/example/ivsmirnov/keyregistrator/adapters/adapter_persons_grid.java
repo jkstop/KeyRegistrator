@@ -1,10 +1,8 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
-import android.media.Image;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
@@ -32,26 +29,19 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
     private SparseArray <String> card;
     private ArrayList <PersonItem> allItems;
     private int mType;
-    private Context context;
+    private Context mContext;
     private LayoutInflater inflater;
     private RecycleItemClickListener mListener;
-    public  DataBaseFavorite mDataBaseFavorite;
     private ArrayList<String> isFreeUsers;
 
     public adapter_persons_grid(Context c, ArrayList<PersonItem> all,int type,RecycleItemClickListener listener) {
         allItems = all;
-        context = c;
+        mContext = c;
         mType = type;
-        if (Launcher.mDataBaseFavorite!=null){
-            mDataBaseFavorite = Launcher.mDataBaseFavorite;
-            Log.d("database","getFromMain");
-        }else{
-            mDataBaseFavorite = new DataBaseFavorite(context);
-            Log.d("database","createNew");
-        }
+
         this.mListener = listener;
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        isFreeUsers = new Settings(context).getFreeUsers();
+        inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        isFreeUsers = new Settings(mContext).getFreeUsers();
     }
 
 
@@ -105,12 +95,11 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
-        Animation fadeInanimation = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
+        Animation fadeInanimation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
         if (mType== Values.SHOW_FAVORITE_PERSONS){
 
-            new GetPersons(holder.personCard, fadeInanimation).execute(new GetPersonParams()
+            new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams()
                     .setPersonTag(allItems.get(position).getRadioLabel())
-                    .setDatabase(mDataBaseFavorite)
                     .setPersonImageView(holder.imageView)
                     .setPersonLastname(holder.textLastname)
                     .setPersonFirstname(holder.textFirstname)
@@ -123,8 +112,7 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
 
         }else if (mType==Values.SHOW_ALL_PERSONS){
 
-            new GetPersons(holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(allItems.get(position).getRadioLabel())
-                    .setDatabase(mDataBaseFavorite)
+            new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(allItems.get(position).getRadioLabel())
                     .setPersonImageView(holder.imageView)
                     .setPersonLastname(holder.textLastname)
                     .setPersonFirstname(holder.textFirstname)
@@ -132,7 +120,6 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
                     .setPersonDivision(holder.textDivision)
                     .setPersonLocation(DataBaseFavorite.SERVER_USER)
                     .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
-
         }
     }
 

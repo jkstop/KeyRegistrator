@@ -231,16 +231,9 @@ public class Values{
 
     public static JournalItem createNewItemForJournal (Context context, PersonItem personItem, String auditroom, int accessType){
         Settings settings = new Settings(context);
-        DataBaseFavorite mDataBaseFavorite;
-        if (Launcher.mDataBaseFavorite!=null){
-            mDataBaseFavorite = Launcher.mDataBaseFavorite;
-            Log.d("databaseF","getFromMain");
-        }else{
-            mDataBaseFavorite = new DataBaseFavorite(context);
-            Log.d("databaseF","createNew");
-        }
 
-        PersonItem person = mDataBaseFavorite.getPersonItem(personItem.getRadioLabel(), DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
+        //asynch task?
+        PersonItem person = DataBaseFavorite.getPersonItem(context, personItem.getRadioLabel(), DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
         return new JournalItem().setAccountID(settings.getActiveAccountID())
                 .setAuditroom(auditroom)
                 .setAccessType(accessType)

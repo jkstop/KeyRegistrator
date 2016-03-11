@@ -34,10 +34,6 @@
             >
         </activity>
 
-        <activity android:name=".activities.NFC"
-            android:label="Приложите карту"
-            />
-
 
         <activity
             android:name="com.nononsenseapps.filepicker.FilePickerActivity"

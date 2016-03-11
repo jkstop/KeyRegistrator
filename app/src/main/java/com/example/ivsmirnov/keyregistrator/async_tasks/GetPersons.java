@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.CardView;
 import android.util.Base64;
 import android.util.Log;
@@ -29,26 +30,29 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
     private CardView personCard;
     private Animation mAnimation;
     private boolean isFreeUser;
+    private Context mContext;
 
     private ImageView mPersonImage, mAccessImage;
     private TextView mPersonLastname, mPersonFirstname, mPersonMidname, mPersonDivision;
+    private AppCompatCheckBox mAccessTypeContainer;
 
-    public GetPersons(CardView personCard, Animation fadeInAnimation){
+    public GetPersons(Context context, CardView personCard, Animation fadeInAnimation){
         this.personCard = new WeakReference<CardView>(personCard).get();
         this.mAnimation = fadeInAnimation;
+        this.mContext = context;
     }
 
     @Override
     protected void onPreExecute() {
-        personCard.setVisibility(View.INVISIBLE);
+        if (personCard!=null) personCard.setVisibility(View.INVISIBLE);
     }
 
     @Override
     protected PersonItem doInBackground(GetPersonParams... params) {
 
         photoDimension = params[0].getPersonPhotoDimension();
-        DataBaseFavorite dataBaseFavorite = params[0].getDataBaseFavorite();
-        PersonItem personItem = dataBaseFavorite.getPersonItem(params[0].getPersonTag(), params[0].getPersonLocation(), photoDimension);
+
+        PersonItem personItem = DataBaseFavorite.getPersonItem(mContext, params[0].getPersonTag(), params[0].getPersonLocation(), photoDimension);
 
         mPersonImage = new WeakReference<ImageView>(params[0].getPersonImageView()).get();
         mAccessImage = new WeakReference<ImageView>(params[0].getAccessImageView()).get();
@@ -56,6 +60,7 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
         mPersonFirstname = new WeakReference<TextView>(params[0].getPersonFirstname()).get();
         mPersonMidname = new WeakReference<TextView>(params[0].getPersonMidname()).get();
         mPersonDivision = new WeakReference<TextView>(params[0].getPersonDivision()).get();
+        mAccessTypeContainer = new WeakReference<AppCompatCheckBox>(params[0].getAccessTypeContainer()).get();
 
         isFreeUser = params[0].getFreeUser();
 
@@ -87,9 +92,12 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
         if (mPersonDivision!=null) mPersonDivision.setText(personItem.getDivision());
 
+        if (mAccessTypeContainer!=null) {
+            if (isFreeUser) mAccessTypeContainer.setChecked(true);
+        }
 
-        personCard.setVisibility(View.VISIBLE);
-        personCard.startAnimation(mAnimation);
+        if (personCard!=null) personCard.setVisibility(View.VISIBLE);
+        if (personCard!=null) personCard.startAnimation(mAnimation);
     }
 
 }

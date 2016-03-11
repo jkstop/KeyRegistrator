@@ -30,7 +30,6 @@ public class CloseDay extends AppCompatActivity {
 
     private Context mContext;
     private DataBaseJournal mDataBaseJournal;
-    private DataBaseFavorite mDataBaseFavorite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +42,6 @@ public class CloseDay extends AppCompatActivity {
             mDataBaseJournal = Launcher.mDataBaseJournal;
         } else {
             mDataBaseJournal = new DataBaseJournal(mContext);
-        }
-
-        if (Launcher.mDataBaseFavorite!=null){
-            mDataBaseFavorite = Launcher.mDataBaseFavorite;
-        } else {
-            mDataBaseFavorite = new DataBaseFavorite(mContext);
         }
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.layout_close_day_text_head);
@@ -73,7 +66,7 @@ public class CloseDay extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.layout_close_day_card_stat_value_journal_items)).setText(String.valueOf(mDataBaseJournal.getItemCount(DataBaseJournal.COUNT_TOTAL)));
 
-        ((TextView) findViewById(R.id.layout_close_day_card_stat_value_person_items)).setText(String.valueOf(mDataBaseFavorite.getPersonsCount()));
+        ((TextView) findViewById(R.id.layout_close_day_card_stat_value_person_items)).setText(String.valueOf(DataBaseFavorite.getPersonsCount()));
 
 
         TextView textAutoCloseCount = (TextView)findViewById(R.id.layout_close_day_card_stat_value_autoclose);

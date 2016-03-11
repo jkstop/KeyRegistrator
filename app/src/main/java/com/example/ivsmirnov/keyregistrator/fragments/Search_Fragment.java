@@ -52,8 +52,6 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
     private ArrayList<PersonItem> mPersonItems;
 
-    private DataBaseFavorite mDataBaseFavorite;
-
     private ProgressBar mProgressBar;
     private RecyclerView mPersonsRecycler;
     private Button mAddButton;
@@ -76,12 +74,6 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
         mSettings = new Settings(mContext);
         mProgressBar = (ProgressBar)rootView.findViewById(R.id.layout_add_new_staff_progress);
         mProgressBar.setVisibility(View.INVISIBLE);
-
-        if (Launcher.mDataBaseFavorite!=null){
-            mDataBaseFavorite = Launcher.mDataBaseFavorite;
-        } else {
-            mDataBaseFavorite = new DataBaseFavorite(mContext);
-        }
 
         mListener = this;
 
@@ -148,7 +140,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
                     lastname = lastname.substring(0,1).toUpperCase() + lastname.substring(1,lastname.length());
 
-                    addUserInFavorite(mContext, new PersonItem().setLastname(lastname)
+                    addUserInFavorite(new PersonItem().setLastname(lastname)
                             .setFirstname(firstname)
                             .setMidname(midname)
                             .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo))
@@ -201,9 +193,9 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     public void onItemLongClick(View v, int position, long timeIn) {
     }
 
-    private void addUserInFavorite(final Context context, final PersonItem personItem){
+    private void addUserInFavorite(final PersonItem personItem){
 
-        mDataBaseFavorite.writeInDBTeachers(personItem);
+        DataBaseFavorite.writeInDBTeachers(mContext, personItem);
 
         if (getView()!=null){
             Snackbar.make(getView(),R.string.snack_user_added,Snackbar.LENGTH_LONG)
@@ -211,7 +203,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                         @Override
                         public void onClick(View v) {
 
-                            mDataBaseFavorite.deleteFromTeachersDB(personItem);
+                            DataBaseFavorite.deleteUser(personItem.getRadioLabel());
                             Snackbar.make(getView(),R.string.snack_cancelled,Snackbar.LENGTH_LONG).show();
                         }
                     })
@@ -223,7 +215,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
         @Override
         protected PersonItem doInBackground(Integer... params) {
-            PersonItem selectedPerson = mDataBaseFavorite.getPersonItem(mPersonItems.get(params[0]).getRadioLabel(), DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
+            PersonItem selectedPerson = DataBaseFavorite.getPersonItem(mContext, mPersonItems.get(params[0]).getRadioLabel(), DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
             selectedPerson.setPhotoPreview(DataBaseFavorite.getPhotoPreview(selectedPerson.getPhotoOriginal()));
             return selectedPerson;
         }
@@ -231,7 +223,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
         @Override
         protected void onPostExecute(PersonItem personItem) {
             if (personItem != null) {
-                addUserInFavorite(mContext, personItem);
+                addUserInFavorite(personItem);
             }
         }
     }
