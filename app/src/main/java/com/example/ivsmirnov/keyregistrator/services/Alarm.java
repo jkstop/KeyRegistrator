@@ -20,11 +20,9 @@ public class Alarm {
     private AlarmManager mAlarmManager;
     private PendingIntent mStartAlarmIntent;
     private Context mContext;
-    private Settings mSettings;
 
     public Alarm(Context context){
         this.mContext = context;
-        mSettings = new Settings(mContext);
     }
 
     public void setAlarm(long closingTime){

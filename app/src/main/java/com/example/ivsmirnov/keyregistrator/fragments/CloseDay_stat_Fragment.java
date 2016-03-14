@@ -34,8 +34,8 @@ public class CloseDay_stat_Fragment extends Fragment {
 
         textDate.setText(preferences.getString(Values.TODAY, Values.showDate()));
         //textItems.setText(String.valueOf(new DataBaseJournal(context).getItemCountForToday()));
-        textClosed.setText(String.valueOf(new Settings(context).getAutoClosedRoomsCount()));
-        textTotal.setText(String.valueOf(new Settings(context).getTotalJournalCount()));
+        textClosed.setText(String.valueOf(Settings.getAutoClosedRoomsCount()));
+        textTotal.setText(String.valueOf(Settings.getTotalJournalCount()));
 
         return root;
     }

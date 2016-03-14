@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
@@ -32,12 +33,12 @@ public class TakeKey extends AsyncTask<TakeKeyParams,Void,Void> {
     @Override
     protected Void doInBackground(TakeKeyParams... params) {
         mListener = params[0].getPublicInterface();
-        JournalItem journalItem = Values.createNewItemForJournal(mContext,
+        JournalItem journalItem = DataBaseJournal.createNewItemForJournal(mContext,
                 params[0].getPersonItem(),
                 params[0].getAuditroom(),
                 params[0].getAccessType());
-        long positionInBase = Values.writeInJournal(mContext, journalItem);
-        Values.writeRoom(mContext, journalItem, params[0].getPersonItem(),positionInBase);
+        long positionInBase = DataBaseJournal.writeInDBJournal(journalItem);
+        Values.writeRoom(journalItem, params[0].getPersonItem(),positionInBase);
         return null;
     }
 

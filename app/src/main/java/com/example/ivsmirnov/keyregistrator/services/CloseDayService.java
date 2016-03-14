@@ -8,6 +8,7 @@ import android.os.IBinder;
 
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
+import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseDayInterface;
 import com.example.ivsmirnov.keyregistrator.items.MailParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
@@ -19,14 +20,12 @@ import java.util.Calendar;
 public class CloseDayService extends Service implements CloseDayInterface {
 
     private Context context;
-    private Settings mSettings;
     private Alarm mAlarm;
 
 
     @Override
     public void onCreate() {
         context = getApplicationContext();
-        mSettings = new Settings(context);
         mAlarm = new Alarm(getApplicationContext());
     }
 
@@ -40,7 +39,7 @@ public class CloseDayService extends Service implements CloseDayInterface {
 
         try {
 
-            mSettings.setAutoClosedRoomsCount(Values.closeAllRooms(context));
+            Settings.setAutoClosedRoomsCount(DataBaseRooms.closeAllRooms());
 
             //Launcher.mRoomInterface.onRoomClosed();
 
@@ -50,10 +49,10 @@ public class CloseDayService extends Service implements CloseDayInterface {
             Calendar calendar = Calendar.getInstance();
             if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
                 new Send_Email(context, Send_Email.DIALOG_DISABLED).execute(new MailParams()
-                        .setTheme(mSettings.getMessageTheme())
-                        .setBody(mSettings.getMessageBody())
-                        .setAttachments(mSettings.getAttachments())
-                        .setRecepients(mSettings.getRecepients()));
+                        .setTheme(Settings.getMessageTheme())
+                        .setBody(Settings.getMessageBody())
+                        .setAttachments(Settings.getAttachments())
+                        .setRecepients(Settings.getRecepients()));
             }
 
             mAlarm.setAlarm(System.currentTimeMillis() + AlarmManager.INTERVAL_DAY);
@@ -78,7 +77,7 @@ public class CloseDayService extends Service implements CloseDayInterface {
     public void onClosed() {
 
         startActivity(new Intent(getApplicationContext(), CloseDay.class)
-                .putExtra(CloseDay.AUTO_CLOSE_ROOMS, mSettings.getAutoClosedRoomsCount())
+                .putExtra(CloseDay.AUTO_CLOSE_ROOMS, Settings.getAutoClosedRoomsCount())
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
     }
 }

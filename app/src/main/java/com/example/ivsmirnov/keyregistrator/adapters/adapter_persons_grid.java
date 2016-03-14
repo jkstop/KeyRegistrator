@@ -41,7 +41,7 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
 
         this.mListener = listener;
         inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        isFreeUsers = new Settings(mContext).getFreeUsers();
+        isFreeUsers = Settings.getFreeUsers();
     }
 
 

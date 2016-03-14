@@ -23,12 +23,10 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
 
     private Context mContext;
     private int mType;
-    private Settings mSettings;
     private ProgressDialog mProgressDialog;
     private String mPathExternal;
     private boolean isShowDialog;
 
-    private DataBaseJournal mDataBaseJournal;
 
     private static final String JOURNAL = "/Journal.xls";
     private static final String TEACHERS = "/Teachers.csv";
@@ -37,15 +35,9 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
         this.mContext = context;
         this.mType = loadType;
         this.isShowDialog = isShowDialog;
-        mSettings = new Settings(mContext);
         mPathExternal = Environment.getExternalStorageDirectory().getPath();
         mProgressDialog = new ProgressDialog(mContext);
 
-        if (Launcher.mDataBaseJournal != null){
-            mDataBaseJournal = Launcher.mDataBaseJournal;
-        } else {
-            mDataBaseJournal = new DataBaseJournal(mContext);
-        }
 
     }
 
@@ -64,30 +56,23 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
         switch (mType){
             case Values.WRITE_JOURNAL:
 
-                mDataBaseJournal.backupJournalToXLS();
-                mDataBaseJournal.backupJournalToCSV();
+                DataBaseJournal.backupJournalToXLS();
+                DataBaseJournal.backupJournalToCSV();
 
                 String srFileJournal = mPathExternal + JOURNAL;
-                String dtFileJournal = mSettings.getJournalBackupLocation() + JOURNAL;
-                Values.copyfile(mContext, srFileJournal, dtFileJournal);
+                String dtFileJournal = Settings.getJournalBackupLocation() + JOURNAL;
+                Values.copyfile(srFileJournal, dtFileJournal);
                 break;
             case Values.WRITE_TEACHERS:
 
                 DataBaseFavorite.backupFavoriteStaffToFile();
 
                 String srFileTeachers = mPathExternal + TEACHERS;
-                String dtFileTeachers = mSettings.getPersonsBackupLocation() + TEACHERS;
-                Values.copyfile(mContext, srFileTeachers, dtFileTeachers);
+                String dtFileTeachers = Settings.getPersonsBackupLocation() + TEACHERS;
+                Values.copyfile(srFileTeachers, dtFileTeachers);
                 break;
             case Values.WRITE_ROOMS:
-                DataBaseRooms mDataBaseRooms;
-                if (Launcher.mDataBaseRooms!=null){
-                    mDataBaseRooms = Launcher.mDataBaseRooms;
-                } else {
-                    mDataBaseRooms = new DataBaseRooms(mContext);
-                }
-
-                mDataBaseRooms.backupRoomsToFile();
+                DataBaseRooms.backupRoomsToFile();
                 break;
         }
         return null;

@@ -53,6 +53,11 @@ public class adapter_free_users extends RecyclerView.Adapter<adapter_free_users.
     }
 
     @Override
+    public void onViewDetachedFromWindow(viewHolder holder) {
+        holder.mCard.clearAnimation();
+    }
+
+    @Override
     public void onBindViewHolder(viewHolder holder, int position) {
 
         new getPersonItem(holder.mCard, AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in))

@@ -48,20 +48,13 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
     public static final boolean DIALOG_DISABLED = false;
 
     private Context mContext;
-    private Settings mSettings;
     private boolean isDialogShow;
     private ProgressDialog mProgressDialog;
-    private DataBaseAccount mDataBaseAccount;
 
     public Send_Email(Context c, boolean isDialogShow) {
         this.mContext = c;
         this.isDialogShow = isDialogShow;
-        mSettings = new Settings(mContext);
-        if (Launcher.mDataBaseAccount !=null){
-            mDataBaseAccount = Launcher.mDataBaseAccount;
-        } else {
-            mDataBaseAccount = new DataBaseAccount(mContext);
-        }
+
     }
 
     @Override
@@ -85,7 +78,7 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
 
         try {
 
-            AccountItem accountItem = mDataBaseAccount.getAccount(mSettings.getActiveAccountID());
+            AccountItem accountItem = DataBaseAccount.getAccount(Settings.getActiveAccountID());
 
             String token = GoogleAuthUtil.getToken(mContext, accountItem.getEmail(),"oauth2:https://mail.google.com/");
             String mTheme = params[0].getTheme();

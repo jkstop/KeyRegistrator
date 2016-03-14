@@ -114,16 +114,12 @@ public class Values{
     public static final String MAIL_ATTACHMENTS = "mail_attachments";
     public static final String MAIL_THEME = "mail_theme";
     public static final String MAIL_BODY = "mail_body";
-    public static final String TOKEN = "token";
 
     public static final int ROOM_IS_BUSY = 0;
     public static final int ROOM_IS_FREE = 1;
 
     public static final int SHOW_FAVORITE_PERSONS = 0;
     public static final int SHOW_ALL_PERSONS = 1;
-
-    //public static final int ACCESS_BY_CLICK = 0;
-    //public static final int ACCESS_BY_CARD = 1;
 
     //request codes
     public static final int REQUEST_CODE_LOAD_FAVORITE_STAFF = 200;
@@ -152,7 +148,7 @@ public class Values{
     public static final int TOAST_POSITIVE = 1;
 
 
-    public static void copyfile(Context context, String srFile, String dtFile){
+    public static void copyfile(String srFile, String dtFile){
         try{
             File f1 = new File(srFile);
             File f2 = new File(dtFile);
@@ -165,7 +161,6 @@ public class Values{
             }
             in.close();
             out.close();
-
         }
         catch(FileNotFoundException ex){
             System.out.println(ex.getMessage() + " in the specified directory.");
@@ -201,26 +196,9 @@ public class Values{
     }
 
 
-    public static long writeInJournal(Context context, JournalItem journalItem){
+    public static void writeRoom (JournalItem journalItem, PersonItem personItem, long positionInBase){
 
-        DataBaseJournal mDataBaseJournal;
-        if (Launcher.mDataBaseJournal!=null){
-            mDataBaseJournal = Launcher.mDataBaseJournal;
-        } else {
-            mDataBaseJournal = new DataBaseJournal(context);
-        }
-
-        return mDataBaseJournal.writeInDBJournal(journalItem);
-    }
-
-    public static void writeRoom (Context context, JournalItem journalItem, PersonItem personItem, long positionInBase){
-        DataBaseRooms mDataBaseRooms;
-        if (Launcher.mDataBaseRooms!=null){
-            mDataBaseRooms = Launcher.mDataBaseRooms;
-        } else {
-            mDataBaseRooms = new DataBaseRooms(context);
-        }
-        mDataBaseRooms.updateRoom(new RoomItem().setAuditroom(journalItem.getAuditroom())
+        DataBaseRooms.updateRoom(new RoomItem().setAuditroom(journalItem.getAuditroom())
                 .setStatus(Values.ROOM_IS_BUSY)
                 .setAccessType(journalItem.getAccessType())
                 .setPositionInBase(positionInBase)
@@ -229,49 +207,4 @@ public class Values{
                 .setPhoto(journalItem.getPersonPhoto()));
     }
 
-    public static JournalItem createNewItemForJournal (Context context, PersonItem personItem, String auditroom, int accessType){
-        Settings settings = new Settings(context);
-
-        //asynch task?
-        PersonItem person = DataBaseFavorite.getPersonItem(context, personItem.getRadioLabel(), DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
-        return new JournalItem().setAccountID(settings.getActiveAccountID())
-                .setAuditroom(auditroom)
-                .setAccessType(accessType)
-                .setTimeIn(System.currentTimeMillis())
-                .setPersonLastname(person.getLastname())
-                .setPersonFirstname(person.getFirstname())
-                .setPersonMidname(person.getMidname())
-                .setPersonPhoto(person.getPhotoPreview());
-    }
-
-    public static int closeAllRooms(Context context){
-        int closedRooms = 0;
-        DataBaseRooms mDataBaseRooms;
-        if (Launcher.mDataBaseRooms!=null){
-            mDataBaseRooms = Launcher.mDataBaseRooms;
-        } else {
-            mDataBaseRooms = new DataBaseRooms(context);
-        }
-
-        DataBaseJournal mDataBaseJournal;
-        if (Launcher.mDataBaseJournal!=null){
-            mDataBaseJournal = Launcher.mDataBaseJournal;
-        } else {
-            mDataBaseJournal = new DataBaseJournal(context);
-        }
-        ArrayList<RoomItem> rooms = mDataBaseRooms.readRoomsDB();
-        for (RoomItem roomItem : rooms){
-            if (roomItem.getStatus() == Values.ROOM_IS_BUSY){
-                roomItem.setStatus(Values.ROOM_IS_FREE);
-                roomItem.setTag(Values.EMPTY);
-
-                mDataBaseRooms.updateRoom(roomItem);
-                mDataBaseJournal.updateDB(roomItem.getPositionInBase());
-
-                closedRooms++;
-            }
-        }
-
-        return closedRooms;
-    }
 }

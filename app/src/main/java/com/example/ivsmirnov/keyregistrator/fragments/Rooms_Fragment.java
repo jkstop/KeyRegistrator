@@ -44,8 +44,6 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
 
     private RecyclerView mRoomsGrid;
 
-    private Settings mSettings;
-
     //private SharedPreferences sharedPreferences;
     //private SharedPreferences.Editor editor;
 
@@ -66,7 +64,6 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_auditrooms_fragment,container,false);
         mContext = rootView.getContext();
-        mSettings = new Settings(mContext);
 
         mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.auditroom_fragment_room_grid);
         mRoomsGrid.setHasFixedSize(true);
@@ -111,15 +108,9 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
     }
 
     private void initializeAuditroomsGrid(){
-        mRoomsGrid.setLayoutManager(new GridLayoutManager(mContext, mSettings.getAuditroomColumnsCount()));
+        mRoomsGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getAuditroomColumnsCount()));
 
-        DataBaseRooms mDataBaseRooms;
-        if (Launcher.mDataBaseRooms!=null){
-            mDataBaseRooms = Launcher.mDataBaseRooms;
-        } else {
-            mDataBaseRooms = new DataBaseRooms(mContext);
-        }
-        mRoomItems = mDataBaseRooms.readRoomsDB();
+        mRoomItems = DataBaseRooms.readRoomsDB();
 
         for (int i=0;i<mRoomItems.size();i++){
             mRoomItems.get(i).setStatus(Values.ROOM_IS_FREE);

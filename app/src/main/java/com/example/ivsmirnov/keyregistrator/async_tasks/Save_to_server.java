@@ -22,12 +22,10 @@ import java.util.ArrayList;
 public class Save_to_server extends AsyncTask <Void,Void,Void> {
 
     private Context mContext;
-    private Settings mSettings;
     private ProgressDialog mProgressDialog;
 
     public Save_to_server (Context context){
         this.mContext = context;
-        mSettings = new Settings(mContext);
         mProgressDialog = new ProgressDialog(mContext);
     }
 
@@ -42,14 +40,8 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        DataBaseJournal mDataBaseJournal;
-        if (Launcher.mDataBaseJournal!=null){
-            mDataBaseJournal = Launcher.mDataBaseJournal;
-        } else {
-            mDataBaseJournal = new DataBaseJournal(mContext);
-        }
 
-        ArrayList<JournalItem> mItems = mDataBaseJournal.realAllJournalFromDB();
+        ArrayList<JournalItem> mItems = DataBaseJournal.realAllJournalFromDB();
 
         try {
             Connection connection = SQL_Connection.SQLconnect;
@@ -62,7 +54,7 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
                 JournalItem journalItem;
                 PreparedStatement preparedStatement;
                 for (int i=0;i<mItems.size();i++){
-                    journalItem = mDataBaseJournal.getJournalItem(mItems.get(i).getTimeIn());
+                    journalItem = DataBaseJournal.getJournalItem(mItems.get(i).getTimeIn());
                     preparedStatement  = connection.prepareStatement("INSERT INTO Journal_recycler VALUES ('"
                             +journalItem.getAccountID()+"','"
                             +journalItem.getAuditroom()+"','"

@@ -49,7 +49,6 @@ public class Nfc_Fragment extends Fragment {
 
     private Context mContext;
     private Button mSelectButton;
-    private Settings mSettings;
     private Button mDekanatPmit,mDekanatAR;
     private RecyclerView mFreeUsersRecycler;
     private ArrayList<String> mTags;
@@ -63,8 +62,8 @@ public class Nfc_Fragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.layout_nfc_fragment,container,false);
         mContext = rootView.getContext();
-        mSettings = new Settings(mContext);
-        mTags = mSettings.getFreeUsers();
+
+        mTags = Settings.getFreeUsers();
 
         ImageView imageView = (ImageView)rootView.findViewById(R.id.nfc_fragment_reader_image);
         AnimationDrawable animationDrawable = (AnimationDrawable)imageView.getDrawable();
@@ -101,7 +100,7 @@ public class Nfc_Fragment extends Fragment {
 
                         new TakeKey(mContext).execute(new TakeKeyParams()
                                 .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
-                                .setAuditroom(mSettings.getLastClickedAuditroom())
+                                .setAuditroom(Settings.getLastClickedAuditroom())
                                 .setPersonItem(new PersonItem().setRadioLabel(mTags.get(position)))
                                 .setPublicInterface(new KeyInterface() {
                                     @Override

@@ -23,14 +23,16 @@
                 android:background="@drawable/splash_account_info">
             </FrameLayout>
 
-            <com.example.ivsmirnov.keyregistrator.custom_views.RoundImageView
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/navigation_drawer_account_information_image_person"
+                android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
                 android:layout_centerInParent="true"
-                android:id="@+id/navigation_drawer_account_information_image_person"
-                android:contentDescription="@string/navigation_drawer_person_image_descritpion"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:layout_margin="@dimen/nav_drawer_left_margin"/>
+                android:layout_margin="@dimen/nav_drawer_left_margin"
+                android:src="@drawable/person_male_colored" />
 
             <RelativeLayout
                 android:id="@+id/navigation_drawer_account_section"

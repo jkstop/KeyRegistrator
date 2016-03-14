@@ -67,12 +67,8 @@ public class Dialog_Fragment extends DialogFragment{
 
     private Context mContext;
     private int dialog_id;
-    private Settings mSettings;
     private LayoutInflater mInflater;
     private Resources mResources;
-    private DataBaseFavorite mDataBaseFavorite;
-    private DataBaseJournal mDataBaseJournal;
-    private DataBaseRooms mDataBaseRooms;
 
     public ArrayList<String> mAttachmentList;
 
@@ -92,28 +88,9 @@ public class Dialog_Fragment extends DialogFragment{
         super.onCreate(savedInstanceState);
         dialog_id = getArguments().getInt(Values.DIALOG_TYPE,0);
         mContext = getActivity();
-        mSettings = new Settings(mContext);
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResources = mContext.getResources();
 
-        if (dialog_id == Values.DIALOG_CLEAR_JOURNAL){
-
-            if (Launcher.mDataBaseJournal!=null){
-                mDataBaseJournal = Launcher.mDataBaseJournal;
-            }else{
-                mDataBaseJournal = new DataBaseJournal(mContext);
-            }
-        } else if (dialog_id == Values.ADD_ROOM_DIALOG |
-                dialog_id == Values.DIALOG_CLEAR_ROOMS |
-                dialog_id == Values.DELETE_ROOM_DIALOG |
-                dialog_id == Values.DIALOG_RESIZE_ITEMS){
-
-            if (Launcher.mDataBaseRooms!=null){
-                mDataBaseRooms = Launcher.mDataBaseRooms;
-            } else {
-                mDataBaseRooms = new DataBaseRooms(mContext);
-            }
-        }
 
     }
 
@@ -140,7 +117,7 @@ public class Dialog_Fragment extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                mDataBaseJournal.clearJournalDB();
+                                DataBaseJournal.clearJournalDB();
 
                                 updateInformation();
 
@@ -192,14 +169,14 @@ public class Dialog_Fragment extends DialogFragment{
                         .setPersonFirstname(inputFirstname.getEditText())
                         .setPersonMidname(inputMidname.getEditText())
                         .setAccessTypeContainer(accessType)
-                        .setFreeUser(mSettings.getFreeUsers().contains(tag))
+                        .setFreeUser(Settings.getFreeUsers().contains(tag))
                         .setPersonDivision(inputDivision.getEditText()));
 
                 accessType.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) mSettings.addFreeUser(tag);
-                                else mSettings.deleteFreeUser(tag);
+                        if (isChecked) Settings.addFreeUser(tag);
+                                else Settings.deleteFreeUser(tag);
                     }
                 });
 
@@ -218,7 +195,7 @@ public class Dialog_Fragment extends DialogFragment{
                                 DataBaseFavorite.deleteUser(tag);
 
                                 //удаление метки в free_users
-                                mSettings.deleteFreeUser(tag);
+                                Settings.deleteFreeUser(tag);
 
                                 updateInformation();
                             }
@@ -272,7 +249,7 @@ public class Dialog_Fragment extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                mDataBaseRooms.deleteFromRoomsDB(aud);
+                                DataBaseRooms.deleteFromRoomsDB(aud);
 
                                 updateInformation();
 
@@ -301,7 +278,7 @@ public class Dialog_Fragment extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                mDataBaseRooms.clearRoomsDB();
+                                DataBaseRooms.clearRoomsDB();
 
                                 updateInformation();
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
@@ -318,7 +295,7 @@ public class Dialog_Fragment extends DialogFragment{
                         String inputText = enterAuditroomText.getText().toString();
                         if (!inputText.isEmpty()){
 
-                            mDataBaseRooms.writeInRoomsDB(new RoomItem().setAuditroom(inputText)
+                            DataBaseRooms.writeInRoomsDB(new RoomItem().setAuditroom(inputText)
                                     .setStatus(Values.ROOM_IS_FREE)
                                     .setAccessType(DataBaseJournal.ACCESS_BY_CLICK));
 
@@ -337,7 +314,7 @@ public class Dialog_Fragment extends DialogFragment{
                         .create();
             case Values.SELECT_COLUMNS_DIALOG:
                 final String ident = getArguments().getString("AudOrPer");
-                final int mSelectedItemAud = mSettings.getAuditroomColumnsCount();
+                final int mSelectedItemAud = Settings.getAuditroomColumnsCount();
                 //final int mSelectedItemPer = sharedPreferences.getInt(Values.COLUMNS_PER_COUNT, 0);
                 LayoutInflater layoutInflater1 = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View pickerView  = layoutInflater1.inflate(R.layout.view_column_selector,null);
@@ -356,7 +333,7 @@ public class Dialog_Fragment extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (ident != null && ident.equalsIgnoreCase("aud")) {
-                                    mSettings.setAuditroomColumnsCount(numberPicker.getValue());
+                                    Settings.setAuditroomColumnsCount(numberPicker.getValue());
                                     updateInformation();
                                 } else if (ident != null && ident.equalsIgnoreCase("per")) {
                                     //editor.putInt(Values.COLUMNS_PER_COUNT, numberPicker.getValue());
@@ -379,15 +356,15 @@ public class Dialog_Fragment extends DialogFragment{
                 final LinearLayout.LayoutParams cardViewLayoutParams = (LinearLayout.LayoutParams)cardView.getLayoutParams();
                 final LinearLayout.LayoutParams frameGridParams = (LinearLayout.LayoutParams)mFrameGrid.getLayoutParams();
 
-                ArrayList <RoomItem> mRoomsItems = mDataBaseRooms.readRoomsDB();
+                ArrayList <RoomItem> mRoomsItems = DataBaseRooms.readRoomsDB();
 
                 RecyclerView mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
                 mRoomsGrid.setClickable(false);
-                mRoomsGrid.setLayoutManager(new GridLayoutManager(mContext, mSettings.getAuditroomColumnsCount()));
+                mRoomsGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getAuditroomColumnsCount()));
                 final adapter_main_auditrooms_grid_resize mAdapter = new adapter_main_auditrooms_grid_resize(mContext, mRoomsItems);
                 mRoomsGrid.setAdapter(mAdapter);
 
-                int weightCard = mSettings.getDisclaimerWeight();
+                int weightCard = Settings.getDisclaimerWeight();
                 mResizeSeekBar.setMax(100);
                 mResizeSeekBar.setProgress(weightCard);
                 cardViewLayoutParams.weight = weightCard;
@@ -428,9 +405,9 @@ public class Dialog_Fragment extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (mProgress==0){
-                                    mSettings.setDisclaimerWeight(mResizeSeekBar.getProgress());
+                                    Settings.setDisclaimerWeight(mResizeSeekBar.getProgress());
                                 }else{
-                                    mSettings.setDisclaimerWeight(mProgress);
+                                    Settings.setDisclaimerWeight(mProgress);
                                 }
 
                                 updateInformation();
@@ -483,13 +460,13 @@ public class Dialog_Fragment extends DialogFragment{
                 final TextView serverStatusText = (TextView)dialogLayout.findViewById(R.id.layout_dialog_sql_new_text_status);
                 final ImageView serverCheckConnection = (ImageView)dialogLayout.findViewById(R.id.layout_dialog_sql_new_image_reconnect);
 
-                final ServerConnectionItem serverConnectionItem = mSettings.getServerConnectionParams();
+                final ServerConnectionItem serverConnectionItem = Settings.getServerConnectionParams();
 
                 inputServer.setText(serverConnectionItem.getServerName());
                 inputLogin.setText(serverConnectionItem.getUserName());
                 inputPassword.setText(serverConnectionItem.getUserPassword());
 
-                if (mSettings.getServerStatus()){
+                if (Settings.getServerStatus()){
                     serverStatusImage.setImageResource(R.drawable.ic_cloud_done_black_48dp);
                     serverStatusText.setText(R.string.dialog_sql_server_connected);
                     serverStatusText.setTextColor(getResources().getColor(R.color.primary));
@@ -563,7 +540,7 @@ public class Dialog_Fragment extends DialogFragment{
                                         .setServerName(inputServer.getText().toString())
                                         .setUserName(inputLogin.getText().toString())
                                         .setUserPassword(inputPassword.getText().toString());
-                                mSettings.setServerConnectionParams(newServerConnectionItem);
+                                Settings.setServerConnectionParams(newServerConnectionItem);
                             }
                         })
                         .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

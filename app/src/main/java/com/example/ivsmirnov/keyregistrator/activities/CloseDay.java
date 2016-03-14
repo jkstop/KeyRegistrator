@@ -28,21 +28,11 @@ public class CloseDay extends AppCompatActivity {
 
     public static final String AUTO_CLOSE_ROOMS = "auto_close_rooms";
 
-    private Context mContext;
-    private DataBaseJournal mDataBaseJournal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_close_day);
-
-        mContext = this;
-
-        if (Launcher.mDataBaseJournal!=null){
-            mDataBaseJournal = Launcher.mDataBaseJournal;
-        } else {
-            mDataBaseJournal = new DataBaseJournal(mContext);
-        }
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.layout_close_day_text_head);
         if (toolbar!=null){
@@ -62,9 +52,9 @@ public class CloseDay extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.layout_close_day_card_stat_head)).setText(Values.showDate());
 
-        ((TextView) findViewById(R.id.layout_close_day_card_stat_value_today)).setText(String.valueOf(mDataBaseJournal.getItemCount(DataBaseJournal.COUNT_TODAY)));
+        ((TextView) findViewById(R.id.layout_close_day_card_stat_value_today)).setText(String.valueOf(DataBaseJournal.getItemCount(DataBaseJournal.COUNT_TODAY)));
 
-        ((TextView) findViewById(R.id.layout_close_day_card_stat_value_journal_items)).setText(String.valueOf(mDataBaseJournal.getItemCount(DataBaseJournal.COUNT_TOTAL)));
+        ((TextView) findViewById(R.id.layout_close_day_card_stat_value_journal_items)).setText(String.valueOf(DataBaseJournal.getItemCount(DataBaseJournal.COUNT_TOTAL)));
 
         ((TextView) findViewById(R.id.layout_close_day_card_stat_value_person_items)).setText(String.valueOf(DataBaseFavorite.getPersonsCount()));
 
@@ -85,7 +75,7 @@ public class CloseDay extends AppCompatActivity {
         } else {
             textTitle.setText(R.string.card_statistic_head_close);
             textTitle.setTextColor(getResources().getColor(R.color.colorAccent));
-            textAutoCloseCount.setText(String.valueOf(new Settings(mContext).getAutoClosedRoomsCount()));
+            textAutoCloseCount.setText(String.valueOf(Settings.getAutoClosedRoomsCount()));
         }
     }
 

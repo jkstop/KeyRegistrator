@@ -59,7 +59,7 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
     @Override
     protected JournalItem doInBackground(Void... params) {
 
-        return Launcher.mDataBaseJournal.getJournalItem(mTimeIn);
+        return DataBaseJournal.getJournalItem(mTimeIn);
     }
 
     @Override

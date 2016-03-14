@@ -47,7 +47,6 @@ import java.util.Random;
 public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server_Interface, RecycleItemClickListener{
 
     private Context mContext;
-    private Settings mSettings;
     private Find_User_in_SQL_Server_Interface mListener;
 
     private ArrayList<PersonItem> mPersonItems;
@@ -71,7 +70,6 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_add_new_staff_fragment,container,false);
         mContext = rootView.getContext();
-        mSettings = new Settings(mContext);
         mProgressBar = (ProgressBar)rootView.findViewById(R.id.layout_add_new_staff_progress);
         mProgressBar.setVisibility(View.INVISIBLE);
 

@@ -38,25 +38,12 @@ public class CloseRooms extends AsyncTask<CloseRoomsParams,Integer,Integer> {
         mRoomInterface = params[0].getRoomInterface();
         String tag = params[0].getTag();
 
-        DataBaseJournal mDataBaseJournal;
-        if (Launcher.mDataBaseJournal!=null){
-            mDataBaseJournal = Launcher.mDataBaseJournal;
-        } else {
-            mDataBaseJournal = new DataBaseJournal(mContext);
-        }
 
-        DataBaseRooms mDataBaseRooms;
-        if (Launcher.mDataBaseRooms!=null){
-            mDataBaseRooms = Launcher.mDataBaseRooms;
-        } else {
-            mDataBaseRooms = new DataBaseRooms(mContext);
-        }
-
-        RoomItem currentRoomItem = mDataBaseRooms.getRoomItemForCurrentUser(tag);
-        int closedRooms = mDataBaseRooms.updateRoom(currentRoomItem
+        RoomItem currentRoomItem = DataBaseRooms.getRoomItemForCurrentUser(tag);
+        int closedRooms = DataBaseRooms.updateRoom(currentRoomItem
                 .setTag(Values.EMPTY)
                 .setStatus(Values.ROOM_IS_FREE));
-        mDataBaseJournal.updateDB(currentRoomItem.getPositionInBase());
+        DataBaseJournal.updateDB(currentRoomItem.getPositionInBase());
 
         return closedRooms;
     }

@@ -15,27 +15,28 @@
             android:id="@+id/card_journal_item_frame_person"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true">
 
-            <FrameLayout
-                android:id="@+id/card_journal_item_person_image_frame"
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/card_journal_item_person_image"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
-                android:layout_width="60dp"
-                android:layout_height="80dp">
-
-                <ImageView
-                    android:id="@+id/card_journal_item_person_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/person_male_colored" />
-
-            </FrameLayout>
+                android:layout_centerVertical="true"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/person_male_colored"
+                app:civ_border_width="1dp"
+                app:civ_border_color="@color/black"/>
 
             <RelativeLayout
-                android:layout_toRightOf="@+id/card_journal_item_person_image_frame"
+                android:layout_toEndOf="@id/card_journal_item_person_image"
+                android:layout_toRightOf="@id/card_journal_item_person_image"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="10dp">
+                android:layout_marginLeft="@dimen/default_content_margin"
+                android:layout_marginRight="@dimen/default_content_margin">
 
                 <TextView
                     android:layout_alignParentLeft="true"

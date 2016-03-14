@@ -69,11 +69,11 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
     @Override
     protected void onPostExecute(Exception e) {
         if (e != null){
-            new Settings(mContext).setServerStatus(false);
+            Settings.setServerStatus(false);
             if (mConnectionInterface!=null) mConnectionInterface.onServerConnectException(e);
             if (mConnectionInterface!=null) mConnectionInterface.onServerDisconnected();
         } else {
-            new Settings(mContext).setServerStatus(true);
+            Settings.setServerStatus(true);
             if (mConnectionInterface!=null) mConnectionInterface.onServerConnected();
         }
     }

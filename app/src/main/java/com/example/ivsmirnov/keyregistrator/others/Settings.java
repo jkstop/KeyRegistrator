@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.others;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 
 import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
@@ -10,6 +11,7 @@ import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.prefs.Preferences;
 
 /**
  * Created by ivsmirnov on 30.01.2016.
@@ -18,204 +20,216 @@ public class Settings {
 
     public static final String FREE_USERS = "free_users";
 
-    private SharedPreferences mPreferences;
-    private SharedPreferences.Editor mPreferencesEditor;
+    private static SharedPreferences mPreferences;
+    private static SharedPreferences.Editor mPreferencesEditor;
 
-    public Settings (Context context){
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+    public Settings (){
+
+        mPreferences = getPreferences();
+        mPreferencesEditor = getPreferencesEditor();
     }
 
-    public void setToken (String token){
-        mPreferencesEditor.putString(Values.TOKEN, token).apply();
+    private static SharedPreferences getPreferences(){
+        if (mPreferences == null){
+            mPreferences = PreferenceManager.getDefaultSharedPreferences(App.getAppContext());
+        }
+        return mPreferences;
     }
 
-    public String getToken(){
-        return mPreferences.getString(Values.TOKEN, null);
+    private static SharedPreferences.Editor getPreferencesEditor(){
+        if (mPreferencesEditor == null){
+            mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(App.getAppContext()).edit();
+        }
+        return mPreferencesEditor;
     }
 
-    public void setMessageTheme (String theme){
-        mPreferencesEditor.putString(Values.MAIL_THEME, theme).apply();
+    public static void setMessageTheme (String theme){
+
+        getPreferencesEditor().putString(Values.MAIL_THEME, theme).apply();
     }
 
-    public String getMessageTheme(){
-        return mPreferences.getString(Values.MAIL_THEME, null);
+    public static String getMessageTheme(){
+
+        return getPreferences().getString(Values.MAIL_THEME, null);
     }
 
-    public void setMessageBody(String body){
-        mPreferencesEditor.putString(Values.MAIL_BODY, body).apply();
+    public static void setMessageBody(String body){
+       getPreferencesEditor().putString(Values.MAIL_BODY, body).apply();
     }
 
-    public String getMessageBody(){
-        return mPreferences.getString(Values.MAIL_BODY, null);
+    public static String getMessageBody(){
+
+        return getPreferences().getString(Values.MAIL_BODY, null);
     }
 
-    public void setFreeUsers(ArrayList<String> tags){
+    public static void setFreeUsers(ArrayList<String> tags){
+
         Set<String> stringSet = new HashSet<>();
         stringSet.addAll(tags);
-        mPreferencesEditor.putStringSet(FREE_USERS, stringSet).apply();
+        getPreferencesEditor().putStringSet(FREE_USERS, stringSet).apply();
     }
 
-    public void addFreeUser(String tag){
+    public static void addFreeUser(String tag){
         ArrayList <String> freeUsers = getFreeUsers();
         if (!freeUsers.contains(tag)) freeUsers.add(tag);
         setFreeUsers(freeUsers);
     }
 
-    public void deleteFreeUser(String tag){
+    public static void deleteFreeUser(String tag){
         ArrayList <String> freeUsers = getFreeUsers();
         freeUsers.remove(tag);
         setFreeUsers(freeUsers);
     }
 
-    public ArrayList<String> getFreeUsers(){
+    public static ArrayList<String> getFreeUsers(){
         ArrayList<String>items = new ArrayList<>();
-        Set<String> freeUsers = mPreferences.getStringSet(FREE_USERS,null);
+        Set<String> freeUsers = getPreferences().getStringSet(FREE_USERS,null);
         if (freeUsers!=null){
             items.addAll(freeUsers);
         }
         return items;
     }
 
-    public void setAttachments(ArrayList<String>attachments){
+    public static void setAttachments(ArrayList<String>attachments){
         Set<String> stringSet = new HashSet<>();
         stringSet.addAll(attachments);
-        mPreferencesEditor.putStringSet(Values.MAIL_ATTACHMENTS,stringSet).apply();
+        getPreferencesEditor().putStringSet(Values.MAIL_ATTACHMENTS,stringSet).apply();
     }
 
-    public ArrayList<String> getAttachments(){
+    public static ArrayList<String> getAttachments(){
         ArrayList<String> items = new ArrayList<>();
-        Set<String> attach = mPreferences.getStringSet(Values.MAIL_ATTACHMENTS,null);
+        Set<String> attach = getPreferences().getStringSet(Values.MAIL_ATTACHMENTS,null);
         if (attach!=null){
             items.addAll(attach);
         }
         return items;
     }
 
-    public void setRecepients(ArrayList<String> recepients){
+    public static void setRecepients(ArrayList<String> recepients){
         Set<String> stringSet = new HashSet<>();
         stringSet.addAll(recepients);
-        mPreferencesEditor.putStringSet(Values.MAIL_RECEPIENTS, stringSet).apply();
+        getPreferencesEditor().putStringSet(Values.MAIL_RECEPIENTS, stringSet).apply();
     }
 
-    public ArrayList<String> getRecepients(){
+    public static ArrayList<String> getRecepients(){
         ArrayList<String> items = new ArrayList<>();
-        Set<String> sets = mPreferences.getStringSet(Values.MAIL_RECEPIENTS, null);
+        Set<String> sets = getPreferences().getStringSet(Values.MAIL_RECEPIENTS, null);
         if (sets!=null){
             items.addAll(sets);
         }
         return items;
     }
 
-    public void setAuthToken(String token){
-        mPreferencesEditor.putString(Values.AUTH_TOKEN,token).apply();
+    public static void setLastClickedAuditroom(String auditroom){
+       getPreferencesEditor().putString(Values.AUDITROOM, auditroom).apply();
     }
 
-    public String getAuthToken(){
-        return mPreferences.getString(Values.AUTH_TOKEN,Values.EMPTY);
+    public static String getLastClickedAuditroom(){
+
+        return getPreferences().getString(Values.AUDITROOM, Values.EMPTY);
     }
 
-    public void setLastClickedAuditroom(String auditroom){
-        mPreferencesEditor.putString(Values.AUDITROOM, auditroom).apply();
+    public static void setTotalJournalCount(int count){
+        getPreferencesEditor().putInt(Values.TOTAL_JOURNAL_COUNT,count).apply();
     }
 
-    public String getLastClickedAuditroom(){
-        return mPreferences.getString(Values.AUDITROOM, Values.EMPTY);
+    public static int getTotalJournalCount(){
+        return getPreferences().getInt(Values.TOTAL_JOURNAL_COUNT, 0);
     }
 
-    public void setTotalJournalCount(int count){
-        mPreferencesEditor.putInt(Values.TOTAL_JOURNAL_COUNT,count).apply();
+    public static void setActiveAccountID(String accountID){
+        getPreferencesEditor().putString(Values.ACTIVE_ACCOUNT_ID, accountID).apply();
     }
 
-    public int getTotalJournalCount(){
-        return mPreferences.getInt(Values.TOTAL_JOURNAL_COUNT, 0);
+    public static String getActiveAccountID(){
+
+        return getPreferences().getString(Values.ACTIVE_ACCOUNT_ID, "localAccount");
     }
 
-    public void setActiveAccountID(String accountID){
-        mPreferencesEditor.putString(Values.ACTIVE_ACCOUNT_ID, accountID).apply();
+    public static void setDisclaimerWeight(int weight){
+        getPreferencesEditor().putInt(Values.DISCLAIMER_SIZE, weight).apply();
     }
 
-    public String getActiveAccountID(){
-        return mPreferences.getString(Values.ACTIVE_ACCOUNT_ID, "localAccount");
-    }
+    public static int getDisclaimerWeight(){
 
-    public void setDisclaimerWeight(int weight){
-        mPreferencesEditor.putInt(Values.DISCLAIMER_SIZE, weight).apply();
-    }
-
-    public int getDisclaimerWeight(){
-        return mPreferences.getInt(Values.DISCLAIMER_SIZE,30);
+        return getPreferences().getInt(Values.DISCLAIMER_SIZE,30);
     }
 
 
-    public void setAuditroomColumnsCount(int columns){
-        mPreferencesEditor.putInt(Values.COLUMNS_AUD_COUNT, columns).apply();
+    public static void setAuditroomColumnsCount(int columns){
+        getPreferencesEditor().putInt(Values.COLUMNS_AUD_COUNT, columns).apply();
     }
-    public int getAuditroomColumnsCount(){
-        return mPreferences.getInt(Values.COLUMNS_AUD_COUNT, 3);
+    public static int getAuditroomColumnsCount(){
+
+        return getPreferences().getInt(Values.COLUMNS_AUD_COUNT, 3);
     }
 
-    public ServerConnectionItem getServerConnectionParams(){
+    public static ServerConnectionItem getServerConnectionParams(){
+
         return new ServerConnectionItem()
-                .setServerName(mPreferences.getString(Values.SQL_SERVER,""))
-                .setUserName(mPreferences.getString(Values.SQL_USER, ""))
-                .setUserPassword(mPreferences.getString(Values.SQL_PASSWORD, ""));
+                .setServerName(getPreferences().getString(Values.SQL_SERVER,""))
+                .setUserName(getPreferences().getString(Values.SQL_USER, ""))
+                .setUserPassword(getPreferences().getString(Values.SQL_PASSWORD, ""));
     }
 
-    public void setServerConnectionParams(ServerConnectionItem serverConnectionItem){
-        mPreferencesEditor.putString(Values.SQL_SERVER, serverConnectionItem.getServerName());
-        mPreferencesEditor.putString(Values.SQL_USER, serverConnectionItem.getUserName());
-        mPreferencesEditor.putString(Values.SQL_PASSWORD, serverConnectionItem.getUserPassword());
-        mPreferencesEditor.apply();
+    public static void setServerConnectionParams(ServerConnectionItem serverConnectionItem){
+
+        getPreferencesEditor().putString(Values.SQL_SERVER, serverConnectionItem.getServerName());
+        getPreferencesEditor().putString(Values.SQL_USER, serverConnectionItem.getUserName());
+        getPreferencesEditor().putString(Values.SQL_PASSWORD, serverConnectionItem.getUserPassword());
+        getPreferencesEditor().apply();
     }
 
-    public boolean getServerStatus(){
-        return mPreferences.getBoolean(Values.SQL_STATUS,false);
+    public static boolean getServerStatus(){
+        return getPreferences().getBoolean(Values.SQL_STATUS,false);
     }
 
-    public void setServerStatus(boolean status){
-        mPreferencesEditor.putBoolean(Values.SQL_STATUS,status).apply();
+    public static void setServerStatus(boolean status){
+        getPreferencesEditor().putBoolean(Values.SQL_STATUS,status).apply();
     }
 
 
     //Backup locations
-    public void setJournalBackupLocation(String path){
-        mPreferencesEditor.putString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,path).apply();
+    public static void setJournalBackupLocation(String path){
+        getPreferencesEditor().putString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,path).apply();
     }
 
-    public String getJournalBackupLocation(){
-        return mPreferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,
+    public static String getJournalBackupLocation(){
+
+        return getPreferences().getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
     }
 
-    public void setPersonsBackupLocation(String path){
-        mPreferencesEditor.putString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS, path).apply();
+    public static void setPersonsBackupLocation(String path){
+        getPreferencesEditor().putString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS, path).apply();
     }
 
-    public String getPersonsBackupLocation(){
-        return mPreferences.getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS,
+    public static String getPersonsBackupLocation(){
+
+        return getPreferences().getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS,
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
     }
 
 
     //Auto close
-    public void setAutoCloseStatus(boolean status){
-        mPreferencesEditor.putBoolean(Values.ALARM_SET, status).apply();
+   // public void setAutoCloseStatus(boolean status){
+   //     mPreferencesEditor.putBoolean(Values.ALARM_SET, status).apply();
+   // }
+
+    public static void setAutoClosedRoomsCount(int closedRoomsCount){
+        getPreferencesEditor().putInt(Values.AUTO_CLOSED_COUNT, closedRoomsCount).apply();
     }
 
-    public void setAutoClosedRoomsCount(int closedRoomsCount){
-        mPreferencesEditor.putInt(Values.AUTO_CLOSED_COUNT, closedRoomsCount).apply();
+    public static int getAutoClosedRoomsCount(){
+
+        return getPreferences().getInt(Values.AUTO_CLOSED_COUNT, 0);
     }
 
-    public int getAutoClosedRoomsCount(){
-        return mPreferences.getInt(Values.AUTO_CLOSED_COUNT, 0);
-    }
+//   // public boolean getAutoCloseStatus(){
+       // return mPreferences.getBoolean(Values.ALARM_SET,false);
+   // }
 
-    public boolean getAutoCloseStatus(){
-        return mPreferences.getBoolean(Values.ALARM_SET,false);
-    }
-
-    public void cleanAutoCloseStatus(){
-        mPreferencesEditor.remove(Values.ALARM_SET).apply();
-    }
+ //   public void cleanAutoCloseStatus(){
+       // mPreferencesEditor.remove(Values.ALARM_SET).apply();
+  //  }
 }

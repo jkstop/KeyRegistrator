@@ -1,11 +1,8 @@
 package com.example.ivsmirnov.keyregistrator.databases;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
-import android.util.Log;
 
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -20,18 +17,7 @@ import java.util.ArrayList;
  */
 public class DataBaseRooms {
 
-    private Context mContext;
-    private DataBaseRoomsRegist dataBaseRoomsRegist;
-    private SQLiteDatabase sqLiteDatabase;
-
-    public DataBaseRooms(Context context){
-        this.mContext = context;
-        dataBaseRoomsRegist = new DataBaseRoomsRegist(mContext);
-        sqLiteDatabase = dataBaseRoomsRegist.getWritableDatabase();
-        Log.d("ROOMS_DB","-------------CREATE---------------");
-    }
-
-    public void writeInRoomsDB (RoomItem roomItem) {
+    public static void writeInRoomsDB (RoomItem roomItem) {
         try {
             ContentValues cv = new ContentValues();
             cv.put(DataBaseRoomsRegist.COLUMN_ROOM, roomItem.getAuditroom());
@@ -41,21 +27,21 @@ public class DataBaseRooms {
             cv.put(DataBaseRoomsRegist.COLUMN_LAST_VISITER, roomItem.getLastVisiter());
             cv.put(DataBaseRoomsRegist.COLUMN_TAG,roomItem.getTag());
             cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, roomItem.getPhoto());
-            sqLiteDatabase.insert(DataBaseRoomsRegist.TABLE_ROOMS, null, cv);
+            DB.getDataBase(DB.DB_ROOM).insert(DataBaseRoomsRegist.TABLE_ROOMS, null, cv);
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public int updateRoom(RoomItem roomItem){
+    public static int updateRoom(RoomItem roomItem){
         int updatedRooms = 0;
         try {
             String roomPosition;
             if (!roomItem.getAuditroom().equals(Values.EMPTY)){
-                roomPosition = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseRoomsRegist.TABLE_ROOMS +
+                roomPosition = DB.getDataBase(DB.DB_ROOM).compileStatement("SELECT * FROM " + DataBaseRoomsRegist.TABLE_ROOMS +
                         " WHERE " + DataBaseRoomsRegist.COLUMN_ROOM + " = " + roomItem.getAuditroom()).simpleQueryForString();
             }else{
-                roomPosition = sqLiteDatabase.compileStatement("SELECT * FROM " + DataBaseRoomsRegist.TABLE_ROOMS +
+                roomPosition = DB.getDataBase(DB.DB_ROOM).compileStatement("SELECT * FROM " + DataBaseRoomsRegist.TABLE_ROOMS +
                         " WHERE " + DataBaseRoomsRegist.COLUMN_TAG + " = " + roomItem.getTag()).simpleQueryForString();
             }
 
@@ -67,7 +53,7 @@ public class DataBaseRooms {
                 cv.put(DataBaseRoomsRegist.COLUMN_ACCESS,roomItem.getAccessType());
                 cv.put(DataBaseRoomsRegist.COLUMN_TAG,roomItem.getTag());
                 cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, roomItem.getPhoto());
-                sqLiteDatabase.update(DataBaseRoomsRegist.TABLE_ROOMS,cv,DataBaseRoomsRegist._ID + "=" + roomPosition, null);
+                DB.getDataBase(DB.DB_ROOM).update(DataBaseRoomsRegist.TABLE_ROOMS,cv,DataBaseRoomsRegist._ID + "=" + roomPosition, null);
                 updatedRooms++;
             }
         }catch (Exception e){
@@ -76,13 +62,18 @@ public class DataBaseRooms {
         return updatedRooms;
     }
 
-    public RoomItem getRoomItemForCurrentUser(String tag){
+    public static RoomItem getRoomItemForCurrentUser(String tag){
         Cursor cursor = null;
         try {
             if (tag!=null){
-                cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + DataBaseRoomsRegist.TABLE_ROOMS
-                                + " WHERE " + DataBaseRoomsRegist.COLUMN_TAG + " =?",
-                        new String[]{tag});
+                cursor = DB.getCursor(DB.DB_ROOM,
+                        DataBaseRoomsRegist.TABLE_ROOMS,
+                        null,
+                        DataBaseRoomsRegist.COLUMN_TAG + " ?",
+                        new String[]{tag},
+                        null,
+                        null,
+                        "1");
                 if (cursor.getCount() > 0){
                     cursor.moveToFirst();
                     return new RoomItem().setAuditroom(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM)))
@@ -105,17 +96,21 @@ public class DataBaseRooms {
         }
     }
 
-
-
-    public void deleteFromRoomsDB(String aud){
+    public static void deleteFromRoomsDB(String aud){
         Cursor cursor = null;
         try {
-            cursor = sqLiteDatabase.query(DataBaseRoomsRegist.TABLE_ROOMS,new String[]{DataBaseRoomsRegist._ID,DataBaseRoomsRegist.COLUMN_ROOM},
-                    null,null,null,null,null);
+            cursor = DB.getCursor(DB.DB_ROOM,
+                    DataBaseRoomsRegist.TABLE_ROOMS,
+                    new String[]{DataBaseRoomsRegist._ID, DataBaseRoomsRegist.COLUMN_ROOM},
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
             cursor.moveToPosition(-1);
             while (cursor.moveToNext()){
                 if (aud.equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM)))){
-                    sqLiteDatabase.delete(DataBaseRoomsRegist.TABLE_ROOMS,
+                    DB.getDataBase(DB.DB_ROOM).delete(DataBaseRoomsRegist.TABLE_ROOMS,
                             DataBaseRoomsRegist._ID + "=" + cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist._ID)),
                             null);
                 }
@@ -128,11 +123,13 @@ public class DataBaseRooms {
 
     }
 
-    public ArrayList<RoomItem> readRoomsDB(){
+    public static ArrayList<RoomItem> readRoomsDB(){
         Cursor cursor = null;
         try {
             ArrayList<RoomItem> roomItems = new ArrayList<>();
-            cursor = sqLiteDatabase.query(DataBaseRoomsRegist.TABLE_ROOMS,null,null,null,null,null,null);
+            cursor = DB.getCursor(DB.DB_ROOM,
+                    DataBaseRoomsRegist.TABLE_ROOMS,
+                    null,null,null,null,null,null);
             cursor.moveToPosition(-1);
             while (cursor.moveToNext()){
                 roomItems.add(new RoomItem().setAuditroom(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM)))
@@ -153,7 +150,7 @@ public class DataBaseRooms {
 
     }
 
-    public void backupRoomsToFile(){
+    public static void backupRoomsToFile(){
         Cursor cursor = null;
         try {
             File file = null;
@@ -161,7 +158,10 @@ public class DataBaseRooms {
             FileOutputStream fileOutputStream;
             String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
             file = new File(mPath + "/Rooms.csv");
-            cursor = sqLiteDatabase.query(DataBaseRoomsRegist.TABLE_ROOMS,null,null,null,null,null,null);
+            //cursor = DB.getDataBase(DB.DB_ROOM).query(DataBaseRoomsRegist.TABLE_ROOMS,null,null,null,null,null,null);
+            cursor = DB.getCursor(DB.DB_ROOM,
+                    DataBaseRoomsRegist.TABLE_ROOMS,
+                    null,null,null,null,null,null);
             cursor.moveToPosition(-1);
             while (cursor.moveToNext()){
                 String room = cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM));
@@ -195,27 +195,34 @@ public class DataBaseRooms {
 
     }
 
-    public void clearRoomsDB(){
+    public static int closeAllRooms(){
+        int closedRooms = 0;
+
+        ArrayList<RoomItem> rooms = DataBaseRooms.readRoomsDB();
+        for (RoomItem roomItem : rooms){
+            if (roomItem.getStatus() == Values.ROOM_IS_BUSY){
+                roomItem.setStatus(Values.ROOM_IS_FREE);
+                roomItem.setTag(Values.EMPTY);
+
+                DataBaseRooms.updateRoom(roomItem);
+                DataBaseJournal.updateDB(roomItem.getPositionInBase());
+
+                closedRooms++;
+            }
+        }
+
+        return closedRooms;
+    }
+
+    public static void clearRoomsDB(){
         try {
-            sqLiteDatabase.delete(DataBaseRoomsRegist.TABLE_ROOMS,null,null);
+            DB.getDataBase(DB.DB_ROOM).delete(DataBaseRoomsRegist.TABLE_ROOMS,null,null);
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public void closeDB(){
-        if (dataBaseRoomsRegist!=null){
-            dataBaseRoomsRegist.close();
-        }
-
-        if (sqLiteDatabase!=null){
-             sqLiteDatabase.close();
-         }
-    }
-
-    private void closeCursor(Cursor cursor){
-        if (cursor!=null){
-            cursor.close();
-        }
+    private static void closeCursor(Cursor cursor){
+        if (cursor!=null) cursor.close();
     }
 }

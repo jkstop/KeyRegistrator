@@ -33,7 +33,6 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
 
     private Context mContext;
     private String mPath;
-    private Settings mSettings;
     private ProgressDialog progressDialog;
     private UpdateInterface mListener;
     private int mLoadType;
@@ -44,7 +43,6 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
         this.mListener = listener;
         this.mLoadType = loadType;
         progressDialog = new ProgressDialog(mContext);
-        mSettings = new Settings(mContext);
     }
 
     @Override
@@ -112,13 +110,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                 }
                 break;
             case Values.REQUEST_CODE_LOAD_JOURNAL:
-                DataBaseJournal mDataBaseJournal;
-                if (Launcher.mDataBaseJournal!=null){
-                    mDataBaseJournal = Launcher.mDataBaseJournal;
-                } else {
-                    mDataBaseJournal = new DataBaseJournal(mContext);
-                }
-                mDataBaseJournal.clearJournalDB();
+                DataBaseJournal.clearJournalDB();
                 try {
                     if (fin != null) {
                         while ((line = fin.readLine())!=null){
@@ -126,7 +118,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                 try {
                                     String [] split = line.split(";");
 
-                                    mDataBaseJournal.writeInDBJournal(new JournalItem()
+                                    DataBaseJournal.writeInDBJournal(new JournalItem()
                                     .setAccountID(split[0])
                                     .setAuditroom(split[1])
                                     .setTimeIn(Long.parseLong(split[2]))
@@ -149,20 +141,14 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                 }
                 break;
             case Values.REQUEST_CODE_LOAD_ROOMS:
-                DataBaseRooms mDataBaseRooms;
-                if (Launcher.mDataBaseRooms!=null){
-                    mDataBaseRooms = Launcher.mDataBaseRooms;
-                } else {
-                    mDataBaseRooms = new DataBaseRooms(mContext);
-                }
-                mDataBaseRooms.clearRoomsDB();
+                DataBaseRooms.clearRoomsDB();
                 try {
                     while ((line = fin.readLine())!=null){
                         if (i<count){
                             if (!lines.contains(line)){
                                 String [] split = line.split(";");
                                 if(split.length==6){
-                                    mDataBaseRooms.writeInRoomsDB(new RoomItem().setAuditroom(split[0])
+                                    DataBaseRooms.writeInRoomsDB(new RoomItem().setAuditroom(split[0])
                                             .setStatus(Integer.parseInt(split[1]))
                                             .setAccessType(Integer.parseInt(split[2]))
                                             .setLastVisiter(split[3])

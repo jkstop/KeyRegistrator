@@ -49,7 +49,6 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     public static RecyclerView mAuditroomGrid;
 
     private Context mContext;
-    private Settings mSettings;
 
     private DataBaseRooms mDataBaseRooms;
 
@@ -85,19 +84,12 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         View rootView = inflater.inflate(R.layout.layout_main_fragment,container,false);
         mContext = rootView.getContext();
 
-        if (Launcher.mDataBaseRooms!=null){
-            mDataBaseRooms = Launcher.mDataBaseRooms;
-        } else {
-            mDataBaseRooms = new DataBaseRooms(mContext);
-        }
-        mRoomItems = mDataBaseRooms.readRoomsDB();
 
+        mRoomItems = DataBaseRooms.readRoomsDB();
 
         roomInterface = this;
 
         frameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
-
-        mSettings = new Settings(mContext);
 
         mAuditroomGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
         mAuditroomGrid.setHasFixedSize(true);
@@ -116,7 +108,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     }
 
     private void setLayoutsWeight(){
-        int weightCard = mSettings.getDisclaimerWeight();
+        int weightCard = Settings.getDisclaimerWeight();
         ((LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams()).weight = weightCard;
         ((LinearLayout.LayoutParams) frameForGrid.getLayoutParams()).weight = 100 - weightCard;
     }
@@ -124,7 +116,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     private void initializeAuditroomGrid(){
         mAuditroomGridAdapter = new adapter_main_auditrooms_grid(mContext,mRoomItems,this);
         mAuditroomGrid.setAdapter(mAuditroomGridAdapter);
-        mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext,mSettings.getAuditroomColumnsCount()));
+        mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getAuditroomColumnsCount()));
     }
 
 
@@ -132,13 +124,8 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     public void onResume() {
         super.onResume();
 
-        if (Launcher.mDataBaseRooms!=null){
-            mDataBaseRooms = Launcher.mDataBaseRooms;
-        } else {
-            mDataBaseRooms = new DataBaseRooms(mContext);
-        }
-        mRoomItems = mDataBaseRooms.readRoomsDB();
 
+        mRoomItems = DataBaseRooms.readRoomsDB();
 
         setLayoutsWeight();
 
@@ -238,7 +225,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
             return;
         }
         if (mRoomItems.get(position).getStatus()==Values.ROOM_IS_FREE) {
-            mSettings.setLastClickedAuditroom(mRoomItems.get(position).getAuditroom());
+            Settings.setLastClickedAuditroom(mRoomItems.get(position).getAuditroom());
             Bundle bundle = new Bundle();
             bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
             Nfc_Fragment nfc_fragment = Nfc_Fragment.newInstance();

@@ -53,10 +53,8 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
     private adapter_email_attach mAdapterRecipients, mAdapterAttachments;
     private RecyclerView mRecipientRecycler, mAttachmentsRecycler;
     private TextInputLayout mInputThemeMessage, mInputBodyMessage;
-    private Settings mSettings;
     private FloatingActionButton mSendButton;
     private AccountItem mAccount;
-    private DataBaseAccount mDataBaseAccount;
 
 
     public static Email_Fragment newInstance(){
@@ -74,7 +72,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
         if (resultCode == Activity.RESULT_OK && requestCode == Values.REQUEST_CODE_SELECT_EMAIL_ATTACHMENT){
             if (data!=null){
                 mAttachmentList.add(data.getData().getPath());
-                mSettings.setAttachments(mAttachmentList);
+                Settings.setAttachments(mAttachmentList);
                 mAdapterAttachments.notifyItemInserted(mAttachmentList.size());
             }
         }
@@ -85,13 +83,6 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_email_fragment,container,false);
         mContext = rootView.getContext();
-        mSettings = new Settings(mContext);
-
-        if (Launcher.mDataBaseAccount !=null){
-            mDataBaseAccount = Launcher.mDataBaseAccount;
-        } else {
-            mDataBaseAccount = new DataBaseAccount(mContext);
-        }
 
         mAccountImage = (ImageView)rootView.findViewById(R.id.email_fragment_account_information_image);
         mAddRecipient = (ImageView)rootView.findViewById(R.id.email_fragment_add_recipient);
@@ -105,7 +96,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
         TextView mAccountName = (TextView)rootView.findViewById(R.id.email_fragment_account_information_name);
         TextView mAccountEmail = (TextView)rootView.findViewById(R.id.email_fragment_account_information_email);
 
-        mAccount = mDataBaseAccount.getAccount(mSettings.getActiveAccountID());
+        mAccount = DataBaseAccount.getAccount(Settings.getActiveAccountID());
         if (mAccount!=null){
             mAccountName.setText(mAccount.getLastname());
             mAccountEmail.setText(mAccount.getEmail());
@@ -116,8 +107,8 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
             mAccountImage.setImageDrawable(null);
         }
 
-        mInputThemeMessage.getEditText().setText(mSettings.getMessageTheme());
-        mInputBodyMessage.getEditText().setText(mSettings.getMessageBody());
+        mInputThemeMessage.getEditText().setText(Settings.getMessageTheme());
+        mInputBodyMessage.getEditText().setText(Settings.getMessageBody());
 
         mInputBodyMessage.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
@@ -128,7 +119,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
             }
             @Override
             public void afterTextChanged(Editable s) {
-                mSettings.setMessageBody(s.toString());
+                Settings.setMessageBody(s.toString());
             }
         });
         mInputThemeMessage.getEditText().addTextChangedListener(new TextWatcher() {
@@ -140,7 +131,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
             }
             @Override
             public void afterTextChanged(Editable s) {
-                mSettings.setMessageTheme(s.toString());
+                Settings.setMessageTheme(s.toString());
             }
         });
 
@@ -148,7 +139,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
             @Override
             public void onClick(View v) {
                 mRecepientList.add(ADD_NEW_RECIPIENT);
-                mSettings.setRecepients(mRecepientList);
+                Settings.setRecepients(mRecepientList);
                 mAdapterRecipients.notifyItemInserted(mRecepientList.size());
                 checkSendButtonVisibility();
             }
@@ -164,9 +155,9 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
             }
         });
 
-        mRecepientList = mSettings.getRecepients();
+        mRecepientList = Settings.getRecepients();
         checkSendButtonVisibility();
-        mAttachmentList = mSettings.getAttachments();
+        mAttachmentList = Settings.getAttachments();
 
         mAdapterRecipients = new adapter_email_attach(mContext, this, adapter_email_attach.RECIPIENTS, mRecepientList);
         mAdapterAttachments = new adapter_email_attach(mContext, this, adapter_email_attach.ATTACHMENTS, mAttachmentList);
@@ -185,8 +176,8 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
             public void onClick(View v) {
                 new Send_Email(mContext, Send_Email.DIALOG_ENABLED)
                         .execute(new MailParams()
-                        .setTheme(mSettings.getMessageTheme())
-                        .setBody(mSettings.getMessageBody())
+                        .setTheme(Settings.getMessageTheme())
+                        .setBody(Settings.getMessageBody())
                         .setAttachments(mAttachmentList)
                         .setRecepients(mRecepientList));
             }
@@ -235,7 +226,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
 
     private void removeRecipient(int position){
         mRecepientList.remove(position);
-        mSettings.setRecepients(mRecepientList);
+        Settings.setRecepients(mRecepientList);
         mAdapterRecipients.notifyItemRemoved(position);
         checkSendButtonVisibility();
     }
@@ -257,7 +248,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
     @Override
     public void onDeleteAttachment(int position, int view_id) {
         mAttachmentList.remove(position);
-        mSettings.setAttachments(mAttachmentList);
+        Settings.setAttachments(mAttachmentList);
         mAdapterAttachments.notifyItemRemoved(position);
     }
 }

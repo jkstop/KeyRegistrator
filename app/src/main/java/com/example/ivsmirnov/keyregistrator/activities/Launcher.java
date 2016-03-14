@@ -38,7 +38,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
-import com.example.ivsmirnov.keyregistrator.databases.DBinit;
+import com.example.ivsmirnov.keyregistrator.databases.DB;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
@@ -93,13 +93,10 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     private adapter_navigation_drawer_list mNavigationDrawerListAdapter;
     private TextView mAccountName, mAccountEmail;
     private ImageView mChangeAccount, mPersonAccountImage;
-    public static DataBaseJournal mDataBaseJournal;
-    public static DataBaseRooms mDataBaseRooms;
-    public static DataBaseAccount mDataBaseAccount;
+
 
     private Context mContext;
     private Resources mResources;
-    private Settings mSettings;
     private FragmentActivity mFragmentActivity;
 
     private KeyInterface mKeyInterface;
@@ -135,15 +132,11 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         mContext = this;
         mResources = getResources();
 
-        new DBinit(mContext);
+        new DB();
+        new Settings();
 
         mAlarm = new Alarm(getApplicationContext());
 
-        mDataBaseJournal = new DataBaseJournal(mContext);
-        mDataBaseRooms = new DataBaseRooms(mContext);
-        mDataBaseAccount = new DataBaseAccount(mContext);
-
-        mSettings = new Settings(mContext);
         mKeyInterface = this;
         mRoomInterface = this;
         mFragmentActivity = this;
@@ -151,7 +144,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         mAlarm.setAlarm(closingTime());
 
-        new SQL_Connection(mContext, mSettings.getServerConnectionParams(), null).execute();
+        new SQL_Connection(mContext, Settings.getServerConnectionParams(), null).execute();
 
         initNavigationDrawer(getMainNavigationItems());
 
@@ -304,7 +297,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                             .setPhoto(acct.getPhotoUrl().toString())
                             .setAccountID(acct.getId());
 
-                    mDataBaseAccount.writeAccount(accountItem);
+                    DataBaseAccount.writeAccount(accountItem);
 
                     DataBaseFavorite.writeInDBTeachers(mContext, new PersonItem()
                             .setLastname(acct.getDisplayName())
@@ -312,8 +305,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                             .setRadioLabel(acct.getId()));
 
 
-                    mSettings.setActiveAccountID(acct.getId());
-                    mSettings.setAuthToken(acct.getIdToken());
+                    Settings.setActiveAccountID(acct.getId());
+                    //Settings.setAuthToken(acct.getIdToken());
                     initNavigationDrawer(getMainNavigationItems());
                 } else {
                     Toast.makeText(mContext,"Не удалось подключиться", Toast.LENGTH_SHORT).show();
@@ -324,7 +317,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
     private void getUserActiveAccount(){
 
-        AccountItem mAccount = mDataBaseAccount.getAccount(mSettings.getActiveAccountID());
+        AccountItem mAccount = DataBaseAccount.getAccount(Settings.getActiveAccountID());
 
         if (mAccount!=null){
             String text = mAccount.getLastname();
@@ -390,7 +383,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
             public void onResult(@NonNull Status status) {
             }
         });
-        mSettings.setActiveAccountID("localAccount");
+        Settings.setActiveAccountID("localAccount");
         getUserActiveAccount();
     }
 
@@ -410,12 +403,12 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
             byte[] byteArray = byteArrayOutputStream.toByteArray();
             String photo = Base64.encodeToString(byteArray,Base64.NO_WRAP);
 
-            if (DataBaseFavorite.getPersonItem(mContext, mSettings.getActiveAccountID(), DataBaseFavorite.LOCAL_USER, -1)!=null){
-                DataBaseFavorite.writeInDBTeachers(mContext, DataBaseFavorite.getPersonItem(mContext, mSettings.getActiveAccountID(),DataBaseFavorite.LOCAL_USER, -1)
+            if (DataBaseFavorite.getPersonItem(mContext, Settings.getActiveAccountID(), DataBaseFavorite.LOCAL_USER, -1)!=null){
+                DataBaseFavorite.writeInDBTeachers(mContext, DataBaseFavorite.getPersonItem(mContext, Settings.getActiveAccountID(),DataBaseFavorite.LOCAL_USER, -1)
                         .setPhotoOriginal(photo)
                         .setPhotoPreview(DataBaseFavorite.getPhotoPreview(photo)));
             } else {
-                AccountItem account = mDataBaseAccount.getAccount(mSettings.getActiveAccountID());
+                AccountItem account = DataBaseAccount.getAccount(Settings.getActiveAccountID());
                 DataBaseFavorite.writeInDBTeachers(mContext,new PersonItem()
                         .setRadioLabel(account.getAccountID())
                         .setLastname(account.getLastname())
@@ -439,22 +432,8 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
             Log.d("SET_ALARM", String.valueOf(mAlarm.isAlarmSet()));
         }
 
-        if (!DBinit.isFavoriteDBinited()){
-            new DBinit(mContext);
-        }
-
-        if (mDataBaseJournal == null){
-            mDataBaseJournal = new DataBaseJournal(mContext);
-            Log.d("recreate","journal");
-        }
-        if (mDataBaseRooms == null){
-            mDataBaseRooms = new DataBaseRooms(mContext);
-            Log.d("recreate","rooms");
-        }
-        if (mDataBaseAccount == null){
-            mDataBaseAccount = new DataBaseAccount(mContext);
-            Log.d("recreate","account");
-        }
+        //new DB();
+        //new Settings();
     }
 
     public long closingTime(){
@@ -477,11 +456,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
         Log.d("Launcher","DESTROY");
 
-        DBinit.closeDB();
-
-        mDataBaseJournal.closeDB();
-        mDataBaseRooms.closeDB();
-        mDataBaseAccount.closeDB();
+        DB.closeDB();
 
         if (mReader!=null){
             mReader.close();
@@ -509,7 +484,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                 Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
                 Bundle bundle = new Bundle();
                 bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
-                bundle.putString(Values.AUDITROOM, mSettings.getLastClickedAuditroom());
+                bundle.putString(Values.AUDITROOM, Settings.getLastClickedAuditroom());
                 persons_fragment.setArguments(bundle);
                 showFragment(persons_fragment, R.string.fragment_tag_main);
             }else{
@@ -576,7 +551,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
 
                                     } else if (main_fragment != null && main_fragment.isVisible()) {
 
-                                        if (mDataBaseRooms.getRoomItemForCurrentUser(tag)!=null){
+                                        if (DataBaseRooms.getRoomItemForCurrentUser(tag)!=null){
                                             new CloseRooms(mContext).execute(new CloseRoomsParams()
                                                     .setTag(tag)
                                                     .setRoomInterface(mRoomInterface));
@@ -664,7 +639,7 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                 if (mType == NFS){
                     new TakeKey(mContext).execute(new TakeKeyParams()
                             .setPersonItem(personItem)
-                            .setAuditroom(mSettings.getLastClickedAuditroom())
+                            .setAuditroom(Settings.getLastClickedAuditroom())
                             .setAccessType(DataBaseJournal.ACCESS_BY_CARD)
                             .setPublicInterface(mKeyInterface));
                 } else if (mType == PERSONS){

@@ -65,12 +65,7 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
         ArrayList<String> auditroomsList = new ArrayList<>();
         result = 0;
 
-        DataBaseRooms mDataBaseRooms;
-        if (Launcher.mDataBaseRooms!=null){
-            mDataBaseRooms = Launcher.mDataBaseRooms;
-        } else {
-            mDataBaseRooms = new DataBaseRooms(mContext);
-        }
+
         //ArrayList<SparseArray<String>> mItems = dbRooms.readRoomsDB();
 /*
         for (int i=0;i<mItems.size();i++){

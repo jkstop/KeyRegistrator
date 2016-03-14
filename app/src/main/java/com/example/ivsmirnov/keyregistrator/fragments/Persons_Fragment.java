@@ -65,8 +65,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
     private ProgressBar mLoadingBar;
 
-    private Settings mSettings;
-
     private int type;
 
     private static long lastClickTime = 0;
@@ -131,7 +129,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
                     new TakeKey(mContext).execute(new TakeKeyParams()
                             .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
-                            .setAuditroom(mSettings.getLastClickedAuditroom())
+                            .setAuditroom(Settings.getLastClickedAuditroom())
                             .setPersonItem(mAllItems.get(position))
                             .setPublicInterface(mKeyInterface));
 
@@ -147,7 +145,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
                     new TakeKey(mContext).execute(new TakeKeyParams()
                             .setAccessType(DataBaseJournal.ACCESS_BY_CARD)
-                            .setAuditroom(mSettings.getLastClickedAuditroom())
+                            .setAuditroom(Settings.getLastClickedAuditroom())
                             .setPersonItem(mAllItems.get(position))
                             .setPublicInterface(mKeyInterface));
 
@@ -190,7 +188,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
         mAllItems = new ArrayList<>();
 
-        mSettings = new Settings(mContext);
         mKeyInterface = this;
 
         mAddFAB = (FloatingActionButton)rootView.findViewById(R.id.persons_fragment_fab);
@@ -275,7 +272,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                 Intent iLC = new Intent(Intent.ACTION_GET_CONTENT);
                 iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
                 iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-                iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, mSettings.getPersonsBackupLocation());
+                iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getPersonsBackupLocation());
                 startActivityForResult(iLC,Values.REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
                 return true;
             default:
@@ -294,7 +291,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                             this,
                             Values.REQUEST_CODE_LOAD_FAVORITE_STAFF).execute();
                 }else if (requestCode == Values.REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION){
-                    mSettings.setPersonsBackupLocation(data.getData().getPath());
+                    Settings.setPersonsBackupLocation(data.getData().getPath());
                 }
             }
         }

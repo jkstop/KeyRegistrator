@@ -24,20 +24,12 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
     private Context mContext;
     private ProgressDialog mProgressDialog;
     private UpdateInterface mListener;
-    private Settings mSettings;
-    private DataBaseJournal mDataBaseJournal;
 
     public Load_from_server(Context context, UpdateInterface updateInterface){
         this.mContext = context;
         this.mListener = updateInterface;
         mProgressDialog = new ProgressDialog(mContext);
-        mSettings = new Settings(mContext);
 
-        if (Launcher.mDataBaseJournal!=null){
-            mDataBaseJournal = Launcher.mDataBaseJournal;
-        } else {
-            mDataBaseJournal = new DataBaseJournal(mContext);
-        }
     }
 
     @Override
@@ -56,11 +48,11 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
             Connection connection = SQL_Connection.SQLconnect;
             if (connection!=null){
 
-                mDataBaseJournal.clearJournalDB();
+                DataBaseJournal.clearJournalDB();
                 Statement statement = connection.createStatement();
                 ResultSet result = statement.executeQuery("SELECT * FROM Journal_recycler");
                 while (result.next()){
-                    mDataBaseJournal.writeInDBJournal(new JournalItem()
+                    DataBaseJournal.writeInDBJournal(new JournalItem()
                     .setAccountID(result.getString("ACCOUNT_ID"))
                     .setAuditroom(result.getString("AUDITROOM"))
                     .setTimeIn(Long.parseLong(result.getString("TIME_IN")))

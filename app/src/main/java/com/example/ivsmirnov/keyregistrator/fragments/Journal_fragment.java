@@ -54,11 +54,8 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     private ArrayList<String> mDates;
     private adapter_journal_list mAdapterjournallist;
     private ArrayList <JournalItem> mJournalItems;
-    private DataBaseJournal mDataBaseJournal;
 
     private ProgressBar mLoadingBar;
-
-    private Settings mSettings;
 
     public static Journal_fragment newInstance() {
         return new Journal_fragment();
@@ -82,13 +79,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
 
     public static ArrayList<String> getDates(Context context){
 
-        DataBaseJournal mDataBaseJournal;
-        if (Launcher.mDataBaseJournal!=null){
-            mDataBaseJournal = Launcher.mDataBaseJournal;
-        } else {
-            mDataBaseJournal = new DataBaseJournal(context);
-        }
-        return mDataBaseJournal.readJournalDatesFromDB();
+        return DataBaseJournal.readJournalDatesFromDB();
     }
 
     private void showDateSpinner(){
@@ -119,13 +110,6 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_journal_fragment,container,false);
         mContext = rootView.getContext();
-        mSettings = new Settings(mContext);
-
-        if (Launcher.mDataBaseJournal!=null){
-            mDataBaseJournal = Launcher.mDataBaseJournal;
-        } else {
-            mDataBaseJournal = new DataBaseJournal(mContext);
-        }
 
         mJournalRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_journal);
         mLoadingBar = (ProgressBar)rootView.findViewById(R.id.layout_journal_fragment_loading_progress_bar);
@@ -173,7 +157,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
                 Intent iLC = new Intent(Intent.ACTION_GET_CONTENT);
                 iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
                 iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-                iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, mSettings.getJournalBackupLocation());
+                iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getJournalBackupLocation());
                 startActivityForResult(iLC,Values.REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION);
                 return true;
             default:
@@ -192,7 +176,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
                             this,
                             Values.REQUEST_CODE_LOAD_JOURNAL).execute();
                 }else if (requestCode == Values.REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION){
-                    mSettings.setJournalBackupLocation(data.getData().getPath());
+                    Settings.setJournalBackupLocation(data.getData().getPath());
                 }
             }
         }
@@ -244,7 +228,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
                                 mJournalItems.remove(position);
                                 mAdapterjournallist.notifyItemRemoved(position);
 
-                                mDataBaseJournal.deleteFromDB(timeIn);
+                                DataBaseJournal.deleteFromDB(timeIn);
 
                             }
                         })
@@ -287,7 +271,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
         @Override
         protected Void doInBackground(Void... params) {
 
-            mJournalItems = mDataBaseJournal.getJournalItemTags(mDate);
+            mJournalItems = DataBaseJournal.getJournalItemTags(mDate);
 
             return null;
         }
