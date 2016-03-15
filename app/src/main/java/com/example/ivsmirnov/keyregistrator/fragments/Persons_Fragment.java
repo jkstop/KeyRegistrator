@@ -14,7 +14,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,8 +44,6 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class Persons_Fragment extends Fragment implements UpdateInterface, KeyInterface{
 
@@ -55,7 +52,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     private ListView mListView;
     private FloatingActionButton mAddFAB;
 
-    private static ArrayList<PersonItem> mAllItems;
+    private static ArrayList<String> mPersonTagList;
     public adapter_persons_grid mAdapter;
     private adapter_list_characters mListAdapter;
 
@@ -101,15 +98,15 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
     private void initializeRecyclerAdapter(){
         if (type==Values.PERSONS_FRAGMENT_EDITOR){
-            mAdapter = new adapter_persons_grid(mContext, mAllItems, Values.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
+            mAdapter = new adapter_persons_grid(mContext, mPersonTagList, Values.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position, int viewID) {
 
                     Bundle b = new Bundle();
-                    b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
-                    b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, mAllItems.get(position).getRadioLabel());
+                    b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_EDIT);
+                    b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, mPersonTagList.get(position));
 
-                    Dialog_Fragment dialog = new Dialog_Fragment();
+                    Dialogs dialog = new Dialogs();
                     dialog.setArguments(b);
                     dialog.setTargetFragment(Persons_Fragment.this, 0);
                     dialog.show(getChildFragmentManager(), "edit");
@@ -120,9 +117,10 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                 }
             });
         }else if (type==Values.PERSONS_FRAGMENT_SELECTOR){
-            mAdapter = new adapter_persons_grid(mContext, mAllItems, Values.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
+            mAdapter = new adapter_persons_grid(mContext, mPersonTagList, Values.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position, int viewID) {
+
                     if (SystemClock.elapsedRealtime() - lastClickTime < 1000) {
                         return;
                     }
@@ -130,9 +128,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                     new TakeKey(mContext).execute(new TakeKeyParams()
                             .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
                             .setAuditroom(Settings.getLastClickedAuditroom())
-                            .setPersonItem(mAllItems.get(position))
+                            .setPersonTag(mPersonTagList.get(position))
                             .setPublicInterface(mKeyInterface));
-
 
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
@@ -146,9 +143,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                     new TakeKey(mContext).execute(new TakeKeyParams()
                             .setAccessType(DataBaseJournal.ACCESS_BY_CARD)
                             .setAuditroom(Settings.getLastClickedAuditroom())
-                            .setPersonItem(mAllItems.get(position))
+                            .setPersonTag(mPersonTagList.get(position))
                             .setPublicInterface(mKeyInterface));
-
 
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
@@ -175,7 +171,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         return initials;
     }
 
-
     private void showMainAuditroomsGrid(){
         getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
     }
@@ -186,7 +181,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         View rootView = inflater.inflate(R.layout.layout_persons_fragment, container, false);
         mContext = rootView.getContext();
 
-        mAllItems = new ArrayList<>();
+        mPersonTagList = new ArrayList<>();
 
         mKeyInterface = this;
 
@@ -194,8 +189,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         mAddFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Search_Fragment.new_Instance(), getResources().getString(R.string.fragment_tag_search)).commit();
                 //запуск activity для поиска пользователя
+                getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, Search_Fragment.new_Instance(), getResources().getString(R.string.fragment_tag_search)).commit();
 
             }
         });
@@ -225,7 +220,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new GridLayoutManager(mContext,3));
 
-        new getPersons().execute();
+        new getPersonTags().execute();
         return rootView;
     }
 
@@ -261,9 +256,9 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                 startActivityForResult(i,Values.REQUEST_CODE_LOAD_FAVORITE_STAFF);
                 return true;
             case R.id.menu_teachers_delete:
-                Dialog_Fragment dialog = new Dialog_Fragment();
+                Dialogs dialog = new Dialogs();
                 Bundle bundle = new Bundle();
-                bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLEAR_TEACHERS);
+                bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_CLEAR_TEACHERS);
                 dialog.setArguments(bundle);
                 dialog.setTargetFragment(Persons_Fragment.this,0);
                 dialog.show(getFragmentManager(),"clearTeachers");
@@ -305,7 +300,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     @Override
     public void updateInformation() {
 
-        new getPersons().execute();
+        new getPersonTags().execute();
     }
 
     @Override
@@ -315,16 +310,13 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     }
 
     private void getTagsForSelectedCharacher(int position){
-        ArrayList<String> tags = DataBaseFavorite.getTagForCurrentCharacter(mListCharacters.get(position).getCharacter());
-        if (!mAllItems.isEmpty()){
-            mAllItems.clear();
-        }
-        for (String tag : tags){
-            mAllItems.add(new PersonItem().setRadioLabel(tag));
-        }
+
+        if (!mPersonTagList.isEmpty()) mPersonTagList.clear();
+
+        mPersonTagList.addAll(DataBaseFavorite.getTagsForCurrentCharacter(mListCharacters.get(position).getCharacter()));
     }
 
-    private class getPersons extends AsyncTask<Void,PersonItem,Void>{
+    private class getPersonTags extends AsyncTask<Void,PersonItem,Void>{
 
         @Override
         protected void onPreExecute() {
@@ -335,11 +327,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         protected Void doInBackground(Void... params) {
 
             initListCharacters();
-
-
-            //setmListCharactersAdapter();
-            //initializeRecyclerAdapter();
-            //mAllItems  = mDataBaseFavorite.readTeachersFromDB();
 
             return null;
         }

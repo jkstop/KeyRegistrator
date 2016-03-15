@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
-import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
+import com.example.ivsmirnov.keyregistrator.fragments.Dialogs;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -63,8 +63,8 @@ public class adapter_main_auditrooms_grid_resize extends RecyclerView.Adapter<Re
 
     private int getItemScaleHeight(){
         int  recyclerHeight;
-        if (Dialog_Fragment.mFrameGrid!=null){
-            recyclerHeight = Dialog_Fragment.mFrameGrid.getHeight();
+        if (Dialogs.mFrameGrid!=null){
+            recyclerHeight = Dialogs.mFrameGrid.getHeight();
         }else{
             recyclerHeight = Main_Fragment.mAuditroomGrid.getHeight();
         }

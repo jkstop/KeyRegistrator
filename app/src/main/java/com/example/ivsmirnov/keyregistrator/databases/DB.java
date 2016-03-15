@@ -2,6 +2,7 @@ package com.example.ivsmirnov.keyregistrator.databases;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.example.ivsmirnov.keyregistrator.others.App;
 
@@ -33,28 +34,28 @@ public class DB {
     public static SQLiteDatabase getDataBase(int db){
         switch (db){
             case DB_FAVORITE:
-                if (mDataBaseFavorite == null){
+                if (mDataBaseFavorite == null || !mDataBaseFavorite.isOpen()){
                     mDataBaseFavoriteOpenHelper = new DataBaseFavoriteRegist(App.getAppContext());
                     mDataBaseFavorite = mDataBaseFavoriteOpenHelper.getWritableDatabase();
                 }
                 return mDataBaseFavorite;
 
             case DB_JOURNAL:
-                if (mDataBaseJournal == null){
+                if (mDataBaseJournal == null || !mDataBaseJournal.isOpen()){
                     mDataBaseJournalOpenHelper = new DataBaseJournalRegist(App.getAppContext());
                     mDataBaseJournal = mDataBaseJournalOpenHelper.getWritableDatabase();
                 }
                 return mDataBaseJournal;
 
             case DB_ROOM:
-                if (mDataBaseRooms == null){
+                if (mDataBaseRooms == null || !mDataBaseRooms.isOpen()){
                     mDataBaseRoomsOpenHelper = new DataBaseRoomsRegist(App.getAppContext());
                     mDataBaseRooms = mDataBaseRoomsOpenHelper.getWritableDatabase();
                 }
                 return mDataBaseRooms;
 
             case DB_ACCOUNT:
-                if (mDataBaseAccount == null){
+                if (mDataBaseAccount == null || !mDataBaseAccount.isOpen()){
                     mDataBaseAccountOpenHelper = new DataBaseAccountRegist(App.getAppContext());
                     mDataBaseAccount = mDataBaseAccountOpenHelper.getWritableDatabase();
                 }

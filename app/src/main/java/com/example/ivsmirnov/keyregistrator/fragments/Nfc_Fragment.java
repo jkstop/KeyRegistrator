@@ -1,7 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.content.Context;
-import android.graphics.Point;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -9,8 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,28 +16,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ScrollView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_free_users;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
 import com.example.ivsmirnov.keyregistrator.custom_views.RecyclerWrapContentHeightManager;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Created by ivsmirnov on 05.11.2015.
@@ -101,7 +93,7 @@ public class Nfc_Fragment extends Fragment {
                         new TakeKey(mContext).execute(new TakeKeyParams()
                                 .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
                                 .setAuditroom(Settings.getLastClickedAuditroom())
-                                .setPersonItem(new PersonItem().setRadioLabel(mTags.get(position)))
+                                .setPersonTag(mTags.get(position))
                                 .setPublicInterface(new KeyInterface() {
                                     @Override
                                     public void onTakeKey() {
@@ -149,20 +141,22 @@ public class Nfc_Fragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_nfc_all_persons:
-                Dialog_Fragment dialog_fragment = new Dialog_Fragment();
+                //запуск диалога ввода пароля
+                Dialogs dialogs = new Dialogs();
                 Bundle bundle = new Bundle();
                 bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
-                bundle.putInt(Values.DIALOG_CLOSE_ROOM_TYPE,Values.DIALOG_CLOSE_ROOM_TYPE_PERSONS);
-                bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLOSE_ROOM);
-                dialog_fragment.setArguments(bundle);
-                dialog_fragment.show(getChildFragmentManager(),"enter_pin");
-                //Bundle bundle = new Bundle();
-                //bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
-                //Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
-                //persons_fragment.setArguments(bundle);
+                bundle.putInt(Dialogs.DIALOG_ENTER_PASSWORD_TYPE, Dialogs.DIALOG_ENTER_PASSWORD_TYPE_ACCESS_FOR_PERSONS);
+                bundle.putInt(Dialogs.DIALOG_TYPE,Dialogs.DIALOG_ENTER_PASSWORD);
+                dialogs.setArguments(bundle);
+                dialogs.show(getChildFragmentManager(),"enter_pin");
 
-               //getActivity().getSupportFragmentManager()
-               //        .beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
+                //есди нужен доступ без пароля
+                /*Bundle bundle = new Bundle();
+                bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
+                Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+                persons_fragment.setArguments(bundle);
+                getActivity().getSupportFragmentManager()
+                       .beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();*/
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

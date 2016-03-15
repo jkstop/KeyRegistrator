@@ -14,7 +14,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -146,9 +145,9 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
                 startActivityForResult(i,Values.REQUEST_CODE_LOAD_JOURNAL);
                 return true;
             case R.id.menu_journal_delete:
-                Dialog_Fragment dialog = new Dialog_Fragment();
+                Dialogs dialog = new Dialogs();
                 Bundle bundle = new Bundle();
-                bundle.putInt(Values.DIALOG_TYPE, Values.DIALOG_CLEAR_JOURNAL);
+                bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_CLEAR_JOURNAL);
                 dialog.setTargetFragment(this, 0);
                 dialog.setArguments(bundle);
                 dialog.show(getFragmentManager(),"clearJournal");

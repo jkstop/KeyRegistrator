@@ -30,7 +30,6 @@ public class CloseRooms extends AsyncTask<CloseRoomsParams,Integer,Integer> {
     @Override
     protected void onPreExecute() {
         Values.showFullscreenToast(mContext, mContext.getString(R.string.text_toast_thanks), Values.TOAST_POSITIVE);
-
     }
 
     @Override

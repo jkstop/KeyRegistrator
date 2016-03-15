@@ -13,7 +13,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,13 +30,9 @@ import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.Find_User_in_SQL_Server_Interface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -49,7 +44,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     private Context mContext;
     private Find_User_in_SQL_Server_Interface mListener;
 
-    private ArrayList<PersonItem> mPersonItems;
+    private ArrayList<String> mPersonTagList;
 
     private ProgressBar mProgressBar;
     private RecyclerView mPersonsRecycler;
@@ -161,11 +156,11 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     }
 
     @Override
-    public void updateGrid(ArrayList<PersonItem> items) {
-        if (!items.isEmpty()){
-            mPersonItems = items;
+    public void updateGrid(ArrayList<String> personTagList) {
+        if (!personTagList.isEmpty()){
+            mPersonTagList = personTagList;
             mPersonsRecycler.setAdapter(new adapter_persons_grid(mContext,
-                    mPersonItems,
+                    mPersonTagList,
                     Values.SHOW_ALL_PERSONS,
                     this));
         }
@@ -213,7 +208,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
         @Override
         protected PersonItem doInBackground(Integer... params) {
-            PersonItem selectedPerson = DataBaseFavorite.getPersonItem(mContext, mPersonItems.get(params[0]).getRadioLabel(), DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
+            PersonItem selectedPerson = DataBaseFavorite.getPersonItem(mContext, mPersonTagList.get(params[0]), DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
             selectedPerson.setPhotoPreview(DataBaseFavorite.getPhotoPreview(selectedPerson.getPhotoOriginal()));
             return selectedPerson;
         }

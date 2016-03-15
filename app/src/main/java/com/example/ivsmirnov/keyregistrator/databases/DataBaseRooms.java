@@ -3,8 +3,10 @@ package com.example.ivsmirnov.keyregistrator.databases;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.File;
@@ -52,7 +54,7 @@ public class DataBaseRooms {
                 cv.put(DataBaseRoomsRegist.COLUMN_LAST_VISITER,roomItem.getLastVisiter());
                 cv.put(DataBaseRoomsRegist.COLUMN_ACCESS,roomItem.getAccessType());
                 cv.put(DataBaseRoomsRegist.COLUMN_TAG,roomItem.getTag());
-                cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, roomItem.getPhoto());
+                //cv.put(DataBaseRoomsRegist.COLUMN_PHOTO_PATH, roomItem.getPhoto());
                 DB.getDataBase(DB.DB_ROOM).update(DataBaseRoomsRegist.TABLE_ROOMS,cv,DataBaseRoomsRegist._ID + "=" + roomPosition, null);
                 updatedRooms++;
             }
@@ -69,7 +71,7 @@ public class DataBaseRooms {
                 cursor = DB.getCursor(DB.DB_ROOM,
                         DataBaseRoomsRegist.TABLE_ROOMS,
                         null,
-                        DataBaseRoomsRegist.COLUMN_TAG + " ?",
+                        DataBaseRoomsRegist.COLUMN_TAG + " =?",
                         new String[]{tag},
                         null,
                         null,
@@ -120,7 +122,6 @@ public class DataBaseRooms {
         } finally {
             closeCursor(cursor);
         }
-
     }
 
     public static ArrayList<RoomItem> readRoomsDB(){
@@ -134,11 +135,12 @@ public class DataBaseRooms {
             while (cursor.moveToNext()){
                 roomItems.add(new RoomItem().setAuditroom(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM)))
                         .setStatus(cursor.getInt(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_STATUS)))
+                        .setTag(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_TAG)))
                         .setAccessType(cursor.getInt(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ACCESS)))
                         .setPositionInBase(cursor.getLong(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_POSITION_IN_BASE)))
                         .setLastVisiter(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_LAST_VISITER)))
-                        .setTag(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_TAG)))
-                        .setPhoto(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_PHOTO_PATH))));
+                        .setTag(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_TAG))));
+                        //.setPhoto(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_PHOTO_PATH))));
             }
             return roomItems;
         } catch (Exception e){
@@ -147,18 +149,80 @@ public class DataBaseRooms {
         } finally {
             closeCursor(cursor);
         }
+    }
 
+    public static RoomItem getRoomItem (String tag, String aud){
+        Cursor cursor = null;
+        try {
+            String selection;
+            String selectionArg;
+            if (tag!=null){
+                selection = DataBaseRoomsRegist.COLUMN_TAG;
+                selectionArg = tag;
+            } else {
+                selection = DataBaseRoomsRegist.COLUMN_ROOM;
+                selectionArg = aud;
+            }
+            cursor = DB.getCursor(DB.DB_ROOM,
+                    DataBaseRoomsRegist.TABLE_ROOMS,
+                    null,
+                    selection + " =?",
+                    new String[]{selectionArg},
+                    null,
+                    null,
+                    "1");
+            if (cursor.getCount() > 0){
+                cursor.moveToFirst();
+                return new RoomItem().setAuditroom(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM)))
+                        .setStatus(cursor.getInt(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_STATUS)))
+                        .setAccessType(cursor.getInt(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ACCESS)))
+                        .setPositionInBase(cursor.getLong(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_POSITION_IN_BASE)))
+                        .setLastVisiter(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_LAST_VISITER)))
+                        .setTag(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_TAG)))
+                        .setPhoto(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_PHOTO_PATH)));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+        return null;
+    }
+
+
+    public static ArrayList<String> getRoomList(){
+        Cursor cursor = null;
+        ArrayList<String> items = new ArrayList<>();
+        try {
+
+            cursor = DB.getCursor(DB.DB_ROOM,
+                    DataBaseRoomsRegist.TABLE_ROOMS,
+                    new String[]{DataBaseRoomsRegist.COLUMN_ROOM},
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
+            cursor.moveToPosition(-1);
+            while (cursor.moveToNext()){
+                items.add(cursor.getString(cursor.getColumnIndex(DataBaseRoomsRegist.COLUMN_ROOM)));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+        return items;
     }
 
     public static void backupRoomsToFile(){
         Cursor cursor = null;
         try {
-            File file = null;
             ArrayList <String> itemList = new ArrayList<>();
             FileOutputStream fileOutputStream;
             String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-            file = new File(mPath + "/Rooms.csv");
-            //cursor = DB.getDataBase(DB.DB_ROOM).query(DataBaseRoomsRegist.TABLE_ROOMS,null,null,null,null,null,null);
+            File file = new File(mPath + "/Rooms.csv");
+
             cursor = DB.getCursor(DB.DB_ROOM,
                     DataBaseRoomsRegist.TABLE_ROOMS,
                     null,null,null,null,null,null);

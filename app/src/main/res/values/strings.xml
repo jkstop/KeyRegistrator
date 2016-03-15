@@ -150,6 +150,7 @@
     <string name="snack_cancelled">Отменено</string>
 
     <string name="input_empty_error">Введите хотя бы один символ!</string>
+    <string name="input_already_exist_error">Такое помещение уже есть!</string>
 
     <string name="view_resize_title">Для изменения размера элементов перетащите ползунок справа</string>
 

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 07.12.2015.
  */
-public class Find_User_in_SQL_Server extends AsyncTask<Connection,Void,ArrayList<PersonItem>> {
+public class Find_User_in_SQL_Server extends AsyncTask<Connection,Void,ArrayList<String>> {
 
     private Find_User_in_SQL_Server_Interface mListener;
     private Context mContext;
@@ -41,20 +41,21 @@ public class Find_User_in_SQL_Server extends AsyncTask<Connection,Void,ArrayList
     }
 
     @Override
-    protected ArrayList<PersonItem> doInBackground(Connection... params) {
-        ArrayList<PersonItem> mItems = new ArrayList<>();
+    protected ArrayList<String> doInBackground(Connection... params) {
+        ArrayList<String> mItems = new ArrayList<>();
         try {
             Statement statement = params[0].createStatement();
-            ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [LASTNAME] like '"+ mSearchString +"%'");
+            ResultSet resultSet = statement.executeQuery("select [RADIO_LABEL] from STAFF_NEW where [LASTNAME] like '"+ mSearchString +"%'");
             while (resultSet.next()){
 
-                mItems.add(new PersonItem()
-                        .setLastname(resultSet.getString("LASTNAME"))
-                        .setFirstname(resultSet.getString("FIRSTNAME"))
-                        .setMidname(resultSet.getString("MIDNAME"))
-                        .setDivision(resultSet.getString("NAME_DIVISION"))
-                        .setSex(resultSet.getString("SEX"))
-                        .setRadioLabel(resultSet.getString("RADIO_LABEL")));
+                //mItems.add(new PersonItem()
+                //        .setLastname(resultSet.getString("LASTNAME"))
+                //        .setFirstname(resultSet.getString("FIRSTNAME"))
+                 //       .setMidname(resultSet.getString("MIDNAME"))
+                 //       .setDivision(resultSet.getString("NAME_DIVISION"))
+                 //       .setSex(resultSet.getString("SEX"))
+                 //       .setRadioLabel(resultSet.getString("RADIO_LABEL")));
+                mItems.add(resultSet.getString("RADIO_LABEL"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -63,10 +64,10 @@ public class Find_User_in_SQL_Server extends AsyncTask<Connection,Void,ArrayList
     }
 
     @Override
-    protected void onPostExecute(ArrayList<PersonItem> personItems) {
-        super.onPostExecute(personItems);
+    protected void onPostExecute(ArrayList<String> personTags) {
+
         mListener.changeProgressBar(View.INVISIBLE);
-        mListener.updateGrid(personItems);
+        mListener.updateGrid(personTags);
     }
 
 }

@@ -30,7 +30,6 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
 import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
-import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
@@ -50,11 +49,8 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
 
     private Context mContext;
 
-    private DataBaseRooms mDataBaseRooms;
-
     private ArrayList<RoomItem> mRoomItems;
 
-    private LinearLayout disclaimer;
     private FrameLayout frameForGrid;
 
     private CardView mDisclaimerCard;
@@ -114,7 +110,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     }
 
     private void initializeAuditroomGrid(){
-        mAuditroomGridAdapter = new adapter_main_auditrooms_grid(mContext,mRoomItems,this);
+        mAuditroomGridAdapter = new adapter_main_auditrooms_grid(mRoomItems,this);
         mAuditroomGrid.setAdapter(mAuditroomGridAdapter);
         mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getAuditroomColumnsCount()));
     }
@@ -123,7 +119,6 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     @Override
     public void onResume() {
         super.onResume();
-
 
         mRoomItems = DataBaseRooms.readRoomsDB();
 
@@ -142,9 +137,9 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_main_items_size:
-                Dialog_Fragment dialog_resize = new Dialog_Fragment();
+                Dialogs dialog_resize = new Dialogs();
                 Bundle bundle_dialog_resize = new Bundle();
-                bundle_dialog_resize.putInt(Values.DIALOG_TYPE, Values.DIALOG_RESIZE_ITEMS);
+                bundle_dialog_resize.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_RESIZE_ITEMS);
                 dialog_resize.setArguments(bundle_dialog_resize);
                 dialog_resize.setTargetFragment(this,0);
                 dialog_resize.show(getFragmentManager(),"dialog_resize");
@@ -207,8 +202,6 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         }
     }
 
-
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -217,7 +210,6 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
             actionBar.setTitle(getResources().getString(R.string.toolbar_title_main));
         }
     }
-
 
     @Override
     public void onItemClick(View v, int position, int viewID) {
@@ -235,7 +227,7 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
                     .replace(R.id.main_frame_for_fragment, nfc_fragment, getResources().getString(R.string.fragment_tag_nfc))
                     .commit();
         } else {
-            if (mRoomItems.get(position).getAccessType()==DataBaseJournal.ACCESS_BY_CLICK) {
+            if (mRoomItems.get(position).getAccessType() == DataBaseJournal.ACCESS_BY_CLICK) {
                 new CloseRooms(mContext).execute(new CloseRoomsParams()
                         .setTag(mRoomItems.get(position).getTag())
                         .setRoomInterface(roomInterface));
@@ -249,16 +241,16 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
     @Override
     public void onItemLongClick(View v, int position, long timeIn) {
         if (mRoomItems.get(position).getAccessType()==DataBaseJournal.ACCESS_BY_CARD){
-            Dialog_Fragment dialog_fragment = new Dialog_Fragment();
+            Dialogs dialogs = new Dialogs();
             Bundle bundle = new Bundle();
-            bundle.putLong(Values.POSITION_IN_BASE_FOR_ROOM,mRoomItems.get(position).getPositionInBase());
+            //bundle.putLong(Values.POSITION_IN_BASE_FOR_ROOM,mRoomItems.get(position).getPositionInBase());
             bundle.putString("aud",mRoomItems.get(position).getAuditroom());
             bundle.putString("tag",mRoomItems.get(position).getTag());
-            bundle.putLong("positionInBase",mRoomItems.get(position).getPositionInBase());
-            bundle.putInt(Values.DIALOG_CLOSE_ROOM_TYPE,Values.DIALOG_CLOSE_ROOM_TYPE_ROOMS);
-            bundle.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLOSE_ROOM);
-            dialog_fragment.setArguments(bundle);
-            dialog_fragment.show(getFragmentManager(),"enter_pin");
+            //bundle.putLong("positionInBase",mRoomItems.get(position).getPositionInBase());
+            bundle.putInt(Dialogs.DIALOG_ENTER_PASSWORD_TYPE, Dialogs.DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM);
+            bundle.putInt(Dialogs.DIALOG_TYPE,Dialogs.DIALOG_ENTER_PASSWORD);
+            dialogs.setArguments(bundle);
+            dialogs.show(getFragmentManager(),"enter_pin");
         }
     }
 
@@ -267,7 +259,6 @@ public class Main_Fragment extends Fragment implements UpdateInterface,RecycleIt
         setLayoutsWeight();
         initializeAuditroomGrid();
     }
-
 
     @Override
     public void onUserRecoverableAuthException(UserRecoverableAuthException e) {

@@ -19,7 +19,14 @@ public class GetPersonParams{
     private TextView personLastname, personFirstname, personMidname, personDivision;
     private CardView personCard;
     private boolean isFreeUser;
+    private boolean isAnimatedPhoto;
     private AppCompatCheckBox accessTypeContainer;
+
+    public GetPersonParams setIsAnimatedPhoto(boolean isAnimatedPhoto){
+        this.isAnimatedPhoto = isAnimatedPhoto;
+        return this;
+    }
+
 
     public GetPersonParams setAccessTypeContainer(AppCompatCheckBox appCompatCheckBox){
         this.accessTypeContainer = appCompatCheckBox;
@@ -83,6 +90,10 @@ public class GetPersonParams{
     public GetPersonParams setPersonDivision(TextView personDivision){
         this.personDivision = personDivision;
         return this;
+    }
+
+    public boolean getIsAnimatedPhoto(){
+        return isAnimatedPhoto;
     }
 
     public boolean getFreeUser(){

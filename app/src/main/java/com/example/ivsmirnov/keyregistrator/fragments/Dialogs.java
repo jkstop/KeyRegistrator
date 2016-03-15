@@ -1,9 +1,9 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.app.Dialog;
-import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.os.Build;
+import android.support.annotation.StringDef;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -21,13 +21,11 @@ import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -39,7 +37,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
@@ -58,40 +55,47 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.lang.reflect.Field;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
-import jxl.biff.drawing.CheckBox;
+public class Dialogs extends DialogFragment{
 
-public class Dialog_Fragment extends DialogFragment{
+    public static final String DIALOG_TYPE = "dialog_type";
+    public static final String DIALOG_ENTER_PASSWORD_TYPE = "dialog_enter_password_type";
+
+    public static final int DIALOG_EDIT = 100;
+    public static final int DIALOG_CLEAR_JOURNAL = 101;
+    public static final int DIALOG_CLEAR_TEACHERS = 102;
+    public static final int DIALOG_CLEAR_ROOMS = 103;
+    public static final int DIALOG_SQL_CONNECT = 104;
+    public static final int DELETE_ROOM_DIALOG = 105;
+    public static final int ADD_ROOM_DIALOG = 106;
+    public static final int SELECT_COLUMNS_DIALOG = 107;
+    public static final int DIALOG_RESIZE_ITEMS = 108;
+    public static final int DIALOG_ENTER_PASSWORD = 109;
+    public static final int DIALOG_LOG_OUT = 110;
+
+    public static final int DIALOG_ENTER_PASSWORD_TYPE_ACCESS_FOR_PERSONS = 111;
+    public static final int DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM = 112;
 
     private Context mContext;
     private int dialog_id;
     private LayoutInflater mInflater;
     private Resources mResources;
 
-    public ArrayList<String> mAttachmentList;
-
-
     public static FrameLayout mFrameGrid;
 
     private int mProgress = 0;
 
-    DialogInterface.OnDismissListener onDismissListener;
-
-
-    public Dialog_Fragment(){
+    public Dialogs(){
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dialog_id = getArguments().getInt(Values.DIALOG_TYPE,0);
+        dialog_id = getArguments().getInt(DIALOG_TYPE,0);
         mContext = getActivity();
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResources = mContext.getResources();
-
-
     }
 
     @Override
@@ -103,7 +107,7 @@ public class Dialog_Fragment extends DialogFragment{
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         switch (dialog_id){
-            case Values.DIALOG_CLEAR_JOURNAL:
+            case DIALOG_CLEAR_JOURNAL:
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(mResources.getString(R.string.dialog_clear_journal_title))
                         .setMessage(mResources.getString(R.string.dialog_clear_journal_message))
@@ -118,14 +122,13 @@ public class Dialog_Fragment extends DialogFragment{
                             public void onClick(DialogInterface dialog, int which) {
 
                                 DataBaseJournal.clearJournalDB();
-
                                 updateInformation();
 
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }
                         })
                         .create();
-            case Values.DIALOG_CLEAR_TEACHERS:
+            case DIALOG_CLEAR_TEACHERS:
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(mResources.getString(R.string.dialog_clear_teachers_title))
                         .setMessage(mResources.getString(R.string.dialog_clear_teachers_message))
@@ -140,14 +143,13 @@ public class Dialog_Fragment extends DialogFragment{
                             public void onClick(DialogInterface dialog, int which) {
 
                                 DataBaseFavorite.clearTeachersDB();
-
                                 updateInformation();
 
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }
                         })
                         .create();
-            case Values.DIALOG_EDIT:
+            case DIALOG_EDIT:
 
                 final View dialogView = mInflater.inflate(R.layout.layout_person_information, null);
                 final ImageView personImage = (ImageView) dialogView.findViewById(R.id.person_information_image);
@@ -240,7 +242,7 @@ public class Dialog_Fragment extends DialogFragment{
 
                 builderEdit.setCancelable(false);
                 return builderEdit.create();
-            case Values.DELETE_ROOM_DIALOG:
+            case DELETE_ROOM_DIALOG:
                 final String aud = getArguments().getString("aud");
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(getResources().getString(R.string.title_delete_room_dialog))
@@ -264,7 +266,7 @@ public class Dialog_Fragment extends DialogFragment{
                             }
                         })
                         .create();
-            case Values.DIALOG_CLEAR_ROOMS:
+            case DIALOG_CLEAR_ROOMS:
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.dialog_clear_rooms_title)
                         .setMessage(R.string.dialog_clear_rooms_message)
@@ -285,7 +287,9 @@ public class Dialog_Fragment extends DialogFragment{
                             }
                         })
                         .create();
-            case Values.ADD_ROOM_DIALOG:
+            case ADD_ROOM_DIALOG:
+                //добавление нового помещения
+
                 final TextInputLayout enterAuditroomLayout = (TextInputLayout) mInflater.inflate(R.layout.view_enter_auditroom,null);
                 final AppCompatEditText enterAuditroomText = (AppCompatEditText)enterAuditroomLayout.findViewById(R.id.view_auditroom_enter_room);
                 AppCompatButton enterAuditroomOkButton = (AppCompatButton)enterAuditroomLayout.findViewById(R.id.view_auditroom_ok_button);
@@ -293,8 +297,12 @@ public class Dialog_Fragment extends DialogFragment{
                     @Override
                     public void onClick(View v) {
                         String inputText = enterAuditroomText.getText().toString();
-                        if (!inputText.isEmpty()){
-
+                        ArrayList<String> auditroomList = DataBaseRooms.getRoomList();
+                        if (inputText.isEmpty()){
+                            enterAuditroomLayout.setError(getResources().getString(R.string.input_empty_error));
+                        } else if (auditroomList.contains(inputText)){
+                            enterAuditroomLayout.setError(getResources().getString(R.string.input_already_exist_error));
+                        } else {
                             DataBaseRooms.writeInRoomsDB(new RoomItem().setAuditroom(inputText)
                                     .setStatus(Values.ROOM_IS_FREE)
                                     .setAccessType(DataBaseJournal.ACCESS_BY_CLICK));
@@ -303,16 +311,15 @@ public class Dialog_Fragment extends DialogFragment{
                             updateInformation();
                             Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                             dismiss();
-                        }else{
-                            enterAuditroomLayout.setError(getResources().getString(R.string.input_empty_error));
                         }
+
                     }
                 });
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.view_enter_auditroom_title)
                         .setView(enterAuditroomLayout)
                         .create();
-            case Values.SELECT_COLUMNS_DIALOG:
+            case SELECT_COLUMNS_DIALOG:
                 final String ident = getArguments().getString("AudOrPer");
                 final int mSelectedItemAud = Settings.getAuditroomColumnsCount();
                 //final int mSelectedItemPer = sharedPreferences.getInt(Values.COLUMNS_PER_COUNT, 0);
@@ -347,7 +354,7 @@ public class Dialog_Fragment extends DialogFragment{
                         .setView(pickerView)
                         .create();
 
-            case Values.DIALOG_RESIZE_ITEMS:
+            case DIALOG_RESIZE_ITEMS:
                 View rootView =  mInflater.inflate(R.layout.view_resize_main_fragment_items,null);
                 final CardView cardView = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
                 final SeekBar mResizeSeekBar = (SeekBar)rootView.findViewById(R.id.view_resize_vertical_seekbar);
@@ -415,8 +422,9 @@ public class Dialog_Fragment extends DialogFragment{
                             }
                         })
                         .show();
-            case Values.DIALOG_CLOSE_ROOM:
+            case DIALOG_ENTER_PASSWORD:
 
+                final int dialog_enter_password_type = getArguments().getInt(DIALOG_ENTER_PASSWORD_TYPE);
                 final TextInputLayout textInputLayout = (TextInputLayout) mInflater.inflate(R.layout.view_enter_password,null);
                 final AppCompatEditText editPassword = (AppCompatEditText)textInputLayout.findViewById(R.id.view_enter_password_edit_text);
                 AppCompatButton okButton = (AppCompatButton)textInputLayout.findViewById(R.id.view_enter_password_ok_button);
@@ -424,12 +432,12 @@ public class Dialog_Fragment extends DialogFragment{
                     @Override
                     public void onClick(View v) {
                         if (editPassword.getText().toString().equalsIgnoreCase("1212")){
-                            if (getArguments().getInt(Values.DIALOG_CLOSE_ROOM_TYPE)==Values.DIALOG_CLOSE_ROOM_TYPE_ROOMS){
+                            if (dialog_enter_password_type == DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM){
                                 new CloseRooms(mContext).execute(new CloseRoomsParams()
                                         .setTag(getArguments().getString("tag"))
                                         .setRoomInterface(Main_Fragment.roomInterface));
                                 dismiss();
-                            }else{
+                            }else if (dialog_enter_password_type == DIALOG_ENTER_PASSWORD_TYPE_ACCESS_FOR_PERSONS){
                                 Bundle bundle = new Bundle();
                                 bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
                                 bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
@@ -451,7 +459,8 @@ public class Dialog_Fragment extends DialogFragment{
                         .setView(textInputLayout)
                         .setCancelable(false)
                         .create();
-            case Values.DIALOG_SQL_CONNECT:
+
+            case DIALOG_SQL_CONNECT:
                 View dialogLayout = mInflater.inflate(R.layout.layout_dialog_sql_connect_new,null);
                 final AppCompatEditText inputServer = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_server)).getEditText();
                 final AppCompatEditText inputLogin = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_login)).getEditText();
@@ -550,7 +559,7 @@ public class Dialog_Fragment extends DialogFragment{
                             }
                         })
                         .create();
-            case Values.DIALOG_LOG_OUT:
+            case DIALOG_LOG_OUT:
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(getString(R.string.title_dialog_log_out))
                         .setMessage(getString(R.string.dialog_log_out_message))

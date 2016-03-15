@@ -44,9 +44,6 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
 
     private RecyclerView mRoomsGrid;
 
-    //private SharedPreferences sharedPreferences;
-    //private SharedPreferences.Editor editor;
-
     public static Rooms_Fragment newInstance(){
         return new Rooms_Fragment();
     }
@@ -57,7 +54,6 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
         setHasOptionsMenu(true);
         setRetainInstance(true);
     }
-
 
     @Nullable
     @Override
@@ -73,9 +69,9 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
         mAddFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Dialog_Fragment dialog = new Dialog_Fragment();
+                Dialogs dialog = new Dialogs();
                 Bundle b = new Bundle();
-                b.putInt(Values.DIALOG_TYPE, Values.ADD_ROOM_DIALOG);
+                b.putInt(Dialogs.DIALOG_TYPE, Dialogs.ADD_ROOM_DIALOG);
                 dialog.setArguments(b);
                 dialog.setTargetFragment(Rooms_Fragment.this, 0);
                 dialog.show(getFragmentManager(), "add_room");
@@ -116,7 +112,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
             mRoomItems.get(i).setStatus(Values.ROOM_IS_FREE);
         }
 
-        mAdapter = new adapter_main_auditrooms_grid(mContext,mRoomItems,this);
+        mAdapter = new adapter_main_auditrooms_grid(mRoomItems,this);
         mRoomsGrid.setAdapter(mAdapter);
 
     }
@@ -125,13 +121,13 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_auditrooms_set_columns_number:
-                Dialog_Fragment dialog_fragment = new Dialog_Fragment();
+                Dialogs dialogs = new Dialogs();
                 Bundle bundle = new Bundle();
-                bundle.putInt(Values.DIALOG_TYPE, Values.SELECT_COLUMNS_DIALOG);
+                bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.SELECT_COLUMNS_DIALOG);
                 bundle.putString("AudOrPer", "aud");
-                dialog_fragment.setArguments(bundle);
-                dialog_fragment.setTargetFragment(Rooms_Fragment.this, 0);
-                dialog_fragment.show(getFragmentManager(),"columns");
+                dialogs.setArguments(bundle);
+                dialogs.setTargetFragment(Rooms_Fragment.this, 0);
+                dialogs.show(getFragmentManager(),"columns");
                 return true;
             case R.id.menu_auditrooms_save_to_file:
                 Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_ROOMS, true);
@@ -144,9 +140,9 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
                 startActivityForResult(i,Values.REQUEST_CODE_LOAD_ROOMS);
                 return true;
             case R.id.menu_auditrooms_clear:
-                Dialog_Fragment dialog = new Dialog_Fragment();
+                Dialogs dialog = new Dialogs();
                 Bundle bundleRooms = new Bundle();
-                bundleRooms.putInt(Values.DIALOG_TYPE,Values.DIALOG_CLEAR_ROOMS);
+                bundleRooms.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_CLEAR_ROOMS);
                 dialog.setArguments(bundleRooms);
                 dialog.setTargetFragment(Rooms_Fragment.this,0);
                 dialog.show(getFragmentManager(),"clearRooms");
@@ -178,10 +174,10 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
 
     @Override
     public void onItemClick(View v, int position, int viewID) {
-        Dialog_Fragment dialog = new Dialog_Fragment();
+        Dialogs dialog = new Dialogs();
         Bundle b = new Bundle();
         b.putString("aud", mRoomItems.get(position).getAuditroom());
-        b.putInt(Values.DIALOG_TYPE,Values.DELETE_ROOM_DIALOG);
+        b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DELETE_ROOM_DIALOG);
         dialog.setArguments(b);
         dialog.setTargetFragment(Rooms_Fragment.this,0);
         dialog.show(getFragmentManager(),"delete_room");

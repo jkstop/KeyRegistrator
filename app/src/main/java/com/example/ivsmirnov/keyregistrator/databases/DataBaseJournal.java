@@ -356,9 +356,9 @@ public class DataBaseJournal{
         }
     }
 
-    public static JournalItem createNewItemForJournal (Context context, PersonItem personItem, String auditroom, int accessType){
+    public static JournalItem createNewItemForJournal (Context context, String personTag, String auditroom, int accessType){
 
-        PersonItem person = DataBaseFavorite.getPersonItem(context, personItem.getRadioLabel(), DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
+        PersonItem person = DataBaseFavorite.getPersonItem(context, personTag, DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
         return new JournalItem().setAccountID(Settings.getActiveAccountID())
                 .setAuditroom(auditroom)
                 .setAccessType(accessType)

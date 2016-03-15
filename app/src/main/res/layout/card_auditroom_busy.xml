@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="@dimen/auditroom_card_width"
     android:layout_height="@dimen/auditroom_card_height"
+    android:id="@+id/card_auditroom_busy"
     app:cardElevation="@dimen/auditroom_card_elevation"
     app:contentPadding="@dimen/auditroom_card_content_padding"
     android:foreground="?android:attr/selectableItemBackground"

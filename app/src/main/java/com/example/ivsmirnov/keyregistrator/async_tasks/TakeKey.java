@@ -34,11 +34,11 @@ public class TakeKey extends AsyncTask<TakeKeyParams,Void,Void> {
     protected Void doInBackground(TakeKeyParams... params) {
         mListener = params[0].getPublicInterface();
         JournalItem journalItem = DataBaseJournal.createNewItemForJournal(mContext,
-                params[0].getPersonItem(),
+                params[0].getPersonTag(),
                 params[0].getAuditroom(),
                 params[0].getAccessType());
         long positionInBase = DataBaseJournal.writeInDBJournal(journalItem);
-        Values.writeRoom(journalItem, params[0].getPersonItem(),positionInBase);
+        Values.writeRoom(journalItem, params[0].getPersonTag(), positionInBase);
         return null;
     }
 

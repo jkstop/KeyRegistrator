@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -101,7 +102,7 @@ public class DataBaseFavorite {
                     }
                 }else{
                     Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
-                    return new PersonItem();
+                    return null;
                 }
             }
             return new PersonItem().setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1);
@@ -119,7 +120,8 @@ public class DataBaseFavorite {
 
             cursor = DB.getCursor(DB.DB_FAVORITE,
                     DataBaseFavoriteRegist.TABLE_TEACHER,
-                    new String[]{DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE, DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE},
+                    new String[]{DataBaseFavoriteRegist._ID, DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE,
+                            DataBaseFavoriteRegist.COLUMN_MIDNAME_FAVORITE, DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE},
                     DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",
                     new String[]{tag},
                     null,
@@ -154,7 +156,7 @@ public class DataBaseFavorite {
         }
     }
 
-    public static ArrayList<String> getTagForCurrentCharacter(String character){
+    public static ArrayList<String> getTagsForCurrentCharacter(String character){
 
         Cursor cursor = null;
         try {
@@ -230,23 +232,37 @@ public class DataBaseFavorite {
 
 
     public static boolean isUserInBase(String tag){
-        SQLiteDatabase mDataBase = DB.getDataBase(DB.DB_FAVORITE);
+        //SQLiteDatabase mDataBase = DB.getDataBase(DB.DB_FAVORITE);
+        Cursor cursor = null;
         try {
-            mDataBase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
-                    + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " = '" + tag + "'").simpleQueryForString();
-            return true;
+          //  /mDataBase.compileStatement("SELECT * FROM " + DataBaseFavoriteRegist.TABLE_TEACHER
+            //        + " WHERE " + DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " = '" + tag + "'").simpleQueryForString();
+            cursor = DB.getCursor(DB.DB_FAVORITE,
+                    DataBaseFavoriteRegist.TABLE_TEACHER,
+                    new String[]{DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE},
+                    DataBaseFavoriteRegist.COLUMN_TAG_FAVORITE + " =?",
+                    new String[]{tag},
+                    null,
+                    null,
+                    "1");
+            return cursor.getCount() > 0;
         }catch (Exception e){
             return false;
+        } finally {
+            closeCursor(cursor);
         }
     }
 
-    public static void writeInDBTeachers(Context mContext, PersonItem personItem) {
+    public static boolean writeInDBTeachers(Context mContext, PersonItem personItem) {
         try {
             if (personItem!=null){
+
+
                 if (personItem.getPhotoOriginal() == null){
                     personItem.setPhotoOriginal(getBase64DefaultPhotoFromResources(mContext, personItem.getSex()));
                     personItem.setPhotoPreview(getPhotoPreview(getBase64DefaultPhotoFromResources(mContext, personItem.getSex())));
                 }
+
                 ContentValues cv = new ContentValues();
                 cv.put(DataBaseFavoriteRegist.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
                 cv.put(DataBaseFavoriteRegist.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
@@ -261,10 +277,12 @@ public class DataBaseFavorite {
                     deleteUser(personItem.getRadioLabel());
                 }
                 DB.getDataBase(DB.DB_FAVORITE).insert(DataBaseFavoriteRegist.TABLE_TEACHER, null, cv);
+                return true;
             }
         } catch (Exception e){
             e.printStackTrace();
         }
+        return false;
     }
 
     public static void backupFavoriteStaffToFile(){

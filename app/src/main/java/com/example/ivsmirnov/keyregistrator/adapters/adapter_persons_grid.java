@@ -17,7 +17,6 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
-import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -26,21 +25,18 @@ import java.util.ArrayList;
 
 public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_grid.ViewHolder>{
 
-    private SparseArray <String> card;
-    private ArrayList <PersonItem> allItems;
+    private ArrayList <String> mTags;
     private int mType;
     private Context mContext;
-    private LayoutInflater inflater;
     private RecycleItemClickListener mListener;
     private ArrayList<String> isFreeUsers;
 
-    public adapter_persons_grid(Context c, ArrayList<PersonItem> all,int type,RecycleItemClickListener listener) {
-        allItems = all;
+    public adapter_persons_grid(Context c, ArrayList<String> tagList,int type,RecycleItemClickListener listener) {
+        mTags = tagList;
         mContext = c;
         mType = type;
 
         this.mListener = listener;
-        inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         isFreeUsers = Settings.getFreeUsers();
     }
 
@@ -99,20 +95,20 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
         if (mType== Values.SHOW_FAVORITE_PERSONS){
 
             new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams()
-                    .setPersonTag(allItems.get(position).getRadioLabel())
+                    .setPersonTag(mTags.get(position))
                     .setPersonImageView(holder.imageView)
                     .setPersonLastname(holder.textLastname)
                     .setPersonFirstname(holder.textFirstname)
                     .setPersonMidname(holder.textMidname)
                     .setPersonDivision(holder.textDivision)
                     .setAccessImageView(holder.accessImageView)
-                    .setFreeUser(isFreeUsers.contains(allItems.get(position).getRadioLabel()))
+                    .setFreeUser(isFreeUsers.contains(mTags.get(position)))
                     .setPersonLocation(DataBaseFavorite.LOCAL_USER)
                     .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
 
         }else if (mType==Values.SHOW_ALL_PERSONS){
 
-            new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(allItems.get(position).getRadioLabel())
+            new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(mTags.get(position))
                     .setPersonImageView(holder.imageView)
                     .setPersonLastname(holder.textLastname)
                     .setPersonFirstname(holder.textFirstname)
@@ -125,7 +121,7 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
 
     @Override
     public int getItemCount() {
-        return allItems.size();
+        return mTags.size();
     }
 
 }

@@ -18,6 +18,7 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.lang.ref.WeakReference;
 
@@ -29,7 +30,7 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
     private int  photoDimension;
     private CardView personCard;
     private Animation mAnimation;
-    private boolean isFreeUser;
+    private boolean isFreeUser, isAnimatedPhoto;
     private Context mContext;
 
     private ImageView mPersonImage, mAccessImage;
@@ -63,6 +64,7 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
         mAccessTypeContainer = new WeakReference<AppCompatCheckBox>(params[0].getAccessTypeContainer()).get();
 
         isFreeUser = params[0].getFreeUser();
+        isAnimatedPhoto = params[0].getIsAnimatedPhoto();
 
         return personItem;
     }
@@ -71,13 +73,25 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
     protected void onPostExecute(PersonItem personItem) {
 
         if (mPersonImage!=null){
+
+            if (isAnimatedPhoto) mPersonImage.setVisibility(View.INVISIBLE);
+
             byte[] decodedString;
             if (photoDimension == DataBaseFavorite.FULLSIZE_PHOTO){
+
+                if (personItem.getPhotoOriginal()==null) personItem.setPhotoOriginal(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, personItem.getSex()));
                 decodedString = Base64.decode(personItem.getPhotoOriginal(), Base64.DEFAULT);
-            }else{
+
+            } else {
+
+                if (personItem.getPhotoPreview()==null) personItem.setPhotoPreview(DataBaseFavorite.getPhotoPreview(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, personItem.getSex())));
                 decodedString = Base64.decode(personItem.getPhotoPreview(), Base64.DEFAULT);
             }
+
             mPersonImage.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+
+            if (isAnimatedPhoto) mPersonImage.setVisibility(View.VISIBLE);
+            if (isAnimatedPhoto) mPersonImage.startAnimation(mAnimation);
         }
 
         if (mAccessImage!=null)
@@ -92,12 +106,12 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
         if (mPersonDivision!=null) mPersonDivision.setText(personItem.getDivision());
 
-        if (mAccessTypeContainer!=null) {
+        if (mAccessTypeContainer!=null)
             if (isFreeUser) mAccessTypeContainer.setChecked(true);
-        }
+
+
 
         if (personCard!=null) personCard.setVisibility(View.VISIBLE);
         if (personCard!=null) personCard.startAnimation(mAnimation);
     }
-
 }

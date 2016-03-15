@@ -10,5 +10,5 @@ import java.util.ArrayList;
 public interface Find_User_in_SQL_Server_Interface {
 
     void changeProgressBar(int visibility);
-    void updateGrid(ArrayList<PersonItem> items);
+    void updateGrid(ArrayList<String> personTagList);
 }

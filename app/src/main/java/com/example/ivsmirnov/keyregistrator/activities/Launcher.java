@@ -52,7 +52,7 @@ import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
 import com.example.ivsmirnov.keyregistrator.items.NavigationItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
-import com.example.ivsmirnov.keyregistrator.fragments.Dialog_Fragment;
+import com.example.ivsmirnov.keyregistrator.fragments.Dialogs;
 import com.example.ivsmirnov.keyregistrator.fragments.Email_Fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Journal_fragment;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
@@ -76,6 +76,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.server.converter.StringToIntConverter;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -214,9 +215,9 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                     setToolbarTitle(R.string.toolbar_title_email);
                     showFragment(Email_Fragment.newInstance(),R.string.fragment_tag_email);
                 }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_sql))){
-                    Dialog_Fragment dialog_sql = new Dialog_Fragment();
+                    Dialogs dialog_sql = new Dialogs();
                     Bundle bundle_sql = new Bundle();
-                    bundle_sql.putInt(Values.DIALOG_TYPE,Values.DIALOG_SQL_CONNECT);
+                    bundle_sql.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_SQL_CONNECT);
                     dialog_sql.setArguments(bundle_sql);
                     dialog_sql.show(getSupportFragmentManager(),"sql");
                 }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_stat))) {
@@ -266,11 +267,11 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
     View.OnClickListener logOutClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Dialog_Fragment dialog_fragment = new Dialog_Fragment();
+            Dialogs dialogs = new Dialogs();
             Bundle bundle = new Bundle();
-            bundle.putInt(Values.DIALOG_TYPE, Values.DIALOG_LOG_OUT);
-            dialog_fragment.setArguments(bundle);
-            dialog_fragment.show(getSupportFragmentManager(),"dialog_logout");
+            bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_LOG_OUT);
+            dialogs.setArguments(bundle);
+            dialogs.show(getSupportFragmentManager(),"dialog_logout");
         }
     };
 
@@ -604,23 +605,41 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
         }
     };
 
-    private class getPerson extends AsyncTask <String, Void, PersonItem> {
+    private class getPerson extends AsyncTask <String, Void, String> {
 
         public static final int NFS = 0;
         public static final int PERSONS = 1;
 
+        private boolean isUserValid = true;
+
         private int mType;
 
         public getPerson(int type){
-            this.mType = type;
+          this.mType = type;
         };
 
 
         @Override
-        protected PersonItem doInBackground(String... params) {
+        protected String doInBackground(String... params) {
 
-            PersonItem personItem = DataBaseFavorite.getPersonItem(mContext, params[0], DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
+            try{
+                if (!DataBaseFavorite.isUserInBase(params[0])){
 
+                    PersonItem personItem = DataBaseFavorite.getPersonItem(mContext, params[0], DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
+                    personItem.setPhotoPreview(DataBaseFavorite.getPhotoPreview(personItem.getPhotoOriginal()));
+
+                    isUserValid = DataBaseFavorite.writeInDBTeachers(mContext, personItem);
+
+                }
+
+                return params[0];
+            } catch (Exception e){
+                e.printStackTrace();
+                return null;
+            }
+
+
+/*
             if (personItem == null){
                 personItem = DataBaseFavorite.getPersonItem(mContext, params[0], DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
                 personItem.setPhotoPreview(DataBaseFavorite.getPhotoPreview(personItem.getPhotoOriginal()));
@@ -628,17 +647,17 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                 DataBaseFavorite.writeInDBTeachers(mContext, personItem);
                 personItem = DataBaseFavorite.getPersonItem(mContext, params[0], DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
             }
-
-            return personItem;
+*/
+           // return personItem;
         }
 
         @Override
-        protected void onPostExecute(PersonItem personItem) {
+        protected void onPostExecute(String personTag) {
 
-            if (personItem!=null&&!personItem.isEmpty()){
+            if (personTag!=null && isUserValid){
                 if (mType == NFS){
                     new TakeKey(mContext).execute(new TakeKeyParams()
-                            .setPersonItem(personItem)
+                            .setPersonTag(personTag)
                             .setAuditroom(Settings.getLastClickedAuditroom())
                             .setAccessType(DataBaseJournal.ACCESS_BY_CARD)
                             .setPublicInterface(mKeyInterface));
@@ -646,17 +665,17 @@ public class Launcher extends AppCompatActivity implements Get_Account_Informati
                     Persons_Fragment persons_fragment = (Persons_Fragment) getFragmentByTag(R.string.fragment_tag_persons);
 
                     Bundle b = new Bundle();
-                    b.putInt(Values.DIALOG_TYPE, Values.DIALOG_EDIT);
-                    b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, personItem.getRadioLabel());
+                    b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_EDIT);
+                    b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, personTag);
 
-                    Dialog_Fragment dialog = new Dialog_Fragment();
+                    Dialogs dialog = new Dialogs();
                     dialog.setArguments(b);
                     dialog.setTargetFragment(persons_fragment, 0);
                     dialog.show(persons_fragment.getChildFragmentManager(), "edit");
                 }
 
             }else{
-                Log.d("wrong","card!!!");
+                Log.d("wrong","card!!! --- " + String.valueOf(personTag));
             }
         }
     }

@@ -9,7 +9,7 @@ import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
  */
 public class TakeKeyParams {
 
-    private PersonItem personItem;
+    private String personTag;
     private String auditroom;
     private int accessType;
     private KeyInterface keyInterface;
@@ -19,8 +19,8 @@ public class TakeKeyParams {
         return this;
     }
 
-    public TakeKeyParams setPersonItem (PersonItem personItem){
-        this.personItem = personItem;
+    public TakeKeyParams setPersonTag (String personTag){
+        this.personTag = personTag;
         return this;
     }
 
@@ -38,8 +38,8 @@ public class TakeKeyParams {
         return keyInterface;
     }
 
-    public PersonItem getPersonItem(){
-        return personItem;
+    public String getPersonTag(){
+        return personTag;
     }
 
     public String getAuditroom(){
