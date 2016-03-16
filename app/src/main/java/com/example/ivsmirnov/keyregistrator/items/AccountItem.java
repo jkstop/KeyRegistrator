@@ -1,7 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
 /**
- * Created by ivsmirnov on 28.01.2016.
+ * элемент аккаунта
  */
 public class AccountItem {
 

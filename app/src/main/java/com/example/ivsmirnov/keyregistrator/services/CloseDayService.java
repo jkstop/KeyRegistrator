@@ -6,7 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
+import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseDayInterface;
@@ -41,10 +42,12 @@ public class CloseDayService extends Service implements CloseDayInterface {
 
             Settings.setAutoClosedRoomsCount(DataBaseRooms.closeAllRooms());
 
-            //Launcher.mRoomInterface.onRoomClosed();
+            //Launcher.mCloseRoomInterface.onRoomClosed();
 
-            new Save_to_file(context, Values.WRITE_JOURNAL, false).execute();
-            new Save_to_file(context, Values.WRITE_TEACHERS, false).execute();
+            new FileWriter(context, FileWriter.WRITE_JOURNAL, false).execute();
+            new FileWriter(context, FileWriter.WRITE_TEACHERS, false).execute();
+
+            new Save_to_server(context, false).execute();
 
             Calendar calendar = Calendar.getInstance();
             if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {

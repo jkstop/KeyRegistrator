@@ -1,11 +1,8 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,17 +10,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.fragments.Email_Fragment;
-import com.example.ivsmirnov.keyregistrator.interfaces.EmailClickItemsInterface;
-import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.interfaces.EmailInterface;
 
 import java.util.ArrayList;
 
 /**
  * Created by ivsmirnov on 13.02.2016.
  */
-public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     public static final int RECIPIENTS = 1;
     public static final int ATTACHMENTS = 2;
@@ -34,13 +29,13 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
     private Context mContext;
     private int mType;
     private ArrayList<String> mItems;
-    private EmailClickItemsInterface mListener;
+    private EmailInterface mEmailInterface;
 
-    public adapter_email_attach (Context context, EmailClickItemsInterface emailClickItemsInterface, int type, ArrayList<String> items){
+    public AdapterEmailExtras(Context context, EmailInterface emailInterface, int type, ArrayList<String> items){
         this.mContext = context;
         this.mType = type;
         this.mItems = items;
-        this.mListener = emailClickItemsInterface;
+        this.mEmailInterface = emailInterface;
     }
 
     @Override
@@ -59,9 +54,9 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
                     @Override
                     public void onClick(View v) {
                         if (mType == RECIPIENTS){
-                            mListener.onDeleteRecepient(finalViewHolder.getLayoutPosition(), v.getId());
+                            mEmailInterface.onDeleteRecepient(finalViewHolder.getLayoutPosition(), v.getId());
                         }else if (mType == ATTACHMENTS){
-                            mListener.onDeleteAttachment(finalViewHolder.getLayoutPosition(), v.getId());
+                            mEmailInterface.onDeleteAttachment(finalViewHolder.getLayoutPosition(), v.getId());
                         }
                     }
                 });
@@ -80,7 +75,7 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
                         String inputText = textInputLayout.getEditText().getText().toString();
                         if (inputText.contains("@") && inputText.contains(".")){
                             v.setTag(textInputLayout.getEditText().getText().toString());
-                            mListener.onAddRecepient(v, finalViewHolder1.getLayoutPosition(), v.getId());
+                            mEmailInterface.onAddRecepient(v, finalViewHolder1.getLayoutPosition(), v.getId());
                         }else{
                             textInputLayout.setError(mContext.getResources().getString(R.string.email_fragment_error_not_email_entered));
                         }
@@ -90,7 +85,7 @@ public class adapter_email_attach extends RecyclerView.Adapter<RecyclerView.View
                 delete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mListener.onDeleteRecepient(finalViewHolder1.getLayoutPosition(), v.getId());
+                        mEmailInterface.onDeleteRecepient(finalViewHolder1.getLayoutPosition(), v.getId());
                     }
                 });
 

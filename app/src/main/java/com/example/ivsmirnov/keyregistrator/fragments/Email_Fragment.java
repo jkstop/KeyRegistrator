@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -23,13 +22,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_email_attach;
+import com.example.ivsmirnov.keyregistrator.adapters.AdapterEmailExtras;
 import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
-import com.example.ivsmirnov.keyregistrator.interfaces.EmailClickItemsInterface;
-import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
+import com.example.ivsmirnov.keyregistrator.interfaces.EmailInterface;
+import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.items.MailParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
@@ -42,15 +40,16 @@ import java.util.ArrayList;
 /**
  * Created by IVSmirnov on 03.09.2015.
  */
-public class Email_Fragment extends Fragment implements Get_Account_Information_Interface, EmailClickItemsInterface{
+public class Email_Fragment extends Fragment implements GetAccountInterface, EmailInterface {
 
     public static final String ADD_NEW_RECIPIENT = "add_new_recipient";
+    public static final int REQUEST_CODE_SELECT_EMAIL_ATTACHMENT = 206;
 
     private Context mContext;
     private ImageView mAccountImage;
     private ArrayList<String> mRecepientList, mAttachmentList;
     private ImageView mAddRecipient, mAddAttachment;
-    private adapter_email_attach mAdapterRecipients, mAdapterAttachments;
+    private AdapterEmailExtras mAdapterRecipients, mAdapterAttachments;
     private RecyclerView mRecipientRecycler, mAttachmentsRecycler;
     private TextInputLayout mInputThemeMessage, mInputBodyMessage;
     private FloatingActionButton mSendButton;
@@ -69,7 +68,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK && requestCode == Values.REQUEST_CODE_SELECT_EMAIL_ATTACHMENT){
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_SELECT_EMAIL_ATTACHMENT){
             if (data!=null){
                 mAttachmentList.add(data.getData().getPath());
                 Settings.setAttachments(mAttachmentList);
@@ -151,7 +150,7 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
                 Intent intentAddAttachment = new Intent(Intent.ACTION_GET_CONTENT);
                 intentAddAttachment.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
                 intentAddAttachment.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getAbsolutePath());
-                startActivityForResult(intentAddAttachment, Values.REQUEST_CODE_SELECT_EMAIL_ATTACHMENT);
+                startActivityForResult(intentAddAttachment, REQUEST_CODE_SELECT_EMAIL_ATTACHMENT);
             }
         });
 
@@ -159,8 +158,8 @@ public class Email_Fragment extends Fragment implements Get_Account_Information_
         checkSendButtonVisibility();
         mAttachmentList = Settings.getAttachments();
 
-        mAdapterRecipients = new adapter_email_attach(mContext, this, adapter_email_attach.RECIPIENTS, mRecepientList);
-        mAdapterAttachments = new adapter_email_attach(mContext, this, adapter_email_attach.ATTACHMENTS, mAttachmentList);
+        mAdapterRecipients = new AdapterEmailExtras(mContext, this, AdapterEmailExtras.RECIPIENTS, mRecepientList);
+        mAdapterAttachments = new AdapterEmailExtras(mContext, this, AdapterEmailExtras.ATTACHMENTS, mAttachmentList);
 
         mRecipientRecycler = (RecyclerView)rootView.findViewById(R.id.fragment_email_recipients_recycler);
         mRecipientRecycler.setItemAnimator(new DefaultItemAnimator());

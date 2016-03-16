@@ -1,47 +1,43 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
-import com.example.ivsmirnov.keyregistrator.interfaces.RoomInterface;
-import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
+import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.others.Values;
-
-import java.util.ArrayList;
+import com.example.ivsmirnov.keyregistrator.services.Toasts;
 
 /**
- * Created by ivsmirnov on 03.02.2016.
+ * Task for close room
  */
-public class CloseRooms extends AsyncTask<CloseRoomsParams,Integer,Integer> {
+public class CloseRooms extends AsyncTask<Void, Void, Integer> {
 
     private Context mContext;
-    private RoomInterface mRoomInterface;
+    private String mTag;
+    private CloseRoomInterface mCloseRoomInterface;
 
-    public CloseRooms (Context context){
-        this.mContext = context;
+    public CloseRooms (Context context, String tag, CloseRoomInterface closeRoomInterface){
+        mContext = context;
+        mTag = tag;
+        mCloseRoomInterface = closeRoomInterface;
     }
 
     @Override
     protected void onPreExecute() {
-        Values.showFullscreenToast(mContext, mContext.getString(R.string.text_toast_thanks), Values.TOAST_POSITIVE);
+        Toasts.showFullscreenToast(mContext, mContext.getString(R.string.text_toast_thanks), Toasts.TOAST_POSITIVE);
     }
 
     @Override
-    protected Integer doInBackground(CloseRoomsParams... params) {
-        mRoomInterface = params[0].getRoomInterface();
-        String tag = params[0].getTag();
+    protected Integer doInBackground(Void... params) {
 
-
-        RoomItem currentRoomItem = DataBaseRooms.getRoomItemForCurrentUser(tag);
+        RoomItem currentRoomItem = DataBaseRooms.getRoomItemForCurrentUser(mTag);
         int closedRooms = DataBaseRooms.updateRoom(currentRoomItem
                 .setTag(Values.EMPTY)
-                .setStatus(Values.ROOM_IS_FREE));
+                .setStatus(DataBaseRooms.ROOM_IS_FREE));
         DataBaseJournal.updateDB(currentRoomItem.getPositionInBase());
 
         return closedRooms;
@@ -49,8 +45,8 @@ public class CloseRooms extends AsyncTask<CloseRoomsParams,Integer,Integer> {
 
     @Override
     protected void onPostExecute(Integer closedRooms) {
-        if (mRoomInterface!=null){
-            mRoomInterface.onRoomClosed();
+        if (mCloseRoomInterface !=null){
+            mCloseRoomInterface.onRoomClosed();
         }
     }
 }

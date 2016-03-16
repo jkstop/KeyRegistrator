@@ -1,8 +1,9 @@
 package com.example.ivsmirnov.keyregistrator.interfaces;
 
 /**
- * Created by ivsmirnov on 03.02.2016.
+ * сдача ключей
  */
-public interface RoomInterface {
+
+public interface CloseRoomInterface {
     void onRoomClosed();
 }

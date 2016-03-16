@@ -3,7 +3,7 @@ package com.example.ivsmirnov.keyregistrator.items;
 import java.util.ArrayList;
 
 /**
- * Created by ivsmirnov on 16.02.2016.
+ * параметры для e-mail рассылки
  */
 public class MailParams{
 

@@ -12,7 +12,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
@@ -25,13 +24,13 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 03.03.2016.
  */
-public class adapter_free_users extends RecyclerView.Adapter<adapter_free_users.viewHolder> {
+public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersList.viewHolder> {
 
     private Context mContext;
     private ArrayList<String> mTags;
     private RecycleItemClickListener mListener;
 
-    public adapter_free_users (Context context, ArrayList<String> tags, RecycleItemClickListener recycleItemClickListener){
+    public AdapterFreeUsersList(Context context, ArrayList<String> tags, RecycleItemClickListener recycleItemClickListener){
         this.mContext = context;
         this.mTags = tags;
         this.mListener = recycleItemClickListener;
@@ -39,7 +38,7 @@ public class adapter_free_users extends RecyclerView.Adapter<adapter_free_users.
     }
 
     @Override
-    public adapter_free_users.viewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
+    public AdapterFreeUsersList.viewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
 
         final View rowView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_free_user,parent,false);
         final viewHolder holder = new viewHolder(rowView);

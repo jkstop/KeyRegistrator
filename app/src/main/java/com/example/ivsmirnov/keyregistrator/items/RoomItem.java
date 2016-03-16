@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 /**
- * Created by ivsmirnov on 11.01.2016.
+ * элемент карточки помещения
  */
 public class RoomItem {
     private String Auditroom = Values.EMPTY;

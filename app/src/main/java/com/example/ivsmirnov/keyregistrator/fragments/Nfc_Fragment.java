@@ -21,16 +21,14 @@ import android.widget.ScrollView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_free_users;
-import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
+import com.example.ivsmirnov.keyregistrator.adapters.AdapterFreeUsersList;
+import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.custom_views.RecyclerWrapContentHeightManager;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
-import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
+import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
+import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
 
@@ -86,23 +84,16 @@ public class Nfc_Fragment extends Fragment {
 
                 popup.showAsDropDown(showPopupButton, 0, 0);
 
-                mFreeUsersRecycler.setAdapter(new adapter_free_users(mContext, mTags, new RecycleItemClickListener() {
+                mFreeUsersRecycler.setAdapter(new AdapterFreeUsersList(mContext, mTags, new RecycleItemClickListener() {
                     @Override
                     public void onItemClick(View v, int position, int viewID) {
 
-                        new TakeKey(mContext).execute(new TakeKeyParams()
+                        popup.dismiss();
+
+                        new BaseWriter(mContext, (BaseWriterInterface)getActivity()).execute(new BaseWriterParams()
                                 .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
                                 .setAuditroom(Settings.getLastClickedAuditroom())
-                                .setPersonTag(mTags.get(position))
-                                .setPublicInterface(new KeyInterface() {
-                                    @Override
-                                    public void onTakeKey() {
-                                        popup.dismiss();
-                                        getFragmentManager().beginTransaction()
-                                                .replace(R.id.main_frame_for_fragment, Main_Fragment.newInstance(),getResources().getString(R.string.fragment_tag_main))
-                                                .commit();
-                                    }
-                                }));
+                                .setPersonTag(mTags.get(position)));
                     }
 
                     @Override
@@ -144,7 +135,7 @@ public class Nfc_Fragment extends Fragment {
                 //запуск диалога ввода пароля
                 Dialogs dialogs = new Dialogs();
                 Bundle bundle = new Bundle();
-                bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
+                bundle.putString(Settings.AUDITROOM, getArguments().getString(Settings.AUDITROOM));
                 bundle.putInt(Dialogs.DIALOG_ENTER_PASSWORD_TYPE, Dialogs.DIALOG_ENTER_PASSWORD_TYPE_ACCESS_FOR_PERSONS);
                 bundle.putInt(Dialogs.DIALOG_TYPE,Dialogs.DIALOG_ENTER_PASSWORD);
                 dialogs.setArguments(bundle);

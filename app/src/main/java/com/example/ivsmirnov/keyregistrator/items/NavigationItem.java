@@ -1,7 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
 /**
- * Created by ivsmirnov on 19.12.2015.
+ * элемент бокового меню навигации
  */
 public class NavigationItem {
 

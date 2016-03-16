@@ -13,6 +13,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialogs;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
@@ -20,16 +21,13 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 26.01.2016.
  */
-public class adapter_main_auditrooms_grid_resize extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class AdapterMainRoomGridResizer extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context mContext;
+
     private ArrayList<RoomItem> mRoomItems;
-    private SharedPreferences mSharedPreferences;
 
-    public  adapter_main_auditrooms_grid_resize (Context context, ArrayList<RoomItem> roomItems){
-        this.mContext = context;
+    public AdapterMainRoomGridResizer(ArrayList<RoomItem> roomItems){
         this.mRoomItems = roomItems;
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
     }
 
     static class cardViewHolder extends RecyclerView.ViewHolder{
@@ -69,7 +67,7 @@ public class adapter_main_auditrooms_grid_resize extends RecyclerView.Adapter<Re
             recyclerHeight = Main_Fragment.mAuditroomGrid.getHeight();
         }
         int recyclerChilds = mRoomItems.size();
-        int recyclerRows = (int) Math.ceil((double) recyclerChilds / mSharedPreferences.getInt(Values.COLUMNS_AUD_COUNT, 1));
+        int recyclerRows = (int) Math.ceil((double) recyclerChilds / Settings.getAuditroomColumnsCount());
         return recyclerHeight/recyclerRows;
     }
 }

@@ -19,6 +19,22 @@ import java.util.prefs.Preferences;
 public class Settings {
 
     public static final String FREE_USERS = "free_users";
+    public static final String COLUMNS_AUD_COUNT = "columns_aud_count";
+    public static final String AUDITROOM = "auditroom";
+    public static final String AUTO_CLOSED_COUNT = "auto_closed_count";
+    public static final String TOTAL_JOURNAL_COUNT = "total_journal_count";
+    public static final String PATH_FOR_COPY_ON_PC_FOR_JOURNAL = "path_for_copy_on_pc_for_journal";
+    public static final String PATH_FOR_COPY_ON_PC_FOR_TEACHERS = "path_for_copy_on_pc_for_teachers";
+    public static final String DISCLAIMER_SIZE = "disclaimer_size";
+    public static final String SQL_SERVER = "sql_server";
+    public static final String SQL_USER = "sql_user";
+    public static final String SQL_PASSWORD = "sql_password";
+    public static final String SQL_STATUS = "sql_status";
+    public static final String ACTIVE_ACCOUNT_ID = "active_account_id";
+    public static final String MAIL_RECEPIENTS = "mail_recepients";
+    public static final String MAIL_ATTACHMENTS = "mail_attachments";
+    public static final String MAIL_THEME = "mail_theme";
+    public static final String MAIL_BODY = "mail_body";
 
     private static SharedPreferences mPreferences;
     private static SharedPreferences.Editor mPreferencesEditor;
@@ -45,21 +61,21 @@ public class Settings {
 
     public static void setMessageTheme (String theme){
 
-        getPreferencesEditor().putString(Values.MAIL_THEME, theme).apply();
+        getPreferencesEditor().putString(MAIL_THEME, theme).apply();
     }
 
     public static String getMessageTheme(){
 
-        return getPreferences().getString(Values.MAIL_THEME, null);
+        return getPreferences().getString(MAIL_THEME, null);
     }
 
     public static void setMessageBody(String body){
-       getPreferencesEditor().putString(Values.MAIL_BODY, body).apply();
+       getPreferencesEditor().putString(MAIL_BODY, body).apply();
     }
 
     public static String getMessageBody(){
 
-        return getPreferences().getString(Values.MAIL_BODY, null);
+        return getPreferences().getString(MAIL_BODY, null);
     }
 
     public static void setFreeUsers(ArrayList<String> tags){
@@ -93,12 +109,12 @@ public class Settings {
     public static void setAttachments(ArrayList<String>attachments){
         Set<String> stringSet = new HashSet<>();
         stringSet.addAll(attachments);
-        getPreferencesEditor().putStringSet(Values.MAIL_ATTACHMENTS,stringSet).apply();
+        getPreferencesEditor().putStringSet(MAIL_ATTACHMENTS,stringSet).apply();
     }
 
     public static ArrayList<String> getAttachments(){
         ArrayList<String> items = new ArrayList<>();
-        Set<String> attach = getPreferences().getStringSet(Values.MAIL_ATTACHMENTS,null);
+        Set<String> attach = getPreferences().getStringSet(MAIL_ATTACHMENTS,null);
         if (attach!=null){
             items.addAll(attach);
         }
@@ -108,12 +124,12 @@ public class Settings {
     public static void setRecepients(ArrayList<String> recepients){
         Set<String> stringSet = new HashSet<>();
         stringSet.addAll(recepients);
-        getPreferencesEditor().putStringSet(Values.MAIL_RECEPIENTS, stringSet).apply();
+        getPreferencesEditor().putStringSet(MAIL_RECEPIENTS, stringSet).apply();
     }
 
     public static ArrayList<String> getRecepients(){
         ArrayList<String> items = new ArrayList<>();
-        Set<String> sets = getPreferences().getStringSet(Values.MAIL_RECEPIENTS, null);
+        Set<String> sets = getPreferences().getStringSet(MAIL_RECEPIENTS, null);
         if (sets!=null){
             items.addAll(sets);
         }
@@ -121,92 +137,92 @@ public class Settings {
     }
 
     public static void setLastClickedAuditroom(String auditroom){
-       getPreferencesEditor().putString(Values.AUDITROOM, auditroom).apply();
+       getPreferencesEditor().putString(AUDITROOM, auditroom).apply();
     }
 
     public static String getLastClickedAuditroom(){
 
-        return getPreferences().getString(Values.AUDITROOM, Values.EMPTY);
+        return getPreferences().getString(AUDITROOM, Values.EMPTY);
     }
 
     public static void setTotalJournalCount(int count){
-        getPreferencesEditor().putInt(Values.TOTAL_JOURNAL_COUNT,count).apply();
+        getPreferencesEditor().putInt(TOTAL_JOURNAL_COUNT,count).apply();
     }
 
     public static int getTotalJournalCount(){
-        return getPreferences().getInt(Values.TOTAL_JOURNAL_COUNT, 0);
+        return getPreferences().getInt(TOTAL_JOURNAL_COUNT, 0);
     }
 
     public static void setActiveAccountID(String accountID){
-        getPreferencesEditor().putString(Values.ACTIVE_ACCOUNT_ID, accountID).apply();
+        getPreferencesEditor().putString(ACTIVE_ACCOUNT_ID, accountID).apply();
     }
 
     public static String getActiveAccountID(){
 
-        return getPreferences().getString(Values.ACTIVE_ACCOUNT_ID, "localAccount");
+        return getPreferences().getString(ACTIVE_ACCOUNT_ID, "localAccount");
     }
 
     public static void setDisclaimerWeight(int weight){
-        getPreferencesEditor().putInt(Values.DISCLAIMER_SIZE, weight).apply();
+        getPreferencesEditor().putInt(DISCLAIMER_SIZE, weight).apply();
     }
 
     public static int getDisclaimerWeight(){
 
-        return getPreferences().getInt(Values.DISCLAIMER_SIZE,30);
+        return getPreferences().getInt(DISCLAIMER_SIZE,30);
     }
 
 
     public static void setAuditroomColumnsCount(int columns){
-        getPreferencesEditor().putInt(Values.COLUMNS_AUD_COUNT, columns).apply();
+        getPreferencesEditor().putInt(COLUMNS_AUD_COUNT, columns).apply();
     }
     public static int getAuditroomColumnsCount(){
 
-        return getPreferences().getInt(Values.COLUMNS_AUD_COUNT, 3);
+        return getPreferences().getInt(COLUMNS_AUD_COUNT, 3);
     }
 
     public static ServerConnectionItem getServerConnectionParams(){
 
         return new ServerConnectionItem()
-                .setServerName(getPreferences().getString(Values.SQL_SERVER,""))
-                .setUserName(getPreferences().getString(Values.SQL_USER, ""))
-                .setUserPassword(getPreferences().getString(Values.SQL_PASSWORD, ""));
+                .setServerName(getPreferences().getString(SQL_SERVER,""))
+                .setUserName(getPreferences().getString(SQL_USER, ""))
+                .setUserPassword(getPreferences().getString(SQL_PASSWORD, ""));
     }
 
     public static void setServerConnectionParams(ServerConnectionItem serverConnectionItem){
 
-        getPreferencesEditor().putString(Values.SQL_SERVER, serverConnectionItem.getServerName());
-        getPreferencesEditor().putString(Values.SQL_USER, serverConnectionItem.getUserName());
-        getPreferencesEditor().putString(Values.SQL_PASSWORD, serverConnectionItem.getUserPassword());
+        getPreferencesEditor().putString(SQL_SERVER, serverConnectionItem.getServerName());
+        getPreferencesEditor().putString(SQL_USER, serverConnectionItem.getUserName());
+        getPreferencesEditor().putString(SQL_PASSWORD, serverConnectionItem.getUserPassword());
         getPreferencesEditor().apply();
     }
 
     public static boolean getServerStatus(){
-        return getPreferences().getBoolean(Values.SQL_STATUS,false);
+        return getPreferences().getBoolean(SQL_STATUS,false);
     }
 
     public static void setServerStatus(boolean status){
-        getPreferencesEditor().putBoolean(Values.SQL_STATUS,status).apply();
+        getPreferencesEditor().putBoolean(SQL_STATUS,status).apply();
     }
 
 
     //Backup locations
     public static void setJournalBackupLocation(String path){
-        getPreferencesEditor().putString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,path).apply();
+        getPreferencesEditor().putString(PATH_FOR_COPY_ON_PC_FOR_JOURNAL,path).apply();
     }
 
     public static String getJournalBackupLocation(){
 
-        return getPreferences().getString(Values.PATH_FOR_COPY_ON_PC_FOR_JOURNAL,
+        return getPreferences().getString(PATH_FOR_COPY_ON_PC_FOR_JOURNAL,
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
     }
 
     public static void setPersonsBackupLocation(String path){
-        getPreferencesEditor().putString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS, path).apply();
+        getPreferencesEditor().putString(PATH_FOR_COPY_ON_PC_FOR_TEACHERS, path).apply();
     }
 
     public static String getPersonsBackupLocation(){
 
-        return getPreferences().getString(Values.PATH_FOR_COPY_ON_PC_FOR_TEACHERS,
+        return getPreferences().getString(PATH_FOR_COPY_ON_PC_FOR_TEACHERS,
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
     }
 
@@ -217,12 +233,12 @@ public class Settings {
    // }
 
     public static void setAutoClosedRoomsCount(int closedRoomsCount){
-        getPreferencesEditor().putInt(Values.AUTO_CLOSED_COUNT, closedRoomsCount).apply();
+        getPreferencesEditor().putInt(AUTO_CLOSED_COUNT, closedRoomsCount).apply();
     }
 
     public static int getAutoClosedRoomsCount(){
 
-        return getPreferences().getInt(Values.AUTO_CLOSED_COUNT, 0);
+        return getPreferences().getInt(AUTO_CLOSED_COUNT, 0);
     }
 
 //   // public boolean getAutoCloseStatus(){

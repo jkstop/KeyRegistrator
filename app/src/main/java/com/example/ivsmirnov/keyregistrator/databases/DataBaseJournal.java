@@ -356,7 +356,7 @@ public class DataBaseJournal{
         }
     }
 
-    public static JournalItem createNewItemForJournal (Context context, String personTag, String auditroom, int accessType){
+    /*public static JournalItem createNewItemForJournal (Context context, String personTag, String auditroom, int accessType){
 
         PersonItem person = DataBaseFavorite.getPersonItem(context, personTag, DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
         return new JournalItem().setAccountID(Settings.getActiveAccountID())
@@ -367,7 +367,7 @@ public class DataBaseJournal{
                 .setPersonFirstname(person.getFirstname())
                 .setPersonMidname(person.getMidname())
                 .setPersonPhoto(person.getPhotoPreview());
-    }
+    }*/
 
     private static void closeCursor(Cursor cursor){
         if (cursor!=null) cursor.close();

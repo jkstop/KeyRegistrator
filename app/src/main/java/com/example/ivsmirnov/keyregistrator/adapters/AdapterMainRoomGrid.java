@@ -1,12 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,25 +13,22 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
-import com.example.ivsmirnov.keyregistrator.async_tasks.GetRoom;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
-import com.example.ivsmirnov.keyregistrator.items.GetRoomParams;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
 
-public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private ArrayList<RoomItem> mRoomItems;
     private RecycleItemClickListener mListener;
 
-    public adapter_main_auditrooms_grid(ArrayList<RoomItem> roomItems, RecycleItemClickListener listener) {
+    public AdapterMainRoomGrid(ArrayList<RoomItem> roomItems, RecycleItemClickListener listener) {
         this.mRoomItems = roomItems;
         this.mListener = listener;
     }
@@ -70,29 +62,7 @@ public class adapter_main_auditrooms_grid extends RecyclerView.Adapter<RecyclerV
             mBusyCard = (CardView)itemView.findViewById(R.id.card_auditroom_busy);
         }
     }
-    /*
-        public class ViewHolder extends RecyclerView.ViewHolder{
 
-            public ImageView mFreeImageKey;
-            TextView mFreeTextAuditroom;
-
-            public ImageView mBusyImagePerson;
-            public TextView mBusyTextAuditroom;
-            public TextView mBusyTextPerson;
-
-            public ViewHolder(View itemView, int viewType) {
-                super(itemView);
-                if (viewType==0){
-                    mFreeImageKey = (ImageView)itemView.findViewById(R.id.card_auditroom_free_image_key);
-                    mFreeTextAuditroom = (TextView)itemView.findViewById(R.id.card_auditroom_free_text_auditroom);
-                }else if (viewType==1){
-                    mBusyImagePerson = (ImageView)itemView.findViewById(R.id.card_auditroom_busy_image_person);
-                    mBusyTextAuditroom = (TextView)itemView.findViewById(R.id.card_auditroom_busy_text_auditroom);
-                    mBusyTextPerson = (TextView)itemView.findViewById(R.id.card_auditroom_busy_text_person);
-                }
-            }
-        }
-    */
     @Override
     public int getItemViewType(int position) {
         return mRoomItems.get(position).getStatus();

@@ -2,10 +2,9 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 
-import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
+import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,11 +15,11 @@ import java.net.URL;
  */
 public class LoadImageFromWeb extends AsyncTask<Void,Bitmap,Bitmap> {
     private String mUrl;
-    private Get_Account_Information_Interface mListener;
+    private GetAccountInterface mGetAccountInterface;
 
-    public LoadImageFromWeb(String url, Get_Account_Information_Interface get_account_information_interface){
+    public LoadImageFromWeb(String url, GetAccountInterface getAccountInterface){
         this.mUrl = url;
-        this.mListener = get_account_information_interface;
+        this.mGetAccountInterface = getAccountInterface;
     }
 
     @Override
@@ -32,13 +31,12 @@ public class LoadImageFromWeb extends AsyncTask<Void,Bitmap,Bitmap> {
             e.printStackTrace();
             return null;
         }
-
     }
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         if (bitmap!=null){
-            mListener.onAccountImageLoaded(bitmap);
+            mGetAccountInterface.onAccountImageLoaded(bitmap);
         }
     }
 }

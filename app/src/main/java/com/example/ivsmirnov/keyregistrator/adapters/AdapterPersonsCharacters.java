@@ -16,12 +16,12 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 03.10.2015.
  */
-public class adapter_list_characters extends ArrayAdapter<CharacterItem> {
+public class AdapterPersonsCharacters extends ArrayAdapter<CharacterItem> {
 
     private Context mContext;
     private ArrayList<CharacterItem> mCharacters;
 
-    public adapter_list_characters(Context context, ArrayList<CharacterItem> characters) {
+    public AdapterPersonsCharacters(Context context, ArrayList<CharacterItem> characters) {
         super(context, R.layout.row_for_characters_list,characters);
         this.mContext = context;
         this.mCharacters = characters;

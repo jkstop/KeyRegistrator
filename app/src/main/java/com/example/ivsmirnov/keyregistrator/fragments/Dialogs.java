@@ -3,7 +3,6 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Dialog;
 import android.graphics.Paint;
 import android.os.Build;
-import android.support.annotation.StringDef;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -37,12 +36,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid_resize;
+import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGridResizer;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
-import com.example.ivsmirnov.keyregistrator.interfaces.Get_Account_Information_Interface;
-import com.example.ivsmirnov.keyregistrator.items.CloseRoomsParams;
+import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
+import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
@@ -52,7 +51,6 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -61,6 +59,7 @@ public class Dialogs extends DialogFragment{
 
     public static final String DIALOG_TYPE = "dialog_type";
     public static final String DIALOG_ENTER_PASSWORD_TYPE = "dialog_enter_password_type";
+    public static final String DIALOG_PERSON_INFORMATION_KEY_TAG = "DIALOG_PERSON_INFORMATION_KEY_TAG";
 
     public static final int DIALOG_EDIT = 100;
     public static final int DIALOG_CLEAR_JOURNAL = 101;
@@ -159,7 +158,7 @@ public class Dialogs extends DialogFragment{
                 final TextInputLayout inputMidname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_midname_layout);
                 final TextInputLayout inputDivision = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_division_layout);
                 AppCompatCheckBox accessType = (AppCompatCheckBox) dialogView.findViewById(R.id.person_information_access_type);
-                final String tag = getArguments().getString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG);
+                final String tag = getArguments().getString(DIALOG_PERSON_INFORMATION_KEY_TAG);
 
                 //получаем пользователя и заполняем поля
                 new GetPersons(mContext, null, null).execute(new GetPersonParams()
@@ -304,7 +303,7 @@ public class Dialogs extends DialogFragment{
                             enterAuditroomLayout.setError(getResources().getString(R.string.input_already_exist_error));
                         } else {
                             DataBaseRooms.writeInRoomsDB(new RoomItem().setAuditroom(inputText)
-                                    .setStatus(Values.ROOM_IS_FREE)
+                                    .setStatus(DataBaseRooms.ROOM_IS_FREE)
                                     .setAccessType(DataBaseJournal.ACCESS_BY_CLICK));
 
                             enterAuditroomText.getText().clear();
@@ -363,12 +362,10 @@ public class Dialogs extends DialogFragment{
                 final LinearLayout.LayoutParams cardViewLayoutParams = (LinearLayout.LayoutParams)cardView.getLayoutParams();
                 final LinearLayout.LayoutParams frameGridParams = (LinearLayout.LayoutParams)mFrameGrid.getLayoutParams();
 
-                ArrayList <RoomItem> mRoomsItems = DataBaseRooms.readRoomsDB();
-
                 RecyclerView mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
                 mRoomsGrid.setClickable(false);
                 mRoomsGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getAuditroomColumnsCount()));
-                final adapter_main_auditrooms_grid_resize mAdapter = new adapter_main_auditrooms_grid_resize(mContext, mRoomsItems);
+                final AdapterMainRoomGridResizer mAdapter = new AdapterMainRoomGridResizer(DataBaseRooms.readRoomsDB());
                 mRoomsGrid.setAdapter(mAdapter);
 
                 int weightCard = Settings.getDisclaimerWeight();
@@ -424,6 +421,7 @@ public class Dialogs extends DialogFragment{
                         .show();
             case DIALOG_ENTER_PASSWORD:
 
+                final CloseRoomInterface mCloseRoomInterface = (CloseRoomInterface)getActivity();
                 final int dialog_enter_password_type = getArguments().getInt(DIALOG_ENTER_PASSWORD_TYPE);
                 final TextInputLayout textInputLayout = (TextInputLayout) mInflater.inflate(R.layout.view_enter_password,null);
                 final AppCompatEditText editPassword = (AppCompatEditText)textInputLayout.findViewById(R.id.view_enter_password_edit_text);
@@ -432,20 +430,23 @@ public class Dialogs extends DialogFragment{
                     @Override
                     public void onClick(View v) {
                         if (editPassword.getText().toString().equalsIgnoreCase("1212")){
-                            if (dialog_enter_password_type == DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM){
-                                new CloseRooms(mContext).execute(new CloseRoomsParams()
-                                        .setTag(getArguments().getString("tag"))
-                                        .setRoomInterface(Main_Fragment.roomInterface));
-                                dismiss();
-                            }else if (dialog_enter_password_type == DIALOG_ENTER_PASSWORD_TYPE_ACCESS_FOR_PERSONS){
-                                Bundle bundle = new Bundle();
-                                bundle.putInt(Values.PERSONS_FRAGMENT_TYPE, Values.PERSONS_FRAGMENT_SELECTOR);
-                                bundle.putString(Values.AUDITROOM, getArguments().getString(Values.AUDITROOM));
-                                Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
-                                persons_fragment.setArguments(bundle);
+                            switch (dialog_enter_password_type){
+                                case DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM:
+                                    new CloseRooms(mContext, getArguments().getString("tag"), mCloseRoomInterface).execute();
+                                    dismiss();
+                                    break;
+                                case DIALOG_ENTER_PASSWORD_TYPE_ACCESS_FOR_PERSONS:
+                                    Bundle bundle = new Bundle();
+                                    bundle.putInt(Persons_Fragment.PERSONS_FRAGMENT_TYPE, Persons_Fragment.PERSONS_FRAGMENT_SELECTOR);
+                                    bundle.putString(Settings.AUDITROOM, getArguments().getString(Settings.AUDITROOM));
+                                    Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
+                                    persons_fragment.setArguments(bundle);
 
-                                getActivity().getSupportFragmentManager()
-                                        .beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
+                                    getActivity().getSupportFragmentManager()
+                                            .beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
+                                    break;
+                                default:
+                                    break;
                             }
                         }else{
                             textInputLayout.setError(getResources().getString(R.string.view_enter_password_entered_incorrect));
@@ -566,9 +567,9 @@ public class Dialogs extends DialogFragment{
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Get_Account_Information_Interface get_account_information_interface =
-                                        (Get_Account_Information_Interface)getActivity();
-                                get_account_information_interface.onChangeAccount();
+                                GetAccountInterface get_account__interface =
+                                        (GetAccountInterface)getActivity();
+                                get_account__interface.onChangeAccount();
                             }
                         })
                         .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

@@ -3,9 +3,9 @@ package com.example.ivsmirnov.keyregistrator.interfaces;
 import android.view.View;
 
 /**
- * Created by ivsmirnov on 15.02.2016.
+ * добавление/удаление вложений и адресатов для рассылки
  */
-public interface EmailClickItemsInterface {
+public interface EmailInterface {
     void onAddRecepient(View v, int position, int view_id);
     void onDeleteRecepient(int position, int view_id);
     void onDeleteAttachment(int position, int view_id);

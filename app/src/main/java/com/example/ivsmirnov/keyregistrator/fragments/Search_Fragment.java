@@ -23,12 +23,12 @@ import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Find_User_in_SQL_Server;
+import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsGrid;
+import com.example.ivsmirnov.keyregistrator.async_tasks.TagSearcher;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.interfaces.Find_User_in_SQL_Server_Interface;
+import com.example.ivsmirnov.keyregistrator.interfaces.TagSearcherInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -39,10 +39,10 @@ import java.util.Random;
 /**
  * Created by ivsmirnov on 04.12.2015.
  */
-public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server_Interface, RecycleItemClickListener{
+public class Search_Fragment extends Fragment implements TagSearcherInterface, RecycleItemClickListener{
 
     private Context mContext;
-    private Find_User_in_SQL_Server_Interface mListener;
+    private TagSearcherInterface mTagSeacherInterface;
 
     private ArrayList<String> mPersonTagList;
 
@@ -68,7 +68,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
         mProgressBar = (ProgressBar)rootView.findViewById(R.id.layout_add_new_staff_progress);
         mProgressBar.setVisibility(View.INVISIBLE);
 
-        mListener = this;
+        mTagSeacherInterface = this;
 
         mPersonsRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_search_persons);
         mPersonsRecycler.setLayoutManager(new GridLayoutManager(mContext,3));
@@ -91,10 +91,10 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
                 if (s.length()>=3 && s.length()<=6){
                     if (connection!=null){
                         try {
-                            Find_User_in_SQL_Server find_user_in_sql_server;
+                            TagSearcher tagSearcher;
                             if (count == 1){
-                                find_user_in_sql_server = new Find_User_in_SQL_Server(mContext, s,  mListener);
-                                find_user_in_sql_server.execute(connection);
+                                tagSearcher = new TagSearcher(s, mTagSeacherInterface);
+                                tagSearcher.execute(connection);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -159,9 +159,9 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
     public void updateGrid(ArrayList<String> personTagList) {
         if (!personTagList.isEmpty()){
             mPersonTagList = personTagList;
-            mPersonsRecycler.setAdapter(new adapter_persons_grid(mContext,
+            mPersonsRecycler.setAdapter(new AdapterPersonsGrid(mContext,
                     mPersonTagList,
-                    Values.SHOW_ALL_PERSONS,
+                    AdapterPersonsGrid.SHOW_ALL_PERSONS,
                     this));
         }
     }
@@ -177,9 +177,7 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
 
     @Override
     public void onItemClick(View v, final int position, int viewID) {
-
-       new getPersonFromServer().execute(position);
-
+       new PersonTransporterFromServer().execute(position);
     }
 
     @Override
@@ -204,13 +202,12 @@ public class Search_Fragment extends Fragment implements Find_User_in_SQL_Server
         }
     }
 
-    private class getPersonFromServer extends AsyncTask<Integer,Void,PersonItem>{
+    //получение информации о пользователе и запись в базу
+    private class PersonTransporterFromServer extends AsyncTask<Integer,Void,PersonItem>{
 
         @Override
         protected PersonItem doInBackground(Integer... params) {
-            PersonItem selectedPerson = DataBaseFavorite.getPersonItem(mContext, mPersonTagList.get(params[0]), DataBaseFavorite.SERVER_USER, DataBaseFavorite.FULLSIZE_PHOTO);
-            selectedPerson.setPhotoPreview(DataBaseFavorite.getPhotoPreview(selectedPerson.getPhotoOriginal()));
-            return selectedPerson;
+            return DataBaseFavorite.getPersonItem(mContext, mPersonTagList.get(params[0]), DataBaseFavorite.SERVER_USER, DataBaseFavorite.ALL_PHOTO);
         }
 
         @Override

@@ -26,26 +26,30 @@ import android.widget.ProgressBar;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_list_characters;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_persons_grid;
+import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsCharacters;
+import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
-import com.example.ivsmirnov.keyregistrator.async_tasks.TakeKey;
+import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
+import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
-import com.example.ivsmirnov.keyregistrator.interfaces.KeyInterface;
+import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
-import com.example.ivsmirnov.keyregistrator.items.TakeKeyParams;
+import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
 
-public class Persons_Fragment extends Fragment implements UpdateInterface, KeyInterface{
+public class Persons_Fragment extends Fragment implements UpdateInterface {
+
+    public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
+    public static final String PERSONS_FRAGMENT_TYPE = "persons_fragment_type";
+    public static final int PERSONS_FRAGMENT_EDITOR = 115;
+    public static final int PERSONS_FRAGMENT_SELECTOR = 116;
 
     private Context mContext;
     private static RecyclerView mRecyclerView;
@@ -53,10 +57,10 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     private FloatingActionButton mAddFAB;
 
     private static ArrayList<String> mPersonTagList;
-    public adapter_persons_grid mAdapter;
-    private adapter_list_characters mListAdapter;
+    public AdapterPersonsGrid mAdapter;
+    private AdapterPersonsCharacters mListAdapter;
 
-    private KeyInterface mKeyInterface;
+    private BaseWriterInterface mBaseWriterInterface;
 
     private ArrayList<CharacterItem> mListCharacters;
 
@@ -77,7 +81,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
         Bundle extras = getArguments();
         if (extras != null) {
-            type = extras.getInt(Values.PERSONS_FRAGMENT_TYPE);
+            type = extras.getInt(PERSONS_FRAGMENT_TYPE);
         }
     }
 
@@ -88,7 +92,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         if (actionBar != null) {
             actionBar.setTitle(getResources().getString(R.string.toolbar_title_persons));
         }
-        if (type == Values.PERSONS_FRAGMENT_SELECTOR){
+        if (type == PERSONS_FRAGMENT_SELECTOR){
             setHasOptionsMenu(false);
         }else{
             setHasOptionsMenu(true);
@@ -97,14 +101,14 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     }
 
     private void initializeRecyclerAdapter(){
-        if (type==Values.PERSONS_FRAGMENT_EDITOR){
-            mAdapter = new adapter_persons_grid(mContext, mPersonTagList, Values.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
+        if (type == PERSONS_FRAGMENT_EDITOR){
+            mAdapter = new AdapterPersonsGrid(mContext, mPersonTagList, AdapterPersonsGrid.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position, int viewID) {
 
                     Bundle b = new Bundle();
                     b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_EDIT);
-                    b.putString(Values.DIALOG_PERSON_INFORMATION_KEY_TAG, mPersonTagList.get(position));
+                    b.putString(Dialogs.DIALOG_PERSON_INFORMATION_KEY_TAG, mPersonTagList.get(position));
 
                     Dialogs dialog = new Dialogs();
                     dialog.setArguments(b);
@@ -116,8 +120,8 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                 public void onItemLongClick(View v, int position, long timeIn) {
                 }
             });
-        }else if (type==Values.PERSONS_FRAGMENT_SELECTOR){
-            mAdapter = new adapter_persons_grid(mContext, mPersonTagList, Values.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
+        }else if (type == PERSONS_FRAGMENT_SELECTOR){
+            mAdapter = new AdapterPersonsGrid(mContext, mPersonTagList, AdapterPersonsGrid.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position, int viewID) {
 
@@ -125,11 +129,10 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                         return;
                     }
 
-                    new TakeKey(mContext).execute(new TakeKeyParams()
+                    new BaseWriter(mContext, mBaseWriterInterface).execute(new BaseWriterParams()
                             .setAccessType(DataBaseJournal.ACCESS_BY_CLICK)
                             .setAuditroom(Settings.getLastClickedAuditroom())
-                            .setPersonTag(mPersonTagList.get(position))
-                            .setPublicInterface(mKeyInterface));
+                            .setPersonTag(mPersonTagList.get(position)));
 
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
@@ -140,11 +143,10 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                         return;
                     }
 
-                    new TakeKey(mContext).execute(new TakeKeyParams()
+                    new BaseWriter(mContext, mBaseWriterInterface).execute(new BaseWriterParams()
                             .setAccessType(DataBaseJournal.ACCESS_BY_CARD)
                             .setAuditroom(Settings.getLastClickedAuditroom())
-                            .setPersonTag(mPersonTagList.get(position))
-                            .setPublicInterface(mKeyInterface));
+                            .setPersonTag(mPersonTagList.get(position)));
 
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
@@ -183,7 +185,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
 
         mPersonTagList = new ArrayList<>();
 
-        mKeyInterface = this;
+        mBaseWriterInterface = (BaseWriterInterface)getActivity();
 
         mAddFAB = (FloatingActionButton)rootView.findViewById(R.id.persons_fragment_fab);
         mAddFAB.setOnClickListener(new View.OnClickListener() {
@@ -225,7 +227,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     }
 
     private void setmListCharactersAdapter(){
-        mListAdapter = new adapter_list_characters(mContext,mListCharacters);
+        mListAdapter = new AdapterPersonsCharacters(mContext,mListCharacters);
         mListView.setAdapter(mListAdapter);
     }
 
@@ -246,14 +248,14 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_teachers_save_to_file:
-                Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_TEACHERS, true);
+                FileWriter saveToFile = new FileWriter(mContext,FileWriter.WRITE_TEACHERS, true);
                 saveToFile.execute();
                 return true;
             case R.id.menu_teachers_download_favorite:
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i,Values.REQUEST_CODE_LOAD_FAVORITE_STAFF);
+                startActivityForResult(i,Loader_intent.REQUEST_CODE_LOAD_FAVORITE_STAFF);
                 return true;
             case R.id.menu_teachers_delete:
                 Dialogs dialog = new Dialogs();
@@ -268,7 +270,7 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
                 iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
                 iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
                 iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getPersonsBackupLocation());
-                startActivityForResult(iLC,Values.REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
+                startActivityForResult(iLC,REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -280,12 +282,12 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK){
             if (data!=null){
-                if (requestCode==Values.REQUEST_CODE_LOAD_FAVORITE_STAFF){
+                if (requestCode==Loader_intent.REQUEST_CODE_LOAD_FAVORITE_STAFF){
                     new Loader_intent(mContext,
                             data.getData().getPath(),
                             this,
-                            Values.REQUEST_CODE_LOAD_FAVORITE_STAFF).execute();
-                }else if (requestCode == Values.REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION){
+                            Loader_intent.REQUEST_CODE_LOAD_FAVORITE_STAFF).execute();
+                }else if (requestCode == REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION){
                     Settings.setPersonsBackupLocation(data.getData().getPath());
                 }
             }
@@ -303,11 +305,6 @@ public class Persons_Fragment extends Fragment implements UpdateInterface, KeyIn
         new getPersonTags().execute();
     }
 
-    @Override
-    public void onTakeKey() {
-
-        showMainAuditroomsGrid();
-    }
 
     private void getTagsForSelectedCharacher(int position){
 

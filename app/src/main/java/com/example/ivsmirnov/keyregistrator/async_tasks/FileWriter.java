@@ -2,24 +2,30 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.Display;
 
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Created by ivsmirnov on 16.11.2015.
  */
-public class Save_to_file extends AsyncTask <Void,Integer,Void> {
+public class FileWriter extends AsyncTask <Void,Integer,Void> {
+
+    public static final int WRITE_JOURNAL = 100;
+    public static final int WRITE_TEACHERS = 101;
+    public static final int WRITE_ROOMS = 123;
 
     private Context mContext;
     private int mType;
@@ -31,7 +37,7 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
     private static final String JOURNAL = "/Journal.xls";
     private static final String TEACHERS = "/Teachers.csv";
 
-    public Save_to_file (Context context, int loadType, boolean isShowDialog){
+    public FileWriter(Context context, int loadType, boolean isShowDialog){
         this.mContext = context;
         this.mType = loadType;
         this.isShowDialog = isShowDialog;
@@ -54,24 +60,24 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
     @Override
     protected Void doInBackground(Void... params) {
         switch (mType){
-            case Values.WRITE_JOURNAL:
+            case WRITE_JOURNAL:
 
                 DataBaseJournal.backupJournalToXLS();
                 DataBaseJournal.backupJournalToCSV();
 
                 String srFileJournal = mPathExternal + JOURNAL;
                 String dtFileJournal = Settings.getJournalBackupLocation() + JOURNAL;
-                Values.copyfile(srFileJournal, dtFileJournal);
+                copyFile(srFileJournal, dtFileJournal);
                 break;
-            case Values.WRITE_TEACHERS:
+            case WRITE_TEACHERS:
 
                 DataBaseFavorite.backupFavoriteStaffToFile();
 
                 String srFileTeachers = mPathExternal + TEACHERS;
                 String dtFileTeachers = Settings.getPersonsBackupLocation() + TEACHERS;
-                Values.copyfile(srFileTeachers, dtFileTeachers);
+                copyFile(srFileTeachers, dtFileTeachers);
                 break;
-            case Values.WRITE_ROOMS:
+            case WRITE_ROOMS:
                 DataBaseRooms.backupRoomsToFile();
                 break;
         }
@@ -82,6 +88,28 @@ public class Save_to_file extends AsyncTask <Void,Integer,Void> {
     protected void onPostExecute(Void aVoid) {
         if (mProgressDialog.isShowing()){
             mProgressDialog.cancel();
+        }
+    }
+
+    public static void copyFile(String srFile, String dtFile){
+        try{
+            File f1 = new File(srFile);
+            File f2 = new File(dtFile);
+            InputStream in = new FileInputStream(f1);
+            OutputStream out = new FileOutputStream(f2);
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0){
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+        }
+        catch(FileNotFoundException ex){
+            System.out.println(ex.getMessage() + " in the specified directory.");
+        }
+        catch(IOException e){
+            System.out.println(e.getMessage());
         }
     }
 }

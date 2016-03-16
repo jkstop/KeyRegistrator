@@ -38,8 +38,11 @@ public class DataBaseFavorite {
     public static final int SERVER_USER = 1;
     public static final int FULLSIZE_PHOTO = 2;
     public static final int PREVIEW_PHOTO = 3;
+    public static final int ALL_PHOTO = 4;
+    public static final int NO_PHOTO = 5;
 
-    public static PersonItem getPersonItem(Context mContext, String tag, int userLocation, int photoSize){
+
+    public static PersonItem getPersonItem(Context mContext, String tag, int userLocation, int photoType){
 
         Cursor cursor = null;
         try {
@@ -62,11 +65,24 @@ public class DataBaseFavorite {
                             .setDivision(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_DIVISION_FAVORITE)))
                             .setSex(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_SEX_FAVORITE)))
                             .setRadioLabel(tag);
-                    if (photoSize == FULLSIZE_PHOTO){
-                        personItem.setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
-                    }else if (photoSize == PREVIEW_PHOTO){
-                        personItem.setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)));
+
+                    switch (photoType){
+                        case FULLSIZE_PHOTO:
+                            personItem.setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
+                            break;
+                        case PREVIEW_PHOTO:
+                            personItem.setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)));
+                            break;
+                        case ALL_PHOTO:
+                            personItem.setPhotoOriginal(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
+                            personItem.setPhotoPreview(cursor.getString(cursor.getColumnIndex(DataBaseFavoriteRegist.COLUMN_PHOTO_PREVIEW_FAVORITE)));
+                            break;
+                        case NO_PHOTO:
+                            break;
+                        default:
+                            break;
                     }
+
                     return personItem;
                 } else {
                     return null;
@@ -86,14 +102,26 @@ public class DataBaseFavorite {
                                     .setSex(resultSet.getString("SEX"))
                                     .setRadioLabel(resultSet.getString("RADIO_LABEL"));
                             String photo = resultSet.getString("PHOTO");
-                            if (photo == null){
-                                photo = getBase64DefaultPhotoFromResources(mContext, resultSet.getString("SEX"));
+
+                            if (photo == null) photo = getBase64DefaultPhotoFromResources(mContext, resultSet.getString("SEX"));
+
+                            switch (photoType){
+                                case FULLSIZE_PHOTO:
+                                    personItem.setPhotoOriginal(photo);
+                                    break;
+                                case PREVIEW_PHOTO:
+                                    personItem.setPhotoPreview(getPhotoPreview(photo));
+                                    break;
+                                case ALL_PHOTO:
+                                    personItem.setPhotoOriginal(photo);
+                                    personItem.setPhotoPreview(getPhotoPreview(photo));
+                                    break;
+                                case NO_PHOTO:
+                                    break;
+                                default:
+                                    break;
                             }
-                            if (photoSize == FULLSIZE_PHOTO){
-                                personItem.setPhotoOriginal(photo);
-                            } else {
-                                personItem.setPhotoPreview(getPhotoPreview(photo));
-                            }
+
                             return personItem;
                         }
                     } catch (SQLException e) {

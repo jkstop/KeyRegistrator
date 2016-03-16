@@ -3,34 +3,19 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_shedule_list;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Load_shedule;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseShedule;
-import com.example.ivsmirnov.keyregistrator.interfaces.Shedule_Load;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by IVSmirnov on 08.09.2015.

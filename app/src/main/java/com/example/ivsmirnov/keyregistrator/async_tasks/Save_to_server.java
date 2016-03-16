@@ -23,19 +23,23 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
 
     private Context mContext;
     private ProgressDialog mProgressDialog;
+    private boolean mIsShowDialog;
 
-    public Save_to_server (Context context){
-        this.mContext = context;
+    public Save_to_server (Context context, boolean isShowDialog){
+        mContext = context;
         mProgressDialog = new ProgressDialog(mContext);
+        mIsShowDialog = isShowDialog;
     }
 
     @Override
     protected void onPreExecute() {
-        super.onPreExecute();
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setMessage("Запись на сервер...");
-        mProgressDialog.show();
+        Log.d("start","save to server");
+        if (mIsShowDialog){
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.setMessage("Запись на сервер...");
+            mProgressDialog.show();
+        }
     }
 
     @Override
@@ -78,6 +82,7 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        Log.d("stop","save to server");
         if (mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }

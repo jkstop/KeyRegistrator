@@ -5,7 +5,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * Created by ivsmirnov on 25.02.2016.
+ * класс для получения записи журнала
  */
 public class GetJournalParams {
 

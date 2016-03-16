@@ -26,17 +26,16 @@ import android.widget.SpinnerAdapter;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_journal_list;
+import com.example.ivsmirnov.keyregistrator.adapters.AdapterJournalList;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Load_from_server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
+import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.text.ParseException;
@@ -47,11 +46,13 @@ import java.util.Date;
 
 public class Journal_fragment extends Fragment implements UpdateInterface,ActionBar.OnNavigationListener {
 
+    public static final int REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION = 203;
+
     private Context mContext;
     private RecyclerView mJournalRecycler;
     private ActionBar mActionBar;
     private ArrayList<String> mDates;
-    private adapter_journal_list mAdapterjournallist;
+    private AdapterJournalList mAdapterjournallist;
     private ArrayList <JournalItem> mJournalItems;
 
     private ProgressBar mLoadingBar;
@@ -127,12 +128,11 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_journal_save_to_file:
-                Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_JOURNAL, true);
+                FileWriter saveToFile = new FileWriter(mContext, FileWriter.WRITE_JOURNAL, true);
                 saveToFile.execute();
                 return true;
             case R.id.menu_journal_download_to_server:
-                Save_to_server save_to_server = new Save_to_server(mContext);
-                save_to_server.execute();
+                new Save_to_server(mContext, true).execute();
                 return true;
             case R.id.menu_journal_download_from_server:
                 Load_from_server loadFromServer = new Load_from_server(mContext,this);
@@ -142,7 +142,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i,Values.REQUEST_CODE_LOAD_JOURNAL);
+                startActivityForResult(i,Loader_intent.REQUEST_CODE_LOAD_JOURNAL);
                 return true;
             case R.id.menu_journal_delete:
                 Dialogs dialog = new Dialogs();
@@ -157,7 +157,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
                 iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
                 iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
                 iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getJournalBackupLocation());
-                startActivityForResult(iLC,Values.REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION);
+                startActivityForResult(iLC,REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -169,12 +169,12 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK){
             if (data!=null){
-                if (requestCode == Values.REQUEST_CODE_LOAD_JOURNAL){
+                if (requestCode == Loader_intent.REQUEST_CODE_LOAD_JOURNAL){
                     new Loader_intent(mContext,
                             data.getData().getPath(),
                             this,
-                            Values.REQUEST_CODE_LOAD_JOURNAL).execute();
-                }else if (requestCode == Values.REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION){
+                            Loader_intent.REQUEST_CODE_LOAD_JOURNAL).execute();
+                }else if (requestCode == REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION){
                     Settings.setJournalBackupLocation(data.getData().getPath());
                 }
             }
@@ -204,7 +204,7 @@ public class Journal_fragment extends Fragment implements UpdateInterface,Action
     }
 
     private void initializeJournal(){
-        mAdapterjournallist = new adapter_journal_list(mContext, new RecycleItemClickListener() {
+        mAdapterjournallist = new AdapterJournalList(mContext, new RecycleItemClickListener() {
             @Override
             public void onItemClick(View v, int position, int viewID) {
 

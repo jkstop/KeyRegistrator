@@ -18,14 +18,14 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import java.util.ArrayList;
 
 
-public class adapter_edit_auditrooms_grid extends BaseAdapter {
+public class AdapterMainRoomGridEditor extends BaseAdapter {
 
     private ArrayList<String> items;
     private Context context;
     private LayoutInflater inflater;
     private SharedPreferences sharedPreferences;
 
-    public adapter_edit_auditrooms_grid(Context c, ArrayList<String> i) {
+    public AdapterMainRoomGridEditor(Context c, ArrayList<String> i) {
         this.context = c;
         this.items = i;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

@@ -19,6 +19,9 @@ import java.util.ArrayList;
  */
 public class DataBaseRooms {
 
+    public static final int ROOM_IS_BUSY = 0;
+    public static final int ROOM_IS_FREE = 1;
+
     public static void writeInRoomsDB (RoomItem roomItem) {
         try {
             ContentValues cv = new ContentValues();
@@ -264,8 +267,8 @@ public class DataBaseRooms {
 
         ArrayList<RoomItem> rooms = DataBaseRooms.readRoomsDB();
         for (RoomItem roomItem : rooms){
-            if (roomItem.getStatus() == Values.ROOM_IS_BUSY){
-                roomItem.setStatus(Values.ROOM_IS_FREE);
+            if (roomItem.getStatus() == ROOM_IS_BUSY){
+                roomItem.setStatus(ROOM_IS_FREE);
                 roomItem.setTag(Values.EMPTY);
 
                 DataBaseRooms.updateRoom(roomItem);

@@ -1,7 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
 /**
- * Created by ivsmirnov on 22.02.2016.
+ * элемент поиска пользователей - первая буква фамилии
  */
 public class CharacterItem {
 

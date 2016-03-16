@@ -17,7 +17,7 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 17.12.2015.
  */
-public class adapter_navigation_drawer_list extends ArrayAdapter<NavigationItem> {
+public class AdapterNavigationDrawerList extends ArrayAdapter<NavigationItem> {
 
     private Context mContext;
     private ArrayList<NavigationItem> mItems;
@@ -27,7 +27,7 @@ public class adapter_navigation_drawer_list extends ArrayAdapter<NavigationItem>
     private TextView mText;
 
 
-    public adapter_navigation_drawer_list(Context context, ArrayList<NavigationItem> arrays) {
+    public AdapterNavigationDrawerList(Context context, ArrayList<NavigationItem> arrays) {
         super(context, R.layout.navigation_drawer,arrays);
         this.mContext = context;
         this.mItems = arrays;

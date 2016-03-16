@@ -1,34 +1,9 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
-import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Log;
-import android.util.SparseArray;
-
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseShedule;
-import com.example.ivsmirnov.keyregistrator.interfaces.Shedule_Load;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-
 /**
  * Created by IVSmirnov on 08.09.2015.
  */
+/*
 public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
 
     HttpURLConnection urlConnection = null;
@@ -67,11 +42,11 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
 
 
         //ArrayList<SparseArray<String>> mItems = dbRooms.readRoomsDB();
-/*
+
         for (int i=0;i<mItems.size();i++){
             auditroomsList.add(mItems.get(i).get(0));
         }
-*/
+
         Calendar calendar = Calendar.getInstance();
         int today = calendar.get(Calendar.DAY_OF_WEEK)-1;
 
@@ -98,7 +73,7 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
 
 
         //список факультетов и их ID
-        /*try {
+        try {
             URL url = new URL("http://www.campus-card.fa.ru/Sched2Json.asmx/get_faculties");
 
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -131,7 +106,7 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
 
         } catch (JSONException e) {
             e.printStackTrace();
-        }*/
+        }
 
         facultyIDs.add(String.valueOf(92));
         facultyIDs.add(String.valueOf(170));
@@ -297,3 +272,4 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
 
 
 }
+        */

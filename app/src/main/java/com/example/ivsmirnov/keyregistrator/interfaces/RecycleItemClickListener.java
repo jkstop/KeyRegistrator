@@ -3,9 +3,9 @@ package com.example.ivsmirnov.keyregistrator.interfaces;
 import android.view.View;
 
 /**
- * Created by ivsmirnov on 22.12.2015.
+ * клики в recyclerView. Встроенный onClick() пока не поддерживается
  */
 public interface RecycleItemClickListener {
-    public void onItemClick(View v,int position, int viewID);
-    public void onItemLongClick(View v, int position, long timeIn);
+    void onItemClick(View v,int position, int viewID);
+    void onItemLongClick(View v, int position, long timeIn);
 }

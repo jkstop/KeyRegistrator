@@ -77,15 +77,20 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
             if (isAnimatedPhoto) mPersonImage.setVisibility(View.INVISIBLE);
 
             byte[] decodedString;
-            if (photoDimension == DataBaseFavorite.FULLSIZE_PHOTO){
 
-                if (personItem.getPhotoOriginal()==null) personItem.setPhotoOriginal(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, personItem.getSex()));
-                decodedString = Base64.decode(personItem.getPhotoOriginal(), Base64.DEFAULT);
+            switch (photoDimension){
+                case DataBaseFavorite.FULLSIZE_PHOTO:
+                    if (personItem.getPhotoOriginal()==null) personItem.setPhotoOriginal(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, personItem.getSex()));
+                    decodedString = Base64.decode(personItem.getPhotoOriginal(), Base64.DEFAULT);
+                    break;
+                case DataBaseFavorite.PREVIEW_PHOTO:
+                    if (personItem.getPhotoPreview()==null) personItem.setPhotoPreview(DataBaseFavorite.getPhotoPreview(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, personItem.getSex())));
+                    decodedString = Base64.decode(personItem.getPhotoPreview(), Base64.DEFAULT);
+                    break;
+                default:
+                    decodedString = Base64.decode(DataBaseFavorite.getPhotoPreview(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, personItem.getSex())), Base64.DEFAULT);
+                    break;
 
-            } else {
-
-                if (personItem.getPhotoPreview()==null) personItem.setPhotoPreview(DataBaseFavorite.getPhotoPreview(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, personItem.getSex())));
-                decodedString = Base64.decode(personItem.getPhotoPreview(), Base64.DEFAULT);
             }
 
             mPersonImage.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));

@@ -31,6 +31,10 @@ import java.util.Locale;
  */
 public class Loader_intent extends AsyncTask<Void,Integer,Void> {
 
+    public static final int REQUEST_CODE_LOAD_FAVORITE_STAFF = 200;
+    public static final int REQUEST_CODE_LOAD_JOURNAL = 201;
+    public static final int REQUEST_CODE_LOAD_ROOMS = 202;
+
     private Context mContext;
     private String mPath;
     private ProgressDialog progressDialog;
@@ -77,7 +81,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
         }
 
         switch (mLoadType){
-            case Values.REQUEST_CODE_LOAD_FAVORITE_STAFF:
+            case REQUEST_CODE_LOAD_FAVORITE_STAFF:
 
                 DataBaseFavorite.clearTeachersDB();
                 try {
@@ -109,7 +113,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                     e.printStackTrace();
                 }
                 break;
-            case Values.REQUEST_CODE_LOAD_JOURNAL:
+            case REQUEST_CODE_LOAD_JOURNAL:
                 DataBaseJournal.clearJournalDB();
                 try {
                     if (fin != null) {
@@ -140,7 +144,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                     e.printStackTrace();
                 }
                 break;
-            case Values.REQUEST_CODE_LOAD_ROOMS:
+            case REQUEST_CODE_LOAD_ROOMS:
                 DataBaseRooms.clearRoomsDB();
                 try {
                     while ((line = fin.readLine())!=null){

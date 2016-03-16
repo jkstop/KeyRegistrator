@@ -3,7 +3,6 @@ package com.example.ivsmirnov.keyregistrator.adapters;
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +18,13 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
 
-public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_grid.ViewHolder>{
+public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.ViewHolder>{
+
+    public static final int SHOW_FAVORITE_PERSONS = 0;
+    public static final int SHOW_ALL_PERSONS = 1;
 
     private ArrayList <String> mTags;
     private int mType;
@@ -31,7 +32,7 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
     private RecycleItemClickListener mListener;
     private ArrayList<String> isFreeUsers;
 
-    public adapter_persons_grid(Context c, ArrayList<String> tagList,int type,RecycleItemClickListener listener) {
+    public AdapterPersonsGrid(Context c, ArrayList<String> tagList, int type, RecycleItemClickListener listener) {
         mTags = tagList;
         mContext = c;
         mType = type;
@@ -91,8 +92,8 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
-        Animation fadeInanimation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
-        if (mType== Values.SHOW_FAVORITE_PERSONS){
+        Animation fadeInanimation = AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in);
+        if (mType== SHOW_FAVORITE_PERSONS){
 
             new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams()
                     .setPersonTag(mTags.get(position))
@@ -106,7 +107,7 @@ public class adapter_persons_grid extends RecyclerView.Adapter<adapter_persons_g
                     .setPersonLocation(DataBaseFavorite.LOCAL_USER)
                     .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
 
-        }else if (mType==Values.SHOW_ALL_PERSONS){
+        }else if (mType == SHOW_ALL_PERSONS){
 
             new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(mTags.get(position))
                     .setPersonImageView(holder.imageView)

@@ -1,13 +1,8 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,20 +14,18 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetJournal;
 import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 
-import java.sql.Time;
 import java.util.ArrayList;
 
-public class adapter_journal_list extends RecyclerView.Adapter<adapter_journal_list.ViewHolderJournalItem> {
+public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.ViewHolderJournalItem> {
 
     private final Context context;
     private ArrayList<JournalItem> journalItems;
     private RecycleItemClickListener mListener;
 
 
-    public adapter_journal_list(Context context, RecycleItemClickListener recycleItemClickListener, ArrayList<JournalItem> journalItems) {
+    public AdapterJournalList(Context context, RecycleItemClickListener recycleItemClickListener, ArrayList<JournalItem> journalItems) {
         this.context = context;
         this.journalItems = journalItems;
         this.mListener = recycleItemClickListener;
@@ -71,7 +64,7 @@ public class adapter_journal_list extends RecyclerView.Adapter<adapter_journal_l
                 .setTextMidname(holder.mTextMidname)
                 .setTextTimeIn(holder.mTextTimeIn)
                 .setTextTimeOut(holder.mTextTimeOut),
-                AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left)).execute();
+                AnimationUtils.loadAnimation(context, android.R.anim.fade_in)).execute();
     }
 
     @Override

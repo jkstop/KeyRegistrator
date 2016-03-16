@@ -1,28 +1,11 @@
 package com.example.ivsmirnov.keyregistrator.services;
 
-import android.app.Notification;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.acs.smartcard.Reader;
-import com.acs.smartcard.ReaderException;
-import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Open_Reader;
-import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
-import com.example.ivsmirnov.keyregistrator.fragments.Nfc_Fragment;
-import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
-import com.example.ivsmirnov.keyregistrator.interfaces.ReaderResponse;
-import com.example.ivsmirnov.keyregistrator.others.Values;
+import com.example.ivsmirnov.keyregistrator.interfaces.ReaderInterface;
 
 /**
  * Created by ivsmirnov on 02.02.2016.
@@ -55,7 +38,7 @@ public class NFC_Reader{
         }
     }
 
-    public void getTag(Reader reader, ReaderResponse response){
+    public void getTag(Reader reader, ReaderInterface response){
         new setPower(reader).execute(getPowerParams());
         new setProtocol(reader).execute(getProtocolParams());
         new transmit(reader, response).execute(getTransmitParams());
@@ -95,11 +78,11 @@ public class NFC_Reader{
     }
 
     private class transmit extends AsyncTask<TransmitParams,Void,TransmitResult>{
-        public ReaderResponse mListener = null;
+        public ReaderInterface mListener = null;
         private Reader mReader;
-        private transmit(Reader reader, ReaderResponse readerResponse){
+        private transmit(Reader reader, ReaderInterface readerInterface){
             this.mReader = reader;
-            this.mListener = readerResponse;
+            this.mListener = readerInterface;
         }
 
         @Override
@@ -124,7 +107,7 @@ public class NFC_Reader{
         protected void onPostExecute(TransmitResult transmitResult) {
             if (transmitResult.responseLength!=0){
                 String tag = getStringFromByte(transmitResult.response, transmitResult.responseLength-2) + "00 00";
-                mListener.onGetResult(tag);
+                mListener.onGetPersonTag(tag);
             }
         }
     }

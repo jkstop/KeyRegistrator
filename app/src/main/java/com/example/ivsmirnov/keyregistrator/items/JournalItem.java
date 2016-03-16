@@ -5,7 +5,7 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import java.sql.Time;
 
 /**
- * Created by ivsmirnov on 11.01.2016.
+ * элемент журнала
  */
 public class JournalItem {
     private String AccountID;

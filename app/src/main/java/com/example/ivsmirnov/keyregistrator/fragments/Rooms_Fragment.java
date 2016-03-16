@@ -21,15 +21,14 @@ import android.view.ViewGroup;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.adapters.adapter_main_auditrooms_grid;
+import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_file;
+import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
 
     private ArrayList<RoomItem> mRoomItems;
     private Context mContext;
-    private adapter_main_auditrooms_grid mAdapter;
+    private AdapterMainRoomGrid mAdapter;
     private FloatingActionButton mAddFAB;
 
     private RecyclerView mRoomsGrid;
@@ -109,10 +108,10 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
         mRoomItems = DataBaseRooms.readRoomsDB();
 
         for (int i=0;i<mRoomItems.size();i++){
-            mRoomItems.get(i).setStatus(Values.ROOM_IS_FREE);
+            mRoomItems.get(i).setStatus(DataBaseRooms.ROOM_IS_FREE);
         }
 
-        mAdapter = new adapter_main_auditrooms_grid(mRoomItems,this);
+        mAdapter = new AdapterMainRoomGrid(mRoomItems,this);
         mRoomsGrid.setAdapter(mAdapter);
 
     }
@@ -130,14 +129,14 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
                 dialogs.show(getFragmentManager(),"columns");
                 return true;
             case R.id.menu_auditrooms_save_to_file:
-                Save_to_file saveToFile = new Save_to_file(mContext,Values.WRITE_ROOMS, true);
+                FileWriter saveToFile = new FileWriter(mContext, FileWriter.WRITE_ROOMS, true);
                 saveToFile.execute();
                 return true;
             case R.id.menu_auditrooms_load_from_file:
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i,Values.REQUEST_CODE_LOAD_ROOMS);
+                startActivityForResult(i,Loader_intent.REQUEST_CODE_LOAD_ROOMS);
                 return true;
             case R.id.menu_auditrooms_clear:
                 Dialogs dialog = new Dialogs();
@@ -156,11 +155,11 @@ public class Rooms_Fragment extends Fragment implements UpdateInterface, Recycle
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data!=null){
-            if (requestCode == Values.REQUEST_CODE_LOAD_ROOMS){
+            if (requestCode == Loader_intent.REQUEST_CODE_LOAD_ROOMS){
                 if (resultCode == Activity.RESULT_OK){
                     Uri uri = data.getData();
                     String path = uri.getPath();
-                    Loader_intent loader_intent = new Loader_intent(mContext,path,this,Values.REQUEST_CODE_LOAD_ROOMS);
+                    Loader_intent loader_intent = new Loader_intent(mContext,path,this,Loader_intent.REQUEST_CODE_LOAD_ROOMS);
                     loader_intent.execute();
                 }
             }

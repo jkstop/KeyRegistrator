@@ -41,6 +41,20 @@ public class Alarm {
 
     }
 
+    public long closingTime(){
+        Calendar now = Calendar.getInstance();
+        Calendar when = (Calendar)now.clone();
+        when.set(Calendar.HOUR_OF_DAY, 22);
+        when.set(Calendar.MINUTE, 1);
+        when.set(Calendar.SECOND, 0);
+        when.set(Calendar.MILLISECOND, 0);
+
+        if (when.compareTo(now)<=0){
+            when.add(Calendar.DATE, 1);
+        }
+        return when.getTimeInMillis();
+    }
+
 
     public void cancelAlarm(){
 

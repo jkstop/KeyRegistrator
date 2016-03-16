@@ -23,6 +23,10 @@ import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 
 public class CloseDay extends AppCompatActivity {
 
@@ -50,7 +54,7 @@ public class CloseDay extends AppCompatActivity {
             actionBar.setCustomView(actionBarView, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
         }
 
-        ((TextView) findViewById(R.id.layout_close_day_card_stat_head)).setText(Values.showDate());
+        ((TextView) findViewById(R.id.layout_close_day_card_stat_head)).setText(showDate());
 
         ((TextView) findViewById(R.id.layout_close_day_card_stat_value_today)).setText(String.valueOf(DataBaseJournal.getItemCount(DataBaseJournal.COUNT_TODAY)));
 
@@ -77,6 +81,11 @@ public class CloseDay extends AppCompatActivity {
             textTitle.setTextColor(getResources().getColor(R.color.colorAccent));
             textAutoCloseCount.setText(String.valueOf(Settings.getAutoClosedRoomsCount()));
         }
+    }
+
+    private String showDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy",new Locale("ru"));
+        return String.valueOf(dateFormat.format(new Date())) + " г.";
     }
 
     @Override
