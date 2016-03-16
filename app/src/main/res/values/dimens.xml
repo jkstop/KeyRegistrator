@@ -1,20 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="text_lastname">18dp</dimen>
 
     <dimen name="text_empty_auditrooms">24dp</dimen>
 
-    <dimen name="toolbar_height">50dp</dimen>
     <dimen name="toolbar_text_size">18dp</dimen>
 
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="grid_vertical_spacing">20dp</dimen>
-    <dimen name="shape_size">100dp</dimen>
-
-    <dimen name="text_size_14">14sp</dimen>
-    <dimen name="divider_height">1dp</dimen>
-    <dimen name="text_lastname_surname">16dp</dimen>
 
     <dimen name="navigation_drawer_widht">400dp</dimen>
     <dimen name="navigation_drawer_item_text_size">18sp</dimen>
@@ -26,7 +17,6 @@
     <dimen name="navigation_drawer_divider_height">0dp</dimen>
     <dimen name="navigation_drawer_item_image_width">24dp</dimen>
     <dimen name="navigation_drawer_item_image_height">24dp</dimen>
-    <dimen name="navigation_drawer_account_info_height">56dp</dimen>
     <dimen name="navigation_drawer_account_selection_height">156dp</dimen>
     <dimen name="navigation_drawer_separator_height">3dp</dimen>
 
@@ -69,14 +59,12 @@
     <dimen name="auditroom_card_content_padding">5dp</dimen>
     <dimen name="auditroom_card_text_size">100sp</dimen>
     <dimen name="auditroom_card_busy_text_aud_size">120sp</dimen>
-    <dimen name="auditroom_card_busy_text_person_size">120sp</dimen>
     <dimen name="auditroom_card_image_margin">5dp</dimen>
     <dimen name="auditroom_card_divider">10dp</dimen>
 
     <dimen name="rooms_fragment_fab_margin">16dp</dimen>
     <dimen name="rooms_fragment_fab_elevation">5dp</dimen>
 
-    <dimen name="persons_fragment_fab_margin">16dp</dimen>
     <dimen name="persons_fragment_fab_elevation">5dp</dimen>
 
     <dimen name="view_enter_auditroom_margin">16dp</dimen>

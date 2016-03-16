@@ -112,7 +112,6 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
     private static long back_pressed;
 
-    private UsbManager mUsbManager;
     private Reader mReader;
 
     private Alarm mAlarm;
@@ -423,8 +422,6 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         }
     }
 
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -478,7 +475,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         @Override
         protected Void doInBackground(Void... params) {
 
-            mUsbManager = (UsbManager)getSystemService(Context.USB_SERVICE);
+            UsbManager mUsbManager = (UsbManager)getSystemService(Context.USB_SERVICE);
             mReader = new Reader(mUsbManager);
             PendingIntent mPermissionIntent = PendingIntent.getBroadcast(mContext, 0, new Intent(ACTION_USB_PERMISSION), 0);
 
@@ -581,8 +578,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
         public GetUser(int type){
           this.mType = type;
-        };
-
+        }
 
         @Override
         protected String doInBackground(String... params) {
@@ -601,27 +597,29 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         @Override
         protected void onPostExecute(String personTag) {
             if (personTag!=null && mValidUser){
-                if (mType == NFC){
-                    new BaseWriter(mContext, mBaseWriterInterface).execute(new BaseWriterParams()
-                            .setPersonTag(personTag)
-                            .setAuditroom(Settings.getLastClickedAuditroom())
-                            .setAccessType(DataBaseJournal.ACCESS_BY_CARD));
-                } else if (mType == PERSONS){
-                    Persons_Fragment persons_fragment = (Persons_Fragment) getFragmentByTag(R.string.fragment_tag_persons);
+                switch (mType){
+                    case NFC:
+                        new BaseWriter(mContext, mBaseWriterInterface).execute(new BaseWriterParams()
+                                .setPersonTag(personTag)
+                                .setAuditroom(Settings.getLastClickedAuditroom())
+                                .setAccessType(DataBaseJournal.ACCESS_BY_CARD));
+                        break;
+                    case PERSONS:
+                        Persons_Fragment persons_fragment = (Persons_Fragment) getFragmentByTag(R.string.fragment_tag_persons);
 
-                    Bundle b = new Bundle();
-                    b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_EDIT);
-                    b.putString(Dialogs.DIALOG_PERSON_INFORMATION_KEY_TAG, personTag);
+                        Bundle b = new Bundle();
+                        b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_EDIT);
+                        b.putString(Dialogs.DIALOG_PERSON_INFORMATION_KEY_TAG, personTag);
 
-                    Dialogs dialog = new Dialogs();
-                    dialog.setArguments(b);
-                    dialog.setTargetFragment(persons_fragment, 0);
-                    dialog.show(persons_fragment.getChildFragmentManager(), "edit");
+                        Dialogs dialog = new Dialogs();
+                        dialog.setArguments(b);
+                        dialog.setTargetFragment(persons_fragment, 0);
+                        dialog.show(persons_fragment.getChildFragmentManager(), "edit");
+                        break;
+                    default:
+                        break;
                 }
-            }else{
-                Log.d("wrong","card!!! --- " + String.valueOf(personTag));
             }
         }
     }
-
 }

@@ -12,7 +12,6 @@
         android:layout_height="match_parent">
 
         <RelativeLayout
-            android:id="@+id/card_journal_item_frame_person"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
@@ -79,7 +78,6 @@
 
         <RelativeLayout
             android:layout_margin="5dp"
-            android:id="@+id/card_journal_item_frame_time"
             android:layout_toRightOf="@id/card_journal_item_frame_auditroom"
             android:layout_width="match_parent"
             android:layout_height="match_parent">

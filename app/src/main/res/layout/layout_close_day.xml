@@ -104,7 +104,6 @@
                 android:layout_height="wrap_content" />
 
             <ImageView
-                android:id="@+id/layout_close_day_card_stat_icon_person_items"
                 android:src="@drawable/ic_person_black_18dp"
                 android:layout_toStartOf="@id/layout_close_day_card_stat_value_person_items"
                 android:layout_toLeftOf="@id/layout_close_day_card_stat_value_person_items"

@@ -1,12 +1,6 @@
 <resources>
     <string name="app_name">Key Registrator</string>
 
-    <!-- Journal -->
-    <string name="journal_auditroom">Аудитория</string>
-    <string name="journal_lastname">Фамилия</string>
-    <string name="journal_time">Время</string>
-    <string name="journal_time_get">Взял</string>
-    <string name="journal_time_put">Сдал</string>
 
     <!-- Fragment tags -->
     <string name="fragment_tag_journal">fragment_tag_journal</string>
@@ -18,29 +12,19 @@
     <string name="fragment_tag_nfc">fragment_tag_nfc</string>
     <string name="fragment_tag_search">fragment_tag_search</string>
 
-    <string name="grid_item_tag_lastname">1</string>
-    <string name="grid_item_tag_firstname">2</string>
-    <string name="grid_item_tag_midname">3</string>
-    <string name="grid_item_tag_division">4</string>
-    <string name="grid_item_tag_sex">5</string>
-    <string name="grid_item_tag_radio_label">6</string>
-
     <!-- Titles -->
     <string name="toolbar_title_main">Выберите при помощи мыши нужную аудиторию</string>
     <string name="toolbar_title_persons">Преподаватели</string>
     <string name="toolbar_title_journal">Журнал</string>
     <string name="toolbar_title_auditrooms">Аудитории</string>
     <string name="toolbar_title_shedule">Расписание</string>
-    <string name="toolbar_title_persons_select">Выберите преподавателя</string>
     <string name="toolbar_title_email">E-mail рассылка</string>
     <string name="title_activity_close_day_dialog">Занятия завершены!</string>
-    <string name="title_activity_rooms">Список аудиторий: </string>
     <string name="title_delete_room_dialog">Удаление</string>
     <string name="title_add_new_staff">Добавление нового пользователя</string>
     <string name="title_dialog_log_out">Отсоединение аккаунта</string>
 
     <string name="label_add_button">Добавить</string>
-
 
     <string name="text_warning">Уважаемые преподаватели!\n
     Брать и сдавать ключи по завершении занятий необходимо ЛИЧНО ВАМ!\n
@@ -51,10 +35,6 @@
 
     <string name="navigation_drawer_opened">The navigation drawer is opened</string>
     <string name="navigation_drawer_closed">The navigation drawer is closed</string>
-    <string name="tag_nav_drawer_main_entry">nav_drawer_main_entry</string>
-    <string name="tag_nav_drawer_special_entry">nav_drawer_special_entry</string>
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
 
     <!-- Dialogs -->
     <string name="dialog_clear_journal_title">ВНИМАНИЕ!</string>
@@ -69,41 +49,27 @@
     <string name="fragment_add_new_staff_edit_hint">Начните вводить фамилию</string>
 
     <string name="done">Готово!</string>
-    <string name="added">Добавлено!</string>
 
     <string name="add">Добавить</string>
 
     <string name="title_check_sql_server_connect">Проверка подключения к SQL - серверу</string>
-    <string name="connected">Подключено</string>
-    <string name="disconnected">Отключено</string>
 
 
     <string name="dialog_delete_room_message">Удалить аудиторию </string>
     <string name="dialog_columns_title">Выберите количество колонок</string>
     <string name="delete">Удалить</string>
-    <string-array name="seek_items">
-        <item>Аудитории</item>
-        <item>Уведомление</item>
-    </string-array>
-
-    <string name="email_settings_box_layout_box_prefix">/@gmail.com</string>
 
     <!-- Typeface names -->
-    <string name="typeface_roboto_regular">Roboto-Regular</string>
-    <string name="typeface_roboto_medium">Roboto-Medium</string>
 
     <!-- Toasts -->
     <string name="text_toast_put_card">Для сдачи ключей просто приложите карту</string>
     <string name="text_toast_choise_room_in_first">Для начала выберите аудиторию!</string>
     <string name="text_toast_thanks">Спасибо!</string>
     <string name="text_toast_take_key">Возьмите ключ</string>
-    <string name="text_nfc_head_card_incorrect">Не удалось распознать вашу карту.\n
-        Попробуйте приложить её еще раз.</string>
-    
+
     <!-- Navigation drawer -->
     <string name="navigation_drawer_list_item_content_description_image">navigation_drawer_list_item_content_description</string>
     <string name="navigation_drawer_account_info_text_user">Войти</string>
-    <string name="navigation_drawer_account_info_text_email">shsupport@fa.ru</string>
     <string name="navigation_drawer_item_home">Главная</string>
     <string name="navigation_drawer_item_persons">Преподаватели</string>
     <string name="navigation_drawer_item_journal">Журнал</string>
@@ -119,7 +85,6 @@
     <string name="auditroom_grid_busy_image_person_description">auditroom_grid_busy_image_description</string>
     <string name="auditroom_grid_busy_image_key_description">auditroom_grid_busy_image_key_description</string>
     <string name="navigation_drawer_change_account_image_descritpion">navigation_drawer_change_account_image_descritpion</string>
-    <string name="navigation_drawer_person_image_descritpion">navigation_drawer_person_image_descritpion</string>
     <string name="image_description_email_fragment_account_image">image_description_email_fragment_account_image</string>
     <string name="image_description_email_fragment_add_recipient">email_fragment_add_recipient</string>
     <string name="image_description_email_fragment_add_attachment">email_fragment_add_attachment</string>
@@ -156,8 +121,6 @@
 
     <string name="dialog_log_out_message">Вы точно хотите отсоединить этот аккаунт? Все введенные данные останутся невредимы.</string>
 
-    <string name="dialog_email_add_recipient">Добавить получателя</string>
-    <string name="dialog_email_add_attachment">Добавить вложение</string>
     <string name="email_fragment_input_theme_hint">Тема</string>
     <string name="email_fragment_input_message_hint">Текст сообщения</string>
     <string name="email_fragment_recepients_text">Получатели</string>
