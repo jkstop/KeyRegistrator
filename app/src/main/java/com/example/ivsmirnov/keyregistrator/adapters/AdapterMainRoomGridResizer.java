@@ -1,8 +1,5 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,11 +7,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.fragments.MainFr;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialogs;
-import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.util.ArrayList;
 
@@ -64,7 +60,7 @@ public class AdapterMainRoomGridResizer extends RecyclerView.Adapter<RecyclerVie
         if (Dialogs.mFrameGrid!=null){
             recyclerHeight = Dialogs.mFrameGrid.getHeight();
         }else{
-            recyclerHeight = Main_Fragment.mAuditroomGrid.getHeight();
+            recyclerHeight = MainFr.mAuditroomGrid.getHeight();
         }
         int recyclerChilds = mRoomItems.size();
         int recyclerRows = (int) Math.ceil((double) recyclerChilds / Settings.getAuditroomColumnsCount());

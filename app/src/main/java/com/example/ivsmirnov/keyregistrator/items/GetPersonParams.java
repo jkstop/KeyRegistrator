@@ -5,7 +5,7 @@ import android.support.v7.widget.CardView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 
 /**
  * Created by ivsmirnov on 21.02.2016.
@@ -14,7 +14,7 @@ public class GetPersonParams{
     private String personTag;
     private int personLocation;
     private int personPhotoDimension;
-    private DataBaseFavorite dataBaseFavorite;
+    private FavoriteDB favoriteDB;
     private ImageView personImageView, accessImageView;
     private TextView personLastname, personFirstname, personMidname, personDivision;
     private CardView personCard;
@@ -63,8 +63,8 @@ public class GetPersonParams{
         return this;
     }
 
-    public GetPersonParams setDatabase(DataBaseFavorite database){
-        this.dataBaseFavorite = database;
+    public GetPersonParams setDatabase(FavoriteDB database){
+        this.favoriteDB = database;
         return this;
     }
 
@@ -112,8 +112,8 @@ public class GetPersonParams{
         return personPhotoDimension;
     }
 
-    public DataBaseFavorite getDataBaseFavorite(){
-        return dataBaseFavorite;
+    public FavoriteDB getFavoriteDB(){
+        return favoriteDB;
     }
 
     public ImageView getPersonImageView(){

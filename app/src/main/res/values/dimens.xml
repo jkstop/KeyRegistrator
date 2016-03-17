@@ -5,8 +5,6 @@
 
     <dimen name="toolbar_text_size">18dp</dimen>
 
-    <dimen name="grid_vertical_spacing">20dp</dimen>
-
     <dimen name="navigation_drawer_widht">400dp</dimen>
     <dimen name="navigation_drawer_item_text_size">18sp</dimen>
     <dimen name="navigation_drawer_account_info_text_size">14sp</dimen>
@@ -19,6 +17,8 @@
     <dimen name="navigation_drawer_item_image_height">24dp</dimen>
     <dimen name="navigation_drawer_account_selection_height">156dp</dimen>
     <dimen name="navigation_drawer_separator_height">3dp</dimen>
+    <dimen name="navigation_drawer_account_image_width">64dp</dimen>
+    <dimen name="navigation_drawer_account_image_height">64dp</dimen>
 
     <dimen name="person_card_width">300dp</dimen>
     <dimen name="person_card_height">160dp</dimen>
@@ -93,5 +93,7 @@
     <dimen name="card_free_user_height">90dp</dimen>
 
     <dimen name="dialog_sql_connect_status_text">28sp</dimen>
+
+    <dimen name="card_nfc_aud_text">78sp</dimen>
 
 </resources>

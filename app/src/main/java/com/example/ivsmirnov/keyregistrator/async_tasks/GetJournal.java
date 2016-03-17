@@ -4,18 +4,15 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
+import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.lang.ref.WeakReference;
 import java.sql.Time;
@@ -59,7 +56,7 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
     @Override
     protected JournalItem doInBackground(Void... params) {
 
-        return DataBaseJournal.getJournalItem(mTimeIn);
+        return JournalDB.getJournalItem(mTimeIn);
     }
 
     @Override
@@ -100,7 +97,7 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
         }
 
         if (mImageAccess!=null){
-            if (journalItem.getAccessType() == DataBaseJournal.ACCESS_BY_CARD){
+            if (journalItem.getAccessType() == JournalDB.ACCESS_BY_CARD){
                 mImageAccess.setImageResource(R.drawable.ic_credit_card_black_18dp);
             } else {
                 mImageAccess.setImageResource(R.drawable.ic_click_icon);

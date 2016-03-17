@@ -17,7 +17,7 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
 
     private int result;
 
-    private DataBaseShedule dbShedule;
+    private SheduleDB dbShedule;
 
     public Load_shedule (Context c, Shedule_Load s){
         this.mContext = c;
@@ -27,7 +27,7 @@ public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {
     @Override
     protected Integer doInBackground(Void... params) {
 
-        dbShedule = new DataBaseShedule(mContext);
+        dbShedule = new SheduleDB(mContext);
 
         JSONObject jsonObject = null;
         String facultyName = "";

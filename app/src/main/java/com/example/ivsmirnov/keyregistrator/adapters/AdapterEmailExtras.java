@@ -10,13 +10,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.fragments.Email_Fragment;
+import com.example.ivsmirnov.keyregistrator.fragments.EmailFr;
 import com.example.ivsmirnov.keyregistrator.interfaces.EmailInterface;
 
 import java.util.ArrayList;
 
 /**
- * Created by ivsmirnov on 13.02.2016.
+ * адаптер для списка вложений и списка получателей email рассылки
  */
 public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -98,7 +98,7 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (mType == RECIPIENTS){
-            if (!mItems.get(position).equals(Email_Fragment.ADD_NEW_RECIPIENT)){
+            if (!mItems.get(position).equals(EmailFr.ADD_NEW_RECIPIENT)){
                 ((viewHolderEmailAttach)holder).mText.setText(mItems.get(position));
                 ((viewHolderEmailAttach)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_assignment_ind_black_48dp));
                 ((viewHolderEmailAttach)holder).mImageDelete.setImageDrawable(mContext.getResources().getDrawable(android.R.drawable.ic_menu_delete));
@@ -113,7 +113,7 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        if (mItems.get(position).equals(Email_Fragment.ADD_NEW_RECIPIENT)){
+        if (mItems.get(position).equals(EmailFr.ADD_NEW_RECIPIENT)){
             return VIEW_RECEPIENTS_ADD_NEW;
         }else{
             return VIEW_RECEPIENTS_SIMPLE;

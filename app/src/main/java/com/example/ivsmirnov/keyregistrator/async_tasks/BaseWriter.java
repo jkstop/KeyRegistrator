@@ -4,10 +4,10 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
-import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
+import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
+import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
+import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
 import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
@@ -38,7 +38,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
     @Override
     protected Void doInBackground(BaseWriterParams... params) {
 
-        PersonItem person = DataBaseFavorite.getPersonItem(mContext, params[0].getPersonTag(), DataBaseFavorite.LOCAL_USER, DataBaseFavorite.PREVIEW_PHOTO);
+        PersonItem person = FavoriteDB.getPersonItem(mContext, params[0].getPersonTag(), FavoriteDB.LOCAL_USER, FavoriteDB.PREVIEW_PHOTO);
 
         JournalItem journalItem = new JournalItem()
                 .setAccountID(Settings.getActiveAccountID())
@@ -50,14 +50,14 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
                 .setPersonMidname(person.getMidname())
                 .setPersonPhoto(person.getPhotoPreview());
 
-        long positionInBase = DataBaseJournal.writeInDBJournal(journalItem);
+        long positionInBase = JournalDB.writeInDBJournal(journalItem);
 
-        DataBaseRooms.updateRoom(new RoomItem()
+        RoomDB.updateRoom(new RoomItem()
                 .setAuditroom(journalItem.getAuditroom())
-                .setStatus(DataBaseRooms.ROOM_IS_BUSY)
+                .setStatus(RoomDB.ROOM_IS_BUSY)
                 .setAccessType(journalItem.getAccessType())
                 .setPositionInBase(positionInBase)
-                .setLastVisiter(Persons_Fragment.getPersonInitials(journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()))
+                .setLastVisiter(PersonsFr.getPersonInitials(journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()))
                 .setTag(params[0].getPersonTag()));
         return null;
     }

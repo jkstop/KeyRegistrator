@@ -13,10 +13,10 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
+import com.example.ivsmirnov.keyregistrator.fragments.MainFr;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
-import com.example.ivsmirnov.keyregistrator.fragments.Main_Fragment;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
@@ -141,8 +141,8 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
                 new GetPersons(App.getAppContext(),null, AnimationUtils.loadAnimation(App.getAppContext(),android.R.anim.fade_in)).execute(new GetPersonParams()
                         .setIsAnimatedPhoto(true)
                         .setPersonImageView(((auditroomBusyViewHolder)holder).mBusyImagePerson)
-                        .setPersonLocation(DataBaseFavorite.LOCAL_USER)
-                        .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO)
+                        .setPersonLocation(FavoriteDB.LOCAL_USER)
+                        .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO)
                         .setPersonTag(mRoomItems.get(position).getTag()));
 
                 break;
@@ -155,7 +155,7 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     private int getItemScaleHeight(){
-        int recyclerHeight = Main_Fragment.mAuditroomGrid.getHeight();
+        int recyclerHeight = MainFr.mAuditroomGrid.getHeight();
         int recyclerChilds = mRoomItems.size();
         int recyclerRows = (int) Math.ceil((double) recyclerChilds / Settings.getAuditroomColumnsCount());
         return recyclerHeight/recyclerRows;
@@ -181,8 +181,8 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
             }
 
         //int space = (int) context.getResources().getDimension(R.dimen.grid_vertical_spacing);
-        //int heightGrid = Main_Fragment.gridView.getHeight();
-        //int childCount = Main_Fragment.gridView.getCount();
+        //int heightGrid = MainFr.gridView.getHeight();
+        //int childCount = MainFr.gridView.getCount();
         //int rows;
        // rows = (int) Math.ceil((double) childCount / preferences.getInt(Values.COLUMNS_AUD_COUNT, 1));
         //int btnHeight = heightGrid/rows - space;

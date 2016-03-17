@@ -2,19 +2,14 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.util.Log;
 
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseAccount;
+import com.example.ivsmirnov.keyregistrator.databases.AccountDB;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.items.MailParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.google.android.gms.auth.GoogleAuthException;
+import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableAuthException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -29,19 +24,16 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.MailcapCommandMap;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 /**
- * Created by IVSmirnov on 26.08.2015.
+ * отправка сообщения
  */
 public class Send_Email extends AsyncTask<MailParams, Void, Void> {
 
@@ -55,7 +47,6 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
     public Send_Email(Context c, boolean isDialogShow) {
         this.mContext = c;
         this.isDialogShow = isDialogShow;
-
     }
 
     @Override
@@ -79,50 +70,52 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
 
         try {
 
-            AccountItem accountItem = DataBaseAccount.getAccount(Settings.getActiveAccountID());
+            AccountItem mAccountItem = AccountDB.getAccount(Settings.getActiveAccountID());
 
-            String token = GoogleAuthUtil.getToken(mContext, accountItem.getEmail(),"oauth2:https://mail.google.com/");
+            String token = GoogleAuthUtil.getToken(mContext, mAccountItem.getEmail(),"oauth2:https://mail.google.com/");
             String mTheme = params[0].getTheme();
             String mBody = params[0].getBody();
             ArrayList<String> mAttachments = params[0].getAttachments();
 
-            Properties props = new Properties();
-            props.put("mail.smtp.ssl.enable", "true");
-            props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
-            Session session = Session.getInstance(props);
+            Properties mProps = new Properties();
+            mProps.put("mail.smtp.ssl.enable", "true");
+            mProps.put("mail.smtp.auth.mechanisms", "XOAUTH2");
+            Session session = Session.getInstance(mProps);
 
-            MimeMessage mimeMessage = new MimeMessage(session);
-            DataHandler handler = new DataHandler(new ByteArrayDataSource(mBody.getBytes(), "multipart/mixed"));
+            MimeMessage mMimeMessage = new MimeMessage(session);
 
-            mimeMessage.setSubject(mTheme);
-            mimeMessage.setDataHandler(handler);
+            if (mBody == null) mBody = Values.EMPTY;
+            DataHandler mHandler = new DataHandler(new ByteArrayDataSource(mBody.getBytes(), "multipart/mixed"));
+
+            mMimeMessage.setSubject(mTheme);
+            mMimeMessage.setDataHandler(mHandler);
 
             for (String recepient : params[0].getRecepients()){
-                mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(recepient));
+                mMimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(recepient));
             }
 
-            MimeBodyPart mimeBodyPartText = new MimeBodyPart();
-            mimeBodyPartText.setText(mBody);
+            MimeBodyPart mMimeBodyPart = new MimeBodyPart();
+            mMimeBodyPart.setText(mBody);
 
-            Multipart multipart = new MimeMultipart();
-            multipart.addBodyPart(mimeBodyPartText);
+            Multipart mMultiPart = new MimeMultipart();
+            mMultiPart.addBodyPart(mMimeBodyPart);
             if (mAttachments.size()!=0){
                 for (String s : mAttachments){
-                    MimeBodyPart mimeBodyPartAttach = new MimeBodyPart();
-                    mimeBodyPartAttach.attachFile(new File(s));
-                    mimeBodyPartAttach.setHeader("Content-Type", "text/plain; charset=\"us-ascii\"; name=\"mail.txt\"");
-                    multipart.addBodyPart(mimeBodyPartAttach);
+                    MimeBodyPart mMimeBodyPartAttach = new MimeBodyPart();
+                    mMimeBodyPartAttach.attachFile(new File(s));
+                    mMimeBodyPartAttach.setHeader("Content-Type", "text/plain; charset=\"us-ascii\"; name=\"mail.txt\"");
+                    mMultiPart.addBodyPart(mMimeBodyPartAttach);
                 }
             }
 
-            mimeMessage.setContent(multipart);
+            mMimeMessage.setContent(mMultiPart);
 
             addMailCap();
 
-            Transport transport = session.getTransport("smtp");
-            transport.connect("imap.gmail.com",accountItem.getEmail(),token);
-            transport.sendMessage(mimeMessage,mimeMessage.getAllRecipients());
-            transport.close();
+            Transport mTransport = session.getTransport("smtp");
+            mTransport.connect("imap.gmail.com",mAccountItem.getEmail(),token);
+            mTransport.sendMessage(mMimeMessage, mMimeMessage.getAllRecipients());
+            mTransport.close();
 
         } catch (Exception e) {
             e.printStackTrace();

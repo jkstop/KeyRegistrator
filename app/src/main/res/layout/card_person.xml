@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:foreground="?android:attr/selectableItemBackground"
     app:cardElevation="@dimen/person_card_elevation"
-    app:cardBackgroundColor="@color/person_card"
+    app:cardBackgroundColor="@color/grey_400"
     app:contentPadding="@dimen/person_card_content_padding"
     android:id="@+id/person_card">
 

@@ -6,19 +6,15 @@ import android.os.AsyncTask;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.CardView;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.lang.ref.WeakReference;
 
@@ -53,7 +49,7 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
         photoDimension = params[0].getPersonPhotoDimension();
 
-        PersonItem personItem = DataBaseFavorite.getPersonItem(mContext, params[0].getPersonTag(), params[0].getPersonLocation(), photoDimension);
+        PersonItem personItem = FavoriteDB.getPersonItem(mContext, params[0].getPersonTag(), params[0].getPersonLocation(), photoDimension);
 
         mPersonImage = new WeakReference<ImageView>(params[0].getPersonImageView()).get();
         mAccessImage = new WeakReference<ImageView>(params[0].getAccessImageView()).get();
@@ -79,16 +75,16 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
             byte[] decodedString;
 
             switch (photoDimension){
-                case DataBaseFavorite.FULLSIZE_PHOTO:
-                    if (personItem.getPhotoOriginal()==null) personItem.setPhotoOriginal(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, personItem.getSex()));
+                case FavoriteDB.FULLSIZE_PHOTO:
+                    if (personItem.getPhotoOriginal()==null) personItem.setPhotoOriginal(FavoriteDB.getBase64DefaultPhotoFromResources(mContext, personItem.getSex()));
                     decodedString = Base64.decode(personItem.getPhotoOriginal(), Base64.DEFAULT);
                     break;
-                case DataBaseFavorite.PREVIEW_PHOTO:
-                    if (personItem.getPhotoPreview()==null) personItem.setPhotoPreview(DataBaseFavorite.getPhotoPreview(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, personItem.getSex())));
+                case FavoriteDB.PREVIEW_PHOTO:
+                    if (personItem.getPhotoPreview()==null) personItem.setPhotoPreview(FavoriteDB.getPhotoPreview(FavoriteDB.getBase64DefaultPhotoFromResources(mContext, personItem.getSex())));
                     decodedString = Base64.decode(personItem.getPhotoPreview(), Base64.DEFAULT);
                     break;
                 default:
-                    decodedString = Base64.decode(DataBaseFavorite.getPhotoPreview(DataBaseFavorite.getBase64DefaultPhotoFromResources(mContext, personItem.getSex())), Base64.DEFAULT);
+                    decodedString = Base64.decode(FavoriteDB.getPhotoPreview(FavoriteDB.getBase64DefaultPhotoFromResources(mContext, personItem.getSex())), Base64.DEFAULT);
                     break;
 
             }

@@ -8,7 +8,7 @@ import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.interfaces.ReaderInterface;
 
 /**
- * Created by ivsmirnov on 02.02.2016.
+ * методы NFC считывателя
  */
 public class NFC_Reader{
 
@@ -121,14 +121,13 @@ public class NFC_Reader{
 
     private ProtocolParams getProtocolParams(){
         int prefferedProtocol = Reader.PROTOCOL_UNDEFINED;
-        String prefferedProtocolString = "";
+        //String prefferedProtocolString;
         prefferedProtocol |= Reader.PROTOCOL_T0;
-        prefferedProtocolString = "T0";
+        //prefferedProtocolString = "T0";
         prefferedProtocol |= Reader.PROTOCOL_T1;
-        prefferedProtocolString +="/T1";
-        if (prefferedProtocolString==""){
-            prefferedProtocolString="None";
-        }
+        //prefferedProtocolString +="/T1";
+        //if (prefferedProtocolString == null) prefferedProtocolString="None";
+
         ProtocolParams params = new ProtocolParams();
         params.preferredProtocols = prefferedProtocol;
         params.slotNum = 0;
@@ -169,7 +168,7 @@ public class NFC_Reader{
                 hexChar = "0" + hexChar;
             }
             if (i % 20 == 0) {
-                if (bufferString != "") {
+                if (!bufferString.equals("")) {
                     bufferString = "";
                 }
             }

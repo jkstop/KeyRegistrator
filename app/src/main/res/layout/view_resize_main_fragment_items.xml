@@ -13,7 +13,7 @@
         android:layout_margin="@dimen/view_resize_included_margin">
 
         <include
-            layout="@layout/layout_main_fragment" />
+            layout="@layout/layout_main_fr" />
 
     </FrameLayout>
 

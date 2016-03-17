@@ -12,8 +12,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.fragments.Persons_Fragment;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
+import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
@@ -40,7 +40,7 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
     @Override
     public AdapterFreeUsersList.viewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
 
-        final View rowView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_free_user,parent,false);
+        final View rowView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_person_free,parent,false);
         final viewHolder holder = new viewHolder(rowView);
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,7 +63,7 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
                 .execute(new GetPersonParams()
                         .setPersonTag(mTags.get(position))
                         .setPersonLastname(holder.mTextLastName)
-                        .setPersonLocation(DataBaseFavorite.LOCAL_USER)
+                        .setPersonLocation(FavoriteDB.LOCAL_USER)
                         .setPersonPhotoDimension(-1));
     }
 
@@ -102,7 +102,7 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
         @Override
         protected PersonItem doInBackground(GetPersonParams... params) {
 
-            PersonItem personItem = DataBaseFavorite.getPersonItem(mContext, params[0].getPersonTag(), params[0].getPersonLocation(), params[0].getPersonPhotoDimension());
+            PersonItem personItem = FavoriteDB.getPersonItem(mContext, params[0].getPersonTag(), params[0].getPersonLocation(), params[0].getPersonPhotoDimension());
             mPersonInitials = new WeakReference<TextView>(params[0].getPersonLastname()).get();
 
             return personItem;
@@ -111,7 +111,7 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
         @Override
         protected void onPostExecute(PersonItem personItem) {
             if (personItem!=null){
-                if (mPersonInitials!=null) mPersonInitials.setText(Persons_Fragment.getPersonInitials(personItem.getLastname(),personItem.getFirstname(),personItem.getMidname()));
+                if (mPersonInitials!=null) mPersonInitials.setText(PersonsFr.getPersonInitials(personItem.getLastname(),personItem.getFirstname(),personItem.getMidname()));
 
                 mPersonCard.setVisibility(View.VISIBLE);
                 mPersonCard.startAnimation(mAnimation);

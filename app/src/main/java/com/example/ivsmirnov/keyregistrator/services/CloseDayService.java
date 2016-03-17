@@ -9,11 +9,10 @@ import android.os.IBinder;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
+import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseDayInterface;
 import com.example.ivsmirnov.keyregistrator.items.MailParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.activities.CloseDay;
 
 import java.util.Calendar;
@@ -40,7 +39,7 @@ public class CloseDayService extends Service implements CloseDayInterface {
 
         try {
 
-            Settings.setAutoClosedRoomsCount(DataBaseRooms.closeAllRooms());
+            Settings.setAutoClosedRoomsCount(RoomDB.closeAllRooms());
 
             //Launcher.mCloseRoomInterface.onRoomClosed();
 

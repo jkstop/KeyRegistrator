@@ -29,7 +29,6 @@
 
     <color name="transparent">#00FFFFFF</color>
 
-    <color name="person_card">#FFFFAB40</color>
     <color name="person_card_text_secondary">@color/material_grey_900</color>
 
     <color name="toast_fullscreen_background">#a4000000</color>
@@ -37,4 +36,5 @@
 
     <color name="auditroom_card">@color/primaryDark</color>
     <color name="auditroom_busy_card">#FFD50000</color>
+    <color name="grey_400">#bdbdbd</color>
 </resources>

@@ -4,8 +4,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
+import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
+import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.others.Values;
@@ -34,11 +34,11 @@ public class CloseRooms extends AsyncTask<Void, Void, Integer> {
     @Override
     protected Integer doInBackground(Void... params) {
 
-        RoomItem currentRoomItem = DataBaseRooms.getRoomItemForCurrentUser(mTag);
-        int closedRooms = DataBaseRooms.updateRoom(currentRoomItem
+        RoomItem currentRoomItem = RoomDB.getRoomItemForCurrentUser(mTag);
+        int closedRooms = RoomDB.updateRoom(currentRoomItem
                 .setTag(Values.EMPTY)
-                .setStatus(DataBaseRooms.ROOM_IS_FREE));
-        DataBaseJournal.updateDB(currentRoomItem.getPositionInBase());
+                .setStatus(RoomDB.ROOM_IS_FREE));
+        JournalDB.updateDB(currentRoomItem.getPositionInBase());
 
         return closedRooms;
     }

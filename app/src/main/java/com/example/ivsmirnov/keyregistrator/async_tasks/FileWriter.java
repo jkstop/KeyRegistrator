@@ -5,9 +5,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
+import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
+import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.io.File;
@@ -62,8 +62,8 @@ public class FileWriter extends AsyncTask <Void,Integer,Void> {
         switch (mType){
             case WRITE_JOURNAL:
 
-                DataBaseJournal.backupJournalToXLS();
-                DataBaseJournal.backupJournalToCSV();
+                JournalDB.backupJournalToXLS();
+                JournalDB.backupJournalToCSV();
 
                 String srFileJournal = mPathExternal + JOURNAL;
                 String dtFileJournal = Settings.getJournalBackupLocation() + JOURNAL;
@@ -71,14 +71,14 @@ public class FileWriter extends AsyncTask <Void,Integer,Void> {
                 break;
             case WRITE_TEACHERS:
 
-                DataBaseFavorite.backupFavoriteStaffToFile();
+                FavoriteDB.backupFavoriteStaffToFile();
 
                 String srFileTeachers = mPathExternal + TEACHERS;
                 String dtFileTeachers = Settings.getPersonsBackupLocation() + TEACHERS;
                 copyFile(srFileTeachers, dtFileTeachers);
                 break;
             case WRITE_ROOMS:
-                DataBaseRooms.backupRoomsToFile();
+                RoomDB.backupRoomsToFile();
                 break;
         }
         return null;

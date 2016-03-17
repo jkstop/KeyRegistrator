@@ -5,16 +5,13 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
+import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
+import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -83,7 +80,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
         switch (mLoadType){
             case REQUEST_CODE_LOAD_FAVORITE_STAFF:
 
-                DataBaseFavorite.clearTeachersDB();
+                FavoriteDB.clearTeachersDB();
                 try {
                     while ((line = fin.readLine())!=null){
                         if (i<count){
@@ -91,7 +88,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                 try {
                                     String [] split = line.split(";");
 
-                                    DataBaseFavorite.writeInDBTeachers(mContext, new PersonItem()
+                                    FavoriteDB.writeInDBTeachers(mContext, new PersonItem()
                                             .setLastname(split[0])
                                             .setFirstname(split[1])
                                             .setMidname(split[2])
@@ -114,7 +111,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                 }
                 break;
             case REQUEST_CODE_LOAD_JOURNAL:
-                DataBaseJournal.clearJournalDB();
+                JournalDB.clearJournalDB();
                 try {
                     if (fin != null) {
                         while ((line = fin.readLine())!=null){
@@ -122,7 +119,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                 try {
                                     String [] split = line.split(";");
 
-                                    DataBaseJournal.writeInDBJournal(new JournalItem()
+                                    JournalDB.writeInDBJournal(new JournalItem()
                                     .setAccountID(split[0])
                                     .setAuditroom(split[1])
                                     .setTimeIn(Long.parseLong(split[2]))
@@ -145,14 +142,14 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                 }
                 break;
             case REQUEST_CODE_LOAD_ROOMS:
-                DataBaseRooms.clearRoomsDB();
+                RoomDB.clearRoomsDB();
                 try {
                     while ((line = fin.readLine())!=null){
                         if (i<count){
                             if (!lines.contains(line)){
                                 String [] split = line.split(";");
                                 if(split.length==6){
-                                    DataBaseRooms.writeInRoomsDB(new RoomItem().setAuditroom(split[0])
+                                    RoomDB.writeInRoomsDB(new RoomItem().setAuditroom(split[0])
                                             .setStatus(Integer.parseInt(split[1]))
                                             .setAccessType(Integer.parseInt(split[2]))
                                             .setLastVisiter(split[3])

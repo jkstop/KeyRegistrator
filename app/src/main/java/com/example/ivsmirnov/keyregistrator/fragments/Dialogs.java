@@ -21,8 +21,11 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
@@ -36,19 +39,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGridResizer;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseRooms;
+import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
+import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
@@ -77,7 +81,7 @@ public class Dialogs extends DialogFragment{
     public static final int DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM = 112;
 
     private Context mContext;
-    private int dialog_id;
+    private int mDialogId;
     private LayoutInflater mInflater;
     private Resources mResources;
 
@@ -91,7 +95,7 @@ public class Dialogs extends DialogFragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dialog_id = getArguments().getInt(DIALOG_TYPE,0);
+        mDialogId = getArguments().getInt(DIALOG_TYPE,0);
         mContext = getActivity();
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResources = mContext.getResources();
@@ -105,7 +109,7 @@ public class Dialogs extends DialogFragment{
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        switch (dialog_id){
+        switch (mDialogId){
             case DIALOG_CLEAR_JOURNAL:
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(mResources.getString(R.string.dialog_clear_journal_title))
@@ -120,7 +124,7 @@ public class Dialogs extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                DataBaseJournal.clearJournalDB();
+                                JournalDB.clearJournalDB();
                                 updateInformation();
 
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
@@ -141,7 +145,7 @@ public class Dialogs extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                DataBaseFavorite.clearTeachersDB();
+                                FavoriteDB.clearTeachersDB();
                                 updateInformation();
 
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
@@ -162,8 +166,8 @@ public class Dialogs extends DialogFragment{
 
                 //получаем пользователя и заполняем поля
                 new GetPersons(mContext, null, null).execute(new GetPersonParams()
-                        .setPersonLocation(DataBaseFavorite.LOCAL_USER)
-                        .setPersonPhotoDimension(DataBaseFavorite.FULLSIZE_PHOTO)
+                        .setPersonLocation(FavoriteDB.LOCAL_USER)
+                        .setPersonPhotoDimension(FavoriteDB.FULLSIZE_PHOTO)
                         .setPersonTag(tag)
                         .setPersonImageView(personImage)
                         .setPersonLastname(inputLastname.getEditText())
@@ -185,15 +189,15 @@ public class Dialogs extends DialogFragment{
                 AlertDialog.Builder builderEdit = new AlertDialog.Builder(getActivity());
                 builderEdit.setView(dialogView);
 
-                if (DataBaseFavorite.isUserInBase(tag)){
+                if (FavoriteDB.isUserInBase(tag)){
                     builderEdit.setNeutralButton(getResources().getString(R.string.delete), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (tag!=null){
 
 
-                                //new DataBaseFavorite.deleteUser(mContext).execute(tag);
-                                DataBaseFavorite.deleteUser(tag);
+                                //new FavoriteDB.deleteUser(mContext).execute(tag);
+                                FavoriteDB.deleteUser(tag);
 
                                 //удаление метки в free_users
                                 Settings.deleteFreeUser(tag);
@@ -212,7 +216,7 @@ public class Dialogs extends DialogFragment{
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            DataBaseFavorite.updatePersonItem(tag, new PersonItem()
+                            FavoriteDB.updatePersonItem(tag, new PersonItem()
                                     .setLastname(inputLastname.getEditText().getText().toString())
                                     .setFirstname(inputFirstname.getEditText().getText().toString())
                                     .setMidname(inputMidname.getEditText().getText().toString())
@@ -225,12 +229,12 @@ public class Dialogs extends DialogFragment{
                     builderEdit.setNeutralButton(getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            //DataBaseFavorite.writeInDBTeachers(mContext, new PersonItem().setLastname(personItem.getLastname())
+                            //FavoriteDB.writeInDBTeachers(mContext, new PersonItem().setLastname(personItem.getLastname())
                             //        .setFirstname(personItem.getFirstname())
                             //        .setMidname(personItem.getMidname())
                             //        .setDivision(personItem.getDivision())
                                     //.setPhotoOriginal(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL))
-                                    //.setPhotoPreview(DataBaseFavorite.getPhotoPreview(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL)))
+                                    //.setPhotoPreview(FavoriteDB.getPhotoPreview(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL)))
                             //        .setSex(personItem.getSex())
                             //        .setRadioLabel(personItem.getRadioLabel()));
                             updateInformation();
@@ -250,7 +254,7 @@ public class Dialogs extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                DataBaseRooms.deleteFromRoomsDB(aud);
+                                RoomDB.deleteFromRoomsDB(aud);
 
                                 updateInformation();
 
@@ -279,7 +283,7 @@ public class Dialogs extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                DataBaseRooms.clearRoomsDB();
+                                RoomDB.clearRoomsDB();
 
                                 updateInformation();
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
@@ -296,15 +300,15 @@ public class Dialogs extends DialogFragment{
                     @Override
                     public void onClick(View v) {
                         String inputText = enterAuditroomText.getText().toString();
-                        ArrayList<String> auditroomList = DataBaseRooms.getRoomList();
+                        ArrayList<String> auditroomList = RoomDB.getRoomList();
                         if (inputText.isEmpty()){
                             enterAuditroomLayout.setError(getResources().getString(R.string.input_empty_error));
                         } else if (auditroomList.contains(inputText)){
                             enterAuditroomLayout.setError(getResources().getString(R.string.input_already_exist_error));
                         } else {
-                            DataBaseRooms.writeInRoomsDB(new RoomItem().setAuditroom(inputText)
-                                    .setStatus(DataBaseRooms.ROOM_IS_FREE)
-                                    .setAccessType(DataBaseJournal.ACCESS_BY_CLICK));
+                            RoomDB.writeInRoomsDB(new RoomItem().setAuditroom(inputText)
+                                    .setStatus(RoomDB.ROOM_IS_FREE)
+                                    .setAccessType(JournalDB.ACCESS_BY_CLICK));
 
                             enterAuditroomText.getText().clear();
                             updateInformation();
@@ -319,34 +323,25 @@ public class Dialogs extends DialogFragment{
                         .setView(enterAuditroomLayout)
                         .create();
             case SELECT_COLUMNS_DIALOG:
-                final String ident = getArguments().getString("AudOrPer");
+
                 final int mSelectedItemAud = Settings.getAuditroomColumnsCount();
-                //final int mSelectedItemPer = sharedPreferences.getInt(Values.COLUMNS_PER_COUNT, 0);
                 LayoutInflater layoutInflater1 = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View pickerView  = layoutInflater1.inflate(R.layout.view_column_selector,null);
                 final NumberPicker numberPicker = (NumberPicker)pickerView.findViewById(R.id.select_column_number_picker);
                 setNumberPickerTextColor(numberPicker,Color.BLACK);
                 numberPicker.setMaxValue(5);
                 numberPicker.setMinValue(2);
-                if (ident != null && ident.equalsIgnoreCase("aud")) {
-                    numberPicker.setValue(mSelectedItemAud);
-                } else if (ident != null && ident.equalsIgnoreCase("per")) {
-                    //numberPicker.setValue(mSelectedItemPer);
-                }
+
+                numberPicker.setValue(mSelectedItemAud);
+
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(getResources().getString(R.string.dialog_columns_title))
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (ident != null && ident.equalsIgnoreCase("aud")) {
-                                    Settings.setAuditroomColumnsCount(numberPicker.getValue());
-                                    updateInformation();
-                                } else if (ident != null && ident.equalsIgnoreCase("per")) {
-                                    //editor.putInt(Values.COLUMNS_PER_COUNT, numberPicker.getValue());
-                                    //editor.commit();
-                                    //UpdateTeachers updateTeachers = (UpdateTeachers) getTargetFragment();
-                                    //updateTeachers.onFinishEditing();
-                                }
+                                Settings.setAuditroomColumnsCount(numberPicker.getValue());
+                                updateInformation();
+
                                 dialog.cancel();
                             }
                         })
@@ -365,7 +360,7 @@ public class Dialogs extends DialogFragment{
                 RecyclerView mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
                 mRoomsGrid.setClickable(false);
                 mRoomsGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getAuditroomColumnsCount()));
-                final AdapterMainRoomGridResizer mAdapter = new AdapterMainRoomGridResizer(DataBaseRooms.readRoomsDB());
+                final AdapterMainRoomGridResizer mAdapter = new AdapterMainRoomGridResizer(RoomDB.readRoomsDB());
                 mRoomsGrid.setAdapter(mAdapter);
 
                 int weightCard = Settings.getDisclaimerWeight();
@@ -437,13 +432,12 @@ public class Dialogs extends DialogFragment{
                                     break;
                                 case DIALOG_ENTER_PASSWORD_TYPE_ACCESS_FOR_PERSONS:
                                     Bundle bundle = new Bundle();
-                                    bundle.putInt(Persons_Fragment.PERSONS_FRAGMENT_TYPE, Persons_Fragment.PERSONS_FRAGMENT_SELECTOR);
+                                    bundle.putInt(PersonsFr.PERSONS_FRAGMENT_TYPE, PersonsFr.PERSONS_FRAGMENT_SELECTOR);
                                     bundle.putString(Settings.AUDITROOM, getArguments().getString(Settings.AUDITROOM));
-                                    Persons_Fragment persons_fragment = Persons_Fragment.newInstance();
-                                    persons_fragment.setArguments(bundle);
+                                    PersonsFr persons_fr = PersonsFr.newInstance();
+                                    persons_fr.setArguments(bundle);
 
-                                    getActivity().getSupportFragmentManager()
-                                            .beginTransaction().replace(R.id.main_frame_for_fragment, persons_fragment,getResources().getString(R.string.fragment_tag_persons)).commit();
+                                    Launcher.showFragment(getActivity().getSupportFragmentManager(), persons_fr, R.string.navigation_drawer_item_persons);
                                     break;
                                 default:
                                     break;
@@ -462,7 +456,7 @@ public class Dialogs extends DialogFragment{
                         .create();
 
             case DIALOG_SQL_CONNECT:
-                View dialogLayout = mInflater.inflate(R.layout.layout_dialog_sql_connect_new,null);
+                View dialogLayout = mInflater.inflate(R.layout.layout_dialog_sql_connect,null);
                 final AppCompatEditText inputServer = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_server)).getEditText();
                 final AppCompatEditText inputLogin = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_login)).getEditText();
                 final AppCompatEditText inputPassword = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_password)).getEditText();
@@ -599,13 +593,7 @@ public class Dialogs extends DialogFragment{
                     numberPicker.invalidate();
                     return true;
                 }
-                catch(NoSuchFieldException e){
-                    Log.w("NumberPickerTextColor", e);
-                }
-                catch(IllegalAccessException e){
-                    Log.w("NumberPickerTextColor", e);
-                }
-                catch(IllegalArgumentException e){
+                catch(NoSuchFieldException | IllegalAccessException | IllegalArgumentException e){
                     Log.w("NumberPickerTextColor", e);
                 }
             }
@@ -618,5 +606,20 @@ public class Dialogs extends DialogFragment{
         updateInterface.updateInformation();
     }
 
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        switch (mDialogId){
+            case DIALOG_SQL_CONNECT:
+                WindowManager mWindowManager = (WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE);
+                Display mDisplay = mWindowManager.getDefaultDisplay();
+                Dialog dialog = getDialog();
+                if (dialog!=null){
+                    dialog.getWindow().setLayout(mDisplay.getWidth()/3, ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }

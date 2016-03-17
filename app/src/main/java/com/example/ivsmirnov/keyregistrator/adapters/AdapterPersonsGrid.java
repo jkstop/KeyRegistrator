@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseFavorite;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
@@ -104,8 +104,8 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
                     .setPersonDivision(holder.textDivision)
                     .setAccessImageView(holder.accessImageView)
                     .setFreeUser(isFreeUsers.contains(mTags.get(position)))
-                    .setPersonLocation(DataBaseFavorite.LOCAL_USER)
-                    .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
+                    .setPersonLocation(FavoriteDB.LOCAL_USER)
+                    .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO));
 
         }else if (mType == SHOW_ALL_PERSONS){
 
@@ -115,8 +115,8 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
                     .setPersonFirstname(holder.textFirstname)
                     .setPersonMidname(holder.textMidname)
                     .setPersonDivision(holder.textDivision)
-                    .setPersonLocation(DataBaseFavorite.SERVER_USER)
-                    .setPersonPhotoDimension(DataBaseFavorite.PREVIEW_PHOTO));
+                    .setPersonLocation(FavoriteDB.SERVER_USER)
+                    .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO));
         }
     }
 

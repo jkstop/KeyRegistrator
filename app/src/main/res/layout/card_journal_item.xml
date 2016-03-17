@@ -4,6 +4,7 @@
     android:id="@+id/card_journal_item"
     android:layout_width="match_parent"
     android:layout_height="@dimen/journal_item_card_height"
+    app:cardBackgroundColor="@color/grey_400"
     app:contentPadding="@dimen/journal_item_card_content_padding"
     app:elevation="@dimen/journal_item_card_elevation">
     

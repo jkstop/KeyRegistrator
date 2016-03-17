@@ -5,14 +5,11 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -45,7 +42,7 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
     @Override
     protected Void doInBackground(Void... params) {
 
-        ArrayList<JournalItem> mItems = DataBaseJournal.realAllJournalFromDB();
+        ArrayList<JournalItem> mItems = JournalDB.realAllJournalFromDB();
 
         try {
             Connection connection = SQL_Connection.SQLconnect;
@@ -58,7 +55,7 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
                 JournalItem journalItem;
                 PreparedStatement preparedStatement;
                 for (int i=0;i<mItems.size();i++){
-                    journalItem = DataBaseJournal.getJournalItem(mItems.get(i).getTimeIn());
+                    journalItem = JournalDB.getJournalItem(mItems.get(i).getTimeIn());
                     preparedStatement  = connection.prepareStatement("INSERT INTO Journal_recycler VALUES ('"
                             +journalItem.getAccountID()+"','"
                             +journalItem.getAuditroom()+"','"

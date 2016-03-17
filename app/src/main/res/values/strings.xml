@@ -2,13 +2,13 @@
     <string name="app_name">Key Registrator</string>
 
 
-    <!-- Fragment tags -->
+    <!-- Fragment tags
     <string name="fragment_tag_journal">fragment_tag_journal</string>
     <string name="fragment_tag_rooms">fragment_tag_rooms</string>
-    <string name="fragment_tag_shedule">fragment_tag_shedule</string>
     <string name="fragment_tag_email">fragment_tag_email</string>
     <string name="fragment_tag_persons">fragment_tag_persons</string>
     <string name="fragment_tag_main">fragment_tag_main</string>
+    -->
     <string name="fragment_tag_nfc">fragment_tag_nfc</string>
     <string name="fragment_tag_search">fragment_tag_search</string>
 
@@ -94,6 +94,7 @@
     <string name="image_description_statistic_image_journal">image_description_statistic_image_journal</string>
     <string name="image_description_sql_server_status">image_description_sql_server_status</string>
     <string name="image_description_sql_server_refresh">image_description_sql_server_refresh</string>
+    <string name="nfc_fragment_aud_image_descryption">nfc_fragment_aud_image_descryption</string>
 
 
     <string name="view_enter_password_hint_password">Пароль</string>

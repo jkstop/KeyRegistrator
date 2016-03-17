@@ -4,12 +4,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
-import com.example.ivsmirnov.keyregistrator.databases.DataBaseJournal;
+import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
-
-import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -48,11 +45,11 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
             Connection connection = SQL_Connection.SQLconnect;
             if (connection!=null){
 
-                DataBaseJournal.clearJournalDB();
+                JournalDB.clearJournalDB();
                 Statement statement = connection.createStatement();
                 ResultSet result = statement.executeQuery("SELECT * FROM Journal_recycler");
                 while (result.next()){
-                    DataBaseJournal.writeInDBJournal(new JournalItem()
+                    JournalDB.writeInDBJournal(new JournalItem()
                     .setAccountID(result.getString("ACCOUNT_ID"))
                     .setAuditroom(result.getString("AUDITROOM"))
                     .setTimeIn(Long.parseLong(result.getString("TIME_IN")))
