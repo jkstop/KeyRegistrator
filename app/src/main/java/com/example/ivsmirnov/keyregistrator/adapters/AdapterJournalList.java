@@ -59,9 +59,10 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
                 .setImagePerson(holder.mImagePerson)
                 .setImageAccess(holder.mImageAccess)
                 .setTextAuditroom(holder.mTextAuditroom)
-                .setTextLastname(holder.mTextLastname)
-                .setTextFirstname(holder.mTextFirstname)
-                .setTextMidname(holder.mTextMidname)
+                .setTextInitials(holder.mTextPesonInitials)
+                //.setTextLastname(holder.mTextLastname)
+                //.setTextFirstname(holder.mTextFirstname)
+                //.setTextMidname(holder.mTextMidname)
                 .setTextTimeIn(holder.mTextTimeIn)
                 .setTextTimeOut(holder.mTextTimeOut),
                 AnimationUtils.loadAnimation(context, android.R.anim.fade_in)).execute();
@@ -78,9 +79,10 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
         public TextView mTextTimeIn;
         public TextView mTextTimeOut;
         public ImageView mImagePerson;
-        public TextView mTextLastname;
-        public TextView mTextFirstname;
-        public TextView mTextMidname;
+        public TextView mTextPesonInitials;
+        //public TextView mTextLastname;
+        //public TextView mTextFirstname;
+        //public TextView mTextMidname;
         public ImageView mImageAccess;
         public CardView mCard;
 
@@ -90,9 +92,10 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
             mTextTimeIn = (TextView)itemView.findViewById(R.id.card_journal_item_time_in);
             mTextTimeOut = (TextView)itemView.findViewById(R.id.card_journal_item_time_out);
             mImagePerson = (ImageView)itemView.findViewById(R.id.card_journal_item_person_image);
-            mTextLastname = (TextView)itemView.findViewById(R.id.journal_card_text_lastname);
-            mTextFirstname = (TextView)itemView.findViewById(R.id.journal_card_text_firstname);
-            mTextMidname = (TextView)itemView.findViewById(R.id.journal_card_text_midname);
+            mTextPesonInitials = (TextView)itemView.findViewById(R.id.card_journal_item_person_initials);
+            //mTextLastname = (TextView)itemView.findViewById(R.id.journal_card_text_lastname);
+            //mTextFirstname = (TextView)itemView.findViewById(R.id.journal_card_text_firstname);
+            //mTextMidname = (TextView)itemView.findViewById(R.id.journal_card_text_midname);
             mImageAccess = (ImageView)itemView.findViewById(R.id.card_journal_item_access_image);
             mCard = (CardView)itemView.findViewById(R.id.card_journal_item);
         }

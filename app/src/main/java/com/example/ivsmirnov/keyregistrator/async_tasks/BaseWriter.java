@@ -57,7 +57,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
                 .setStatus(RoomDB.ROOM_IS_BUSY)
                 .setAccessType(journalItem.getAccessType())
                 .setPositionInBase(positionInBase)
-                .setLastVisiter(PersonsFr.getPersonInitials(journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()))
+                .setLastVisiter(FavoriteDB.getPersonInitials(FavoriteDB.SHORT_INITIALS, journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()))
                 .setTag(params[0].getPersonTag()));
         return null;
     }

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
@@ -28,9 +29,10 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
     private TextView mTextTimeIn;
     private TextView mTextTimeOut;
     private ImageView mImagePerson;
-    private TextView mTextLastname;
-    private TextView mTextFirstname;
-    private TextView mTextMidname;
+    private TextView mTextInitials;
+    //private TextView mTextLastname;
+    //private TextView mTextFirstname;
+    //private TextView mTextMidname;
     private ImageView mImageAccess;
     private long mTimeIn;
 
@@ -40,9 +42,10 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
         this.mTextTimeIn = new WeakReference<TextView>(journalParams.getTextTimeIn()).get();
         this.mTextTimeOut = new WeakReference<TextView>(journalParams.getTextTimeOut()).get();
         this.mImagePerson = new WeakReference<ImageView>(journalParams.getImagePerson()).get();
-        this.mTextLastname = new WeakReference<TextView>(journalParams.getTextLastname()).get();
-        this.mTextFirstname = new WeakReference<TextView>(journalParams.getTextFirstname()).get();
-        this.mTextMidname = new WeakReference<TextView>(journalParams.getTextMidname()).get();
+        this.mTextInitials = new WeakReference<TextView>(journalParams.getTextInitials()).get();
+        //this.mTextLastname = new WeakReference<TextView>(journalParams.getTextLastname()).get();
+        //this.mTextFirstname = new WeakReference<TextView>(journalParams.getTextFirstname()).get();
+        //this.mTextMidname = new WeakReference<TextView>(journalParams.getTextMidname()).get();
         this.mImageAccess = new WeakReference<ImageView>(journalParams.getImageAccess()).get();
         this.mTimeIn = journalParams.getTimeIn();
         this.mAnimation = animation;
@@ -77,17 +80,9 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
             }
         }
 
-        if (mTextLastname!=null){
-            mTextLastname.setText(journalItem.getPersonLastname());
-        }
+        if (mTextInitials!=null) mTextInitials.setText(FavoriteDB
+                .getPersonInitials(FavoriteDB.FULL_INITIALS, journalItem.getPersonLastname(), journalItem.getPersonFirstname(), journalItem.getPersonMidname()));
 
-        if (mTextFirstname!=null){
-            mTextFirstname.setText(journalItem.getPersonFirstname());
-        }
-
-        if (mTextMidname!=null){
-            mTextMidname.setText(journalItem.getPersonMidname());
-        }
 
         if (mImagePerson!=null){
             if (journalItem.getPersonPhoto()!=null){
@@ -100,7 +95,7 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
             if (journalItem.getAccessType() == JournalDB.ACCESS_BY_CARD){
                 mImageAccess.setImageResource(R.drawable.ic_credit_card_black_18dp);
             } else {
-                mImageAccess.setImageResource(R.drawable.ic_click_icon);
+                mImageAccess.setImageResource(R.drawable.ic_touch_app_black_24dp);
             }
         }
 

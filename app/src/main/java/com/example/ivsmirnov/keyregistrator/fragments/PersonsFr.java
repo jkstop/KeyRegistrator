@@ -157,21 +157,7 @@ public class PersonsFr extends Fragment implements UpdateInterface {
     }
 
 
-    public static String getPersonInitials (String lastname, String firstname, String midname){
-        String initials = "-";
-        if (lastname.length() != 0 && firstname.length() != 1 && firstname.length()!=0 && midname.length() != 1 && midname.length() != 0) {
-            initials = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";
-        } else {
-            if (lastname.length() != 1 && firstname.length() != 1) {
-                initials = lastname + " " + firstname;
-            } else {
-                if (lastname.length() != 1) {
-                    initials = lastname;
-                }
-            }
-        }
-        return initials;
-    }
+
 
     //private void showMainAuditroomsGrid(){
     //    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, MainFr.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
@@ -196,7 +182,7 @@ public class PersonsFr extends Fragment implements UpdateInterface {
             }
         });
 
-        mListView = (ListView)rootView.findViewById(R.id.list_for_base_sql);
+        mListView = (ListView)rootView.findViewById(R.id.persons_fragment_list_characters);
         mLoadingBar = (ProgressBar)rootView.findViewById(R.id.layout_persons_fragment_loading_progress_bar);
 
 

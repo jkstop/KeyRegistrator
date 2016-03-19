@@ -12,9 +12,12 @@
             android:layout_height="match_parent"
             tools:context=".MainActivity"
             android:orientation="vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingBottom="16dp">
+            android:layout_marginTop="@dimen/layout_margin_top"
+            android:layout_marginBottom="@dimen/layout_margin_bottom"
+            android:layout_marginRight="@dimen/layout_margin_right"
+            android:layout_marginLeft="@dimen/layout_margin_left"
+            android:layout_marginStart="@dimen/layout_margin_left"
+            android:layout_marginEnd="@dimen/layout_margin_right">
 
             <include
                 layout="@layout/toolbar" />

@@ -18,20 +18,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/auditroom_grid_free_image_descryption"
-            android:src="@drawable/key_colored"
-
+            android:src="@drawable/ic_key_48dp"
+            android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_margin="@dimen/auditroom_card_image_margin"/>
 
-        <RelativeLayout
-            android:layout_toRightOf="@+id/card_auditroom_free_image_key"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/auditroom_card_divider">
-
             <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                 android:id="@+id/card_auditroom_free_text_auditroom"
+                android:layout_toEndOf="@+id/card_auditroom_free_image_key"
+                android:layout_toRightOf="@+id/card_auditroom_free_image_key"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
@@ -39,12 +35,7 @@
                 android:text="400"
                 android:textColor="@color/black"
                 android:textSize="@dimen/auditroom_card_text_size"
-                android:layout_centerInParent="true"
                 />
-
-        </RelativeLayout>
-
-
 
     </RelativeLayout>
 

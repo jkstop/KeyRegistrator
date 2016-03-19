@@ -111,7 +111,7 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
         @Override
         protected void onPostExecute(PersonItem personItem) {
             if (personItem!=null){
-                if (mPersonInitials!=null) mPersonInitials.setText(PersonsFr.getPersonInitials(personItem.getLastname(),personItem.getFirstname(),personItem.getMidname()));
+                if (mPersonInitials!=null) mPersonInitials.setText(FavoriteDB.getPersonInitials(FavoriteDB.SHORT_INITIALS, personItem.getLastname(),personItem.getFirstname(),personItem.getMidname()));
 
                 mPersonCard.setVisibility(View.VISIBLE);
                 mPersonCard.startAnimation(mAnimation);

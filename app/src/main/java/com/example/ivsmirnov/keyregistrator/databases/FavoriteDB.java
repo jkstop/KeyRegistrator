@@ -39,6 +39,9 @@ public class FavoriteDB {
     public static final int ALL_PHOTO = 4;
     public static final int NO_PHOTO = 5;
 
+    public static final int SHORT_INITIALS = 6;
+    public static final int FULL_INITIALS = 7;
+
 
     public static PersonItem getPersonItem(Context mContext, String tag, int userLocation, int photoType){
 
@@ -189,7 +192,7 @@ public class FavoriteDB {
             ArrayList <String> mTags = new ArrayList<>();
             String selection;
             String [] selectionArgs;
-            if (character.equalsIgnoreCase("Все")){
+            if (character.equalsIgnoreCase("#")){
                 selection = null;
                 selectionArgs = null;
             } else{
@@ -246,7 +249,7 @@ public class FavoriteDB {
                     return lhs.getCharacter().compareTo(rhs.getCharacter());
                 }
             });
-            characters.add(0,new CharacterItem().setCharacter("Все").setSelection(true));
+            characters.add(0,new CharacterItem().setCharacter("#").setSelection(true));
             return characters;
         } catch (Exception e){
             e.printStackTrace();
@@ -466,6 +469,42 @@ public class FavoriteDB {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static String getPersonInitials (int initialsType, String lastname, String firstname, String midname){
+        String initials = Values.EMPTY;
+        switch (initialsType){
+            case SHORT_INITIALS:
+                if (lastname.length() != 0 && firstname.length() != 1 && firstname.length()!=0 && midname.length() != 1 && midname.length() != 0) {
+                    initials = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";
+                } else {
+                    if (lastname.length() != 1 && firstname.length() != 1) {
+                        initials = lastname + " " + firstname;
+                    } else {
+                        if (lastname.length() != 1) {
+                            initials = lastname;
+                        }
+                    }
+                }
+               break;
+            case FULL_INITIALS:
+                if (lastname.length() != 0 && firstname.length() != 1 && firstname.length()!=0 && midname.length() != 1 && midname.length() != 0) {
+                    initials = lastname + " " + firstname + " " + midname;
+                } else {
+                    if (lastname.length() != 1 && firstname.length() != 1) {
+                        initials = lastname + " " + firstname;
+                    } else {
+                        if (lastname.length() != 1) {
+                            initials = lastname;
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        return initials;
+
     }
 
     private static void closeCursor(Cursor cursor){

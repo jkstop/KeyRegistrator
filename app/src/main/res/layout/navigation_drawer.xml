@@ -25,32 +25,44 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/navigation_drawer_account_information_image_person"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
                 android:layout_centerInParent="true"
                 android:layout_width="@dimen/navigation_drawer_account_image_width"
                 android:layout_height="@dimen/navigation_drawer_account_image_height"
-                android:layout_margin="@dimen/nav_drawer_left_margin"
+                android:layout_above="@+id/navigation_drawer_account_information_layout"
+                android:layout_alignStart="@+id/navigation_drawer_account_information_layout"
+                android:layout_alignLeft="@+id/navigation_drawer_account_information_layout"
+                android:layout_margin="@dimen/navigation_drawer_account_image_margin"
                 android:src="@drawable/person_male_colored" />
 
             <RelativeLayout
-                android:layout_below="@+id/navigation_drawer_account_information_image_person"
+                android:id="@+id/navigation_drawer_account_information_layout"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/nav_drawer_account_selection_height"
+                android:layout_height="wrap_content"
                 android:clickable="true"
-                android:layout_marginStart="@dimen/nav_drawer_left_margin"
-                android:layout_marginEnd="@dimen/nav_drawer_right_margin"
-                android:layout_marginLeft="@dimen/nav_drawer_left_margin"
-                android:layout_marginRight="@dimen/nav_drawer_right_margin">
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="@dimen/navigation_drawer_top_margin"
+                android:layout_marginBottom="@dimen/navigation_drawer_bottom_margin"
+                android:layout_marginStart="@dimen/navigation_drawer_left_margin"
+                android:layout_marginEnd="@dimen/navigation_drawer_right_margin"
+                android:layout_marginLeft="@dimen/navigation_drawer_left_margin"
+                android:layout_marginRight="@dimen/navigation_drawer_right_margin">
 
                 <TextView
                     android:clickable="true"
                     android:id="@+id/navigation_drawer_account_information_display_name"
                     style="@style/NavigationDrawerAccountInfoText"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/navigation_drawer_account_information_change_account"
+                    android:layout_toLeftOf="@+id/navigation_drawer_account_information_change_account"
                     android:text="@string/navigation_drawer_account_info_text_user" />
                 <TextView
                     android:id="@+id/navigation_drawer_account_information_email"
                     style="@style/NavigationDrawerAccountInfoText"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/navigation_drawer_account_information_change_account"
+                    android:layout_toLeftOf="@+id/navigation_drawer_account_information_change_account"
                     android:layout_below="@+id/navigation_drawer_account_information_display_name" />
                 <ImageView
                     android:id="@+id/navigation_drawer_account_information_change_account"

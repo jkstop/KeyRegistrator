@@ -1,5 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -27,10 +29,12 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private ArrayList<RoomItem> mRoomItems;
     private RecycleItemClickListener mListener;
+    private int mColorFilter;
 
     public AdapterMainRoomGrid(ArrayList<RoomItem> roomItems, RecycleItemClickListener listener) {
         this.mRoomItems = roomItems;
         this.mListener = listener;
+        this.mColorFilter = App.getAppContext().getResources().getColor(R.color.colorAccent);
     }
 
     static class auditroomFreeViewHolder extends RecyclerView.ViewHolder{
@@ -128,14 +132,14 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
                 ((auditroomBusyViewHolder)holder).mBusyTextAuditroom.setText(mRoomItems.get(position).getAuditroom());
                 ((auditroomBusyViewHolder)holder).mBusyTextPerson.setText(mRoomItems.get(position).getLastVisiter());
 
-                RelativeLayout.LayoutParams imageKeyParams = (RelativeLayout.LayoutParams) ((auditroomBusyViewHolder)holder).mBusyImageKey.getLayoutParams();
-                imageKeyParams.width = imageKeyParams.height = (int)(getItemScaleHeight()/5.6);
+                //RelativeLayout.LayoutParams imageKeyParams = (RelativeLayout.LayoutParams) ((auditroomBusyViewHolder)holder).mBusyImageKey.getLayoutParams();
+                //imageKeyParams.width = imageKeyParams.height = (int)(getItemScaleHeight()/5.6);
 
                 RelativeLayout.LayoutParams imagePersonParams = (RelativeLayout.LayoutParams) ((auditroomBusyViewHolder)holder).mBusyImagePerson.getLayoutParams();
                 imagePersonParams.width = (int) (getItemScaleHeight()/1.4);
 
                 ((auditroomBusyViewHolder)holder).mBusyImagePerson.setLayoutParams(imagePersonParams);
-                ((auditroomBusyViewHolder)holder).mBusyImageKey.setLayoutParams(imageKeyParams);
+                ((auditroomBusyViewHolder)holder).mBusyImageKey.setColorFilter(mColorFilter);
 
                 //загрузка и отображение фото из БД
                 new GetPersons(App.getAppContext(),null, AnimationUtils.loadAnimation(App.getAppContext(),android.R.anim.fade_in)).execute(new GetPersonParams()

@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="text_empty_auditrooms">24dp</dimen>
+    <dimen name="layout_margin_right">16dp</dimen>
+    <dimen name="layout_margin_left">16dp</dimen>
+    <dimen name="layout_margin_top">0dp</dimen>
+    <dimen name="layout_margin_bottom">16dp</dimen>
 
-    <dimen name="toolbar_text_size">18dp</dimen>
+    <dimen name="action_bar_height">24dp</dimen>
+    <dimen name="text_empty_auditrooms">24sp</dimen>
+    <dimen name="toolbar_text_size">18sp</dimen>
 
     <dimen name="navigation_drawer_widht">400dp</dimen>
     <dimen name="navigation_drawer_item_text_size">18sp</dimen>
@@ -13,12 +18,17 @@
     <dimen name="navigation_drawer_item_right_margin">16dp</dimen>
     <dimen name="navigation_drawer_item_height">48dp</dimen>
     <dimen name="navigation_drawer_divider_height">0dp</dimen>
-    <dimen name="navigation_drawer_item_image_width">24dp</dimen>
-    <dimen name="navigation_drawer_item_image_height">24dp</dimen>
     <dimen name="navigation_drawer_account_selection_height">156dp</dimen>
     <dimen name="navigation_drawer_separator_height">3dp</dimen>
     <dimen name="navigation_drawer_account_image_width">64dp</dimen>
     <dimen name="navigation_drawer_account_image_height">64dp</dimen>
+    <dimen name="navigation_drawer_account_image_margin">16dp</dimen>
+    <dimen name="navigation_drawer_right_margin">16dp</dimen>
+    <dimen name="navigation_drawer_left_margin">16dp</dimen>
+    <dimen name="navigation_drawer_top_margin">16dp</dimen>
+    <dimen name="navigation_drawer_bottom_margin">16dp</dimen>
+
+    <dimen name="disclaimer_card_elevation">10dp</dimen>
 
     <dimen name="person_card_width">300dp</dimen>
     <dimen name="person_card_height">160dp</dimen>
@@ -39,6 +49,11 @@
     <dimen name="journal_item_card_person_text_right_margin">5sp</dimen>
     <dimen name="journal_item_card_person_text_size">32sp</dimen>
     <dimen name="journal_item_card_aud_text_size">50sp</dimen>
+    <dimen name="journal_item_card_image_width">64dp</dimen>
+    <dimen name="journal_item_card_image_height">64dp</dimen>
+    <dimen name="journal_item_max_text_person_initials">100sp</dimen>
+    <dimen name="journal_item_max_text_time">60sp</dimen>
+    <dimen name="journal_item_max_text_aud">80sp</dimen>
 
     <dimen name="view_enter_password_margin">16dp</dimen>
 
@@ -61,6 +76,11 @@
     <dimen name="auditroom_card_busy_text_aud_size">120sp</dimen>
     <dimen name="auditroom_card_image_margin">5dp</dimen>
     <dimen name="auditroom_card_divider">10dp</dimen>
+    <dimen name="auditroom_card_busy_image_width">120dp</dimen>
+
+
+
+    <dimen name="characters_list_text_size">24sp</dimen>
 
     <dimen name="rooms_fragment_fab_margin">16dp</dimen>
     <dimen name="rooms_fragment_fab_elevation">5dp</dimen>
@@ -95,5 +115,6 @@
     <dimen name="dialog_sql_connect_status_text">28sp</dimen>
 
     <dimen name="card_nfc_aud_text">78sp</dimen>
+    <dimen name="auth_user_fr_head_text">48sp</dimen>
 
 </resources>

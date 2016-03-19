@@ -6,6 +6,8 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/layout_add_new_staff_input"
+        android:layout_toLeftOf="@+id/layout_add_new_staff_input_button"
+        android:layout_toStartOf="@id/layout_add_new_staff_input_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:errorEnabled = "true">
@@ -15,14 +17,17 @@
             android:hint="@string/fragment_add_new_staff_edit_hint"
             android:gravity="center"
             android:inputType="textPersonName"
+            android:layout_marginStart="@dimen/layout_add_new_staff_input_text_margin_left"
             android:layout_marginLeft="@dimen/layout_add_new_staff_input_text_margin_left"
             android:layout_marginRight="@dimen/layout_add_new_staff_input_text_margin_right"
+            android:layout_marginEnd="@dimen/layout_add_new_staff_input_text_margin_right"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </android.support.design.widget.TextInputLayout>
 
     <Button
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:id="@+id/layout_add_new_staff_input_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

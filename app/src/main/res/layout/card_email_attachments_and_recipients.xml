@@ -10,13 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!--<com.example.ivsmirnov.keyregistrator.custom_views.RoundImageView
-            android:id="@+id/card_email_attach_image"
-            android:contentDescription="fddgbdfvssddvdf"
-            android:layout_centerInParent="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentLeft="true" />-->
         <ImageView
             android:id="@+id/card_email_attach_image"
             android:contentDescription="@string/image_description_email_fragment_icon_attachment"

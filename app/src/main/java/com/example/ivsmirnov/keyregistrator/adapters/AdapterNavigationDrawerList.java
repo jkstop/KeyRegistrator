@@ -2,6 +2,7 @@ package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -24,8 +25,6 @@ public class AdapterNavigationDrawerList extends ArrayAdapter<NavigationItem> {
     private Context mContext;
     private ArrayList<NavigationItem> mItems;
     private LayoutInflater mInflater;
-    private ImageView mImage;
-    private TextView mText;
 
     public AdapterNavigationDrawerList(Context context, ArrayList<NavigationItem> arrays) {
         super(context, R.layout.navigation_drawer,arrays);
@@ -38,17 +37,9 @@ public class AdapterNavigationDrawerList extends ArrayAdapter<NavigationItem> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View rootView;
         if (mItems.get(position).getSeparator()){
-            if (convertView==null){
-                rootView = mInflater.inflate(R.layout.navigation_drawer_list_separator,parent,false);
-            }else{
-                rootView = convertView;
-            }
+            rootView = mInflater.inflate(R.layout.navigation_drawer_list_separator,parent,false);
         }else{
-            if (convertView==null){
-                rootView = mInflater.inflate(R.layout.navigation_drawer_list_item,parent,false);
-            }else{
-                rootView = convertView;
-            }
+            rootView = mInflater.inflate(R.layout.navigation_drawer_list_item,parent,false);
 
             if (mItems.get(position).getSelected()){
                 rootView.setBackgroundColor(Color.LTGRAY);
@@ -56,12 +47,14 @@ public class AdapterNavigationDrawerList extends ArrayAdapter<NavigationItem> {
                 rootView.setBackgroundColor(Color.TRANSPARENT);
             }
 
-            mImage = (ImageView)rootView.findViewById(R.id.navigation_drawer_list_item_image);
-            mText = (TextView)rootView.findViewById(R.id.navigation_drawer_list_item_text);
+            ImageView mImage = (ImageView) rootView.findViewById(R.id.navigation_drawer_list_item_image);
+            TextView mText = (TextView) rootView.findViewById(R.id.navigation_drawer_list_item_text);
             mText.setText(mItems.get(position).getText());
             mImage.setImageResource(mItems.get(position).getDraw());
 
         }
         return rootView;
     }
+
+
 }

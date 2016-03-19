@@ -14,11 +14,17 @@ public class GetJournalParams {
     private TextView TextTimeIn;
     private TextView TextTimeOut;
     private ImageView ImagePerson;
-    private TextView TextLastname;
-    private TextView TextFirstname;
-    private TextView TextMidname;
+    private TextView mTextInitials;
+    //private TextView TextLastname;
+    //private TextView TextFirstname;
+    //private TextView TextMidname;
     private ImageView ImageAccess;
     private CardView Card;
+
+    public GetJournalParams setTextInitials(TextView textInitials){
+        this.mTextInitials = textInitials;
+        return this;
+    }
 
     public GetJournalParams setTimeIn(long timeIn){
         this.timeIn = timeIn;
@@ -50,20 +56,20 @@ public class GetJournalParams {
         return this;
     }
 
-    public GetJournalParams setTextLastname(TextView textLastname){
-        this.TextLastname = textLastname;
-        return this;
-    }
+   // public GetJournalParams setTextLastname(TextView textLastname){
+   //     this.TextLastname = textLastname;
+   //     return this;
+   // }
 
-    public GetJournalParams setTextFirstname(TextView textFirstname){
-        this.TextFirstname = textFirstname;
-        return this;
-    }
+//    public GetJournalParams setTextFirstname(TextView textFirstname){
+ //       this.TextFirstname = textFirstname;
+  //      return this;
+  //  }
 
-    public GetJournalParams setTextMidname(TextView textMidname){
-        this.TextMidname = textMidname;
-        return this;
-    }
+    //public GetJournalParams setTextMidname(TextView textMidname){
+    //    this.TextMidname = textMidname;
+    //    return this;
+    //}
 
     public GetJournalParams setImageAccess(ImageView imageAccess){
         this.ImageAccess = imageAccess;
@@ -94,17 +100,21 @@ public class GetJournalParams {
         return ImagePerson;
     }
 
-    public TextView getTextLastname(){
-        return TextLastname;
+    public TextView getTextInitials(){
+        return mTextInitials;
     }
 
-    public TextView getTextFirstname(){
-        return TextFirstname;
-    }
+   // public TextView getTextLastname(){
+   //     return TextLastname;
+   // }
 
-    public TextView getTextMidname(){
-        return TextMidname;
-    }
+    //public TextView getTextFirstname(){
+    //    return TextFirstname;
+    //}
+
+    //public TextView getTextMidname(){
+     //   return TextMidname;
+   // }
 
     public ImageView getImageAccess(){
         return ImageAccess;

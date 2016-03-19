@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--главный layout-->
+    <dimen name="layout_margin_right">5dp</dimen>
+    <dimen name="layout_margin_left">5dp</dimen>
+    <dimen name="layout_margin_bottom">5dp</dimen>
+    <!---->
+
+    <dimen name="text_empty_auditrooms">8sp</dimen>
+    <dimen name="toolbar_text_size">10sp</dimen>
+
+    <!-- боковое меню -->
+    <dimen name="navigation_drawer_widht">180dp</dimen>
+    <dimen name="navigation_drawer_item_text_size">12sp</dimen>
+    <dimen name="navigation_drawer_account_info_text_size">8sp</dimen>
+    <dimen name="navigation_drawer_item_text_left_margin">48dp</dimen>
+    <dimen name="navigation_drawer_item_left_margin">8dp</dimen>
+    <dimen name="navigation_drawer_item_right_margin">8dp</dimen>
+    <dimen name="navigation_drawer_item_height">28dp</dimen>
+    <dimen name="navigation_drawer_separator_height">2dp</dimen>
+    <dimen name="navigation_drawer_account_image_width">32dp</dimen>
+    <dimen name="navigation_drawer_account_image_height">32dp</dimen>
+    <dimen name="navigation_drawer_account_image_margin">0dp</dimen>
+    <dimen name="navigation_drawer_right_margin">8dp</dimen>
+    <dimen name="navigation_drawer_left_margin">8dp</dimen>
+    <dimen name="navigation_drawer_top_margin">4dp</dimen>
+    <dimen name="navigation_drawer_bottom_margin">4dp</dimen>
+    <!---->
+
+    <dimen name="disclaimer_card_elevation">3dp</dimen>
+
+    <!--карта пользовтеля-->
+    <dimen name="person_card_width">150dp</dimen>
+    <dimen name="person_card_height">70dp</dimen>
+    <dimen name="person_card_elevation">3dp</dimen>
+    <dimen name="person_card_content_padding">2dp</dimen>
+    <dimen name="person_card_image_width">45dp</dimen>
+    <dimen name="person_card_image_height">70dp</dimen>
+    <dimen name="person_card_text_lastname">14sp</dimen>
+    <dimen name="person_card_text_firstname">8sp</dimen>
+    <dimen name="person_card_text_midname">8sp</dimen>
+    <dimen name="person_card_text_division">4sp</dimen>
+    <dimen name="person_card_icon_division_margin">1sp</dimen>
+    <dimen name="person_card_text_division_margin">1sp</dimen>
+    <!---->
+
+    <dimen name="journal_item_card_height">50dp</dimen>
+    
+    <dimen name="journal_item_card_content_padding">3dp</dimen>
+   
+    <dimen name="journal_item_card_person_text_size">26sp</dimen>
+  
+    <dimen name="journal_item_card_image_width">36dp</dimen>
+    <dimen name="journal_item_card_image_height">36dp</dimen>
+
+   
+
+    <dimen name="person_information_image_width">160dp</dimen>
+    <dimen name="person_information_image_height">220dp</dimen>
+
+
+    <dimen name="layout_add_new_staff_input_text_margin_left">100dp</dimen>
+    <dimen name="layout_add_new_staff_input_text_margin_right">100dp</dimen>
+
+    <dimen name="characters_list_text_size">14sp</dimen>
+    <dimen name="rooms_fragment_fab_margin">8dp</dimen>
+    <dimen name="rooms_fragment_fab_elevation">3dp</dimen>
+
+    >
+    <dimen name="auditroom_card_elevation">3dp</dimen>
+    <dimen name="auditroom_card_content_padding">2dp</dimen>
+    
+    <dimen name="auditroom_card_image_margin">1dp</dimen>
+    <dimen name="auditroom_card_divider">3dp</dimen>
+    <dimen name="auditroom_card_busy_image_width">60dp</dimen>
+
+    
+
+    <dimen name="email_account_image_size">48dp</dimen>
+    <dimen name="email_account_account_name_size">16sp</dimen>
+    <dimen name="email_account_account_mail_size">12sp</dimen>
+    <dimen name="email_account_extra_text_size">12sp</dimen>
+    <dimen name="email_account_extra_attach_text_size">14sp</dimen>
+
+    <dimen name="card_default_elevation">3dp</dimen>
+    <dimen name="card_default_content_padding">2dp</dimen>
+
+    <dimen name="layout_default_margin">8dp</dimen>
+
+    <dimen name="card_statistic_text_head">26sp</dimen>
+    <dimen name="card_statistic_text_primary">16sp</dimen>
+    <dimen name="card_statistic_text_toolbar">36sp</dimen>
+
+    <dimen name="default_content_margin">6dp</dimen>
+
+    <dimen name="card_free_user_initials">18sp</dimen>
+    <dimen name="card_free_user_width">200dp</dimen>
+    <dimen name="card_free_user_height">50dp</dimen>
+
+    <dimen name="dialog_sql_connect_status_text">28sp</dimen>
+
+    <dimen name="card_nfc_aud_text">48sp</dimen>
+    <dimen name="auth_user_fr_head_text">32sp</dimen>
+
+</resources>

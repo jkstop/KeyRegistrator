@@ -606,20 +606,4 @@ public class Dialogs extends DialogFragment{
         updateInterface.updateInformation();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        switch (mDialogId){
-            case DIALOG_SQL_CONNECT:
-                WindowManager mWindowManager = (WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE);
-                Display mDisplay = mWindowManager.getDefaultDisplay();
-                Dialog dialog = getDialog();
-                if (dialog!=null){
-                    dialog.getWindow().setLayout(mDisplay.getWidth()/3, ViewGroup.LayoutParams.WRAP_CONTENT);
-                }
-                break;
-            default:
-                break;
-        }
-    }
 }

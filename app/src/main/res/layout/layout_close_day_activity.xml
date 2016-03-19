@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp"
+    android:layout_margin="@dimen/layout_default_margin"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <include
@@ -118,11 +118,12 @@
 
     <Button
         android:id="@+id/layout_close_day_button_ok"
-        android:layout_toEndOf="@id/layout_close_day_card_stat"
-        android:layout_toRightOf="@id/layout_close_day_card_stat"
         android:layout_below="@id/layout_close_day_card_stat"
+        android:layout_alignRight="@id/layout_close_day_card_stat"
+        android:layout_alignEnd="@id/layout_close_day_card_stat"
         android:text="@android:string/ok"
         style="@style/ButtonMaterial"
+        android:maxLines="1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
