@@ -38,7 +38,7 @@ import com.nononsenseapps.filepicker.FilePickerActivity;
 import java.util.ArrayList;
 
 /**
- * Created by IVSmirnov on 03.09.2015.
+ * email fragment
  */
 public class EmailFr extends Fragment implements GetAccountInterface, EmailInterface {
 
@@ -48,22 +48,13 @@ public class EmailFr extends Fragment implements GetAccountInterface, EmailInter
     private Context mContext;
     private ImageView mAccountImage;
     private ArrayList<String> mRecepientList, mAttachmentList;
-    private ImageView mAddRecipient, mAddAttachment;
     private AdapterEmailExtras mAdapterRecipients, mAdapterAttachments;
-    private RecyclerView mRecipientRecycler, mAttachmentsRecycler;
-    private TextInputLayout mInputThemeMessage, mInputBodyMessage;
     private FloatingActionButton mSendButton;
     private AccountItem mAccount;
 
 
     public static EmailFr newInstance(){
         return new EmailFr();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -84,11 +75,11 @@ public class EmailFr extends Fragment implements GetAccountInterface, EmailInter
         mContext = rootView.getContext();
 
         mAccountImage = (ImageView)rootView.findViewById(R.id.email_fragment_account_information_image);
-        mAddRecipient = (ImageView)rootView.findViewById(R.id.email_fragment_add_recipient);
-        mAddAttachment = (ImageView) rootView.findViewById(R.id.email_fragment_add_attachment);
+        ImageView mAddRecipient = (ImageView) rootView.findViewById(R.id.email_fragment_add_recipient);
+        ImageView mAddAttachment = (ImageView) rootView.findViewById(R.id.email_fragment_add_attachment);
 
-        mInputThemeMessage = (TextInputLayout)rootView.findViewById(R.id.email_fragment_input_message_theme);
-        mInputBodyMessage = (TextInputLayout)rootView.findViewById(R.id.email_fragment_input_message_body);
+        TextInputLayout mInputThemeMessage = (TextInputLayout) rootView.findViewById(R.id.email_fragment_input_message_theme);
+        TextInputLayout mInputBodyMessage = (TextInputLayout) rootView.findViewById(R.id.email_fragment_input_message_body);
 
         mSendButton = (FloatingActionButton)rootView.findViewById(R.id.email_fragment_send_fab);
 
@@ -161,12 +152,12 @@ public class EmailFr extends Fragment implements GetAccountInterface, EmailInter
         mAdapterRecipients = new AdapterEmailExtras(mContext, this, AdapterEmailExtras.RECIPIENTS, mRecepientList);
         mAdapterAttachments = new AdapterEmailExtras(mContext, this, AdapterEmailExtras.ATTACHMENTS, mAttachmentList);
 
-        mRecipientRecycler = (RecyclerView)rootView.findViewById(R.id.fragment_email_recipients_recycler);
+        RecyclerView mRecipientRecycler = (RecyclerView) rootView.findViewById(R.id.fragment_email_recipients_recycler);
         mRecipientRecycler.setItemAnimator(new DefaultItemAnimator());
         mRecipientRecycler.setLayoutManager(/*new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false)*/new LinearLayoutManager(mContext));
         mRecipientRecycler.setAdapter(mAdapterRecipients);
 
-        mAttachmentsRecycler = (RecyclerView)rootView.findViewById(R.id.email_fagment_attachments_recycler);
+        RecyclerView mAttachmentsRecycler = (RecyclerView) rootView.findViewById(R.id.email_fagment_attachments_recycler);
         mAttachmentsRecycler.setLayoutManager(/*new RecyclerWrapContentHeightManager(mContext, LinearLayoutManager.VERTICAL, false)*/new LinearLayoutManager(mContext));
         mAttachmentsRecycler.setAdapter(mAdapterAttachments);
 
@@ -233,7 +224,7 @@ public class EmailFr extends Fragment implements GetAccountInterface, EmailInter
 
     @Override
     public void onAddRecepient(View v, int position, int view_id) {
-        if (view_id == R.id.card_email_add_new_recepient_save){
+        if (view_id == R.id.card_email_add_new_recipient_save){
             mRecepientList.add(v.getTag().toString());
         }
         removeRecipient(position);

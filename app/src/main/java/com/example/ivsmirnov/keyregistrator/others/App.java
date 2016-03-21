@@ -2,10 +2,9 @@ package com.example.ivsmirnov.keyregistrator.others;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
 
 /**
- * Created by ivsmirnov on 14.03.2016.
+ * APP
  */
 public class App extends Application {
 

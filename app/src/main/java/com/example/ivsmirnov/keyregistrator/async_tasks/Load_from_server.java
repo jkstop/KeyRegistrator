@@ -14,18 +14,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Created by ivsmirnov on 10.12.2015.
+ * Загрузка с сервера
  */
 public class Load_from_server extends AsyncTask<Void,Void,Void> {
 
-    private Context mContext;
     private ProgressDialog mProgressDialog;
     private UpdateInterface mListener;
 
     public Load_from_server(Context context, UpdateInterface updateInterface){
-        this.mContext = context;
         this.mListener = updateInterface;
-        mProgressDialog = new ProgressDialog(mContext);
+        mProgressDialog = new ProgressDialog(context);
 
     }
 

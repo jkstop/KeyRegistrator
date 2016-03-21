@@ -2,8 +2,6 @@ package com.example.ivsmirnov.keyregistrator.items;
 
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
-import java.sql.Time;
-
 /**
  * элемент журнала
  */

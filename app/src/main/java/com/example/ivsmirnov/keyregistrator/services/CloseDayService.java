@@ -30,11 +30,6 @@ public class CloseDayService extends Service implements CloseDayInterface {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         try {

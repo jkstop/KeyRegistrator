@@ -42,6 +42,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnNavigationListener {
@@ -138,7 +139,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
                 Load_from_server loadFromServer = new Load_from_server(mContext,this);
                 loadFromServer.execute();
                 return true;
-            case R.id.menu_journal_download:
+            case R.id.menu_journal_download_from_file:
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
@@ -187,7 +188,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
         Date date = null;
         if (mDates.size()!=0){
             try {
-                date = new SimpleDateFormat("dd MMM yyyy").parse(mDates.get(0));
+                date = new SimpleDateFormat("dd MMM yyyy", new Locale("RU","ru")).parse(mDates.get(0));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -244,9 +245,9 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        Date date = null;
+        Date date;
         try {
-            date = new SimpleDateFormat("dd MMM yyyy").parse(mDates.get(itemPosition));
+            date = new SimpleDateFormat("dd MMM yyyy", new Locale("RU","ru")).parse(mDates.get(itemPosition));
             new getJournalForDate(date).execute();
         } catch (ParseException e) {
             e.printStackTrace();

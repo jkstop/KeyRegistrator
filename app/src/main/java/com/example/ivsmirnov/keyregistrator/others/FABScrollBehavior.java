@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * Created by ivsmirnov on 22.01.2016.
+ * FAB scroll
  */
 public class FABScrollBehavior extends FloatingActionButton.Behavior {
 

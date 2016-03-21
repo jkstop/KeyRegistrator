@@ -6,7 +6,7 @@ import android.database.Cursor;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 
 /**
- * Created by ivsmirnov on 28.01.2016.
+ * ДБ Аккаунтов
  */
 public class AccountDB {
 

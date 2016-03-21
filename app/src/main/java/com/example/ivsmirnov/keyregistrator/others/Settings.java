@@ -1,9 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.others;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 
 import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
@@ -11,10 +9,9 @@ import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.prefs.Preferences;
 
 /**
- * Created by ivsmirnov on 30.01.2016.
+ * Настройки
  */
 public class Settings {
 

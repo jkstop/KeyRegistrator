@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Created by ivsmirnov on 04.12.2015.
+ * Поиск пользователей
  */
 public class SearchFr extends Fragment implements TagSearcherInterface, RecycleItemClickListener{
 
@@ -48,17 +48,10 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
     private ProgressBar mProgressBar;
     private RecyclerView mPersonsRecycler;
-    private Button mAddButton;
 
     public static SearchFr new_Instance(){
         return new SearchFr();
     }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
 
     @Nullable
     @Override
@@ -73,7 +66,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
         mPersonsRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_search_persons);
         mPersonsRecycler.setLayoutManager(new GridLayoutManager(mContext,3));
 
-        mAddButton = (Button)rootView.findViewById(R.id.layout_add_new_staff_input_button);
+        Button mAddButton = (Button) rootView.findViewById(R.id.layout_add_new_staff_input_button);
 
         final Connection connection = SQL_Connection.SQLconnect;
         final TextInputLayout mInputLayout = (TextInputLayout)rootView.findViewById(R.id.layout_add_new_staff_input);

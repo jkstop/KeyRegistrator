@@ -1,39 +1,28 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.StrictMode;
-import android.util.Log;
 
 import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Properties;
 
 /**
- * Created by ivsmirnov on 26.02.2016.
+ * Соединение с сервером
  */
 public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
 
     public static Connection SQLconnect;
 
-    private Context mContext;
     private ServerConnectionItem mServerConnectionItem;
     private SQL_Connection_interface mConnectionInterface;
 
-    public SQL_Connection (Context context, ServerConnectionItem serverConnectionItem, SQL_Connection_interface sql_connection_interface){
-        this.mContext = context;
+    public SQL_Connection (ServerConnectionItem serverConnectionItem, SQL_Connection_interface sql_connection_interface){
         this.mServerConnectionItem = serverConnectionItem;
         this.mConnectionInterface = sql_connection_interface;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
     }
 
     @Override

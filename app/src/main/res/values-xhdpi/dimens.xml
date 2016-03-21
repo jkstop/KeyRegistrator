@@ -8,7 +8,7 @@
     <!---->
 
     <dimen name="text_empty_auditrooms">8sp</dimen>
-    <dimen name="toolbar_text_size">10sp</dimen>
+    <dimen name="toolbar_text_size">12sp</dimen>
 
     <!-- боковое меню -->
     <dimen name="navigation_drawer_widht">180dp</dimen>
@@ -46,11 +46,8 @@
     <!---->
 
     <dimen name="journal_item_card_height">50dp</dimen>
-    
     <dimen name="journal_item_card_content_padding">3dp</dimen>
-   
     <dimen name="journal_item_card_person_text_size">26sp</dimen>
-  
     <dimen name="journal_item_card_image_width">36dp</dimen>
     <dimen name="journal_item_card_image_height">36dp</dimen>
     <dimen name="journal_item_max_text_person_initials">100sp</dimen>
@@ -67,15 +64,13 @@
     <dimen name="rooms_fragment_fab_margin">8dp</dimen>
     <dimen name="rooms_fragment_fab_elevation">3dp</dimen>
 
-    <dimen name="auditroom_card_text_size">50sp</dimen>
+    <dimen name="auditroom_card_text_size">130sp</dimen>
     <dimen name="auditroom_card_elevation">3dp</dimen>
     <dimen name="auditroom_card_content_padding">2dp</dimen>
-    
-    <dimen name="auditroom_card_image_margin">1dp</dimen>
+    <dimen name="auditroom_card_image_margin">2dp</dimen>
     <dimen name="auditroom_card_divider">3dp</dimen>
     <dimen name="auditroom_card_busy_image_width">60dp</dimen>
 
-    
 
     <dimen name="email_account_image_size">48dp</dimen>
     <dimen name="email_account_account_name_size">16sp</dimen>

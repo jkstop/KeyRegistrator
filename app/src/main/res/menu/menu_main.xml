@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/menu_main_items_size"
-        android:title="Размер элеметов"
+        android:title="@string/menu_main_items_size"
         app:showAsAction="never"/>
 
     <!--<item

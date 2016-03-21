@@ -2,7 +2,6 @@ package com.example.ivsmirnov.keyregistrator.services;
 
 import android.content.Context;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -10,7 +9,7 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 
 /**
- * Created by ivsmirnov on 16.03.2016.
+ * Тосты
  */
 public class Toasts {
 
@@ -18,8 +17,8 @@ public class Toasts {
     public static final int TOAST_POSITIVE = 1;
 
     public static void showFullscreenToast(Context context, String message, int type){
-        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View toastView = inflater.inflate(R.layout.layout_toast_fullscreen,null);
+        //LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View toastView = View.inflate(context, R.layout.layout_toast_fullscreen, null);
         TextView toastText = (TextView)toastView.findViewById(R.id.toast_fullscreen_text);
         toastText.setText(message);
 

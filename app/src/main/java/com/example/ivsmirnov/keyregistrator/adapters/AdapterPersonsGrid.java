@@ -52,7 +52,7 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
 
         public ViewHolder(View itemView) {
             super(itemView);
-            imageView = (ImageView)itemView.findViewById(R.id.image_sql);
+            imageView = (ImageView)itemView.findViewById(R.id.person_card_image_user);
             accessImageView = (ImageView) itemView.findViewById(R.id.person_card_icon_access);
             textLastname = (TextView) itemView.findViewById(R.id.person_card_text_lastname);
             textFirstname = (TextView)itemView.findViewById(R.id.person_card_text_firstname);

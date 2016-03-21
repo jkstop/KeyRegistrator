@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:override="true">
     <!-- App Main Palette -->
     <color name="primary">@color/green_500</color>
     <color name="primaryDark">@color/green_700</color>

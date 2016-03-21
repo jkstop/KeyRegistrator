@@ -12,6 +12,7 @@
 
     <RelativeLayout
         android:layout_toRightOf="@+id/person_information_image"
+        android:layout_toEndOf="@+id/person_information_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -67,7 +68,7 @@
             android:id="@+id/person_information_access_type"
             android:layout_below="@id/person_information_text_division_layout"
             android:layout_width="wrap_content"
-            android:text="Доступ без карты" />
+            android:text="@string/person_information_access_type" />
 
     </RelativeLayout>
 

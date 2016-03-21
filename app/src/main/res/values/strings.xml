@@ -61,7 +61,8 @@
     <string name="dialog_columns_title">Выберите количество колонок</string>
     <string name="delete">Удалить</string>
 
-    <!-- Typeface names -->
+    <string name="empty_text_journal_item_room">AUD</string>
+    <string name="empty_text_journal_item_time">00:00:00</string>
 
     <!-- Toasts -->
     <string name="text_toast_put_card">Для сдачи ключей просто приложите карту</string>
@@ -100,6 +101,12 @@
     <string name="image_description_sql_journal_item_timer">image_description_sql_journal_item_timer</string>
     <string name="image_description_sql_journal_item_access">image_description_sql_journal_item_access</string>
     <string name="nfc_fragment_aud_image_descryption">nfc_fragment_aud_image_descryption</string>
+    <string name="descryption_navigation_drawer_list_item_image">descryption_navigation_drawer_list_item_image</string>
+    <string name="descryption_person_card_image_user">descryption_person_card_image_user</string>
+    <string name="descryption_nfc_fragment_reader_image">descryption_nfc_fragment_reader_image</string>
+    <string name="descryption_card_email_add_new_recipient_delete">descryption_card_email_add_new_recipient_delete</string>
+    <string name="descryption_card_email_add_new_recipient_save">descryption_card_email_add_new_recipient_save</string>
+    <string name="descryption_person_card_icon_access">descryption_person_card_icon_access</string>
 
 
     <string name="view_enter_password_hint_password">Пароль</string>
@@ -115,6 +122,7 @@
     <string name="person_information_text_firstname">Имя</string>
     <string name="person_information_text_midname">Отчество</string>
     <string name="person_information_text_division">Структурное подразделение</string>
+    <string name="person_information_access_type">Доступ без карты</string>
 
     <string name="snack_user_added">Пользователь добавлен!</string>
     <string name="snack_cancel">Отменить</string>
@@ -133,6 +141,7 @@
     <string name="email_fragment_attachments_text">Вложения</string>
     <string name="email_fragment_logon">Для отправки писем сначала войдите в аккаунт</string>
     <string name="email_fragment_error_not_email_entered">Некорректный e-mail </string>
+    <string name="card_email_add_new_recepient_input">Введите e-mail</string>
 
     <string name="card_statistic_today_count">Посещений за день:</string>
     <string name="card_statistic_autoclose_count">Закрыто автоматически:</string>
@@ -149,5 +158,23 @@
     <string name="dialog_sql_server_hint_password">Пароль</string>
 
     <string name="toast_press_back_again">Нажмите НАЗАД еще раз, чтобы выйти из программы</string>
+
+    <!-- menu items -->
+    <string name="menu_auditrooms_set_columns_number">Количество колонок</string>
+    <string name="menu_auditrooms_save_to_file">Сохранить</string>
+    <string name="menu_auditrooms_load_from_file">Загрузить</string>
+    <string name="menu_auditrooms_clear">Очистить</string>
+    <string name="menu_journal_save_to_file">Сохранить</string>
+    <string name="menu_journal_download_from_file">Загрузить из файла</string>
+    <string name="menu_journal_delete">Очистить</string>
+    <string name="menu_journal_select_location_for_copy">Указать папку для копии</string>
+    <string name="menu_journal_download_to_server">Загрузить с сервера</string>
+    <string name="menu_journal_download_from_server">Загрузить на сервер</string>
+    <string name="menu_teachers_save_to_file">Сохранить</string>
+    <string name="menu_teachers_download_favorite">Загрузить из файла</string>
+    <string name="menu_teachers_delete">Очистить</string>
+    <string name="menu_teachers_select_location_for_copy">Указать папку для копии</string>
+    <string name="menu_main_items_size">Размер элементов</string>
+    <string name="menu_nfc_all_persons">Все пользователи</string>
 
 </resources>

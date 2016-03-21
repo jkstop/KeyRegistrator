@@ -1,7 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
 /**
- * Created by ivsmirnov on 03.02.2016.
+ * Параметры для записи в базу
  */
 public class BaseWriterParams {
 

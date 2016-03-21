@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /**
- * Created by ivsmirnov on 13.11.2015.
+ * Загрузка из файла
  */
 public class Loader_intent extends AsyncTask<Void,Integer,Void> {
 
@@ -190,14 +190,16 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
     public static int getStringCount(File file)
     {
         int i=0;
-        BufferedReader bufferedReader = null;
+        BufferedReader bufferedReader;
         try{
             FileReader fileReader = new FileReader(file);
             bufferedReader = new BufferedReader(fileReader);
             while(bufferedReader.readLine()!=null)
                 i++;
             bufferedReader.close();
-        }catch(Exception e){}
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         return i;
     }
 

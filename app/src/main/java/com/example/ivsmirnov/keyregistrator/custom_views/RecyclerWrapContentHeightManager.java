@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by ivsmirnov on 13.02.2016.
+ * layout manager обрезка по высоте recycler View
  */
 public class RecyclerWrapContentHeightManager extends LinearLayoutManager {
 

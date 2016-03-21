@@ -3,31 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/menu_journal_save_to_file"
-        android:title="Сохранить и выгрузить"
+        android:title="@string/menu_journal_save_to_file"
         android:icon="@drawable/ic_save_black_24dp"
         app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/menu_journal_download"
-        android:title="Загрузить из файла"
+    <item android:id="@+id/menu_journal_download_from_file"
+        android:title="@string/menu_journal_download_from_file"
         android:icon="@drawable/ic_file_download_black_24dp"
         app:showAsAction="never"/>
 
     <item android:id="@+id/menu_journal_delete"
-        android:title="Очистить"
+        android:title="@string/menu_journal_delete"
         android:icon="@drawable/ic_delete_black_24dp"
         app:showAsAction="never"/>
 
     <item android:id="@+id/menu_journal_select_location_for_copy"
-        android:title="Указать путь для копирования на ПК"
+        android:title="@string/menu_journal_select_location_for_copy"
         app:showAsAction="never"/>
 
     <item
         android:id="@+id/menu_journal_download_to_server"
-        android:title="Загрузить на сервер"
+        android:title="@string/menu_journal_download_to_server"
         app:showAsAction="never"/>
 
     <item android:id="@+id/menu_journal_download_from_server"
-        android:title="Загрузить с сервера"
+        android:title="@string/menu_journal_download_from_server"
         app:showAsAction="never"/>
 
 </menu>

@@ -21,11 +21,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
@@ -82,7 +78,6 @@ public class Dialogs extends DialogFragment{
 
     private Context mContext;
     private int mDialogId;
-    private LayoutInflater mInflater;
     private Resources mResources;
 
     public static FrameLayout mFrameGrid;
@@ -97,14 +92,9 @@ public class Dialogs extends DialogFragment{
         super.onCreate(savedInstanceState);
         mDialogId = getArguments().getInt(DIALOG_TYPE,0);
         mContext = getActivity();
-        mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResources = mContext.getResources();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
 
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -154,7 +144,7 @@ public class Dialogs extends DialogFragment{
                         .create();
             case DIALOG_EDIT:
 
-                final View dialogView = mInflater.inflate(R.layout.layout_person_information, null);
+                final View dialogView = View.inflate(mContext, R.layout.layout_person_information, null);
                 final ImageView personImage = (ImageView) dialogView.findViewById(R.id.person_information_image);
 
                 final TextInputLayout inputLastname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_lastname_layout);
@@ -195,8 +185,6 @@ public class Dialogs extends DialogFragment{
                         public void onClick(DialogInterface dialog, int which) {
                             if (tag!=null){
 
-
-                                //new FavoriteDB.deleteUser(mContext).execute(tag);
                                 FavoriteDB.deleteUser(tag);
 
                                 //удаление метки в free_users
@@ -229,14 +217,6 @@ public class Dialogs extends DialogFragment{
                     builderEdit.setNeutralButton(getResources().getString(R.string.add), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            //FavoriteDB.writeInDBTeachers(mContext, new PersonItem().setLastname(personItem.getLastname())
-                            //        .setFirstname(personItem.getFirstname())
-                            //        .setMidname(personItem.getMidname())
-                            //        .setDivision(personItem.getDivision())
-                                    //.setPhotoOriginal(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL))
-                                    //.setPhotoPreview(FavoriteDB.getPhotoPreview(valuesForEdits.get(Values.DIALOG_PERSON_INFORMATION_KEY_PHOTO_ORIGINAL)))
-                            //        .setSex(personItem.getSex())
-                            //        .setRadioLabel(personItem.getRadioLabel()));
                             updateInformation();
                         }
                     });
@@ -293,7 +273,7 @@ public class Dialogs extends DialogFragment{
             case ADD_ROOM_DIALOG:
                 //добавление нового помещения
 
-                final TextInputLayout enterAuditroomLayout = (TextInputLayout) mInflater.inflate(R.layout.view_enter_auditroom,null);
+                final TextInputLayout enterAuditroomLayout = (TextInputLayout) View.inflate(mContext, R.layout.view_enter_auditroom, null);
                 final AppCompatEditText enterAuditroomText = (AppCompatEditText)enterAuditroomLayout.findViewById(R.id.view_auditroom_enter_room);
                 AppCompatButton enterAuditroomOkButton = (AppCompatButton)enterAuditroomLayout.findViewById(R.id.view_auditroom_ok_button);
                 enterAuditroomOkButton.setOnClickListener(new View.OnClickListener() {
@@ -325,8 +305,7 @@ public class Dialogs extends DialogFragment{
             case SELECT_COLUMNS_DIALOG:
 
                 final int mSelectedItemAud = Settings.getAuditroomColumnsCount();
-                LayoutInflater layoutInflater1 = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View pickerView  = layoutInflater1.inflate(R.layout.view_column_selector,null);
+                View pickerView  = View.inflate(mContext, R.layout.view_column_selector, null);
                 final NumberPicker numberPicker = (NumberPicker)pickerView.findViewById(R.id.select_column_number_picker);
                 setNumberPickerTextColor(numberPicker,Color.BLACK);
                 numberPicker.setMaxValue(5);
@@ -349,7 +328,7 @@ public class Dialogs extends DialogFragment{
                         .create();
 
             case DIALOG_RESIZE_ITEMS:
-                View rootView =  mInflater.inflate(R.layout.view_resize_main_fragment_items,null);
+                View rootView =  View.inflate(mContext, R.layout.view_resize_main_fragment_items, null);
                 final CardView cardView = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
                 final SeekBar mResizeSeekBar = (SeekBar)rootView.findViewById(R.id.view_resize_vertical_seekbar);
                 mFrameGrid = (FrameLayout)rootView.findViewById(R.id.frame_for_grid_aud);
@@ -418,7 +397,7 @@ public class Dialogs extends DialogFragment{
 
                 final CloseRoomInterface mCloseRoomInterface = (CloseRoomInterface)getActivity();
                 final int dialog_enter_password_type = getArguments().getInt(DIALOG_ENTER_PASSWORD_TYPE);
-                final TextInputLayout textInputLayout = (TextInputLayout) mInflater.inflate(R.layout.view_enter_password,null);
+                final TextInputLayout textInputLayout = (TextInputLayout) View.inflate(mContext, R.layout.view_enter_password, null);
                 final AppCompatEditText editPassword = (AppCompatEditText)textInputLayout.findViewById(R.id.view_enter_password_edit_text);
                 AppCompatButton okButton = (AppCompatButton)textInputLayout.findViewById(R.id.view_enter_password_ok_button);
                 okButton.setOnClickListener(new View.OnClickListener() {
@@ -456,7 +435,7 @@ public class Dialogs extends DialogFragment{
                         .create();
 
             case DIALOG_SQL_CONNECT:
-                View dialogLayout = mInflater.inflate(R.layout.layout_dialog_sql_connect,null);
+                View dialogLayout = View.inflate(mContext, R.layout.layout_dialog_sql_connect, null);
                 final AppCompatEditText inputServer = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_server)).getEditText();
                 final AppCompatEditText inputLogin = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_login)).getEditText();
                 final AppCompatEditText inputPassword = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_password)).getEditText();
@@ -502,7 +481,7 @@ public class Dialogs extends DialogFragment{
                                 .setUserPassword(inputPassword.getText().toString());
                         try {
                             SQL_Connection.SQLconnect = null;
-                            new SQL_Connection(mContext, newServerConnectionItem, new SQL_Connection.SQL_Connection_interface() {
+                            new SQL_Connection(newServerConnectionItem, new SQL_Connection.SQL_Connection_interface() {
                                 @Override
                                 public void onServerConnected() {
                                     serverCheckConnection.clearAnimation();

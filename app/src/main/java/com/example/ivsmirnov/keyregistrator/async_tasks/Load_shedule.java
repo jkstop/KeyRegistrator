@@ -1,7 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 /**
- * Created by IVSmirnov on 08.09.2015.
+ * Загрузка расписания
  */
 /*
 public class Load_shedule extends AsyncTask<Void, ArrayList<String>, Integer> {

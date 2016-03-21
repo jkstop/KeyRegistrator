@@ -4,6 +4,7 @@
 
     <ImageView
         android:id="@+id/navigation_drawer_list_item_image"
+        android:contentDescription="@string/descryption_navigation_drawer_list_item_image"
         style="@style/NavigationDrawerItemImage" />
 
     <TextView

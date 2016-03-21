@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
-import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
@@ -22,7 +21,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 /**
- * Created by ivsmirnov on 03.03.2016.
+ * Адаптер пользователей без карты
  */
 public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersList.viewHolder> {
 
@@ -90,7 +89,7 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
         private TextView mPersonInitials;
 
         public getPersonItem(CardView cardView, Animation animation){
-            this.mPersonCard = new WeakReference<CardView>(cardView).get();
+            this.mPersonCard = new WeakReference<>(cardView).get();
             this.mAnimation = animation;
         }
 
@@ -103,7 +102,7 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
         protected PersonItem doInBackground(GetPersonParams... params) {
 
             PersonItem personItem = FavoriteDB.getPersonItem(mContext, params[0].getPersonTag(), params[0].getPersonLocation(), params[0].getPersonPhotoDimension());
-            mPersonInitials = new WeakReference<TextView>(params[0].getPersonLastname()).get();
+            mPersonInitials = new WeakReference<>(params[0].getPersonLastname()).get();
 
             return personItem;
         }

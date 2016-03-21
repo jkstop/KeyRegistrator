@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 /**
- * Created by ivsmirnov on 13.02.2016.
+ * Загрузка изображения из интернета
  */
 public class LoadImageFromWeb extends AsyncTask<Void,Bitmap,Bitmap> {
     private String mUrl;

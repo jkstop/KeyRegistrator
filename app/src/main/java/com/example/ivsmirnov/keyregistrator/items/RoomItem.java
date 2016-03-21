@@ -1,8 +1,5 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 /**

@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 /**
- * Created by ivsmirnov on 10.11.2015.
+ * ДБ журнал
  */
 public class JournalDBinit extends SQLiteOpenHelper implements BaseColumns {
 

@@ -5,15 +5,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
-
-import com.example.ivsmirnov.keyregistrator.async_tasks.Load_from_server;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.util.Calendar;
 
 /**
- * Created by ivsmirnov on 27.02.2016.
+ * Планировщик
  */
 public class Alarm {
 

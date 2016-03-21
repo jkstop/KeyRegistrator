@@ -34,7 +34,7 @@ public class CloseDay extends AppCompatActivity {
             setSupportActionBar(mToolbar);
         }
 
-        View actionBarView = getLayoutInflater().inflate(R.layout.action_bar_close_day, null);
+        View actionBarView = View.inflate(this, R.layout.action_bar_close_day, null);
 
         TextView mTextTitle = (TextView)actionBarView.findViewById(R.id.action_bar_close_day_title);
 
@@ -77,23 +77,6 @@ public class CloseDay extends AppCompatActivity {
     private String showDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy",new Locale("ru"));
         return String.valueOf(dateFormat.format(new Date())) + " г.";
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
 }

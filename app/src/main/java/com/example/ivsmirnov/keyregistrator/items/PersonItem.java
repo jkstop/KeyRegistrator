@@ -4,7 +4,7 @@ package com.example.ivsmirnov.keyregistrator.items;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 /**
- * Created by ivsmirnov on 22.12.2015.
+ * User item
  */
 public class PersonItem {
     private String Lastname = Values.EMPTY;

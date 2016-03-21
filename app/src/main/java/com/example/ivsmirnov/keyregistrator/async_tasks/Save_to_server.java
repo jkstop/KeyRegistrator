@@ -14,23 +14,20 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * Created by ivsmirnov on 10.12.2015.
+ * Запись на сервер
  */
 public class Save_to_server extends AsyncTask <Void,Void,Void> {
 
-    private Context mContext;
     private ProgressDialog mProgressDialog;
     private boolean mIsShowDialog;
 
     public Save_to_server (Context context, boolean isShowDialog){
-        mContext = context;
-        mProgressDialog = new ProgressDialog(mContext);
+        mProgressDialog = new ProgressDialog(context);
         mIsShowDialog = isShowDialog;
     }
 
     @Override
     protected void onPreExecute() {
-        Log.d("start","save to server");
         if (mIsShowDialog){
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             mProgressDialog.setCancelable(false);
@@ -79,7 +76,6 @@ public class Save_to_server extends AsyncTask <Void,Void,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        Log.d("stop","save to server");
         if (mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }

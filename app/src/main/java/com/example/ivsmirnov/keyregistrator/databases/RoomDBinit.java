@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 /**
- * Created by ivsmirnov on 09.11.2015.
+ * ДБ помещений
  */
 public class RoomDBinit extends SQLiteOpenHelper implements BaseColumns {
 

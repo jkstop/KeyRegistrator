@@ -54,9 +54,10 @@
             android:maxLines="1"
             android:textColor="@color/black"
             android:gravity="center"
-            android:textSize="@dimen/journal_item_max_text_aud"
+            android:textSize="100sp"
+            android:text="@string/empty_text_journal_item_room"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
 
         <RelativeLayout
             android:layout_toEndOf="@id/card_journal_item_text_auditroom"
@@ -75,6 +76,7 @@
                 android:maxLines="1"
                 android:gravity="center"
                 android:textSize="@dimen/journal_item_max_text_time"
+                android:text="@string/empty_text_journal_item_time"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent" />
 
@@ -97,6 +99,7 @@
                 android:maxLines="1"
                 android:gravity="center"
                 android:textSize="@dimen/journal_item_max_text_time"
+                android:text="@string/empty_text_journal_item_time"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent" />
 

@@ -16,12 +16,14 @@
         <FrameLayout
             android:id="@+id/person_card_image_frame"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_width="@dimen/person_card_image_width"
             android:layout_height="@dimen/person_card_image_height">
 
 
             <ImageView
-                android:id="@+id/image_sql"
+                android:id="@+id/person_card_image_user"
+                android:contentDescription="@string/descryption_person_card_image_user"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"/>
@@ -30,9 +32,11 @@
 
         <RelativeLayout
             android:layout_toRightOf="@+id/person_card_image_frame"
+            android:layout_toEndOf="@+id/person_card_image_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="10dp">
+            android:layout_marginLeft="@dimen/default_content_margin"
+            android:layout_marginStart="@dimen/default_content_margin">
 
             <TextView
                 android:layout_alignParentTop="true"
@@ -58,6 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/person_card_icon_division_margin"
+                android:layout_marginEnd="@dimen/person_card_icon_division_margin"
                 android:layout_marginTop="@dimen/person_card_icon_division_margin"
                 android:contentDescription="@string/person_card_icon_division_descryption"
                 android:src="@drawable/ic_work_black_18dp" />
@@ -65,17 +70,20 @@
             <TextView
                 android:layout_alignParentBottom="true"
                 android:layout_toRightOf="@+id/person_card_icon_division"
+                android:layout_toEndOf="@+id/person_card_icon_division"
                 android:layout_toLeftOf="@+id/person_card_icon_access"
+                android:layout_toStartOf="@+id/person_card_icon_access"
                 android:id="@+id/person_card_text_division"
                 android:textSize="@dimen/person_card_text_division"
                 style="@style/CardPersonText.Division" />
 
             <ImageView
                 android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_alignBottom="@id/person_card_text_division"
                 android:id="@id/person_card_icon_access"
                 android:clickable="true"
-                android:contentDescription="hjgdlkjfglkdflk"
+                android:contentDescription="@string/descryption_person_card_icon_access"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 

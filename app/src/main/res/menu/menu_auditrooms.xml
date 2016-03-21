@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/menu_auditrooms_set_columns_number"
-        android:title="Количество колонок"
+        android:title="@string/menu_auditrooms_set_columns_number"
         android:icon="@drawable/ic_view_column_black_24dp"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/menu_auditrooms_save_to_file"
-        android:title="Сохранить"
+        android:title="@string/menu_auditrooms_save_to_file"
         app:showAsAction="never"/>
 
     <item android:id="@+id/menu_auditrooms_load_from_file"
-        android:title="Загрузить"
+        android:title="@string/menu_auditrooms_load_from_file"
         app:showAsAction="never"/>
 
     <item android:id="@+id/menu_auditrooms_clear"
-        android:title="Очистить"
+        android:title="@string/menu_auditrooms_clear"
         app:showAsAction="never"/>
 </menu>

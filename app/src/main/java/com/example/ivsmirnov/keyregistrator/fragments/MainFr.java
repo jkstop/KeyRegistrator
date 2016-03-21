@@ -42,13 +42,9 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     public static RecyclerView mAuditroomGrid;
 
     private Context mContext;
-
     private ArrayList<RoomItem> mRoomItems;
-
-    private FrameLayout frameForGrid;
-
+    private FrameLayout mFrameForGrid;
     private CardView mDisclaimerCard;
-
     private CloseRoomInterface mCloseRoomInterface;
 
     private static long lastClickTime = 0;
@@ -76,7 +72,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
         mCloseRoomInterface = (CloseRoomInterface)getActivity();
 
-        frameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
+        mFrameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
 
         mAuditroomGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
         mAuditroomGrid.setHasFixedSize(true);
@@ -97,7 +93,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     private void setLayoutsWeight(){
         int weightCard = Settings.getDisclaimerWeight();
         ((LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams()).weight = weightCard;
-        ((LinearLayout.LayoutParams) frameForGrid.getLayoutParams()).weight = 100 - weightCard;
+        ((LinearLayout.LayoutParams) mFrameForGrid.getLayoutParams()).weight = 100 - weightCard;
     }
 
     private void initializeAuditroomGrid(){

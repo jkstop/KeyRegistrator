@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 /**
- * Created by ivsmirnov on 28.01.2016.
+ * ДБ аккаунтов
  */
 public class AccountDBinit extends SQLiteOpenHelper implements BaseColumns {
 
@@ -21,14 +21,14 @@ public class AccountDBinit extends SQLiteOpenHelper implements BaseColumns {
     public static final String COLUMN_ACCOUNT_PERSON_FIRSTNAME = "Имя";
     public static final String COLUMN_ACCOUNT_PERSON_PHOTO = "Фото";
 
-    public static final String SQL_CREATE_TEACHERS_BASE = "create table " + TABLE_ACCOUNTS + " (" + BaseColumns._ID + " integer primary key autoincrement, "
+    private static final String SQL_CREATE_TEACHERS_BASE = "create table " + TABLE_ACCOUNTS + " (" + BaseColumns._ID + " integer primary key autoincrement, "
             + COLUMN_ACCOUNT_ID + " text, "
             + COLUMN_ACCOUNT_NAME + " text, "
             + COLUMN_ACCOUNT_PERSON_LASTNAME + " text, "
             + COLUMN_ACCOUNT_PERSON_FIRSTNAME + " text, "
             + COLUMN_ACCOUNT_PERSON_PHOTO + " text);";
 
-    public static final String SQL_DELETE_ACCOUNTS_BASE = "DROP TABLE IF EXISTS "
+    private static final String SQL_DELETE_ACCOUNTS_BASE = "DROP TABLE IF EXISTS "
             + TABLE_ACCOUNTS;
 
     public AccountDBinit(Context context) {

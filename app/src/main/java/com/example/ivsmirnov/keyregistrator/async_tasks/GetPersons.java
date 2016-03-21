@@ -19,7 +19,7 @@ import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by ivsmirnov on 21.02.2016.
+ * Загрузка пользователя
  */
 public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
@@ -34,7 +34,7 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
     private AppCompatCheckBox mAccessTypeContainer;
 
     public GetPersons(Context context, CardView personCard, Animation fadeInAnimation){
-        this.personCard = new WeakReference<CardView>(personCard).get();
+        this.personCard = new WeakReference<>(personCard).get();
         this.mAnimation = fadeInAnimation;
         this.mContext = context;
     }
@@ -51,13 +51,13 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
         PersonItem personItem = FavoriteDB.getPersonItem(mContext, params[0].getPersonTag(), params[0].getPersonLocation(), photoDimension);
 
-        mPersonImage = new WeakReference<ImageView>(params[0].getPersonImageView()).get();
-        mAccessImage = new WeakReference<ImageView>(params[0].getAccessImageView()).get();
-        mPersonLastname = new WeakReference<TextView>(params[0].getPersonLastname()).get();
-        mPersonFirstname = new WeakReference<TextView>(params[0].getPersonFirstname()).get();
-        mPersonMidname = new WeakReference<TextView>(params[0].getPersonMidname()).get();
-        mPersonDivision = new WeakReference<TextView>(params[0].getPersonDivision()).get();
-        mAccessTypeContainer = new WeakReference<AppCompatCheckBox>(params[0].getAccessTypeContainer()).get();
+        mPersonImage = new WeakReference<>(params[0].getPersonImageView()).get();
+        mAccessImage = new WeakReference<>(params[0].getAccessImageView()).get();
+        mPersonLastname = new WeakReference<>(params[0].getPersonLastname()).get();
+        mPersonFirstname = new WeakReference<>(params[0].getPersonFirstname()).get();
+        mPersonMidname = new WeakReference<>(params[0].getPersonMidname()).get();
+        mPersonDivision = new WeakReference<>(params[0].getPersonDivision()).get();
+        mAccessTypeContainer = new WeakReference<>(params[0].getAccessTypeContainer()).get();
 
         isFreeUser = params[0].getFreeUser();
         isAnimatedPhoto = params[0].getIsAnimatedPhoto();

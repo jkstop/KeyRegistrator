@@ -15,12 +15,8 @@ public class SheduleDB {
     public SQLiteDatabase sqLiteDatabase;
     public Cursor cursor;
 
-    private Context mContext;
-
     public SheduleDB(Context context){
-        this.mContext = context;
-
-        sheduleDBinit = new SheduleDBinit(mContext);
+        sheduleDBinit = new SheduleDBinit(context);
         sqLiteDatabase = sheduleDBinit.getWritableDatabase();
         cursor = sqLiteDatabase.query(SheduleDBinit.TABLE_SHEDULE,null,null,null,null,null,null);
     }
@@ -36,7 +32,7 @@ public class SheduleDB {
         cv.put(SheduleDBinit.COLUMN_PARITY,parity);
         sqLiteDatabase.insert(SheduleDBinit.TABLE_SHEDULE,null,cv);
     }
-
+/*
     public ArrayList<SparseArray> readShedule(){
         ArrayList <SparseArray> items = new ArrayList<>();
         cursor.moveToPosition(-1);
@@ -52,7 +48,7 @@ public class SheduleDB {
         }
         return items;
     }
-
+*/
     public void clearBaseShedule(){
         sqLiteDatabase.delete(SheduleDBinit.TABLE_SHEDULE,null,null);
     }

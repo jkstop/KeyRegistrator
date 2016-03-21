@@ -53,7 +53,7 @@
     <dimen name="journal_item_card_image_height">64dp</dimen>
     <dimen name="journal_item_max_text_person_initials">100sp</dimen>
     <dimen name="journal_item_max_text_time">60sp</dimen>
-    <dimen name="journal_item_max_text_aud">80sp</dimen>
+    <dimen name="journal_item_max_text_aud">100sp</dimen>
 
     <dimen name="view_enter_password_margin">16dp</dimen>
 

@@ -20,7 +20,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
@@ -132,7 +131,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         new Settings();
 
         //connect to server
-        new SQL_Connection(mContext, Settings.getServerConnectionParams(), null).execute();
+        new SQL_Connection(Settings.getServerConnectionParams(), null).execute();
 
         //init interfaces
         mBaseWriterInterface = this;

@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 
 /**
- * Created by ivsmirnov on 21.02.2016.
+ * Параметры для загрузки пользователя
  */
 public class GetPersonParams{
     private String personTag;

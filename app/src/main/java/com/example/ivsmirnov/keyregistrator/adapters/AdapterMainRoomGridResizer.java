@@ -15,7 +15,7 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 import java.util.ArrayList;
 
 /**
- * Created by ivsmirnov on 26.01.2016.
+ * Адаптер layout для изменения размера
  */
 public class AdapterMainRoomGridResizer extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

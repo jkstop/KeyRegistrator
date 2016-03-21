@@ -64,8 +64,8 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
             case VIEW_RECEPIENTS_ADD_NEW:
                 View rowViewNEW = layoutInflater.inflate(R.layout.card_email_add_new_recipient,parent,false);
                 viewHolder = new viewHolderAddNew(rowViewNEW);
-                ImageView save = (ImageView)rowViewNEW.findViewById(R.id.card_email_add_new_recepient_save);
-                ImageView delete = (ImageView)rowViewNEW.findViewById(R.id.card_email_add_new_recepient_delete);
+                ImageView save = (ImageView)rowViewNEW.findViewById(R.id.card_email_add_new_recipient_save);
+                ImageView delete = (ImageView)rowViewNEW.findViewById(R.id.card_email_add_new_recipient_delete);
                 final TextInputLayout textInputLayout = (TextInputLayout)rowViewNEW.findViewById(R.id.card_email_add_new_recepient_input);
 
                 final RecyclerView.ViewHolder finalViewHolder1 = viewHolder;
@@ -148,8 +148,8 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         public viewHolderAddNew(View itemView) {
             super(itemView);
-            mSave = (ImageView)itemView.findViewById(R.id.card_email_add_new_recepient_save);
-            mDelete = (ImageView)itemView.findViewById(R.id.card_email_add_new_recepient_delete);
+            mSave = (ImageView)itemView.findViewById(R.id.card_email_add_new_recipient_save);
+            mDelete = (ImageView)itemView.findViewById(R.id.card_email_add_new_recipient_delete);
         }
     }
 }

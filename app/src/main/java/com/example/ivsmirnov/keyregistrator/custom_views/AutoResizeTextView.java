@@ -11,11 +11,10 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.SparseIntArray;
 import android.util.TypedValue;
-import android.view.View;
 import android.widget.TextView;
 
 /**
- * Created by Jkstop on 27.05.2015.
+ * Auto resize textView
  */
 public class AutoResizeTextView extends TextView {
     private interface SizeTester {
@@ -156,8 +155,6 @@ public class AutoResizeTextView extends TextView {
 
     /**
      * Set the lower text size limit and invalidate the view
-     *
-     * @param minTextSize
      */
     public void setMinTextSize(float minTextSize) {
         mMinTextSize = minTextSize;
@@ -261,7 +258,7 @@ public class AutoResizeTextView extends TextView {
         int lastBest = start;
         int lo = start;
         int hi = end - 1;
-        int mid = 0;
+        int mid;
         while (lo <= hi) {
             mid = (lo + hi) >>> 1;
             int midValCmp = sizeTester.onTestSize(mid, availableSpace);

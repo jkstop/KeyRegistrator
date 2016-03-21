@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 /**
- * Created by ivsmirnov on 29.10.2015.
+ * ДБ расписания
  */
 public class SheduleDBinit extends SQLiteOpenHelper implements BaseColumns {
 

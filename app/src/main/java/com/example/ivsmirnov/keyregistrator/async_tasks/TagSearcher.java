@@ -12,7 +12,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 /**
- * Created by ivsmirnov on 07.12.2015.
+ * Поиск радиометки
  */
 public class TagSearcher extends AsyncTask<Connection,Void,ArrayList<String>> {
 

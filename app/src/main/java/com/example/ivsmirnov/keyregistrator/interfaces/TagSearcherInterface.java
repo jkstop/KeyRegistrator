@@ -1,7 +1,5 @@
 package com.example.ivsmirnov.keyregistrator.interfaces;
 
-import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-
 import java.util.ArrayList;
 
 /**

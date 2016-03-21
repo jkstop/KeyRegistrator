@@ -25,10 +25,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Random;
 
 /**
- * Created by ivsmirnov on 05.11.2015.
+ * ДБ преподавателей
  */
 public class FavoriteDB {
 
@@ -95,7 +94,7 @@ public class FavoriteDB {
                     try {
                         Statement statement = connection.createStatement();
                         ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [RADIO_LABEL] = '" + tag + "'");
-                        while (resultSet.next()){
+                        while (resultSet.next()) {
                             personItem = new PersonItem().setLastname(resultSet.getString("LASTNAME"))
                                     .setFirstname(resultSet.getString("FIRSTNAME"))
                                     .setMidname(resultSet.getString("MIDNAME"))
@@ -104,9 +103,10 @@ public class FavoriteDB {
                                     .setRadioLabel(resultSet.getString("RADIO_LABEL"));
                             String photo = resultSet.getString("PHOTO");
 
-                            if (photo == null) photo = getBase64DefaultPhotoFromResources(mContext, resultSet.getString("SEX"));
+                            if (photo == null)
+                                photo = getBase64DefaultPhotoFromResources(mContext, resultSet.getString("SEX"));
 
-                            switch (photoType){
+                            switch (photoType) {
                                 case FULLSIZE_PHOTO:
                                     personItem.setPhotoOriginal(photo);
                                     break;
@@ -122,9 +122,9 @@ public class FavoriteDB {
                                 default:
                                     break;
                             }
-
                             return personItem;
                         }
+
                     } catch (SQLException e) {
                         e.printStackTrace();
                         return null;

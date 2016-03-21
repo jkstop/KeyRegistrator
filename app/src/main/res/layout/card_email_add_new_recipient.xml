@@ -14,32 +14,39 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/card_email_add_new_recepient_delete"
+            android:layout_alignParentStart="true"
+            android:layout_toLeftOf="@+id/card_email_add_new_recipient_delete"
+            android:layout_toStartOf="@+id/card_email_add_new_recipient_delete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:errorEnabled="true">
+
             <EditText
-                android:hint="Введите EMAIL"
+                android:hint="@string/card_email_add_new_recepient_input"
                 android:inputType="textEmailAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </android.support.design.widget.TextInputLayout>
 
         <ImageView
-            android:id="@+id/card_email_add_new_recepient_delete"
+            android:id="@+id/card_email_add_new_recipient_delete"
             android:src="@android:drawable/ic_delete"
-            android:layout_toLeftOf="@+id/card_email_add_new_recepient_save"
+            android:layout_toLeftOf="@+id/card_email_add_new_recipient_save"
+            android:layout_toStartOf="@+id/card_email_add_new_recipient_save"
             android:layout_centerInParent="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/descryption_card_email_add_new_recipient_delete" />
 
         <ImageView
-            android:id="@+id/card_email_add_new_recepient_save"
+            android:id="@+id/card_email_add_new_recipient_save"
             android:src="@android:drawable/ic_input_add"
             android:layout_centerInParent="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/descryption_card_email_add_new_recipient_save" />
 
     </RelativeLayout>
 

@@ -25,7 +25,7 @@ import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 
 /**
- * Created by ivsmirnov on 10.11.2015.
+ * ДБ журнал
  */
 public class JournalDB {
 
@@ -315,7 +315,7 @@ public class JournalDB {
         File directory = new File(sdCard.getAbsolutePath());
         File file = new File(directory,fileName);
         FileOutputStream fileOutputStream;
-        Cursor cursor = null;
+        Cursor cursor;
 
         cursor = DbShare.getCursor(DbShare.DB_JOURNAL,
                 JournalDBinit.TABLE_JOURNAL,

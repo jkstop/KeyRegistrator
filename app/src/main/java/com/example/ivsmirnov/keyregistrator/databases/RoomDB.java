@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Created by ivsmirnov on 09.11.2015.
+ * ДБ помещений
  */
 public class RoomDB {
 

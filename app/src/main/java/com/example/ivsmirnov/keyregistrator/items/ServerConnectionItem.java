@@ -1,7 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
 /**
- * Created by ivsmirnov on 30.01.2016.
+ * Server conn item
  */
 public class ServerConnectionItem {
 

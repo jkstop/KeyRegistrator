@@ -7,7 +7,9 @@
     <FrameLayout
         android:foreground="@color/black_alpha_50"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_toLeftOf="@+id/view_resize_vertical_seekbar"
+        android:layout_toStartOf="@+id/view_resize_vertical_seekbar"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/view_resize_included_margin">
@@ -20,6 +22,7 @@
 
     <com.example.ivsmirnov.keyregistrator.custom_views.VerticalSeekBar
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:id="@+id/view_resize_vertical_seekbar"
         android:layout_width="wrap_content"
         android:layout_height="match_parent" />

@@ -19,7 +19,7 @@ import java.lang.ref.WeakReference;
 import java.sql.Time;
 
 /**
- * Created by ivsmirnov on 25.02.2016.
+ * Загрузка журнала
  */
 public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
 
@@ -30,23 +30,17 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
     private TextView mTextTimeOut;
     private ImageView mImagePerson;
     private TextView mTextInitials;
-    //private TextView mTextLastname;
-    //private TextView mTextFirstname;
-    //private TextView mTextMidname;
     private ImageView mImageAccess;
     private long mTimeIn;
 
     public GetJournal (GetJournalParams journalParams, Animation animation){
-        this.mCard = new WeakReference<CardView>(journalParams.getCard()).get();
-        this.mTextAuditroom = new WeakReference<TextView>(journalParams.getTextAuditroom()).get();
-        this.mTextTimeIn = new WeakReference<TextView>(journalParams.getTextTimeIn()).get();
-        this.mTextTimeOut = new WeakReference<TextView>(journalParams.getTextTimeOut()).get();
-        this.mImagePerson = new WeakReference<ImageView>(journalParams.getImagePerson()).get();
-        this.mTextInitials = new WeakReference<TextView>(journalParams.getTextInitials()).get();
-        //this.mTextLastname = new WeakReference<TextView>(journalParams.getTextLastname()).get();
-        //this.mTextFirstname = new WeakReference<TextView>(journalParams.getTextFirstname()).get();
-        //this.mTextMidname = new WeakReference<TextView>(journalParams.getTextMidname()).get();
-        this.mImageAccess = new WeakReference<ImageView>(journalParams.getImageAccess()).get();
+        this.mCard = new WeakReference<>(journalParams.getCard()).get();
+        this.mTextAuditroom = new WeakReference<>(journalParams.getTextAuditroom()).get();
+        this.mTextTimeIn = new WeakReference<>(journalParams.getTextTimeIn()).get();
+        this.mTextTimeOut = new WeakReference<>(journalParams.getTextTimeOut()).get();
+        this.mImagePerson = new WeakReference<>(journalParams.getImagePerson()).get();
+        this.mTextInitials = new WeakReference<>(journalParams.getTextInitials()).get();
+        this.mImageAccess = new WeakReference<>(journalParams.getImageAccess()).get();
         this.mTimeIn = journalParams.getTimeIn();
         this.mAnimation = animation;
     }

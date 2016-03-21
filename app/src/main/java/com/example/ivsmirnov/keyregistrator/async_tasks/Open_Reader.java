@@ -7,7 +7,7 @@ import android.util.Log;
 import com.acs.smartcard.Reader;
 
 /**
- * Created by ivsmirnov on 02.11.2015.
+ * Открываем считыватель
  */
 public class Open_Reader extends AsyncTask<UsbDevice,Void,Exception> {
 

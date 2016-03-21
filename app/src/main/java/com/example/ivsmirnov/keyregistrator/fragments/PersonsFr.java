@@ -54,11 +54,9 @@ public class PersonsFr extends Fragment implements UpdateInterface {
     private Context mContext;
     private static RecyclerView mRecyclerView;
     private ListView mListView;
-    private FloatingActionButton mAddFAB;
 
     private static ArrayList<String> mPersonTagList;
     public AdapterPersonsGrid mAdapter;
-    private AdapterPersonsCharacters mListAdapter;
 
     private BaseWriterInterface mBaseWriterInterface;
 
@@ -173,7 +171,7 @@ public class PersonsFr extends Fragment implements UpdateInterface {
 
         mBaseWriterInterface = (BaseWriterInterface)getActivity();
 
-        mAddFAB = (FloatingActionButton)rootView.findViewById(R.id.persons_fragment_fab);
+        FloatingActionButton mAddFAB = (FloatingActionButton) rootView.findViewById(R.id.persons_fragment_fab);
         mAddFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -212,7 +210,7 @@ public class PersonsFr extends Fragment implements UpdateInterface {
     }
 
     private void setmListCharactersAdapter(){
-        mListAdapter = new AdapterPersonsCharacters(mContext,mListCharacters);
+        AdapterPersonsCharacters mListAdapter = new AdapterPersonsCharacters(mContext, mListCharacters);
         mListView.setAdapter(mListAdapter);
     }
 
@@ -279,10 +277,6 @@ public class PersonsFr extends Fragment implements UpdateInterface {
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
 
     @Override
     public void updateInformation() {

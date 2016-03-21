@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Created by ivsmirnov on 16.11.2015.
+ * Запись файлов
  */
 public class FileWriter extends AsyncTask <Void,Integer,Void> {
 
@@ -27,7 +27,6 @@ public class FileWriter extends AsyncTask <Void,Integer,Void> {
     public static final int WRITE_TEACHERS = 101;
     public static final int WRITE_ROOMS = 123;
 
-    private Context mContext;
     private int mType;
     private ProgressDialog mProgressDialog;
     private String mPathExternal;
@@ -38,11 +37,10 @@ public class FileWriter extends AsyncTask <Void,Integer,Void> {
     private static final String TEACHERS = "/Teachers.csv";
 
     public FileWriter(Context context, int loadType, boolean isShowDialog){
-        this.mContext = context;
         this.mType = loadType;
         this.isShowDialog = isShowDialog;
         mPathExternal = Environment.getExternalStorageDirectory().getPath();
-        mProgressDialog = new ProgressDialog(mContext);
+        mProgressDialog = new ProgressDialog(context);
 
 
     }
