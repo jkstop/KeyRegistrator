@@ -1,10 +1,14 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.ImageView;
@@ -27,12 +31,15 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private ArrayList<RoomItem> mRoomItems;
     private RecycleItemClickListener mListener;
-    private int mColorFilter;
+    private int itemWidth;
 
-    public AdapterMainRoomGrid(ArrayList<RoomItem> roomItems, RecycleItemClickListener listener) {
+    public AdapterMainRoomGrid(Context context, ArrayList<RoomItem> roomItems, RecycleItemClickListener listener) {
         this.mRoomItems = roomItems;
         this.mListener = listener;
-        this.mColorFilter = App.getAppContext().getResources().getColor(R.color.colorAccent);
+
+        WindowManager mWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        Display mDisplay = mWindowManager.getDefaultDisplay();
+        itemWidth = (mDisplay.getWidth() - (context.getResources().getDimensionPixelSize(R.dimen.layout_margin_right)*2)) / 3;
     }
 
     static class auditroomFreeViewHolder extends RecyclerView.ViewHolder{
@@ -125,19 +132,35 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
         switch (holder.getItemViewType()){
             case 1:
                 ((auditroomFreeViewHolder) holder).mFreeTextAuditroom.setText(mRoomItems.get(position).getAuditroom());
+
+                RelativeLayout.LayoutParams imageKeyLayoutParams = (RelativeLayout.LayoutParams) ((auditroomFreeViewHolder)holder).mFreeImageKey.getLayoutParams();
+                imageKeyLayoutParams.width = (int)Math.round(itemWidth /3.5);
+
+                //if (itemWidth / 2 > getItemScaleHeight()){
+                //    imageKeyLayoutParams.width = imageKeyLayoutParams.height = (int) (getItemScaleHeight()/2);
+                //} else {
+                //    imageKeyLayoutParams.width = imageKeyLayoutParams.height = (int) (getItemScaleHeight()/3);
+                //}
+
                 break;
             case 0:
                 ((auditroomBusyViewHolder)holder).mBusyTextAuditroom.setText(mRoomItems.get(position).getAuditroom());
                 ((auditroomBusyViewHolder)holder).mBusyTextPerson.setText(mRoomItems.get(position).getLastVisiter());
 
-                //RelativeLayout.LayoutParams imageKeyParams = (RelativeLayout.LayoutParams) ((auditroomBusyViewHolder)holder).mBusyImageKey.getLayoutParams();
-                //imageKeyParams.width = imageKeyParams.height = (int)(getItemScaleHeight()/5.6);
+                RelativeLayout.LayoutParams imageKeyParams = (RelativeLayout.LayoutParams) ((auditroomBusyViewHolder)holder).mBusyImageKey.getLayoutParams();
+                imageKeyParams.width = imageKeyParams.height = (int)(getItemScaleHeight()/5);
 
                 RelativeLayout.LayoutParams imagePersonParams = (RelativeLayout.LayoutParams) ((auditroomBusyViewHolder)holder).mBusyImagePerson.getLayoutParams();
-                imagePersonParams.width = (int) (getItemScaleHeight()/1.4);
+
+                //if (itemWidth / 2 > getItemScaleHeight()){
+                //    imagePersonParams.width = getItemScaleHeight()/2;
+                //} else {
+                //    imagePersonParams.width = getItemScaleHeight()/3;
+                //}
+                imagePersonParams.width = (int)Math.round(itemWidth /3.5);
 
                 ((auditroomBusyViewHolder)holder).mBusyImagePerson.setLayoutParams(imagePersonParams);
-                ((auditroomBusyViewHolder)holder).mBusyImageKey.setColorFilter(mColorFilter);
+
 
                 //загрузка и отображение фото из БД
                 new GetPersons(App.getAppContext(),null, AnimationUtils.loadAnimation(App.getAppContext(),android.R.anim.fade_in)).execute(new GetPersonParams()

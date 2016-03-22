@@ -6,6 +6,7 @@
     android:id="@+id/card_auditroom_busy"
     app:cardElevation="@dimen/auditroom_card_elevation"
     app:contentPadding="@dimen/auditroom_card_content_padding"
+    app:cardUseCompatPadding="true"
     android:foreground="?android:attr/selectableItemBackground"
     app:cardBackgroundColor="@color/auditroom_busy_card">
 
@@ -15,7 +16,7 @@
 
         <RelativeLayout
             android:id="@+id/card_auditroom_busy_image_layout"
-            android:layout_width="@dimen/auditroom_card_busy_image_width"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/auditroom_card_image_margin"
             android:layout_alignParentStart="true"
@@ -34,7 +35,7 @@
                 android:contentDescription="@string/auditroom_grid_busy_image_key_description"
                 android:layout_alignEnd="@id/card_auditroom_busy_image_person"
                 android:layout_alignRight="@id/card_auditroom_busy_image_person"
-                android:src="@drawable/ic_key_24dp"
+                android:src="@drawable/ic_key_color"
                 android:layout_alignParentBottom="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -55,14 +56,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.6"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:textColor="@color/black"
                 android:textSize="@dimen/auditroom_card_busy_text_aud_size"
                 android:gravity="center" />
 
             <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                 android:id="@+id/card_auditroom_busy_text_person"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:textColor="@color/black"
                 android:textSize="50sp"
                 android:layout_width="match_parent"

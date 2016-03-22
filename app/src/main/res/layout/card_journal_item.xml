@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/journal_item_card_height"
     app:cardBackgroundColor="@color/grey_400"
+    app:cardUseCompatPadding="true"
     app:contentPadding="@dimen/journal_item_card_content_padding"
     app:elevation="@dimen/journal_item_card_elevation">
     

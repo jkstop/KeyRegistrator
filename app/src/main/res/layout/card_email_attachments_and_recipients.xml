@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardUseCompatPadding="true"
     app:contentPadding="@dimen/card_default_content_padding"
     app:cardElevation="@dimen/card_default_elevation">
 

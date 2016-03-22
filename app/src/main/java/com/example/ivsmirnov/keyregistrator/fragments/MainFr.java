@@ -97,7 +97,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     }
 
     private void initializeAuditroomGrid(){
-        AdapterMainRoomGrid mAuditroomGridAdapter = new AdapterMainRoomGrid(mRoomItems,this);
+        AdapterMainRoomGrid mAuditroomGridAdapter = new AdapterMainRoomGrid(mContext, mRoomItems,this);
         mAuditroomGrid.setAdapter(mAuditroomGridAdapter);
 
         //Layout manager для сетки с пользователями, отключение прокрутки

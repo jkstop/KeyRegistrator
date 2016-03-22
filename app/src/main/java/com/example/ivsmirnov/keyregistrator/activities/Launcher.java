@@ -20,6 +20,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
@@ -71,9 +72,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -296,6 +301,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
                     GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
 
+
                     if (result.isSuccess()) {
                         final GoogleSignInAccount acct = result.getSignInAccount();
                         AccountItem accountItem = new AccountItem().setLastname(acct.getDisplayName())
@@ -315,7 +321,6 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                     }
                 }
             }
-
     }
 
     private void getUserActiveAccount(){

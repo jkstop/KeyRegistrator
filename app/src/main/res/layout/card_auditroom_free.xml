@@ -5,6 +5,7 @@
     android:layout_height="@dimen/auditroom_card_height"
     app:cardElevation="@dimen/auditroom_card_elevation"
     app:contentPadding="@dimen/auditroom_card_content_padding"
+    app:cardUseCompatPadding="true"
     android:foreground="?android:attr/selectableItemBackground"
     app:cardBackgroundColor="@color/auditroom_card">
 
@@ -18,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/auditroom_grid_free_image_descryption"
-            android:src="@drawable/ic_key_48dp"
+            android:src="@drawable/ic_key_color"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"

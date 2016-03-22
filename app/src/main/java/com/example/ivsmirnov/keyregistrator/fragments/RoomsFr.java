@@ -59,7 +59,7 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
         mContext = rootView.getContext();
 
         mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.auditroom_fragment_room_grid);
-        mRoomsGrid.setHasFixedSize(true);
+        //mRoomsGrid.setHasFixedSize(true);
 
         FloatingActionButton mAddFAB = (FloatingActionButton) rootView.findViewById(R.id.auditroom_fragment_fab);
 
@@ -109,7 +109,7 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
             mRoomItems.get(i).setStatus(RoomDB.ROOM_IS_FREE);
         }
 
-        AdapterMainRoomGrid mAdapter = new AdapterMainRoomGrid(mRoomItems, this);
+        AdapterMainRoomGrid mAdapter = new AdapterMainRoomGrid(mContext, mRoomItems, this);
         mRoomsGrid.setAdapter(mAdapter);
 
     }

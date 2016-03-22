@@ -13,6 +13,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,18 +75,25 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
         if (mInputText.requestFocus()){
             getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         }
+
+
         mInputText.addTextChangedListener(new TextWatcher() {
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.d("s",String.valueOf(s.length()));
+
+                Log.d("count", String.valueOf(count));
+
                 if (s.length()>=3 && s.length()<=6){
                     if (connection!=null){
                         try {
                             TagSearcher tagSearcher;
-                            if (count == 1){
+                            if (count != 0){
                                 tagSearcher = new TagSearcher(s, mTagSeacherInterface);
                                 tagSearcher.execute(connection);
                             }
@@ -111,9 +119,9 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
                     mInputLayout.setError(getResources().getString(R.string.input_empty_error));
                 }else{
                     String[] split = source.split("\\s+");
-                    String lastname = Values.EMPTY;
-                    String firstname = Values.EMPTY;
-                    String midname = Values.EMPTY;
+                    String lastname = null;
+                    String firstname = null;
+                    String midname = null;
 
                     String photo = FavoriteDB.getBase64DefaultPhotoFromResources(mContext,"М");
                     try {

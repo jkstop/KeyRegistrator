@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
@@ -87,6 +88,9 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                             if (!lines.contains(line)){
                                 try {
                                     String [] split = line.split(";");
+                                    for (int j=0; j<split.length; j++){
+                                        if (split[j].equals("null")) split[j] = null;
+                                    }
 
                                     FavoriteDB.writeInDBTeachers(mContext, new PersonItem()
                                             .setLastname(split[0])

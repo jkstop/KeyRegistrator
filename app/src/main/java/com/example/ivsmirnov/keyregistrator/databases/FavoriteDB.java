@@ -198,7 +198,6 @@ public class FavoriteDB {
             } else{
                 selection = FavoriteDBinit.COLUMN_LASTNAME_FAVORITE + " LIKE?";
                 selectionArgs = new String[]{character + "%"};
-
             }
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
                     FavoriteDBinit.TABLE_TEACHER,
@@ -235,8 +234,13 @@ public class FavoriteDB {
             cursor.moveToPosition(-1);
             ArrayList<String> uniqueCharacters = new ArrayList<>();
             while (cursor.moveToNext()){
-                String firstSymbol = cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE)).substring(0,1).toUpperCase();
-                if (!uniqueCharacters.contains(firstSymbol)){
+                String firstSymbol = null;
+                try {
+                    firstSymbol = cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE)).substring(0,1).toUpperCase();
+                } catch (StringIndexOutOfBoundsException e){
+                    e.printStackTrace();
+                }
+                if (firstSymbol!=null && !uniqueCharacters.contains(firstSymbol)){
                     uniqueCharacters.add(firstSymbol);
                 }
             }
@@ -292,14 +296,14 @@ public class FavoriteDB {
                 }
 
                 ContentValues cv = new ContentValues();
-                cv.put(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
-                cv.put(FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
-                cv.put(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE, personItem.getMidname());
-                cv.put(FavoriteDBinit.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
-                cv.put(FavoriteDBinit.COLUMN_TAG_FAVORITE, personItem.getRadioLabel());
-                cv.put(FavoriteDBinit.COLUMN_SEX_FAVORITE, personItem.getSex());
-                cv.put(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE, personItem.getPhotoPreview());
-                cv.put(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE, personItem.getPhotoOriginal());
+                if (personItem.getLastname()!=null) cv.put(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
+                if (personItem.getFirstname()!=null) cv.put(FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
+                if (personItem.getMidname()!=null) cv.put(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE, personItem.getMidname());
+                if (personItem.getDivision()!=null) cv.put(FavoriteDBinit.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
+                if (personItem.getRadioLabel()!=null) cv.put(FavoriteDBinit.COLUMN_TAG_FAVORITE, personItem.getRadioLabel());
+                if (personItem.getSex()!=null) cv.put(FavoriteDBinit.COLUMN_SEX_FAVORITE, personItem.getSex());
+                if (personItem.getPhotoPreview()!=null) cv.put(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE, personItem.getPhotoPreview());
+                if (personItem.getPhotoOriginal()!=null) cv.put(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE, personItem.getPhotoOriginal());
 
                 if (isUserInBase(personItem.getRadioLabel())){
                     deleteUser(personItem.getRadioLabel());
@@ -475,26 +479,26 @@ public class FavoriteDB {
         String initials = Values.EMPTY;
         switch (initialsType){
             case SHORT_INITIALS:
-                if (lastname.length() != 0 && firstname.length() != 1 && firstname.length()!=0 && midname.length() != 1 && midname.length() != 0) {
+                if (lastname != null && firstname != null && midname != null && firstname.length() != 0 && midname.length() != 0) {
                     initials = lastname + " " + firstname.charAt(0) + "." + midname.charAt(0) + ".";
                 } else {
-                    if (lastname.length() != 1 && firstname.length() != 1) {
+                    if (lastname != null && firstname != null) {
                         initials = lastname + " " + firstname;
                     } else {
-                        if (lastname.length() != 1) {
+                        if (lastname != null) {
                             initials = lastname;
                         }
                     }
                 }
                break;
             case FULL_INITIALS:
-                if (lastname.length() != 0 && firstname.length() != 1 && firstname.length()!=0 && midname.length() != 1 && midname.length() != 0) {
+                if (lastname != null && firstname != null && midname != null) {
                     initials = lastname + " " + firstname + " " + midname;
                 } else {
-                    if (lastname.length() != 1 && firstname.length() != 1) {
+                    if (lastname != null && firstname != null) {
                         initials = lastname + " " + firstname;
                     } else {
-                        if (lastname.length() != 1) {
+                        if (lastname != null) {
                             initials = lastname;
                         }
                     }

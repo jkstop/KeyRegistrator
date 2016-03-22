@@ -94,6 +94,10 @@ public class Settings {
         setFreeUsers(freeUsers);
     }
 
+    public static void clearFreeUsers(){
+        mPreferencesEditor.remove(FREE_USERS);
+    }
+
     public static ArrayList<String> getFreeUsers(){
         ArrayList<String>items = new ArrayList<>();
         Set<String> freeUsers = getPreferences().getStringSet(FREE_USERS,null);

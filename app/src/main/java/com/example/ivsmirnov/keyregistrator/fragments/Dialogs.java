@@ -136,6 +136,7 @@ public class Dialogs extends DialogFragment{
                             public void onClick(DialogInterface dialog, int which) {
 
                                 FavoriteDB.clearTeachersDB();
+                                Settings.clearFreeUsers();
                                 updateInformation();
 
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();

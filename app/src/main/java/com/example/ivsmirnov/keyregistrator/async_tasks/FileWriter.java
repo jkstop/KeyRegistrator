@@ -41,8 +41,6 @@ public class FileWriter extends AsyncTask <Void,Integer,Void> {
         this.isShowDialog = isShowDialog;
         mPathExternal = Environment.getExternalStorageDirectory().getPath();
         mProgressDialog = new ProgressDialog(context);
-
-
     }
 
     @Override

@@ -7,14 +7,14 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
  * User item
  */
 public class PersonItem {
-    private String Lastname = Values.EMPTY;
-    private String Firstname = Values.EMPTY;
-    private String Midname = Values.EMPTY;
-    private String Division = Values.EMPTY;
-    private String Sex = "М";
+    private String Lastname;
+    private String Firstname;
+    private String Midname;
+    private String Division;
+    private String Sex;
     private String PhotoPreview;
     private String PhotoOriginal;
-    private String RadioLabel = Values.EMPTY;
+    private String RadioLabel;
 
     public boolean isEmpty(){
         return Lastname.equals(Values.EMPTY) &&
@@ -66,7 +66,9 @@ public class PersonItem {
     }
 
     public String getSex(){
-        return Sex;
+        if (Sex!=null) return Sex;
+        else return "М";
+
     }
 
     public PersonItem setPhotoPreview (String photoPreview){
