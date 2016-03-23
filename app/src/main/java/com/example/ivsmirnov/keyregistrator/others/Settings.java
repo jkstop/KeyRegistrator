@@ -1,9 +1,11 @@
 package com.example.ivsmirnov.keyregistrator.others;
 
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 
 import java.util.ArrayList;
@@ -32,6 +34,8 @@ public class Settings {
     public static final String MAIL_ATTACHMENTS = "mail_attachments";
     public static final String MAIL_THEME = "mail_theme";
     public static final String MAIL_BODY = "mail_body";
+    public static final String AUTO_CLOSE_STATUS = App.getAppContext().getResources().getString(R.string.shared_preferences_auto_close);
+    public static final String AUTO_CLOSE_TIME = App.getAppContext().getResources().getString(R.string.shared_preferences_time_close);
 
     private static SharedPreferences mPreferences;
     private static SharedPreferences.Editor mPreferencesEditor;
@@ -54,6 +58,14 @@ public class Settings {
             mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(App.getAppContext()).edit();
         }
         return mPreferencesEditor;
+    }
+
+    public static boolean getAutoCloseStatus(){
+        return getPreferences().getBoolean(AUTO_CLOSE_STATUS, false);
+    }
+
+    public static String getAutoCloseTime(){
+        return getPreferences().getString(AUTO_CLOSE_TIME, "00:00");
     }
 
     public static void setMessageTheme (String theme){

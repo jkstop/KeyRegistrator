@@ -5,6 +5,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
+
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.util.Calendar;
 
@@ -34,22 +37,42 @@ public class Alarm {
         }else{
             mAlarmManager.setExact(AlarmManager.RTC_WAKEUP, closingTime, mStartAlarmIntent);
         }
-
+        System.out.println("ALARM SET");
     }
 
-    public long closingTime(){
-        Calendar now = Calendar.getInstance();
-        Calendar when = (Calendar)now.clone();
-        when.set(Calendar.HOUR_OF_DAY, 22);
-        when.set(Calendar.MINUTE, 1);
-        when.set(Calendar.SECOND, 0);
-        when.set(Calendar.MILLISECOND, 0);
+    //public long closingTime(){
+    //    Calendar now = Calendar.getInstance();
+    //    Calendar when = (Calendar)now.clone();
+    ///    when.set(Calendar.HOUR_OF_DAY, 22);
+       // when.set(Calendar.MINUTE, 1);
+    //    when.set(Calendar.SECOND, 0);
+     //   when.set(Calendar.MILLISECOND, 0);
 
-        if (when.compareTo(now)<=0){
-            when.add(Calendar.DATE, 1);
+//        if (when.compareTo(now)<=0){
+//            when.add(Calendar.DATE, 1);
+ //       }
+  //      return when.getTimeInMillis();
+   // }
+
+    public static long getClosingTime(){
+        Calendar mNowCalendar = Calendar.getInstance();
+        Calendar mCloseCalendar = (Calendar)mNowCalendar.clone();
+
+        String [] timeSplit = Settings.getAutoCloseTime().split(":");
+        mCloseCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeSplit[0]));
+        mCloseCalendar.set(Calendar.MINUTE, Integer.parseInt(timeSplit[1]));
+        mCloseCalendar.set(Calendar.SECOND,0);
+
+        //если сегодня пропустили, то перенос на завтра
+        if (mCloseCalendar.compareTo(mNowCalendar) <= 0){
+            mCloseCalendar.add(Calendar.DATE, 1);
         }
-        return when.getTimeInMillis();
+
+        System.out.println(mCloseCalendar.getTime());
+
+        return mCloseCalendar.getTimeInMillis();
     }
+
 
 
     public void cancelAlarm(){
@@ -62,6 +85,7 @@ public class Alarm {
 
         mAlarmManager.cancel(mStartAlarmIntent);
         mStartAlarmIntent.cancel();
+        System.out.println("ALARM OFF");
     }
 
     public boolean isAlarmSet(){

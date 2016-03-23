@@ -48,6 +48,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".activities.Preferences"
+            android:label="@string/navigation_drawer_item_settings"/>
+
     </application>
 
 </manifest>

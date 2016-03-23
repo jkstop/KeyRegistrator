@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="@string/shared_preferences_category_sheduler"
+        android:title="@string/shared_preferences_category_sheduler">
+
+        <SwitchPreference
+            android:key = "@string/shared_preferences_auto_close"
+            android:title = "@string/shared_preferences_auto_close" />
+
+        <com.example.ivsmirnov.keyregistrator.custom_views.TimePreference
+            android:key="@string/shared_preferences_time_close"
+            android:title="@string/shared_preferences_time_close"
+            android:dependency="@string/shared_preferences_auto_close"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

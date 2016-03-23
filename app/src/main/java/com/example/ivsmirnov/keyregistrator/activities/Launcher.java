@@ -72,13 +72,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
+import com.google.android.gms.common.server.converter.StringToIntConverter;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -144,8 +141,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         mCloseRoomInterface = this;
 
         //init and set auto close alarm
-        mAlarm = new Alarm(App.getAppContext());
-        mAlarm.setAlarm(mAlarm.closingTime());
+        setAutoClose();
 
         setNavigationItems();
 
@@ -178,6 +174,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_journal)).setIcon(R.drawable.ic_format_list_bulleted_black_24dp));
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_rooms)).setIcon(R.drawable.ic_room_black_24dp));
         mNavigationItems.add(new NavigationItem().setSeparator(true));
+        mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_settings)).setIcon(R.drawable.ic_settings_black_24dp));
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_mail)).setIcon(R.drawable.ic_attachment_black_24dp));
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_sql)).setIcon(R.drawable.ic_cloud_black_24dp));
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_stat)).setIcon(R.drawable.ic_info_black_24dp));
@@ -241,6 +238,8 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                     dialog_sql.show(getSupportFragmentManager(),"sql");
                 }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_stat))) {
                     startActivity(new Intent(mContext, CloseDay.class).putExtra("type", 1).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                } else if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_settings))){
+                    startActivity(new Intent(mContext, Preferences.class));
                 }
 
                 //mNavigationItems.get(position).setSelected(true);
@@ -443,11 +442,23 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     @Override
     protected void onResume() {
         super.onResume();
-        if (!mAlarm.isAlarmSet()) {
-            mAlarm.setAlarm(mAlarm.closingTime());
-        }
+
+        //Log.d("AutoCloseStatus", String.valueOf(Settings.getAutoCloseStatus()));
+
+        //if (!mAlarm.isAlarmSet()) {
+        //    mAlarm.setAlarm(mAlarm.closingTime());
+        //}
+        System.out.println(String.valueOf(mAlarm.isAlarmSet()));
+        setAutoClose();
 
         if (mNavigationItems == null) setNavigationItems();
+    }
+
+    private void setAutoClose(){
+        if (mAlarm == null) mAlarm = new Alarm(App.getAppContext());
+        if (Settings.getAutoCloseStatus()){
+            if (!mAlarm.isAlarmSet()) mAlarm.setAlarm(Alarm.getClosingTime());
+        }
     }
 
     @Override

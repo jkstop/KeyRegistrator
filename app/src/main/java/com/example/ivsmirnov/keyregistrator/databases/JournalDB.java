@@ -356,7 +356,7 @@ public class JournalDB {
     /*public static JournalItem createNewItemForJournal (Context context, String personTag, String auditroom, int accessType){
 
         PersonItem person = FavoriteDB.getPersonItem(context, personTag, FavoriteDB.LOCAL_USER, FavoriteDB.PREVIEW_PHOTO);
-        return new JournalItem().setAccountID(Settings.getActiveAccountID())
+        return new JournalItem().setAccountID(Preferences.getActiveAccountID())
                 .setAuditroom(auditroom)
                 .setAccessType(accessType)
                 .setTimeIn(System.currentTimeMillis())

@@ -177,4 +177,9 @@
     <string name="menu_main_items_size">Размер элементов</string>
     <string name="menu_nfc_all_persons">Все пользователи</string>
 
+    <!--Preferences-->
+    <string name="shared_preferences_category_sheduler">Планировщик</string>
+    <string name="shared_preferences_auto_close">Закрывать аудитории автоматически</string>
+    <string name="shared_preferences_time_close">Время завершения занятий</string>
+
 </resources>
