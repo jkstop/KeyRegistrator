@@ -36,6 +36,7 @@ public class JournalDB {
     public static final int COUNT_TOTAL = 3;
 
     public static long writeInDBJournal(JournalItem journalItem){
+
         SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.DB_JOURNAL);
         Cursor cursor = null;
         try {
@@ -67,9 +68,9 @@ public class JournalDB {
         }
     }
 
-    public static ArrayList<JournalItem> getJournalItemTags(Date date){
+    public static ArrayList<Long> getJournalItemTags(Date date){
         DateFormat dateFormat = DateFormat.getDateInstance();
-        ArrayList <JournalItem> items = new ArrayList<>();
+        ArrayList <Long> items = new ArrayList<>();
         Cursor cursor = null;
         try {
 
@@ -84,11 +85,14 @@ public class JournalDB {
             if (cursor.getCount()>0){
                 cursor.moveToPosition(-1);
                 while (cursor.moveToNext()){
-                    if (dateFormat.format(date).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN)))))){
-                        items.add(new JournalItem()
-                        .setTimeIn(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN))));
-
+                    if (date!=null){ //возвращаем тэги (они же время входа) на указанную дату
+                        if (dateFormat.format(date).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN)))))){
+                            items.add(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN)));
+                        }
+                    } else { //если пусто, то возвращаем все
+                        items.add(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN)));
                     }
+
                 }
             }
         }catch (Exception e){
@@ -225,17 +229,25 @@ public class JournalDB {
         return items;
     }
 
-    public static void updateDB(Long roomPositionInBase){
+    public static void updateDB(Long timeIn){
         SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.DB_JOURNAL);
+        Cursor cursor = null;
         try {
+            cursor = DbShare.getCursor(DbShare.DB_JOURNAL, JournalDBinit.TABLE_JOURNAL,
+                    new String[] {JournalDBinit._ID},
+                    JournalDBinit.COLUMN_TIME_IN + " =?",
+                    new String[]{String.valueOf(timeIn)},
+                    null,
+                    null,
+                    "1");
+            cursor.moveToFirst();
             ContentValues cv = new ContentValues();
             cv.put(JournalDBinit.COLUMN_TIME_OUT, System.currentTimeMillis());
             mDataBase.update(JournalDBinit.TABLE_JOURNAL, cv,
-                    JournalDBinit._ID + "=" + roomPositionInBase, null);
+                    JournalDBinit._ID + "=" + cursor.getInt(cursor.getColumnIndex(JournalDBinit._ID)), null);
         } catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
     public static  void backupJournalToXLS(){

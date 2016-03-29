@@ -30,6 +30,7 @@ public class PersonItem {
     }
 
     public String getLastname(){
+        if (Lastname == null) Lastname = "";
         return Lastname;
     }
 
@@ -39,6 +40,7 @@ public class PersonItem {
     }
 
     public String getFirstname(){
+        if (Firstname == null) Firstname = "";
         return Firstname;
     }
 
@@ -48,6 +50,7 @@ public class PersonItem {
     }
 
     public String getMidname(){
+        if (Midname == null) Midname = "";
         return Midname;
     }
 

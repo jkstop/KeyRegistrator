@@ -26,7 +26,7 @@ public class RoomDB {
             cv.put(RoomDBinit.COLUMN_ROOM, roomItem.getAuditroom());
             cv.put(RoomDBinit.COLUMN_STATUS, roomItem.getStatus());
             cv.put(RoomDBinit.COLUMN_ACCESS,roomItem.getAccessType());
-            cv.put(RoomDBinit.COLUMN_POSITION_IN_BASE, roomItem.getPositionInBase());
+            cv.put(RoomDBinit.COLUMN_TIME, roomItem.getTime());
             cv.put(RoomDBinit.COLUMN_LAST_VISITER, roomItem.getLastVisiter());
             cv.put(RoomDBinit.COLUMN_TAG,roomItem.getTag());
             cv.put(RoomDBinit.COLUMN_PHOTO_PATH, roomItem.getPhoto());
@@ -51,7 +51,7 @@ public class RoomDB {
             if (roomPosition!=null){
                 ContentValues cv = new ContentValues();
                 cv.put(RoomDBinit.COLUMN_STATUS,roomItem.getStatus());
-                cv.put(RoomDBinit.COLUMN_POSITION_IN_BASE,roomItem.getPositionInBase());
+                cv.put(RoomDBinit.COLUMN_TIME,roomItem.getTime());
                 cv.put(RoomDBinit.COLUMN_LAST_VISITER,roomItem.getLastVisiter());
                 cv.put(RoomDBinit.COLUMN_ACCESS,roomItem.getAccessType());
                 cv.put(RoomDBinit.COLUMN_TAG,roomItem.getTag());
@@ -83,7 +83,7 @@ public class RoomDB {
                             .setStatus(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_STATUS)))
                             .setAccessType(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_ACCESS)))
                             .setLastVisiter(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_LAST_VISITER)))
-                            .setPositionInBase(cursor.getLong(cursor.getColumnIndex(RoomDBinit.COLUMN_POSITION_IN_BASE)))
+                            .setTime(cursor.getLong(cursor.getColumnIndex(RoomDBinit.COLUMN_TIME)))
                             .setTag(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG))); /* photo is null for speed*/
                 }else{
                     return null;
@@ -138,7 +138,7 @@ public class RoomDB {
                         .setStatus(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_STATUS)))
                         .setTag(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG)))
                         .setAccessType(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_ACCESS)))
-                        .setPositionInBase(cursor.getLong(cursor.getColumnIndex(RoomDBinit.COLUMN_POSITION_IN_BASE)))
+                        .setTime(cursor.getLong(cursor.getColumnIndex(RoomDBinit.COLUMN_TIME)))
                         .setLastVisiter(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_LAST_VISITER)))
                         .setTag(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG))));
                         //.setPhoto(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_PHOTO_PATH))));
@@ -177,7 +177,7 @@ public class RoomDB {
                 return new RoomItem().setAuditroom(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_ROOM)))
                         .setStatus(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_STATUS)))
                         .setAccessType(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_ACCESS)))
-                        .setPositionInBase(cursor.getLong(cursor.getColumnIndex(RoomDBinit.COLUMN_POSITION_IN_BASE)))
+                        .setTime(cursor.getLong(cursor.getColumnIndex(RoomDBinit.COLUMN_TIME)))
                         .setLastVisiter(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_LAST_VISITER)))
                         .setTag(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG)))
                         .setPhoto(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_PHOTO_PATH)));
@@ -270,7 +270,7 @@ public class RoomDB {
                 roomItem.setTag(Values.EMPTY);
 
                 RoomDB.updateRoom(roomItem);
-                JournalDB.updateDB(roomItem.getPositionInBase());
+                JournalDB.updateDB(roomItem.getTime());
 
                 closedRooms++;
             }

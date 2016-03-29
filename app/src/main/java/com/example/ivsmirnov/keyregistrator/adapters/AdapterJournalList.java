@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetJournal;
 import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
-import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 
 import java.util.ArrayList;
@@ -21,13 +20,13 @@ import java.util.ArrayList;
 public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.ViewHolderJournalItem> {
 
     private final Context context;
-    private ArrayList<JournalItem> journalItems;
+    private ArrayList<Long> mJournalItemTags;
     private RecycleItemClickListener mListener;
 
 
-    public AdapterJournalList(Context context, RecycleItemClickListener recycleItemClickListener, ArrayList<JournalItem> journalItems) {
+    public AdapterJournalList(Context context, RecycleItemClickListener recycleItemClickListener, ArrayList<Long> mJournalItemTags) {
         this.context = context;
-        this.journalItems = journalItems;
+        this.mJournalItemTags = mJournalItemTags;
         this.mListener = recycleItemClickListener;
     }
 
@@ -38,7 +37,7 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
         rowView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                mListener.onItemLongClick(v,viewHolderJournalItem.getLayoutPosition(),journalItems.get(viewHolderJournalItem.getLayoutPosition()).getTimeIn());
+                mListener.onItemLongClick(v,viewHolderJournalItem.getLayoutPosition(), mJournalItemTags.get(viewHolderJournalItem.getLayoutPosition()));
                 return true;
             }
         });
@@ -54,7 +53,7 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
     public void onBindViewHolder(ViewHolderJournalItem holder, int position) {
 
         new GetJournal(new GetJournalParams()
-                .setTimeIn(journalItems.get(position).getTimeIn())
+                .setTimeIn(mJournalItemTags.get(position))
                 .setCard(holder.mCard)
                 .setImagePerson(holder.mImagePerson)
                 .setImageAccess(holder.mImageAccess)
@@ -70,7 +69,7 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
 
     @Override
     public int getItemCount() {
-        return journalItems.size();
+        return mJournalItemTags.size();
     }
 
     static class ViewHolderJournalItem extends RecyclerView.ViewHolder{

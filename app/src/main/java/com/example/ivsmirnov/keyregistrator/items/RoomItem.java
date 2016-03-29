@@ -9,7 +9,7 @@ public class RoomItem {
     private String Auditroom = Values.EMPTY;
     private int Status;
     private int Access;
-    private long PositionInBase = 0;
+    private long Time = 0;
     private String LastVisiter  =Values.EMPTY;
     private String Tag = Values.EMPTY;
     private String Photo = Values.EMPTY;
@@ -29,8 +29,8 @@ public class RoomItem {
         return this;
     }
 
-    public RoomItem setPositionInBase(long positionInBase){
-        this.PositionInBase = positionInBase;
+    public RoomItem setTime(long time){
+        this.Time = time;
         return this;
     }
 
@@ -61,8 +61,8 @@ public class RoomItem {
         return Access;
     }
 
-    public long getPositionInBase(){
-        return PositionInBase;
+    public long getTime(){
+        return Time;
     }
 
     public String getLastVisiter(){

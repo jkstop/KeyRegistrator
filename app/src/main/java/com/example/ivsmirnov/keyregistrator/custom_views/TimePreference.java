@@ -63,8 +63,16 @@ public class TimePreference extends DialogPreference {
             if (callChangeListener(time)) {
                 persistString(time);
             }
-            setSummary(time);
+            setSummaryTime(time);
         }
+    }
+
+    private void setSummaryTime(String time){
+        String [] splitTime = time.split(":");
+        for (int i=0; i<splitTime.length; i++){
+            if (splitTime[i].length()==1) splitTime[i] = "0"+splitTime[i];
+        }
+        setSummary(splitTime[0]+ ":" +splitTime[1]);
     }
 
     @Override
@@ -91,6 +99,6 @@ public class TimePreference extends DialogPreference {
         lastHour=getHour(time);
         lastMinute=getMinute(time);
 
-        setSummary(time);
+        setSummaryTime(time);
     }
 }

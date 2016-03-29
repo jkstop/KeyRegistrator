@@ -66,7 +66,8 @@
 
     <!-- Toasts -->
     <string name="text_toast_put_card">Для сдачи ключей просто приложите карту</string>
-    <string name="text_toast_choise_room_in_first">Для начала выберите аудиторию!</string>
+    <string name="text_toast_choise_room_in_first">Выберите аудиторию!</string>
+    <string name="text_toast_incorrect_card">Не удалось считать карту!</string>
     <string name="text_toast_thanks">Спасибо!</string>
     <string name="text_toast_take_key">Возьмите ключ</string>
 
@@ -168,8 +169,8 @@
     <string name="menu_journal_download_from_file">Загрузить из файла</string>
     <string name="menu_journal_delete">Очистить</string>
     <string name="menu_journal_select_location_for_copy">Указать папку для копии</string>
-    <string name="menu_journal_download_to_server">Загрузить с сервера</string>
-    <string name="menu_journal_download_from_server">Загрузить на сервер</string>
+    <string name="menu_journal_download_to_server">Загрузить на сервер</string>
+    <string name="menu_journal_download_from_server">Загрузить с сервера</string>
     <string name="menu_teachers_save_to_file">Сохранить</string>
     <string name="menu_teachers_download_favorite">Загрузить из файла</string>
     <string name="menu_teachers_delete">Очистить</string>
@@ -178,8 +179,24 @@
     <string name="menu_nfc_all_persons">Все пользователи</string>
 
     <!--Preferences-->
-    <string name="shared_preferences_category_sheduler">Планировщик</string>
-    <string name="shared_preferences_auto_close">Закрывать аудитории автоматически</string>
-    <string name="shared_preferences_time_close">Время завершения занятий</string>
+    <string name="shared_preferences_category_sheduler">Настройки планировщика</string>
+    <string name="shared_preferences_category_server">Запись на сервер</string>
+    <string name="shared_preferences_sheduler">Планировщик</string>
+    <string name="shared_preferences_sheduler_time">Время срабатывания планировщика</string>
+    <string name="shared_preferences_sheduler_disabled">отключен</string>
+    <string name="shared_preferences_sheduler_enabled">активен</string>
+    <string name="shared_preferences_auto_close">Закрывать открытые помещения</string>
+    <string name="shared_preferences_email_distribution">E-mail рассылка</string>
+    <string name="shared_preferences_file_writer">Запись файлов</string>
+    <string name="shared_preferences_write_journal">Журнал посещений</string>
+    <string name="shared_preferences_write_teachers">Список пользователей</string>
+    <string name="shared_preferences_write_rooms">Список помещений</string>
+    <string name="shared_preferences_write_server">Синхронизация с сервером</string>
+    <string name="shared_preferences_server_disabled">отключена</string>
+    <string name="shared_preferences_server_enabled">активна</string>
+    <string name="shared_preferences_write_journal_server">Журнал посещений</string>
+    <string name="shared_preferences_write_teachers_server">Список пользователей</string>
+    <string name="shared_preferences_write_rooms_server">Список помещений</string>
+
 
 </resources>

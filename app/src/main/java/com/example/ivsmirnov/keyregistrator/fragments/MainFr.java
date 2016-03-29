@@ -1,8 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -25,13 +23,12 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
-import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
-import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
-import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
+import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.services.Toasts;
 
@@ -149,42 +146,6 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         }
     }
 
-    private class insert extends AsyncTask<Void,Integer,Void>{
-
-        private Context context;
-        private ProgressDialog progressDialog;
-
-        private insert(Context context){
-            this.context = context;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            progressDialog = new ProgressDialog(context);
-            progressDialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            for (int i=0;i<1000;i++){
-                FavoriteDB.writeInDBTeachers(mContext, FavoriteDB.getPersonItem(mContext,"99 77 DC 1A 00 00", FavoriteDB.SERVER_USER, FavoriteDB.ALL_PHOTO));
-                publishProgress(i);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            progressDialog.setMessage(String.valueOf(values[0]));
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            progressDialog.cancel();
-        }
-    }
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -205,11 +166,12 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
             bundle.putInt(PersonsFr.PERSONS_FRAGMENT_TYPE, PersonsFr.PERSONS_FRAGMENT_SELECTOR);
             UserAuthFr nfc_fr = UserAuthFr.newInstance();
             nfc_fr.setArguments(bundle);
-            //getFragmentManager().beginTransaction()
-                    //.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-              //      .replace(R.id.main_frame_for_fragment, nfc_fr, getResources().getString(R.string.fragment_tag_nfc))
-                //    .commit();
+
             Launcher.showFragment(getActivity().getSupportFragmentManager(), nfc_fr, R.string.fragment_tag_nfc);
+
+            if (Launcher.sCardConnected && Launcher.sReaderStateChangeListener!=null) Launcher.sReaderStateChangeListener.onStateChange(0, 1, 2);
+
+
         } else {
             if (mRoomItems.get(position).getAccessType() == JournalDB.ACCESS_BY_CLICK) {
                 new CloseRooms(mContext, mRoomItems.get(position).getTag(), mCloseRoomInterface).execute();
@@ -226,10 +188,10 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
             if (mRoomItems.get(position).getAccessType()== JournalDB.ACCESS_BY_CARD){
                 Dialogs dialogs = new Dialogs();
                 Bundle bundle = new Bundle();
-                //bundle.putLong(Values.POSITION_IN_BASE_FOR_ROOM,mRoomItems.get(position).getPositionInBase());
+                //bundle.putLong(Values.POSITION_IN_BASE_FOR_ROOM,mRoomItems.get(position).getTime());
                 bundle.putString("aud",mRoomItems.get(position).getAuditroom());
                 bundle.putString("tag",mRoomItems.get(position).getTag());
-                //bundle.putLong("positionInBase",mRoomItems.get(position).getPositionInBase());
+                //bundle.putLong("positionInBase",mRoomItems.get(position).getTime());
                 bundle.putInt(Dialogs.DIALOG_ENTER_PASSWORD_TYPE, Dialogs.DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM);
                 bundle.putInt(Dialogs.DIALOG_TYPE,Dialogs.DIALOG_ENTER_PASSWORD);
                 dialogs.setArguments(bundle);

@@ -107,7 +107,10 @@ public class NFC_Reader{
         protected void onPostExecute(TransmitResult transmitResult) {
             if (transmitResult.responseLength!=0){
                 String tag = getStringFromByte(transmitResult.response, transmitResult.responseLength-2) + "00 00";
+
                 mListener.onGetPersonTag(tag);
+
+
             }
         }
     }

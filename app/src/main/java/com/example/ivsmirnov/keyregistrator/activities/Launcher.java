@@ -20,7 +20,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
@@ -75,7 +74,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.common.server.converter.StringToIntConverter;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -115,6 +113,8 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     private static long back_pressed;
 
     private Reader mReader;
+    public static Reader.OnStateChangeListener sReaderStateChangeListener;
+    public static boolean sCardConnected = false;
 
     private Alarm mAlarm;
 
@@ -141,7 +141,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         mCloseRoomInterface = this;
 
         //init and set auto close alarm
-        setAutoClose();
+        setSheduler();
 
         setNavigationItems();
 
@@ -443,20 +443,15 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     protected void onResume() {
         super.onResume();
 
-        //Log.d("AutoCloseStatus", String.valueOf(Settings.getAutoCloseStatus()));
-
-        //if (!mAlarm.isAlarmSet()) {
-        //    mAlarm.setAlarm(mAlarm.closingTime());
-        //}
         System.out.println(String.valueOf(mAlarm.isAlarmSet()));
-        setAutoClose();
+        setSheduler();
 
         if (mNavigationItems == null) setNavigationItems();
     }
 
-    private void setAutoClose(){
+    private void setSheduler(){
         if (mAlarm == null) mAlarm = new Alarm(App.getAppContext());
-        if (Settings.getAutoCloseStatus()){
+        if (Settings.getShedulerStatus()){
             if (!mAlarm.isAlarmSet()) mAlarm.setAlarm(Alarm.getClosingTime());
         }
     }
@@ -529,7 +524,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                 mUsbManager.requestPermission(device,mPermissionIntent);
             }
 
-            mReader.setOnStateChangeListener(new com.acs.smartcard.Reader.OnStateChangeListener() {
+            sReaderStateChangeListener = new Reader.OnStateChangeListener() {
                 @Override
                 public void onStateChange(int i, int prevState, int currState) {
 
@@ -537,10 +532,11 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                             || currState > com.acs.smartcard.Reader.CARD_SPECIFIC) {
                         currState = com.acs.smartcard.Reader.CARD_UNKNOWN;
                     }
-
                     final int finalCurrState = currState;
                     try {
                         if (stateStrings[finalCurrState].equals("Present")) {
+
+                            sCardConnected = true;
 
                             new NFC_Reader().getTag(mReader, new ReaderInterface() {
                                 @Override
@@ -549,30 +545,39 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                                     UserAuthFr nfc_fr = (UserAuthFr)getFragmentByTag(R.string.fragment_tag_nfc);
                                     MainFr main_fr = (MainFr) getFragmentByTag(R.string.navigation_drawer_item_home);
 
-                                    if (persons_fr != null && persons_fr.isVisible()) {
+                                    if (tag.length() == 17){
+                                        if (persons_fr != null && persons_fr.isVisible()) {
 
-                                        new GetUser(GetUser.PERSONS).execute(tag);
+                                            new GetUser(GetUser.PERSONS).execute(tag);
 
-                                    } else if (nfc_fr != null && nfc_fr.isVisible()) {
+                                        } else if (nfc_fr != null && nfc_fr.isVisible()) {
 
-                                        new GetUser(GetUser.NFC).execute(tag);
+                                            new GetUser(GetUser.NFC).execute(tag);
 
-                                    } else if (main_fr != null && main_fr.isVisible()) {
+                                        } else if (main_fr != null && main_fr.isVisible()) {
 
-                                        if (RoomDB.getRoomItemForCurrentUser(tag)!=null){
-                                            new CloseRooms(mContext, tag, mCloseRoomInterface).execute();
-                                        }else{
-                                            Toasts.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_choise_room_in_first), Toasts.TOAST_NEGATIVE);
+                                            if (RoomDB.getRoomItemForCurrentUser(tag)!=null){
+                                                new CloseRooms(mContext, tag, mCloseRoomInterface).execute();
+                                            }else{
+                                                Toasts.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_choise_room_in_first), Toasts.TOAST_NEGATIVE);
+                                            }
                                         }
+                                    } else {
+                                        Toasts.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_incorrect_card),Toasts.TOAST_NEGATIVE);
                                     }
                                 }
                             });
+                        } else {
+                            sCardConnected = false;
                         }
                     }catch (Exception e){
                         e.printStackTrace();
                     }
                 }
-            });
+            };
+
+            mReader.setOnStateChangeListener(sReaderStateChangeListener);
+
             return null;
         }
     }
@@ -626,6 +631,14 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                 //если нет в базе, то добавить
                 if (!FavoriteDB.isUserInBase(params[0])){
                     mValidUser = FavoriteDB.writeInDBTeachers(mContext, FavoriteDB.getPersonItem(mContext, params[0], FavoriteDB.SERVER_USER, FavoriteDB.ALL_PHOTO));
+
+                    //если не удалось добавить, то карта некорректна. Показать тост
+                    if (!mValidUser) runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toasts.showFullscreenToast(App.getAppContext(), getStringFromResources(R.string.text_toast_incorrect_card), Toasts.TOAST_NEGATIVE);
+                        }
+                    });
                 }
                 return params[0];
             } catch (Exception e){

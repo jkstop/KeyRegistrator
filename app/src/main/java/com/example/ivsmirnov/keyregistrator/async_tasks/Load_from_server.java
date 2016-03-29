@@ -45,13 +45,13 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
 
                 JournalDB.clearJournalDB();
                 Statement statement = connection.createStatement();
-                ResultSet result = statement.executeQuery("SELECT * FROM Journal_recycler");
+                ResultSet result = statement.executeQuery("SELECT * FROM Journal_recycler ORDER BY TIME_IN ASC");
                 while (result.next()){
                     JournalDB.writeInDBJournal(new JournalItem()
                     .setAccountID(result.getString("ACCOUNT_ID"))
                     .setAuditroom(result.getString("AUDITROOM"))
-                    .setTimeIn(Long.parseLong(result.getString("TIME_IN")))
-                    .setTimeOut(Long.parseLong(result.getString("TIME_OUT")))
+                    .setTimeIn(result.getString("TIME_IN"))
+                    .setTimeOut(result.getString("TIME_OUT"))
                     .setAccessType(result.getInt("ACCESS"))
                     .setPersonLastname(result.getString("PERSON_LASTNAME"))
                     .setPersonFirstname(result.getString("PERSON_FIRSTNAME"))

@@ -30,11 +30,11 @@ import com.example.ivsmirnov.keyregistrator.adapters.AdapterJournalList;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Load_from_server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
-import com.example.ivsmirnov.keyregistrator.items.JournalItem;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
+import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
@@ -54,7 +54,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
     private ActionBar mActionBar;
     private ArrayList<String> mDates;
     private AdapterJournalList mAdapterjournallist;
-    private ArrayList <JournalItem> mJournalItems;
+    private ArrayList <Long> mJournalTags;
 
     private ProgressBar mLoadingBar;
 
@@ -133,7 +133,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
                 saveToFile.execute();
                 return true;
             case R.id.menu_journal_download_to_server:
-                new Save_to_server(mContext, true).execute();
+                new ServerWriter(mContext, true).execute(ServerWriter.JOURNAL_ALL);
                 return true;
             case R.id.menu_journal_download_from_server:
                 Load_from_server loadFromServer = new Load_from_server(mContext,this);
@@ -225,7 +225,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                mJournalItems.remove(position);
+                                mJournalTags.remove(position);
                                 mAdapterjournallist.notifyItemRemoved(position);
 
                                 JournalDB.deleteFromDB(timeIn);
@@ -236,11 +236,11 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
                 Dialog dialog = builder.create();
                 dialog.show();
             }
-        },mJournalItems);
+        }, mJournalTags);
 
         mJournalRecycler.setLayoutManager(new LinearLayoutManager(mContext));
         mJournalRecycler.setAdapter(mAdapterjournallist);
-        mJournalRecycler.scrollToPosition(mJournalItems.size()-1);
+        mJournalRecycler.scrollToPosition(mJournalTags.size()-1);
     }
 
     @Override
@@ -271,7 +271,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
         @Override
         protected Void doInBackground(Void... params) {
 
-            mJournalItems = JournalDB.getJournalItemTags(mDate);
+            mJournalTags = JournalDB.getJournalItemTags(mDate);
 
             return null;
         }

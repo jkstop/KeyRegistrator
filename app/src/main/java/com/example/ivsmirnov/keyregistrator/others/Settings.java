@@ -1,7 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.others;
 
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
@@ -34,11 +33,26 @@ public class Settings {
     public static final String MAIL_ATTACHMENTS = "mail_attachments";
     public static final String MAIL_THEME = "mail_theme";
     public static final String MAIL_BODY = "mail_body";
-    public static final String AUTO_CLOSE_STATUS = App.getAppContext().getResources().getString(R.string.shared_preferences_auto_close);
-    public static final String AUTO_CLOSE_TIME = App.getAppContext().getResources().getString(R.string.shared_preferences_time_close);
+    public static final String SHEDULER_STATUS = getStringFromRes(R.string.shared_preferences_sheduler);
+    public static final String AUTO_CLOSE_STATUS = getStringFromRes(R.string.shared_preferences_auto_close);
+    public static final String SHEDULER_TIME = getStringFromRes(R.string.shared_preferences_sheduler_time);
+    public static final String EMAIL_DISTRIBUTION_STATUS = getStringFromRes(R.string.shared_preferences_email_distribution);
+    public static final String FILE_WRITER = getStringFromRes(R.string.shared_preferences_file_writer);
+    public static final String FILE_WRITE_JOURNAL = getStringFromRes(R.string.shared_preferences_write_journal);
+    public static final String FILE_WRITE_TEACHERS = getStringFromRes(R.string.shared_preferences_write_teachers);
+    public static final String FILE_WRITE_ROOMS = getStringFromRes(R.string.shared_preferences_write_rooms);
+    public static final String SERVER_WRITER = getStringFromRes(R.string.shared_preferences_write_server);
+    public static final String SERVER_WRITE_JOURNAL = getStringFromRes(R.string.shared_preferences_write_journal_server);
+    public static final String SERVER_WRITE_TEACHERS = getStringFromRes(R.string.shared_preferences_write_teachers_server);
+    public static final String SERVER_WRITE_ROOMS = getStringFromRes(R.string.shared_preferences_write_rooms_server);
+    public static final String last_room_time_in = "timein";
 
     private static SharedPreferences mPreferences;
     private static SharedPreferences.Editor mPreferencesEditor;
+
+    private static String getStringFromRes(int strId){
+        return App.getAppContext().getResources().getString(strId);
+    }
 
     public Settings (){
 
@@ -60,12 +74,60 @@ public class Settings {
         return mPreferencesEditor;
     }
 
+    public static void setLAstRoomTimeIn(long timeIn){
+        getPreferencesEditor().putLong(last_room_time_in, timeIn).apply();
+    }
+
+    public static long getLastRoomTimeIn(){
+        return getPreferences().getLong(last_room_time_in, 0);
+    }
+
+    public static boolean getWriteServerStatus(){
+        return getPreferences().getBoolean(SERVER_WRITER, false);
+    }
+
+    public static boolean getWriteJournalServerStatus(){
+        return getPreferences().getBoolean(SERVER_WRITE_JOURNAL, false);
+    }
+
+    public static boolean getWriteTeachersServerStatus(){
+        return getPreferences().getBoolean(SERVER_WRITE_TEACHERS, false);
+    }
+
+    public static boolean getWriteRoomsServerStatus(){
+        return getPreferences().getBoolean(SERVER_WRITE_ROOMS, false);
+    }
+
+    public static boolean getShedulerStatus(){
+        return getPreferences().getBoolean(SHEDULER_STATUS, false);
+    }
+
+    public static boolean getFileWriterStatus(){
+        return getPreferences().getBoolean(FILE_WRITER, false);
+    }
+
+    public static boolean getWriteJournalStatus(){
+        return getPreferences().getBoolean(FILE_WRITE_JOURNAL, false);
+    }
+
+    public static boolean getWriteTeachersStatus(){
+        return getPreferences().getBoolean(FILE_WRITE_TEACHERS, false);
+    }
+
+    public static boolean getWriteRoomsStatus(){
+        return getPreferences().getBoolean(FILE_WRITE_ROOMS, false);
+    }
+
+    public static boolean getEmailDistributionStatus(){
+        return getPreferences().getBoolean(EMAIL_DISTRIBUTION_STATUS,false);
+    }
+
     public static boolean getAutoCloseStatus(){
         return getPreferences().getBoolean(AUTO_CLOSE_STATUS, false);
     }
 
-    public static String getAutoCloseTime(){
-        return getPreferences().getString(AUTO_CLOSE_TIME, "00:00");
+    public static String getShedulerTime(){
+        return getPreferences().getString(SHEDULER_TIME, "00:00");
     }
 
     public static void setMessageTheme (String theme){

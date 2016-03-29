@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Save_to_server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseDayInterface;
 import com.example.ivsmirnov.keyregistrator.items.MailParams;
@@ -34,24 +34,33 @@ public class CloseDayService extends Service implements CloseDayInterface {
 
         try {
 
-            Settings.setAutoClosedRoomsCount(RoomDB.closeAllRooms());
+            //закрываем открытые помещения
+            if (Settings.getAutoCloseStatus()) Settings.setAutoClosedRoomsCount(RoomDB.closeAllRooms());
 
-            //Launcher.mCloseRoomInterface.onRoomClosed();
-
-            new FileWriter(context, FileWriter.WRITE_JOURNAL, false).execute();
-            new FileWriter(context, FileWriter.WRITE_TEACHERS, false).execute();
-
-            new Save_to_server(context, false).execute();
-
-            Calendar calendar = Calendar.getInstance();
-            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-                new Send_Email(context, Send_Email.DIALOG_DISABLED).execute(new MailParams()
-                        .setTheme(Settings.getMessageTheme())
-                        .setBody(Settings.getMessageBody())
-                        .setAttachments(Settings.getAttachments())
-                        .setRecepients(Settings.getRecepients()));
+            //запись файлов
+            if (Settings.getFileWriterStatus()){
+                if (Settings.getWriteJournalStatus()) new FileWriter(context, FileWriter.WRITE_JOURNAL, false).execute();
+                if (Settings.getWriteTeachersStatus()) new FileWriter(context, FileWriter.WRITE_TEACHERS, false).execute();
             }
 
+            //запись на сервер
+            if (Settings.getWriteServerStatus()){
+                if (Settings.getWriteJournalServerStatus()) new ServerWriter().execute(ServerWriter.JOURNAL_ALL);
+            }
+
+            //рассылка email
+            Calendar calendar = Calendar.getInstance();
+            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+                if (Settings.getEmailDistributionStatus()){
+                    new Send_Email(context, Send_Email.DIALOG_DISABLED).execute(new MailParams()
+                            .setTheme(Settings.getMessageTheme())
+                            .setBody(Settings.getMessageBody())
+                            .setAttachments(Settings.getAttachments())
+                            .setRecepients(Settings.getRecepients()));
+                }
+            }
+
+            //установка планировщика
             mAlarm.setAlarm(System.currentTimeMillis() + AlarmManager.INTERVAL_DAY);
 
         } catch (Exception e){

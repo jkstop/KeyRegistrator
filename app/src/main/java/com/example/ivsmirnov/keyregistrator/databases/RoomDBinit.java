@@ -12,13 +12,13 @@ import android.util.Log;
 public class RoomDBinit extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String name = "Rooms.db";
-    private static final int version = 7;
+    private static final int version = 8;
 
     public static final String TABLE_ROOMS = "Аудитории";
     public static final String COLUMN_ROOM = "Помещение";
     public static final String COLUMN_STATUS = "Статус";
     public static final String COLUMN_ACCESS = "Доступ";
-    public static final String COLUMN_POSITION_IN_BASE = "Строка";
+    public static final String COLUMN_TIME = "Время";
     public static final String COLUMN_LAST_VISITER = "Последний";
     public static final String COLUMN_TAG = "Тэг";
     public static final String COLUMN_PHOTO_PATH = "Фото";
@@ -26,7 +26,7 @@ public class RoomDBinit extends SQLiteOpenHelper implements BaseColumns {
             + COLUMN_ROOM + " text, "
             + COLUMN_STATUS + " integer, "
             + COLUMN_ACCESS + " integer, "
-            + COLUMN_POSITION_IN_BASE + " long, "
+            + COLUMN_TIME + " long, "
             + COLUMN_LAST_VISITER + " text, "
             + COLUMN_TAG + " text, "
             + COLUMN_PHOTO_PATH + " text);";

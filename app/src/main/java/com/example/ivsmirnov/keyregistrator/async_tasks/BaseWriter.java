@@ -23,6 +23,8 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
     private Context mContext;
     private BaseWriterInterface mBaseWriterInterface;
 
+    private JournalItem mJournalItem;
+
 
     public BaseWriter(Context context, BaseWriterInterface baseWriterInterface){
         mContext = context;
@@ -39,30 +41,38 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
 
         PersonItem person = FavoriteDB.getPersonItem(mContext, params[0].getPersonTag(), FavoriteDB.LOCAL_USER, FavoriteDB.PREVIEW_PHOTO);
 
-        JournalItem journalItem = new JournalItem()
+        final long timeIn = System.currentTimeMillis();
+
+        mJournalItem = new JournalItem()
                 .setAccountID(Settings.getActiveAccountID())
                 .setAuditroom(params[0].getAuditroom())
                 .setAccessType(params[0].getAccessType())
-                .setTimeIn(System.currentTimeMillis())
+                .setTimeIn(timeIn)
                 .setPersonLastname(person.getLastname())
                 .setPersonFirstname(person.getFirstname())
                 .setPersonMidname(person.getMidname())
                 .setPersonPhoto(person.getPhotoPreview());
 
-        long positionInBase = JournalDB.writeInDBJournal(journalItem);
+        JournalDB.writeInDBJournal(mJournalItem);
 
         RoomDB.updateRoom(new RoomItem()
-                .setAuditroom(journalItem.getAuditroom())
+                .setAuditroom(mJournalItem.getAuditroom())
                 .setStatus(RoomDB.ROOM_IS_BUSY)
-                .setAccessType(journalItem.getAccessType())
-                .setPositionInBase(positionInBase)
-                .setLastVisiter(FavoriteDB.getPersonInitials(FavoriteDB.SHORT_INITIALS, journalItem.getPersonLastname(),journalItem.getPersonFirstname(),journalItem.getPersonMidname()))
+                .setAccessType(mJournalItem.getAccessType())
+                .setTime(timeIn)
+                .setLastVisiter(FavoriteDB.getPersonInitials(FavoriteDB.SHORT_INITIALS, mJournalItem.getPersonLastname(),mJournalItem.getPersonFirstname(),mJournalItem.getPersonMidname()))
                 .setTag(params[0].getPersonTag()));
+
+        Settings.setLAstRoomTimeIn(mJournalItem.getTimeIn());
         return null;
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
         if (mBaseWriterInterface!=null) mBaseWriterInterface.onSuccessBaseWrite();
+
+        if (Settings.getWriteServerStatus()){
+            if (Settings.getWriteJournalServerStatus()) new ServerWriter(mJournalItem, null, false).execute(ServerWriter.JOURNAL_NEW);
+        }
     }
 }

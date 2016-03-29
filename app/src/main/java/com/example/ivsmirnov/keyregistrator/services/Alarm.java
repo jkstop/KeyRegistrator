@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
@@ -58,7 +57,7 @@ public class Alarm {
         Calendar mNowCalendar = Calendar.getInstance();
         Calendar mCloseCalendar = (Calendar)mNowCalendar.clone();
 
-        String [] timeSplit = Settings.getAutoCloseTime().split(":");
+        String [] timeSplit = Settings.getShedulerTime().split(":");
         mCloseCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeSplit[0]));
         mCloseCalendar.set(Calendar.MINUTE, Integer.parseInt(timeSplit[1]));
         mCloseCalendar.set(Calendar.SECOND,0);

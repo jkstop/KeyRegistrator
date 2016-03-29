@@ -35,7 +35,30 @@ public class JournalItem {
     }
 
     public JournalItem setTimeIn (Long timeIn){
+        if (timeIn == null) timeIn = (long) 0;
         this.TimeIn = timeIn;
+        return this;
+    }
+
+    public JournalItem setTimeIn (String timeIn){
+        long time;
+        try {
+            time = Long.parseLong(timeIn);
+        } catch (NumberFormatException e){
+            time = (long) 0;
+        }
+        this.TimeIn = time;
+        return this;
+    }
+
+    public JournalItem setTimeOut (String timeOut){
+        long time;
+        try {
+            time = Long.parseLong(timeOut);
+        } catch (NumberFormatException e){
+            time = (long) 0;
+        }
+        this.TimeOut = time;
         return this;
     }
 
@@ -44,6 +67,7 @@ public class JournalItem {
     }
 
     public JournalItem setTimeOut (Long timeOut){
+        if (timeOut == null) timeOut = (long)0;
         this.TimeOut = timeOut;
         return this;
     }
