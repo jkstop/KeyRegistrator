@@ -26,6 +26,7 @@
     <string name="title_add_new_staff">Добавление нового пользователя</string>
     <string name="title_dialog_log_out">Отсоединение аккаунта</string>
 
+
     <string name="label_add_button">Добавить</string>
 
     <string name="text_warning">Уважаемые преподаватели!\n
@@ -39,8 +40,9 @@
     <string name="navigation_drawer_closed">The navigation drawer is closed</string>
 
     <!-- Dialogs -->
-    <string name="dialog_clear_journal_title">ВНИМАНИЕ!</string>
-    <string name="dialog_clear_journal_message">Из журнала будут удалены все записи. Продолжить?</string>
+    <string name="dialog_clear_journal_title">Очистка журнала посещений</string>
+    <string name="dialog_clear_journal_erase_local">Удалить все записи на этом устройстве</string>
+    <string name="dialog_clear_journal_erase_server">Удалить все записи на сервере</string>
 
     <string name="dialog_clear_teachers_title">ВНИМАНИЕ!</string>
     <string name="dialog_clear_teachers_message">Из базы данных преподавателей будут удалены все записи. Продолжить?</string>
@@ -63,6 +65,10 @@
 
     <string name="empty_text_journal_item_room">AUD</string>
     <string name="empty_text_journal_item_time">00:00:00</string>
+
+    <string name="title_dialog_delete_journal_item">Удаление записи</string>
+    <string name="message_dialog_delete_journal_item_from_journal">Удалить из журнала</string>
+    <string name="message_dialg_delete_journal_item_from_server_also">Удалить с сервера</string>
 
     <!-- Toasts -->
     <string name="text_toast_put_card">Для сдачи ключей просто приложите карту</string>

@@ -43,20 +43,21 @@ public class Load_from_server extends AsyncTask<Void,Void,Void> {
             Connection connection = SQL_Connection.SQLconnect;
             if (connection!=null){
 
-                JournalDB.clearJournalDB();
                 Statement statement = connection.createStatement();
-                ResultSet result = statement.executeQuery("SELECT * FROM Journal_recycler ORDER BY TIME_IN ASC");
+                ResultSet result = statement.executeQuery("SELECT * FROM JOURNAL ORDER BY TIME_IN ASC");
                 while (result.next()){
-                    JournalDB.writeInDBJournal(new JournalItem()
-                    .setAccountID(result.getString("ACCOUNT_ID"))
-                    .setAuditroom(result.getString("AUDITROOM"))
-                    .setTimeIn(result.getString("TIME_IN"))
-                    .setTimeOut(result.getString("TIME_OUT"))
-                    .setAccessType(result.getInt("ACCESS"))
-                    .setPersonLastname(result.getString("PERSON_LASTNAME"))
-                    .setPersonFirstname(result.getString("PERSON_FIRSTNAME"))
-                    .setPersonMidname(result.getString("PERSON_MIDNAME"))
-                    .setPersonPhoto(result.getString("PERSON_PHOTO")));
+                    if (JournalDB.getJournalItem(result.getLong("TIME_IN")) == null){
+                        JournalDB.writeInDBJournal(new JournalItem()
+                                .setAccountID(result.getString("ACCOUNT_ID"))
+                                .setAuditroom(result.getString("AUDITROOM"))
+                                .setTimeIn(result.getLong("TIME_IN"))
+                                .setTimeOut(result.getLong("TIME_OUT"))
+                                .setAccessType(result.getInt("ACCESS"))
+                                .setPersonLastname(result.getString("PERSON_LASTNAME"))
+                                .setPersonFirstname(result.getString("PERSON_FIRSTNAME"))
+                                .setPersonMidname(result.getString("PERSON_MIDNAME"))
+                                .setPersonPhoto(result.getString("PERSON_PHOTO")));
+                    }
                 }
             }
         } catch (SQLException e) {

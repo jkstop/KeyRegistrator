@@ -37,6 +37,8 @@ public class JournalDB {
 
     public static long writeInDBJournal(JournalItem journalItem){
 
+        System.out.println("writeInJournal");
+
         SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.DB_JOURNAL);
         Cursor cursor = null;
         try {
@@ -80,7 +82,7 @@ public class JournalDB {
                     JournalDBinit.COLUMN_USER_ID + " =?",
                     new String[]{Settings.getActiveAccountID()},
                     null,
-                    null,
+                    JournalDBinit.COLUMN_TIME_IN,
                     null);
             if (cursor.getCount()>0){
                 cursor.moveToPosition(-1);
@@ -171,31 +173,6 @@ public class JournalDB {
         return count;
     }
 
-
-    public static ArrayList<JournalItem> realAllJournalFromDB(){
-        Cursor cursor = null;
-        try {
-            cursor = DbShare.getCursor(DbShare.DB_JOURNAL,
-                    JournalDBinit.TABLE_JOURNAL,
-                    new String[]{JournalDBinit.COLUMN_TIME_IN},
-                    null,null,null,null,null);
-            cursor.moveToPosition(-1);
-            ArrayList<JournalItem> items = new ArrayList<>();
-            while (cursor.moveToNext()){
-                items.add(new JournalItem()
-                        .setTimeIn(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN))));
-
-            }
-            return items;
-        }catch (Exception e){
-            e.printStackTrace();
-            return new ArrayList<>();
-        } finally {
-           closeCursor(cursor);
-        }
-
-    }
-
     public static ArrayList<String> readJournalDatesFromDB(){
         DateFormat dateFormat = DateFormat.getDateInstance();
         final ArrayList <String> items = new ArrayList<>();
@@ -231,7 +208,7 @@ public class JournalDB {
 
     public static void updateDB(Long timeIn){
         SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.DB_JOURNAL);
-        Cursor cursor = null;
+        Cursor cursor;
         try {
             cursor = DbShare.getCursor(DbShare.DB_JOURNAL, JournalDBinit.TABLE_JOURNAL,
                     new String[] {JournalDBinit._ID},
@@ -336,7 +313,6 @@ public class JournalDB {
             if (file != null) {
                 fileOutputStream = new FileOutputStream(file);
                 String row;
-                int count = 0;
                 if (cursor.getCount()!=0){
                     cursor.moveToPosition(-1);
                     while (cursor.moveToNext()){
@@ -351,10 +327,8 @@ public class JournalDB {
                                 +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_PHOTO));
                         fileOutputStream.write(row.getBytes());
                         fileOutputStream.write("\n".getBytes());
-                        count++;
                     }
                 }
-
                 fileOutputStream.close();
             }
         }
@@ -364,19 +338,6 @@ public class JournalDB {
             closeCursor(cursor);
         }
     }
-
-    /*public static JournalItem createNewItemForJournal (Context context, String personTag, String auditroom, int accessType){
-
-        PersonItem person = FavoriteDB.getPersonItem(context, personTag, FavoriteDB.LOCAL_USER, FavoriteDB.PREVIEW_PHOTO);
-        return new JournalItem().setAccountID(Preferences.getActiveAccountID())
-                .setAuditroom(auditroom)
-                .setAccessType(accessType)
-                .setTimeIn(System.currentTimeMillis())
-                .setPersonLastname(person.getLastname())
-                .setPersonFirstname(person.getFirstname())
-                .setPersonMidname(person.getMidname())
-                .setPersonPhoto(person.getPhotoPreview());
-    }*/
 
     private static void closeCursor(Cursor cursor){
         if (cursor!=null) cursor.close();
@@ -415,8 +376,4 @@ public class JournalDB {
             closeCursor(cursor);
         }
     }
-
-
-
-
 }

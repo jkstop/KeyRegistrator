@@ -8,8 +8,8 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 public class JournalItem {
     private String AccountID;
     private String Auditroom = Values.EMPTY;
-    private Long TimeIn;
-    private Long TimeOut;
+    private long TimeIn;
+    private long TimeOut;
     private int AccessType;
     private String PersonLastname = Values.EMPTY;
     private String PersonFirstname = Values.EMPTY;

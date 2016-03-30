@@ -26,22 +26,22 @@
             android:title="@string/shared_preferences_email_distribution"
             android:dependency="@string/shared_preferences_sheduler"/>
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:key="@string/shared_preferences_file_writer"
             android:title="@string/shared_preferences_file_writer"
             android:dependency="@string/shared_preferences_sheduler"/>
 
-        <SwitchPreference
+        <CheckBoxPreference
             android:key="@string/shared_preferences_write_journal"
             android:title="@string/shared_preferences_write_journal"
             android:dependency="@string/shared_preferences_file_writer"/>
 
-        <SwitchPreference
+        <CheckBoxPreference
             android:key="@string/shared_preferences_write_teachers"
             android:title="@string/shared_preferences_write_teachers"
             android:dependency="@string/shared_preferences_file_writer"/>
 
-        <SwitchPreference
+        <CheckBoxPreference
             android:key="@string/shared_preferences_write_rooms"
             android:title="@string/shared_preferences_write_rooms"
             android:dependency="@string/shared_preferences_file_writer"/>
@@ -58,17 +58,17 @@
             android:summaryOn="@string/shared_preferences_server_enabled"
             android:summaryOff="@string/shared_preferences_server_disabled"/>
 
-        <SwitchPreference
+        <CheckBoxPreference
             android:key="@string/shared_preferences_write_journal_server"
             android:title="@string/shared_preferences_write_journal_server"
             android:dependency="@string/shared_preferences_write_server"/>
 
-        <SwitchPreference
+        <CheckBoxPreference
             android:key="@string/shared_preferences_write_teachers_server"
             android:title="@string/shared_preferences_write_teachers_server"
             android:dependency="@string/shared_preferences_write_server"/>
 
-        <SwitchPreference
+        <CheckBoxPreference
             android:key="@string/shared_preferences_write_rooms_server"
             android:title="@string/shared_preferences_write_rooms_server"
             android:dependency="@string/shared_preferences_write_server"/>

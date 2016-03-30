@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,13 +21,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterJournalList;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetJournal;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Load_from_server;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
@@ -34,6 +40,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
+import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.nononsenseapps.filepicker.FilePickerActivity;
@@ -213,34 +220,60 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
 
             @Override
             public void onItemLongClick(View v, final int position, final long timeIn) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setTitle("Удаление элемента")
-                        .setMessage("Удалить выбранный элемент из списка?")
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        })
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mJournalTags.remove(position);
-                                mAdapterjournallist.notifyItemRemoved(position);
-
-                                JournalDB.deleteFromDB(timeIn);
-
-                            }
-                        })
-                        .setCancelable(true);
-                Dialog dialog = builder.create();
-                dialog.show();
+                showDeleteItemDialog(position, timeIn);
             }
         }, mJournalTags);
 
         mJournalRecycler.setLayoutManager(new LinearLayoutManager(mContext));
         mJournalRecycler.setAdapter(mAdapterjournallist);
         mJournalRecycler.scrollToPosition(mJournalTags.size()-1);
+    }
+
+    private void showDeleteItemDialog(final int clickedPosition, final long clickedTag){
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        View dialogView = View.inflate(mContext, R.layout.view_dialog_delete_journal_item, null);
+        CardView selectedCard = (CardView)dialogView.findViewById(R.id.view_dialog_delete_journal_item_card);
+        final CheckBox deleteFromJournalCheck = (CheckBox)dialogView.findViewById(R.id.view_dialog_delete_journal_item_delete_from_journal_check);
+        final CheckBox deleteFromServerCheck = (CheckBox)dialogView.findViewById(R.id.view_dialog_delete_journal_item_delete_from_server_check);
+
+        new GetJournal(new GetJournalParams()
+                .setCard(selectedCard)
+                .setTextAuditroom((TextView)selectedCard.findViewById(R.id.card_journal_item_text_auditroom))
+                .setImagePerson((ImageView)selectedCard.findViewById(R.id.card_journal_item_person_image))
+                .setTextInitials((TextView)selectedCard.findViewById(R.id.card_journal_item_person_initials))
+                .setTextTimeIn((TextView)selectedCard.findViewById(R.id.card_journal_item_time_in))
+                .setTextTimeOut((TextView)selectedCard.findViewById(R.id.card_journal_item_time_out))
+                .setTimeIn(clickedTag),
+                AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in))
+                .execute();
+        builder.setTitle(R.string.title_dialog_delete_journal_item)
+                .setView(dialogView)
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if (deleteFromJournalCheck.isChecked()){ //удаление из журнала
+                            mJournalTags.remove(clickedPosition);
+                            mAdapterjournallist.notifyItemRemoved(clickedPosition);
+                            JournalDB.deleteFromDB(clickedTag);
+                        }
+
+                        if (deleteFromServerCheck.isChecked()){ //удаление с сервера
+                            new ServerWriter(clickedTag).execute(ServerWriter.JOURNAL_DELETE_ONE);
+                        }
+
+
+                    }
+                })
+                .setCancelable(true);
+        Dialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override

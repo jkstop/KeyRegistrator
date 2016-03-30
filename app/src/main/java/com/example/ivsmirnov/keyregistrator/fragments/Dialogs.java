@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -40,6 +41,7 @@ import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGridResizer;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
@@ -101,9 +103,13 @@ public class Dialogs extends DialogFragment{
 
         switch (mDialogId){
             case DIALOG_CLEAR_JOURNAL:
+                View dialogClearJournalView = View.inflate(mContext, R.layout.view_dialog_clear_journal,null);
+                final CheckBox checkClearJournalLocal = (CheckBox)dialogClearJournalView.findViewById(R.id.view_dialog_clear_journal_delete_journal_check);
+                final CheckBox checkClearJournalServer = (CheckBox)dialogClearJournalView.findViewById(R.id.view_dialog_clear_journal_delete_server_check);
+
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(mResources.getString(R.string.dialog_clear_journal_title))
-                        .setMessage(mResources.getString(R.string.dialog_clear_journal_message))
+                        .setView(dialogClearJournalView)
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -114,8 +120,14 @@ public class Dialogs extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                JournalDB.clearJournalDB();
-                                updateInformation();
+                                if (checkClearJournalLocal.isChecked()){
+                                    JournalDB.clearJournalDB();
+                                    updateInformation();
+                                }
+
+                                if (checkClearJournalServer.isChecked()){
+                                    new ServerWriter().execute(ServerWriter.JOURNAL_DELETE_ALL);
+                                }
 
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }

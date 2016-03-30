@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/default_content_margin">
+
+    <include layout="@layout/card_journal_item"
+        android:id="@+id/view_dialog_delete_journal_item_card" />
+
+    <CheckBox
+        android:id="@+id/view_dialog_delete_journal_item_delete_from_journal_check"
+        android:layout_below="@id/view_dialog_delete_journal_item_card"
+        android:text="@string/message_dialog_delete_journal_item_from_journal"
+        android:checked="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <CheckBox
+        android:id="@+id/view_dialog_delete_journal_item_delete_from_server_check"
+        android:layout_below="@id/view_dialog_delete_journal_item_delete_from_journal_check"
+        android:text="@string/message_dialg_delete_journal_item_from_server_also"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
