@@ -150,7 +150,7 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+       // super.onActivityResult(requestCode, resultCode, data);
         if (data!=null){
             if (requestCode == Loader_intent.REQUEST_CODE_LOAD_ROOMS){
                 if (resultCode == Activity.RESULT_OK){

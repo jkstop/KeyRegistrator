@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 
 
-
 repositories {
     mavenCentral();
     jcenter()
@@ -11,12 +10,12 @@ repositories {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "22.0.1"
+    buildToolsVersion '23.0.3'
 
     defaultConfig {
         applicationId "com.example.ivsmirnov.keyregistrator"
-        minSdkVersion 14
-        targetSdkVersion 22
+        minSdkVersion 16
+        targetSdkVersion 23
         versionCode 7
         versionName "3.2"
     }
@@ -57,3 +56,5 @@ dependencies {
     compile 'net.sourceforge.jtds:jtds:1.2.8'
     compile files('libs/javax.mail.jar')
 }
+
+apply plugin: 'com.google.gms.google-services'

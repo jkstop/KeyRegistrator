@@ -1,5 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.activities;
 
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -70,9 +71,12 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 
 import java.io.ByteArrayOutputStream;
@@ -87,6 +91,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
             "Present", "Swallowed", "Powered", "Negotiable", "Specific" };
 
     public static final int REQUEST_CODE_LOG_ON = 205;
+    static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 
     private Context mContext;
     private Resources mResources;
@@ -295,11 +300,10 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
 
-            if (resultCode == Activity.RESULT_OK){
+            //if (resultCode == RESULT_OK){
                 if (requestCode == REQUEST_CODE_LOG_ON){
-
+                    Toast.makeText(mContext, "LOGON " + String.valueOf(resultCode), Toast.LENGTH_SHORT).show();
                     GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-
 
                     if (result.isSuccess()) {
                         final GoogleSignInAccount acct = result.getSignInAccount();
@@ -319,7 +323,8 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                         initNavigationDrawer();
                     }
                 }
-            }
+           // }
+
     }
 
     private void getUserActiveAccount(){
@@ -340,6 +345,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        System.out.println("connectionFAIL");
     }
 
     private float calculateDrawerWidth(){
@@ -443,7 +449,6 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     protected void onResume() {
         super.onResume();
 
-        System.out.println(String.valueOf(mAlarm.isAlarmSet()));
         setSheduler();
 
         if (mNavigationItems == null) setNavigationItems();
