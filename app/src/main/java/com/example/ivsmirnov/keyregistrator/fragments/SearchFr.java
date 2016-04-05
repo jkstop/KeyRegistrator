@@ -25,12 +25,14 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsGrid;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.TagSearcher;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.TagSearcherInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.sql.Connection;
@@ -188,6 +190,10 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
     private void addUserInFavorite(final PersonItem personItem){
 
         FavoriteDB.writeInDBTeachers(mContext, personItem);
+
+        if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
+            new ServerWriter(personItem).execute(ServerWriter.PERSON_NEW);
+        }
 
         if (getView()!=null){
             Snackbar.make(getView(),R.string.snack_user_added,Snackbar.LENGTH_LONG)

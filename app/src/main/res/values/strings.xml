@@ -177,10 +177,12 @@
     <string name="menu_journal_select_location_for_copy">Указать папку для копии</string>
     <string name="menu_journal_download_to_server">Загрузить на сервер</string>
     <string name="menu_journal_download_from_server">Загрузить с сервера</string>
+    <string name="menu_journal_synch_to_server">Синхронизировать с сервером</string>
     <string name="menu_teachers_save_to_file">Сохранить</string>
     <string name="menu_teachers_download_favorite">Загрузить из файла</string>
     <string name="menu_teachers_delete">Очистить</string>
     <string name="menu_teachers_select_location_for_copy">Указать папку для копии</string>
+    <string name="menu_teachers_synch_to_server">Синхронизировать с сервером</string>
     <string name="menu_main_items_size">Размер элементов</string>
     <string name="menu_nfc_all_persons">Все пользователи</string>
 

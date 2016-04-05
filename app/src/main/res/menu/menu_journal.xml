@@ -22,12 +22,8 @@
         app:showAsAction="never"/>
 
     <item
-        android:id="@+id/menu_journal_download_to_server"
-        android:title="@string/menu_journal_download_to_server"
-        app:showAsAction="never"/>
-
-    <item android:id="@+id/menu_journal_download_from_server"
-        android:title="@string/menu_journal_download_from_server"
+        android:id="@+id/menu_journal_synch_to_server"
+        android:title="@string/menu_journal_synch_to_server"
         app:showAsAction="never"/>
 
 </menu>

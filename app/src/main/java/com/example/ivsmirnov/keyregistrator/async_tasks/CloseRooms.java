@@ -41,13 +41,14 @@ public class CloseRooms extends AsyncTask<Void, Void, Integer> {
         int closedRooms = RoomDB.updateRoom(mRoomItem
                 .setTag(Values.EMPTY)
                 .setStatus(RoomDB.ROOM_IS_FREE));
-        JournalDB.updateDB(mRoomItem.getTime());
+        JournalDB.updateDB(mRoomItem.getTime(), System.currentTimeMillis());
 
         return closedRooms;
     }
 
     @Override
     protected void onPostExecute(Integer closedRooms) {
+        System.out.println(closedRooms);
         if (mCloseRoomInterface !=null){
             mCloseRoomInterface.onRoomClosed();
         }

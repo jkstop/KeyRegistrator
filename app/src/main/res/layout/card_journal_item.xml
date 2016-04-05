@@ -45,7 +45,7 @@
                 android:maxLines="3"
                 android:textSize="@dimen/journal_item_max_text_person_initials"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent" />
 
         </RelativeLayout>
 
@@ -57,8 +57,12 @@
             android:gravity="center"
             android:textSize="100sp"
             android:text="@string/empty_text_journal_item_room"
+            android:layout_marginStart="@dimen/default_content_margin"
+            android:layout_marginLeft="@dimen/default_content_margin"
+            android:layout_marginEnd="@dimen/default_content_margin"
+            android:layout_marginRight="@dimen/default_content_margin"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent" />
 
         <RelativeLayout
             android:layout_toEndOf="@id/card_journal_item_text_auditroom"
@@ -75,10 +79,10 @@
                 android:layout_alignBottom="@+id/card_journal_item_time_icon"
                 android:layout_alignTop="@+id/card_journal_item_time_icon"
                 android:maxLines="1"
-                android:gravity="center"
+                android:gravity="end|center_vertical"
                 android:textSize="@dimen/journal_item_max_text_time"
                 android:text="@string/empty_text_journal_item_time"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
             <ImageView
@@ -98,10 +102,10 @@
                 android:layout_alignBottom="@+id/card_journal_item_time_icon"
                 android:layout_alignTop="@+id/card_journal_item_time_icon"
                 android:maxLines="1"
-                android:gravity="center"
+                android:gravity="start|center_vertical"
                 android:textSize="@dimen/journal_item_max_text_time"
                 android:text="@string/empty_text_journal_item_time"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
         </RelativeLayout>

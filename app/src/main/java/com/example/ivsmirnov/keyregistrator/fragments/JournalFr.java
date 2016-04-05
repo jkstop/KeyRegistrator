@@ -33,7 +33,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterJournalList;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetJournal;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Load_from_server;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerLoader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
@@ -41,7 +41,6 @@ import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
-import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
@@ -139,12 +138,9 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
                 FileWriter saveToFile = new FileWriter(mContext, FileWriter.WRITE_JOURNAL, true);
                 saveToFile.execute();
                 return true;
-            case R.id.menu_journal_download_to_server:
+            case R.id.menu_journal_synch_to_server:
                 new ServerWriter(mContext, true).execute(ServerWriter.JOURNAL_ALL);
-                return true;
-            case R.id.menu_journal_download_from_server:
-                Load_from_server loadFromServer = new Load_from_server(mContext,this);
-                loadFromServer.execute();
+                new ServerLoader(mContext, this).execute();
                 return true;
             case R.id.menu_journal_download_from_file:
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);

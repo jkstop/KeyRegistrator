@@ -9,11 +9,9 @@ import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -26,8 +24,11 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
     public static final int JOURNAL_ALL = 101; //для добавления всех не синхронизированных записей
     public static final int JOURNAL_DELETE_ONE = 102; //для удаления 1 записи
     public static final int JOURNAL_DELETE_ALL = 103; //для очистки все журнала
-    public static final int TEACHERS = 2;
+    public static final int PERSON_NEW = 200; //добавление 1 нового пользователя
     public static final int ROOMS = 3;
+
+    public static final String PERSONS_TABLE = "TEACHERS"; //таблица с пользователями
+    public static final String PERSONS_TABLE_COLUMN_RADIO_LABEL = "RADIO_LABEL";
 
     private ProgressDialog mProgressDialog;
 
@@ -85,45 +86,21 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                             mResult = mStatement.executeQuery("SELECT * FROM JOURNAL WHERE [TIME_IN] = " + mJournalItem.getTimeIn());
                             mResult.first();
                             if (mResult.getRow() == 0){
-                               // int timeI = new BigDecimal(mJournalItem.getTimeIn()).intValueExact();
-                               // int timeO = new BigDecimal(mJournalItem.getTimeOut()).intValueExact();
-                                System.out.println("write");
-                                mStatement.executeUpdate("INSERT INTO JOURNAL VALUES ('"
-                                        +mJournalItem.getAccountID()+"','"
-                                        +mJournalItem.getAuditroom()+"',"
-                                        +mJournalItem.getTimeIn()+","
-                                        +mJournalItem.getTimeOut()+","
-                                        +mJournalItem.getAccessType()+",'"
-                                        +mJournalItem.getPersonLastname()+"','"
-                                        +mJournalItem.getPersonFirstname()+"','"
-                                        +mJournalItem.getPersonMidname()+"','"
-                                        +mJournalItem.getPersonPhoto()+"')");
+                                writeJournalItem(mStatement, mJournalItem);
                             } else {
-                                System.out.println("update");
                                 mResult.updateLong("TIME_OUT",System.currentTimeMillis());
                                 mResult.updateRow();
                             }
-
                         }
                         break;
                     case JOURNAL_ALL:
                         ArrayList<Long> mJournalTags = JournalDB.getJournalItemTags(null);
                         for (Long tag : mJournalTags){
-                            mJournalItem = JournalDB.getJournalItem(tag);
-                            mResult = mStatement.executeQuery("SELECT * FROM JOURNAL WHERE [TIME_IN] = " + mJournalItem.getTimeIn());
+                            mResult = mStatement.executeQuery("SELECT TIME_IN FROM JOURNAL WHERE TIME_IN = " + tag);
                             mResult.first();
                             if (mResult.getRow()==0){
-                                System.out.println("write "+mJournalItem.getAuditroom());
-                                mStatement.executeUpdate("INSERT INTO JOURNAL VALUES ('"
-                                        +mJournalItem.getAccountID()+"','"
-                                        +mJournalItem.getAuditroom()+"',"
-                                        +mJournalItem.getTimeIn()+","
-                                        +mJournalItem.getTimeOut()+","
-                                        +mJournalItem.getAccessType()+",'"
-                                        +mJournalItem.getPersonLastname()+"','"
-                                        +mJournalItem.getPersonFirstname()+"','"
-                                        +mJournalItem.getPersonMidname()+"','"
-                                        +mJournalItem.getPersonPhoto()+"')");
+                                    mJournalItem = JournalDB.getJournalItem(tag);
+                                    writeJournalItem(mStatement, mJournalItem);
                             }
                         }
                         break;
@@ -135,7 +112,25 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                     case JOURNAL_DELETE_ALL:
                         mStatement.execute("TRUNCATE TABLE JOURNAL");
                         break;
-                    case TEACHERS:
+                    case PERSON_NEW:
+                        if (mPersonItem!=null){
+                            mResult = mStatement.executeQuery("SELECT * FROM " + PERSONS_TABLE + " WHERE " + PERSONS_TABLE_COLUMN_RADIO_LABEL + " = '" + mPersonItem.getRadioLabel() + "'");
+                            mResult.first();
+                            if (mResult.getRow() == 1){ //если такой уже есть, то удаляем
+                                System.out.println("user already exist");
+                                mStatement.executeUpdate("DELETE FROM " + PERSONS_TABLE + " WHERE " + PERSONS_TABLE_COLUMN_RADIO_LABEL + " = '" + mPersonItem.getRadioLabel() + "'");
+                            }
+                            System.out.println("write user");
+                            mStatement.executeUpdate("INSERT INTO " + PERSONS_TABLE + " VALUES ('"
+                                    +mPersonItem.getLastname() + "','"
+                                    +mPersonItem.getFirstname() + "','"
+                                    +mPersonItem.getMidname() + "','"
+                                    +mPersonItem.getDivision() + "','"
+                                    +mPersonItem.getRadioLabel() + "','"
+                                    +mPersonItem.getSex() + "','"
+                                    +mPersonItem.getPhotoPreview() + "','"
+                                    +mPersonItem.getPhotoOriginal() + "')");
+                        }
                         break;
                     case ROOMS:
                         break;
@@ -153,6 +148,23 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void writeJournalItem(Statement statement, JournalItem journalItem){
+        try {
+            statement.executeUpdate("INSERT INTO JOURNAL VALUES ('"
+                    +journalItem.getAccountID()+"','"
+                    +journalItem.getAuditroom()+"',"
+                    +journalItem.getTimeIn()+","
+                    +journalItem.getTimeOut()+","
+                    +journalItem.getAccessType()+",'"
+                    +journalItem.getPersonLastname()+"','"
+                    +journalItem.getPersonFirstname()+"','"
+                    +journalItem.getPersonMidname()+"','"
+                    +journalItem.getPersonPhoto()+"')");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

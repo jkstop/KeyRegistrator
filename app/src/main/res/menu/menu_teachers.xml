@@ -21,4 +21,8 @@
         android:title="@string/menu_teachers_select_location_for_copy"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/menu_teachers_synch_to_server"
+        android:title="@string/menu_teachers_synch_to_server"
+        app:showAsAction="never"/>
+
 </menu>

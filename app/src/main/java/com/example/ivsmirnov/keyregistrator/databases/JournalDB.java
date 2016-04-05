@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.sql.Time;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
@@ -138,6 +137,49 @@ public class JournalDB {
         }
     }
 
+    public static boolean isJournalItemCreated(long timeIn){
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.DB_JOURNAL,
+                    JournalDBinit.TABLE_JOURNAL,
+                    new String[]{JournalDBinit._ID},
+                    JournalDBinit.COLUMN_TIME_IN + " =?",
+                    new String[]{String.valueOf(timeIn)},
+                    null,
+                    null,
+                    "1");
+            return cursor.getCount()!=0;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        } finally {
+            cursor.close();
+        }
+    }
+
+    public static ArrayList<Long> getOpenRoomsTags(){
+        Cursor cursor = null;
+        ArrayList<Long> items = new ArrayList<>();
+        try {
+            cursor = DbShare.getCursor(DbShare.DB_JOURNAL,
+                    JournalDBinit.TABLE_JOURNAL,
+                    new String[]{JournalDBinit.COLUMN_TIME_IN},
+                    JournalDBinit.COLUMN_TIME_OUT + " =?",
+                    new String[]{"0"},
+                    null, null, null);
+            cursor.moveToPosition(-1);
+            while (cursor.moveToNext()){
+                items.add(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN)));
+            }
+            return items;
+        }catch (Exception e){
+            e.printStackTrace();
+            return items;
+        } finally {
+            closeCursor(cursor);
+        }
+    }
+
     public static int getItemCount(int type){
         int count = 0;
         DateFormat dateFormat = DateFormat.getDateInstance();
@@ -184,7 +226,7 @@ public class JournalDB {
                     JournalDBinit.COLUMN_USER_ID + " =?",
                     new String[]{Settings.getActiveAccountID()},
                     null,
-                    null,
+                    JournalDBinit.COLUMN_TIME_IN + " DESC",
                     null);
             if (cursor.getCount()>0){
                 cursor.moveToPosition(-1);
@@ -201,12 +243,10 @@ public class JournalDB {
             closeCursor(cursor);
         }
 
-        Collections.reverse(items);
-
         return items;
     }
 
-    public static void updateDB(Long timeIn){
+    public static void updateDB(Long timeIn, Long timeOut){
         SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.DB_JOURNAL);
         Cursor cursor;
         try {
@@ -219,7 +259,7 @@ public class JournalDB {
                     "1");
             cursor.moveToFirst();
             ContentValues cv = new ContentValues();
-            cv.put(JournalDBinit.COLUMN_TIME_OUT, System.currentTimeMillis());
+            cv.put(JournalDBinit.COLUMN_TIME_OUT, timeOut);
             mDataBase.update(JournalDBinit.TABLE_JOURNAL, cv,
                     JournalDBinit._ID + "=" + cursor.getInt(cursor.getColumnIndex(JournalDBinit._ID)), null);
         } catch (Exception e){

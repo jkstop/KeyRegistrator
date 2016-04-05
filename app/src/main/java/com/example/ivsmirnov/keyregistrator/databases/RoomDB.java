@@ -4,7 +4,10 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Environment;
 
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
+import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.File;
@@ -152,6 +155,27 @@ public class RoomDB {
         }
     }
 
+    public static ArrayList<String> getRoomsTags(){
+        Cursor cursor = null;
+        try {
+            ArrayList<String> tags = new ArrayList<>();
+            cursor = DbShare.getCursor(DbShare.DB_ROOM,
+                    RoomDBinit.TABLE_ROOMS,
+                    new String[]{RoomDBinit.COLUMN_TAG},
+                    null,null,null,null,null);
+            cursor.moveToPosition(-1);
+            while (cursor.moveToNext()){
+                tags.add(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG)));
+            }
+            return tags;
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ArrayList<>();
+        } finally {
+            closeCursor(cursor);
+        }
+    }
+
     public static RoomItem getRoomItem (String tag, String aud){
         Cursor cursor = null;
         try {
@@ -270,7 +294,11 @@ public class RoomDB {
                 roomItem.setTag(Values.EMPTY);
 
                 RoomDB.updateRoom(roomItem);
-                JournalDB.updateDB(roomItem.getTime());
+                JournalDB.updateDB(roomItem.getTime(), System.currentTimeMillis());
+
+                if (Settings.getWriteServerStatus()){
+                    if (Settings.getWriteJournalServerStatus()) new ServerWriter(new JournalItem().setTimeIn(roomItem.getTime()), null, false).execute(ServerWriter.JOURNAL_NEW);
+                }
 
                 closedRooms++;
             }
