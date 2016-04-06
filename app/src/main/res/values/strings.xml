@@ -41,10 +41,10 @@
 
     <!-- Dialogs -->
     <string name="dialog_clear_journal_title">Очистка журнала посещений</string>
+    <string name="dialog_clear_teachers_title">Очистка базы пользователей</string>
     <string name="dialog_clear_journal_erase_local">Удалить все записи на этом устройстве</string>
     <string name="dialog_clear_journal_erase_server">Удалить все записи на сервере</string>
 
-    <string name="dialog_clear_teachers_title">ВНИМАНИЕ!</string>
     <string name="dialog_clear_teachers_message">Из базы данных преподавателей будут удалены все записи. Продолжить?</string>
 
     <string name="dialog_clear_rooms_title">ВНИМАНИЕ!</string>

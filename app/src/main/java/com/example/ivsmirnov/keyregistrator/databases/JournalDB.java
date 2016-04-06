@@ -104,6 +104,33 @@ public class JournalDB {
         return items;
     }
 
+    public static Long [] getJournalItemTags(){
+        Cursor cursor = null;
+        Long [] items  = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.DB_JOURNAL,
+                    JournalDBinit.TABLE_JOURNAL,
+                    new String[]{JournalDBinit.COLUMN_TIME_IN},
+                    JournalDBinit.COLUMN_USER_ID + " =?",
+                    new String[]{Settings.getActiveAccountID()},
+                    null,
+                    JournalDBinit.COLUMN_TIME_IN,
+                    null);
+            if (cursor.getCount()>0){
+                items = new Long[cursor.getCount()];
+                cursor.moveToPosition(-1);
+                while (cursor.moveToNext()){
+                    items[cursor.getPosition()] = cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN));
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            closeCursor(cursor);
+        }
+        return items;
+    }
+
     public static JournalItem getJournalItem(long timeIn) {
         Cursor cursor = null;
         try {

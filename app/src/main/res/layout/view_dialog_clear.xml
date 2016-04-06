@@ -5,7 +5,7 @@
     android:padding="@dimen/default_content_margin">
 
     <CheckBox
-        android:id="@+id/view_dialog_clear_journal_delete_journal_check"
+        android:id="@+id/view_dialog_clear_delete_local"
         android:layout_alignParentTop="true"
         android:checked="true"
         android:layout_width="wrap_content"
@@ -13,8 +13,8 @@
         android:text="@string/dialog_clear_journal_erase_local"/>
 
     <CheckBox
-        android:id="@+id/view_dialog_clear_journal_delete_server_check"
-        android:layout_below="@id/view_dialog_clear_journal_delete_journal_check"
+        android:id="@+id/view_dialog_clear_delete_server"
+        android:layout_below="@id/view_dialog_clear_delete_local"
         android:text="@string/dialog_clear_journal_erase_server"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

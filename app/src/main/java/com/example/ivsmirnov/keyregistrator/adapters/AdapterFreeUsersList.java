@@ -101,7 +101,7 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
         @Override
         protected PersonItem doInBackground(GetPersonParams... params) {
 
-            PersonItem personItem = FavoriteDB.getPersonItem(mContext, params[0].getPersonTag(), params[0].getPersonLocation(), params[0].getPersonPhotoDimension());
+            PersonItem personItem = FavoriteDB.getPersonItem(params[0].getPersonTag(), params[0].getPersonLocation(), params[0].getPersonPhotoDimension());
             mPersonInitials = new WeakReference<>(params[0].getPersonLastname()).get();
 
             return personItem;

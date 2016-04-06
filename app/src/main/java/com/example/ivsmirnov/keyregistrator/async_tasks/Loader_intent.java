@@ -92,7 +92,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                         if (split[j].equals("null")) split[j] = null;
                                     }
 
-                                    FavoriteDB.writeInDBTeachers(mContext, new PersonItem()
+                                    FavoriteDB.writeInDBTeachers(new PersonItem()
                                             .setLastname(split[0])
                                             .setFirstname(split[1])
                                             .setMidname(split[2])

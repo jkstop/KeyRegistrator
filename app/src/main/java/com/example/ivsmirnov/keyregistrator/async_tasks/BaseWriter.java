@@ -39,7 +39,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
     @Override
     protected Void doInBackground(BaseWriterParams... params) {
 
-        PersonItem person = FavoriteDB.getPersonItem(mContext, params[0].getPersonTag(), FavoriteDB.LOCAL_USER, FavoriteDB.PREVIEW_PHOTO);
+        PersonItem person = FavoriteDB.getPersonItem(params[0].getPersonTag(), FavoriteDB.LOCAL_USER, FavoriteDB.PREVIEW_PHOTO);
 
         final long timeIn = System.currentTimeMillis();
 

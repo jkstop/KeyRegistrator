@@ -4,16 +4,19 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Запись на сервер
@@ -25,6 +28,9 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
     public static final int JOURNAL_DELETE_ONE = 102; //для удаления 1 записи
     public static final int JOURNAL_DELETE_ALL = 103; //для очистки все журнала
     public static final int PERSON_NEW = 200; //добавление 1 нового пользователя
+    public static final int PERSON_ALL = 201; //добавление всех не синхронизированных пользователей
+    public static final int PERSON_DELETE_ONE = 202; //удаление 1 пользователя
+    public static final int PERSON_DELETE_ALL = 203; //удаление всех пользователей на сервере
     public static final int ROOMS = 3;
 
     public static final String PERSONS_TABLE = "TEACHERS"; //таблица с пользователями
@@ -33,9 +39,12 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
     private ProgressDialog mProgressDialog;
 
     private Long mJournalItemTag;
+    private String mPersonItemTag;
     private JournalItem mJournalItem;
     private PersonItem mPersonItem;
     private RoomItem mRoomItem;
+
+    private long taskDurationStart, taskDurationEnd;
 
     public ServerWriter (JournalItem journalItem, Context context, boolean isShowProgress){
         mJournalItem = journalItem;
@@ -44,6 +53,10 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
 
     public ServerWriter (Long journalItemTag){
         mJournalItemTag = journalItemTag;
+    }
+
+    public ServerWriter (String personTag){
+        mPersonItemTag = personTag;
     }
 
     public ServerWriter (PersonItem personItem){
@@ -64,6 +77,7 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        taskDurationStart = System.currentTimeMillis();
         System.out.println("start server writer");
         if (mProgressDialog!=null){
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -86,7 +100,7 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                             mResult = mStatement.executeQuery("SELECT * FROM JOURNAL WHERE [TIME_IN] = " + mJournalItem.getTimeIn());
                             mResult.first();
                             if (mResult.getRow() == 0){
-                                writeJournalItem(mStatement, mJournalItem);
+                                writeJournalItemToServer(mStatement, mJournalItem);
                             } else {
                                 mResult.updateLong("TIME_OUT",System.currentTimeMillis());
                                 mResult.updateRow();
@@ -94,15 +108,28 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                         }
                         break;
                     case JOURNAL_ALL:
+                        //загружаем все теги с сервера. если в журнале есть, а на сервере нет, то пишем
                         ArrayList<Long> mJournalTags = JournalDB.getJournalItemTags(null);
+                        ArrayList<Long> mJournalServerTags = new ArrayList<>();
+
+                        mResult = mStatement.executeQuery("SELECT TIME_IN FROM JOURNAL");
+                        while (mResult.next()){
+                            mJournalServerTags.add(mResult.getLong("TIME_IN"));
+                        }
+
+                        for (Long unWriteTag : compareTags(mJournalTags, mJournalServerTags)){
+                            mJournalItem = JournalDB.getJournalItem(unWriteTag);
+                            writeJournalItemToServer(mStatement, mJournalItem);
+                        }
+/*
                         for (Long tag : mJournalTags){
                             mResult = mStatement.executeQuery("SELECT TIME_IN FROM JOURNAL WHERE TIME_IN = " + tag);
                             mResult.first();
                             if (mResult.getRow()==0){
                                     mJournalItem = JournalDB.getJournalItem(tag);
-                                    writeJournalItem(mStatement, mJournalItem);
+                                    writeJournalItemToServer(mStatement, mJournalItem);
                             }
-                        }
+                        }*/
                         break;
                     case JOURNAL_DELETE_ONE:
                         if (mJournalItemTag!=null){
@@ -117,20 +144,31 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                             mResult = mStatement.executeQuery("SELECT * FROM " + PERSONS_TABLE + " WHERE " + PERSONS_TABLE_COLUMN_RADIO_LABEL + " = '" + mPersonItem.getRadioLabel() + "'");
                             mResult.first();
                             if (mResult.getRow() == 1){ //если такой уже есть, то удаляем
-                                System.out.println("user already exist");
                                 mStatement.executeUpdate("DELETE FROM " + PERSONS_TABLE + " WHERE " + PERSONS_TABLE_COLUMN_RADIO_LABEL + " = '" + mPersonItem.getRadioLabel() + "'");
                             }
-                            System.out.println("write user");
-                            mStatement.executeUpdate("INSERT INTO " + PERSONS_TABLE + " VALUES ('"
-                                    +mPersonItem.getLastname() + "','"
-                                    +mPersonItem.getFirstname() + "','"
-                                    +mPersonItem.getMidname() + "','"
-                                    +mPersonItem.getDivision() + "','"
-                                    +mPersonItem.getRadioLabel() + "','"
-                                    +mPersonItem.getSex() + "','"
-                                    +mPersonItem.getPhotoPreview() + "','"
-                                    +mPersonItem.getPhotoOriginal() + "')");
+                            //пишем нового пользователя на сервер
+                            writePersonItemToServer(mStatement, mPersonItem);
                         }
+                        break;
+                    case PERSON_ALL:
+                        ArrayList<String> items = FavoriteDB.getPersonsTags();
+                        for (String tag : items){
+                            mResult = mStatement.executeQuery("SELECT " + PERSONS_TABLE_COLUMN_RADIO_LABEL + " FROM " + PERSONS_TABLE + " WHERE " + PERSONS_TABLE_COLUMN_RADIO_LABEL + " = '" + tag + "'");
+                            mResult.first();
+                            if (mResult.getRow() == 0){ //если пользователя нет на сервере, то пишем
+                                writePersonItemToServer(mStatement,FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER, FavoriteDB.ALL_PHOTO));
+                                System.out.println("write " + tag);
+                            }
+                        }
+                        break;
+                    case PERSON_DELETE_ONE:
+                        if (mPersonItemTag!=null){
+                            mStatement.execute("DELETE FROM " + PERSONS_TABLE + " WHERE " + PERSONS_TABLE_COLUMN_RADIO_LABEL + " ='" + mPersonItemTag + "'");
+                            System.out.println("deleted " + mPersonItemTag);
+                        }
+                        break;
+                    case PERSON_DELETE_ALL:
+                        mStatement.execute("TRUNCATE TABLE " + PERSONS_TABLE);
                         break;
                     case ROOMS:
                         break;
@@ -150,7 +188,24 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
         return null;
     }
 
-    private void writeJournalItem(Statement statement, JournalItem journalItem){
+   private ArrayList<Long> compareTags (ArrayList<Long> localTags, ArrayList<Long> serverTags){
+       ArrayList<Long> compareResults = new ArrayList<>();
+       for (Long localTag : localTags) {
+
+           boolean found = false;
+           for (Long serverTag : serverTags) {
+               if (serverTag.equals(localTag)) {
+                   found = true;
+               }
+           }
+           if (!found) {
+               compareResults.add(localTag);
+           }
+       }
+       return compareResults;
+   }
+
+    private void writeJournalItemToServer(Statement statement, JournalItem journalItem){
         try {
             statement.executeUpdate("INSERT INTO JOURNAL VALUES ('"
                     +journalItem.getAccountID()+"','"
@@ -167,9 +222,27 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
         }
     }
 
+    private void writePersonItemToServer(Statement statement, PersonItem personItem){
+        try {
+            statement.executeUpdate("INSERT INTO " + PERSONS_TABLE + " VALUES ('"
+                    +personItem.getLastname() + "','"
+                    +personItem.getFirstname() + "','"
+                    +personItem.getMidname() + "','"
+                    +personItem.getDivision() + "','"
+                    +personItem.getRadioLabel() + "','"
+                    +personItem.getSex() + "','"
+                    +personItem.getPhotoPreview() + "','"
+                    +personItem.getPhotoOriginal() + "')");
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        taskDurationEnd = System.currentTimeMillis();
+        System.out.println("WRITE TASK DURATION " + (taskDurationEnd - taskDurationStart));
         if (mProgressDialog!=null && mProgressDialog.isShowing()) mProgressDialog.cancel();
     }
 }

@@ -125,7 +125,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
                     String firstname = null;
                     String midname = null;
 
-                    String photo = FavoriteDB.getBase64DefaultPhotoFromResources(mContext,"М");
+                    String photo = FavoriteDB.getBase64DefaultPhotoFromResources("М");
                     try {
                         lastname = split[0];
                         firstname = split[1];
@@ -189,7 +189,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
     private void addUserInFavorite(final PersonItem personItem){
 
-        FavoriteDB.writeInDBTeachers(mContext, personItem);
+        FavoriteDB.writeInDBTeachers(personItem);
 
         if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
             new ServerWriter(personItem).execute(ServerWriter.PERSON_NEW);
@@ -214,7 +214,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
         @Override
         protected PersonItem doInBackground(Integer... params) {
-            return FavoriteDB.getPersonItem(mContext, mPersonTagList.get(params[0]), FavoriteDB.SERVER_USER, FavoriteDB.ALL_PHOTO);
+            return FavoriteDB.getPersonItem(mPersonTagList.get(params[0]), FavoriteDB.SERVER_USER, FavoriteDB.ALL_PHOTO);
         }
 
         @Override

@@ -314,7 +314,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
                         AccountDB.writeAccount(accountItem);
 
-                        FavoriteDB.writeInDBTeachers(mContext, new PersonItem()
+                        FavoriteDB.writeInDBTeachers(new PersonItem()
                                 .setLastname(acct.getDisplayName())
                                 .setDivision(acct.getEmail())
                                 .setRadioLabel(acct.getId()));
@@ -429,12 +429,12 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
             String photo = Base64.encodeToString(byteArray,Base64.NO_WRAP);
 
             if (FavoriteDB.isUserInBase(Settings.getActiveAccountID())){
-                FavoriteDB.writeInDBTeachers(mContext, FavoriteDB.getPersonItem(mContext, Settings.getActiveAccountID(), FavoriteDB.LOCAL_USER, FavoriteDB.NO_PHOTO)
+                FavoriteDB.writeInDBTeachers(FavoriteDB.getPersonItem(Settings.getActiveAccountID(), FavoriteDB.LOCAL_USER, FavoriteDB.NO_PHOTO)
                         .setPhotoOriginal(photo)
                         .setPhotoPreview(FavoriteDB.getPhotoPreview(photo)));
             } else {
                 AccountItem account = AccountDB.getAccount(Settings.getActiveAccountID());
-                FavoriteDB.writeInDBTeachers(mContext,new PersonItem()
+                FavoriteDB.writeInDBTeachers(new PersonItem()
                         .setRadioLabel(account.getAccountID())
                         .setLastname(account.getLastname())
                         .setDivision(account.getEmail())
@@ -635,7 +635,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
             try{
                 //если нет в базе, то добавить
                 if (!FavoriteDB.isUserInBase(params[0])){
-                    mValidUser = FavoriteDB.writeInDBTeachers(mContext, FavoriteDB.getPersonItem(mContext, params[0], FavoriteDB.SERVER_USER, FavoriteDB.ALL_PHOTO));
+                    mValidUser = FavoriteDB.writeInDBTeachers(FavoriteDB.getPersonItem(params[0], FavoriteDB.SERVER_USER, FavoriteDB.ALL_PHOTO));
 
                     //если не удалось добавить, то карта некорректна. Показать тост
                     if (!mValidUser) runOnUiThread(new Runnable() {

@@ -103,9 +103,9 @@ public class Dialogs extends DialogFragment{
 
         switch (mDialogId){
             case DIALOG_CLEAR_JOURNAL:
-                View dialogClearJournalView = View.inflate(mContext, R.layout.view_dialog_clear_journal,null);
-                final CheckBox checkClearJournalLocal = (CheckBox)dialogClearJournalView.findViewById(R.id.view_dialog_clear_journal_delete_journal_check);
-                final CheckBox checkClearJournalServer = (CheckBox)dialogClearJournalView.findViewById(R.id.view_dialog_clear_journal_delete_server_check);
+                View dialogClearJournalView = View.inflate(mContext, R.layout.view_dialog_clear,null);
+                final CheckBox checkClearJournalLocal = (CheckBox)dialogClearJournalView.findViewById(R.id.view_dialog_clear_delete_local);
+                final CheckBox checkClearJournalServer = (CheckBox)dialogClearJournalView.findViewById(R.id.view_dialog_clear_delete_server);
 
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(mResources.getString(R.string.dialog_clear_journal_title))
@@ -134,9 +134,12 @@ public class Dialogs extends DialogFragment{
                         })
                         .create();
             case DIALOG_CLEAR_TEACHERS:
+                View dialogClearTeachersView = View.inflate(mContext, R.layout.view_dialog_clear, null);
+                final CheckBox checkClearTeachersLocal = (CheckBox)dialogClearTeachersView.findViewById(R.id.view_dialog_clear_delete_local);
+                final CheckBox checkClearTeachersServer = (CheckBox)dialogClearTeachersView.findViewById(R.id.view_dialog_clear_delete_server);
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(mResources.getString(R.string.dialog_clear_teachers_title))
-                        .setMessage(mResources.getString(R.string.dialog_clear_teachers_message))
+                        .setView(dialogClearTeachersView)
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -147,9 +150,15 @@ public class Dialogs extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                FavoriteDB.clearTeachersDB();
-                                Settings.clearFreeUsers();
-                                updateInformation();
+                                if (checkClearTeachersLocal.isChecked()){
+                                    FavoriteDB.clearTeachersDB();
+                                    Settings.clearFreeUsers();
+                                    updateInformation();
+                                }
+
+                                if (checkClearTeachersServer.isChecked()){
+                                    new ServerWriter().execute(ServerWriter.PERSON_DELETE_ALL);
+                                }
 
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }
@@ -202,6 +211,11 @@ public class Dialogs extends DialogFragment{
 
                                 //удаление метки в free_users
                                 Settings.deleteFreeUser(tag);
+
+                                //удаление с сервера
+                                if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
+                                    new ServerWriter(tag).execute(ServerWriter.PERSON_DELETE_ONE);
+                                }
 
                                 updateInformation();
                             }

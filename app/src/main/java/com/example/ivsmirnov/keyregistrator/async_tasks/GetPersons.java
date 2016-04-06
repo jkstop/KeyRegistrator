@@ -50,7 +50,7 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
         photoDimension = params[0].getPersonPhotoDimension();
 
-        PersonItem personItem = FavoriteDB.getPersonItem(mContext, params[0].getPersonTag(), params[0].getPersonLocation(), photoDimension);
+        PersonItem personItem = FavoriteDB.getPersonItem(params[0].getPersonTag(), params[0].getPersonLocation(), photoDimension);
 
         mPersonImage = new WeakReference<>(params[0].getPersonImageView()).get();
         mAccessImage = new WeakReference<>(params[0].getAccessImageView()).get();
@@ -78,15 +78,15 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
                 switch (photoDimension){
                     case FavoriteDB.FULLSIZE_PHOTO:
-                        if (personItem.getPhotoOriginal()==null) personItem.setPhotoOriginal(FavoriteDB.getBase64DefaultPhotoFromResources(mContext, personItem.getSex()));
+                        if (personItem.getPhotoOriginal()==null) personItem.setPhotoOriginal(FavoriteDB.getBase64DefaultPhotoFromResources(personItem.getSex()));
                         decodedString = Base64.decode(personItem.getPhotoOriginal(), Base64.DEFAULT);
                         break;
                     case FavoriteDB.PREVIEW_PHOTO:
-                        if (personItem.getPhotoPreview()==null) personItem.setPhotoPreview(FavoriteDB.getPhotoPreview(FavoriteDB.getBase64DefaultPhotoFromResources(mContext, personItem.getSex())));
+                        if (personItem.getPhotoPreview()==null) personItem.setPhotoPreview(FavoriteDB.getPhotoPreview(FavoriteDB.getBase64DefaultPhotoFromResources(personItem.getSex())));
                         decodedString = Base64.decode(personItem.getPhotoPreview(), Base64.DEFAULT);
                         break;
                     default:
-                        decodedString = Base64.decode(FavoriteDB.getPhotoPreview(FavoriteDB.getBase64DefaultPhotoFromResources(mContext, personItem.getSex())), Base64.DEFAULT);
+                        decodedString = Base64.decode(FavoriteDB.getPhotoPreview(FavoriteDB.getBase64DefaultPhotoFromResources(personItem.getSex())), Base64.DEFAULT);
                         break;
                 }
 

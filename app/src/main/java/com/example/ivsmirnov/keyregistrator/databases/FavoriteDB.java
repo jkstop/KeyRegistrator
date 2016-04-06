@@ -13,6 +13,8 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
+import com.example.ivsmirnov.keyregistrator.others.App;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.ByteArrayOutputStream;
@@ -42,7 +44,7 @@ public class FavoriteDB {
     public static final int FULL_INITIALS = 7;
 
 
-    public static PersonItem getPersonItem(Context mContext, String tag, int userLocation, int photoType){
+    public static PersonItem getPersonItem(String tag, int userLocation, int photoType){
 
         Cursor cursor = null;
         try {
@@ -104,7 +106,7 @@ public class FavoriteDB {
                             String photo = resultSet.getString("PHOTO");
 
                             if (photo == null)
-                                photo = getBase64DefaultPhotoFromResources(mContext, resultSet.getString("SEX"));
+                                photo = getBase64DefaultPhotoFromResources(resultSet.getString("SEX"));
 
                             switch (photoType) {
                                 case FULLSIZE_PHOTO:
@@ -130,7 +132,8 @@ public class FavoriteDB {
                         return null;
                     }
                 }else{
-                    Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
+                    //ПОПРОБОВАТЬ СДЕЛАТЬ SNACKBAR
+                    //Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
                     return null;
                 }
             }
@@ -263,6 +266,27 @@ public class FavoriteDB {
         }
     }
 
+    //получение списка радиометок (тэгов) всех пользователей
+    public static ArrayList<String> getPersonsTags(){
+        ArrayList <String> items = new ArrayList <>();
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
+                    FavoriteDBinit.TABLE_TEACHER,
+                    new String[]{FavoriteDBinit.COLUMN_TAG_FAVORITE},
+                    null,null,null,null,null);
+            cursor.moveToPosition(-1);
+            while (cursor.moveToNext()){
+                items.add(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_TAG_FAVORITE)));
+            }
+            return items;
+        } catch (Exception e){
+            e.printStackTrace();
+            return items;
+        } finally {
+            closeCursor(cursor);
+        }
+    }
 
     public static boolean isUserInBase(String tag){
         //SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.DB_FAVORITE);
@@ -286,13 +310,13 @@ public class FavoriteDB {
         }
     }
 
-    public static boolean writeInDBTeachers(Context mContext, PersonItem personItem) {
+    public static boolean writeInDBTeachers(PersonItem personItem) {
         try {
             if (personItem!=null){
 
                 if (personItem.getPhotoOriginal() == null){
-                    personItem.setPhotoOriginal(getBase64DefaultPhotoFromResources(mContext, personItem.getSex()));
-                    personItem.setPhotoPreview(getPhotoPreview(getBase64DefaultPhotoFromResources(mContext, personItem.getSex())));
+                    personItem.setPhotoOriginal(getBase64DefaultPhotoFromResources(personItem.getSex()));
+                    personItem.setPhotoPreview(getPhotoPreview(getBase64DefaultPhotoFromResources(personItem.getSex())));
                 }
 
                 ContentValues cv = new ContentValues();
@@ -392,6 +416,7 @@ public class FavoriteDB {
     public static void clearTeachersDB(){
         try {
             DbShare.getDataBase(DbShare.DB_FAVORITE).delete(FavoriteDBinit.TABLE_TEACHER, null, null);
+            Settings.deleteFreeUser(null);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -456,14 +481,14 @@ public class FavoriteDB {
         return inSampleSize;
     }
 
-    public static String getBase64DefaultPhotoFromResources(Context context, String sex){
+    public static String getBase64DefaultPhotoFromResources(String sex){
         try {
             BitmapFactory.Options options = new BitmapFactory.Options();
             Bitmap bitmap;
             if (sex.equalsIgnoreCase("М")){
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_male_colored, options);
+                bitmap = BitmapFactory.decodeResource(App.getAppContext().getResources(), R.drawable.person_male_colored, options);
             } else {
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.person_female_colored, options);
+                bitmap = BitmapFactory.decodeResource(App.getAppContext().getResources(), R.drawable.person_female_colored, options);
             }
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);

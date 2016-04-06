@@ -164,7 +164,11 @@ public class Settings {
 
     public static void deleteFreeUser(String tag){
         ArrayList <String> freeUsers = getFreeUsers();
-        freeUsers.remove(tag);
+        if (tag!=null){
+            freeUsers.remove(tag);
+        } else {
+            freeUsers.clear();
+        }
         setFreeUsers(freeUsers);
     }
 

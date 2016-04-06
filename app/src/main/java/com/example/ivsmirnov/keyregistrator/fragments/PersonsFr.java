@@ -31,6 +31,8 @@ import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerLoader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
@@ -255,6 +257,9 @@ public class PersonsFr extends Fragment implements UpdateInterface {
                 iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getPersonsBackupLocation());
                 startActivityForResult(iLC,REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
                 return true;
+            case R.id.menu_teachers_synch_to_server:
+                new ServerWriter(mContext, true).execute(ServerWriter.PERSON_ALL);
+                new ServerLoader(mContext,this).execute(ServerLoader.LOAD_TEACHERS);
             default:
                 return super.onOptionsItemSelected(item);
         }

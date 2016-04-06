@@ -4,9 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +20,12 @@ import java.util.ArrayList;
 /**
  * Загрузка с сервера
  */
-public class ServerLoader extends AsyncTask<Void,Void,Void> {
+public class ServerLoader extends AsyncTask<Integer,Void,Void> {
+
+    public static final int LOAD_JOURNAL = 100;
+    public static final int LOAD_TEACHERS = 200;
+
+    private long taskDurationStart, taskDurationEnd;
 
     private ProgressDialog mProgressDialog;
     private UpdateInterface mListener;
@@ -32,6 +39,7 @@ public class ServerLoader extends AsyncTask<Void,Void,Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        taskDurationStart = System.currentTimeMillis();
         System.out.println("start server loader");
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mProgressDialog.setCancelable(false);
@@ -40,54 +48,76 @@ public class ServerLoader extends AsyncTask<Void,Void,Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Void doInBackground(Integer... params) {
 
         try {
             Connection connection = SQL_Connection.SQLconnect;
             if (connection!=null){
 
-                Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                Statement mStatement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                ResultSet mResult;
+                switch (params[0]){
+                    case LOAD_JOURNAL:
+                        ArrayList<Long> mJournalTags = JournalDB.getJournalItemTags(null);
 
-                ResultSet preResult = connection.prepareStatement("SELECT TIME_IN FROM JOURNAL ORDER BY TIME_IN ASC").executeQuery();
-                ResultSet postResult;
-                ResultSet resultSetOpen;
-
-                //получаем тэги (время входа) всех помещений с сервера
-                while (preResult.next()){
-                    long timeIn = preResult.getLong("TIME_IN");
-                    if (!JournalDB.isJournalItemCreated(timeIn)){
-                        //если записи нет в локальном журнале, то загружаем ее с сервера и пишем в журнал
-                        postResult = statement.executeQuery("SELECT * FROM JOURNAL WHERE TIME_IN = " + timeIn);
-                        while (postResult.next()){
+                        //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
+                        mResult = mStatement.executeQuery("SELECT * FROM JOURNAL WHERE TIME_IN NOT IN (" + getInClause(mJournalTags) + ")");
+                        while (mResult.next()){
                             JournalDB.writeInDBJournal(new JournalItem()
-                                    .setAccountID(postResult.getString("ACCOUNT_ID"))
-                                    .setAuditroom(postResult.getString("AUDITROOM"))
-                                    .setTimeIn(postResult.getLong("TIME_IN"))
-                                    .setTimeOut(postResult.getLong("TIME_OUT"))
-                                    .setAccessType(postResult.getInt("ACCESS"))
-                                    .setPersonLastname(postResult.getString("PERSON_LASTNAME"))
-                                    .setPersonFirstname(postResult.getString("PERSON_FIRSTNAME"))
-                                    .setPersonMidname(postResult.getString("PERSON_MIDNAME"))
-                                    .setPersonPhoto(postResult.getString("PERSON_PHOTO")));
+                                    .setAccountID(mResult.getString("ACCOUNT_ID"))
+                                    .setAuditroom(mResult.getString("AUDITROOM"))
+                                    .setTimeIn(mResult.getLong("TIME_IN"))
+                                    .setTimeOut(mResult.getLong("TIME_OUT"))
+                                    .setAccessType(mResult.getInt("ACCESS"))
+                                    .setPersonLastname(mResult.getString("PERSON_LASTNAME"))
+                                    .setPersonFirstname(mResult.getString("PERSON_FIRSTNAME"))
+                                    .setPersonMidname(mResult.getString("PERSON_MIDNAME"))
+                                    .setPersonPhoto(mResult.getString("PERSON_PHOTO")));
                         }
-                    }
+
+                        //проверяем открытые помещения. Если на сервере они закрыты, то обновляем локальный журнал.
+                        //сначала получаем тэги открытых помещений  в журнале (они же время входа)
+                        ArrayList<Long> mOpenTags = JournalDB.getOpenRoomsTags();
+
+                        //для каждого помещения проверяем, закрылось ли на сервере
+                        mResult = mStatement.executeQuery("SELECT TIME_OUT FROM JOURNAL WHERE TIME_IN IN (" + getInClause(mOpenTags) + ")");
+                        long timeOut;
+                        while (mResult.next()){
+                            timeOut = mResult.getLong("TIME_OUT");
+                            if (timeOut!=0) JournalDB.updateDB(mOpenTags.get(mResult.getRow()-1), timeOut);
+                        }
+
+                        break;
+                    case LOAD_TEACHERS:
+                        //отправляем запрос, получаем радиометки всех пользователей с сервера
+                        ResultSet personsTagsResult = connection.prepareStatement("SELECT RADIO_LABEL FROM TEACHERS").executeQuery();
+                        ResultSet personsItemResult;
+
+                        while (personsTagsResult.next()){
+                            String tag = personsTagsResult.getString("RADIO_LABEL"); //тэг пользователя
+                            //если пользователя нет в базе на устройстве, то загружаем его с сервера и пишем в базу на устройство
+                            if (!FavoriteDB.isUserInBase(tag)){
+                                personsItemResult = mStatement.executeQuery("SELECT * FROM TEACHERS WHERE RADIO_LABEL ='" + tag + "'");
+                                personsItemResult.first();
+                                FavoriteDB.writeInDBTeachers(new PersonItem()
+                                        .setLastname(personsItemResult.getString("LASTNAME"))
+                                        .setFirstname(personsItemResult.getString("FIRSTNAME"))
+                                        .setMidname(personsItemResult.getString("MIDNAME"))
+                                        .setDivision(personsItemResult.getString("DIVISION"))
+                                        .setRadioLabel(tag)
+                                        .setSex(personsItemResult.getString("SEX"))
+                                        .setPhotoPreview(personsItemResult.getString("PHOTO_PREVIEW"))
+                                        .setPhotoOriginal(personsItemResult.getString("PHOTO_ORIGINAL")));
+                                System.out.println("write in local " + tag);
+                            }
+
+                        }
+                        break;
+                    default:
+                        break;
                 }
 
-                //проверяем открытые помещения. Если на сервере они закрыты, то обновляем локальный журнал.
-                //сначала получаем тэги открытых помещений  в журнале (они же время входа)
-                ArrayList<Long> mOpenTags = JournalDB.getOpenRoomsTags();
-                //для каждого помещения проверяем, закрылось ли на сервере
-                for (long timeIn : mOpenTags){
-                    resultSetOpen = connection.prepareStatement("SELECT TIME_OUT FROM JOURNAL WHERE TIME_IN = " + timeIn).executeQuery();
-                    while (resultSetOpen.next()){
-                        long timeOut = resultSetOpen.getLong("TIME_OUT");
-                        //если помещение закрыто на сервере, то обновляем журнал
-                        if (timeOut!=0){
-                            JournalDB.updateDB(timeIn, timeOut);
-                        }
-                    }
 
-                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -95,12 +125,30 @@ public class ServerLoader extends AsyncTask<Void,Void,Void> {
         return null;
     }
 
+    private String getInClause(ArrayList<Long> items){
+        StringBuilder inClause = new StringBuilder();
+        for (int i=0; i < items.size(); i++) {
+            inClause.append(items.get(i));
+            inClause.append(',');
+        }
+        if (inClause.length() == 0){
+            inClause.append(0);
+        } else {
+            inClause.delete(inClause.length()-1,inClause.length());
+        }
+        return inClause.toString();
+    }
+
+
+
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        taskDurationEnd = System.currentTimeMillis();
+        System.out.println("LOAD TASK DURATION " + (taskDurationEnd - taskDurationStart));
         if (mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }
-        mListener.updateInformation();
+        if (mListener!=null) mListener.updateInformation();
     }
 }
