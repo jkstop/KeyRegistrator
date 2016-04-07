@@ -24,6 +24,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
     private BaseWriterInterface mBaseWriterInterface;
 
     private JournalItem mJournalItem;
+    private RoomItem mRoomItem;
 
 
     public BaseWriter(Context context, BaseWriterInterface baseWriterInterface){
@@ -53,15 +54,16 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
                 .setPersonMidname(person.getMidname())
                 .setPersonPhoto(person.getPhotoPreview());
 
-        JournalDB.writeInDBJournal(mJournalItem);
-
-        RoomDB.updateRoom(new RoomItem()
+        mRoomItem = new RoomItem()
                 .setAuditroom(mJournalItem.getAuditroom())
                 .setStatus(RoomDB.ROOM_IS_BUSY)
                 .setAccessType(mJournalItem.getAccessType())
                 .setTime(timeIn)
                 .setLastVisiter(FavoriteDB.getPersonInitials(FavoriteDB.SHORT_INITIALS, mJournalItem.getPersonLastname(),mJournalItem.getPersonFirstname(),mJournalItem.getPersonMidname()))
-                .setTag(params[0].getPersonTag()));
+                .setTag(params[0].getPersonTag());
+
+        JournalDB.writeInDBJournal(mJournalItem);
+        RoomDB.updateRoom(mRoomItem);
 
         Settings.setLAstRoomTimeIn(mJournalItem.getTimeIn());
         return null;
@@ -72,7 +74,8 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
         if (mBaseWriterInterface!=null) mBaseWriterInterface.onSuccessBaseWrite();
 
         if (Settings.getWriteServerStatus()){
-            if (Settings.getWriteJournalServerStatus()) new ServerWriter(mJournalItem, null, false).execute(ServerWriter.JOURNAL_NEW);
+            if (Settings.getWriteJournalServerStatus()) new ServerWriter(mJournalItem, null, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_NEW);
+            if (Settings.getWriteRoomsServerStatus()) new ServerWriter(mRoomItem).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_NEW);
         }
     }
 }

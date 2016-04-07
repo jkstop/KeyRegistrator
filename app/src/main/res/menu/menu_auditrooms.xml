@@ -5,7 +5,7 @@
     <item android:id="@+id/menu_auditrooms_set_columns_number"
         android:title="@string/menu_auditrooms_set_columns_number"
         android:icon="@drawable/ic_view_column_black_24dp"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
     <item android:id="@+id/menu_auditrooms_save_to_file"
         android:title="@string/menu_auditrooms_save_to_file"
@@ -18,4 +18,11 @@
     <item android:id="@+id/menu_auditrooms_clear"
         android:title="@string/menu_auditrooms_clear"
         app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_auditrooms_synch_to_server"
+        android:title="@string/menu_auditrooms_synch_to_server"
+        android:icon="@drawable/ic_update_black_24dp"
+        app:showAsAction="ifRoom"/>
+
+
 </menu>

@@ -68,10 +68,10 @@
             android:title="@string/shared_preferences_write_teachers_server"
             android:dependency="@string/shared_preferences_write_server"/>
 
-        <!-- <CheckBoxPreference
+         <CheckBoxPreference
              android:key="@string/shared_preferences_write_rooms_server"
              android:title="@string/shared_preferences_write_rooms_server"
-             android:dependency="@string/shared_preferences_write_server"/>-->
+             android:dependency="@string/shared_preferences_write_server"/>
 
     </PreferenceCategory>
 

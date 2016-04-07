@@ -60,6 +60,7 @@ public class PersonItem {
     }
 
     public String getDivision(){
+        if (Division == null) Division = "";
         return Division;
     }
 

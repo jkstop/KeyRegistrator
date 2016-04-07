@@ -5,10 +5,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
+import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,6 +26,7 @@ public class ServerLoader extends AsyncTask<Integer,Void,Void> {
 
     public static final int LOAD_JOURNAL = 100;
     public static final int LOAD_TEACHERS = 200;
+    public static final int LOAD_ROOMS = 300;
 
     private long taskDurationStart, taskDurationEnd;
 
@@ -61,56 +64,70 @@ public class ServerLoader extends AsyncTask<Integer,Void,Void> {
                         ArrayList<Long> mJournalTags = JournalDB.getJournalItemTags(null);
 
                         //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
-                        mResult = mStatement.executeQuery("SELECT * FROM JOURNAL WHERE TIME_IN NOT IN (" + getInClause(mJournalTags) + ")");
+                        mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " NOT IN (" + getInClause(mJournalTags) + ")");
                         while (mResult.next()){
                             JournalDB.writeInDBJournal(new JournalItem()
-                                    .setAccountID(mResult.getString("ACCOUNT_ID"))
-                                    .setAuditroom(mResult.getString("AUDITROOM"))
-                                    .setTimeIn(mResult.getLong("TIME_IN"))
-                                    .setTimeOut(mResult.getLong("TIME_OUT"))
-                                    .setAccessType(mResult.getInt("ACCESS"))
-                                    .setPersonLastname(mResult.getString("PERSON_LASTNAME"))
-                                    .setPersonFirstname(mResult.getString("PERSON_FIRSTNAME"))
-                                    .setPersonMidname(mResult.getString("PERSON_MIDNAME"))
-                                    .setPersonPhoto(mResult.getString("PERSON_PHOTO")));
+                                    .setAccountID(mResult.getString(SQL_Connection.COLUMN_JOURNAL_ACCOUNT_ID))
+                                    .setAuditroom(mResult.getString(SQL_Connection.COLUMN_JOURNAL_AUDITROOM))
+                                    .setTimeIn(mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN))
+                                    .setTimeOut(mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT))
+                                    .setAccessType(mResult.getInt(SQL_Connection.COLUMN_JOURNAL_ACCESS))
+                                    .setPersonLastname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_LASTNAME))
+                                    .setPersonFirstname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_FIRSTNAME))
+                                    .setPersonMidname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_MIDNAME))
+                                    .setPersonPhoto(mResult.getString(SQL_Connection.COLUMN_JOURNAL_PHOTO)));
                         }
 
                         //проверяем открытые помещения. Если на сервере они закрыты, то обновляем локальный журнал.
                         //сначала получаем тэги открытых помещений  в журнале (они же время входа)
                         ArrayList<Long> mOpenTags = JournalDB.getOpenRoomsTags();
 
-                        //для каждого помещения проверяем, закрылось ли на сервере
-                        mResult = mStatement.executeQuery("SELECT TIME_OUT FROM JOURNAL WHERE TIME_IN IN (" + getInClause(mOpenTags) + ")");
+                        //для каждого открытого помещения проверяем, закрылось ли на сервере
+                        mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + ","
+                                + SQL_Connection.COLUMN_JOURNAL_TIME_OUT + " FROM " + SQL_Connection.JOURNAL_TABLE
+                                + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " IN (" + getInClause(mOpenTags) + ")");
                         long timeOut;
+                        long timeIn;
                         while (mResult.next()){
-                            timeOut = mResult.getLong("TIME_OUT");
-                            if (timeOut!=0) JournalDB.updateDB(mOpenTags.get(mResult.getRow()-1), timeOut);
+                            timeOut = mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT);
+                            timeIn = mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN);
+                            if (timeOut!=0) JournalDB.updateDB(timeIn, timeOut);
                         }
 
                         break;
                     case LOAD_TEACHERS:
-                        //отправляем запрос, получаем радиометки всех пользователей с сервера
-                        ResultSet personsTagsResult = connection.prepareStatement("SELECT RADIO_LABEL FROM TEACHERS").executeQuery();
-                        ResultSet personsItemResult;
-
-                        while (personsTagsResult.next()){
-                            String tag = personsTagsResult.getString("RADIO_LABEL"); //тэг пользователя
-                            //если пользователя нет в базе на устройстве, то загружаем его с сервера и пишем в базу на устройство
-                            if (!FavoriteDB.isUserInBase(tag)){
-                                personsItemResult = mStatement.executeQuery("SELECT * FROM TEACHERS WHERE RADIO_LABEL ='" + tag + "'");
-                                personsItemResult.first();
-                                FavoriteDB.writeInDBTeachers(new PersonItem()
-                                        .setLastname(personsItemResult.getString("LASTNAME"))
-                                        .setFirstname(personsItemResult.getString("FIRSTNAME"))
-                                        .setMidname(personsItemResult.getString("MIDNAME"))
-                                        .setDivision(personsItemResult.getString("DIVISION"))
-                                        .setRadioLabel(tag)
-                                        .setSex(personsItemResult.getString("SEX"))
-                                        .setPhotoPreview(personsItemResult.getString("PHOTO_PREVIEW"))
-                                        .setPhotoOriginal(personsItemResult.getString("PHOTO_ORIGINAL")));
-                                System.out.println("write in local " + tag);
-                            }
-
+                        ArrayList<String> mPersonsTags = FavoriteDB.getPersonsTags();
+                        //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
+                        mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.PERSONS_TABLE
+                                + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " NOT IN (" + getInClause(mPersonsTags) + ")");
+                        while (mResult.next()){
+                            FavoriteDB.writeInDBTeachers(new PersonItem()
+                                    .setLastname(mResult.getString(SQL_Connection.COLUMN_PERSONS_LASTNAME))
+                                    .setFirstname(mResult.getString(SQL_Connection.COLUMN_PERSONS_FIRSTNAME))
+                                    .setMidname(mResult.getString(SQL_Connection.COLUMN_PERSONS_MIDNAME))
+                                    .setDivision(mResult.getString(SQL_Connection.COLUMN_PERSONS_DIVISION))
+                                    .setRadioLabel(mResult.getString(SQL_Connection.COLUMN_PERSONS_RADIO_LABEL))
+                                    .setSex(mResult.getString(SQL_Connection.COLUMN_PERSONS_SEX))
+                                    .setPhotoPreview(mResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_PREVIEW))
+                                    .setPhotoOriginal(mResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_ORIGINAL)));
+                            System.out.println("write in local " + mResult.getString(SQL_Connection.COLUMN_PERSONS_LASTNAME));
+                        }
+                        break;
+                    case LOAD_ROOMS:
+                        //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
+                        ArrayList<String> mRooms = RoomDB.getRoomList();
+                        mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.ROOMS_TABLE
+                                + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " NOT IN (" + getInClause(mRooms) + ")");
+                        while (mResult.next()){
+                            RoomDB.writeInRoomsDB(new RoomItem()
+                                    .setAuditroom(mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM))
+                                    .setStatus(mResult.getInt(SQL_Connection.COLUMN_ROOMS_STATUS))
+                                    .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
+                                    .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME))
+                                    .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
+                                    .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL))
+                                    .setPhoto(mResult.getString(SQL_Connection.COLUMN_ROOMS_PHOTO)));
+                            System.out.println("write " + mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM));
                         }
                         break;
                     default:
@@ -125,10 +142,14 @@ public class ServerLoader extends AsyncTask<Integer,Void,Void> {
         return null;
     }
 
-    private String getInClause(ArrayList<Long> items){
+    private String getInClause(ArrayList items){
         StringBuilder inClause = new StringBuilder();
         for (int i=0; i < items.size(); i++) {
-            inClause.append(items.get(i));
+            if (items.get(i).getClass().equals(String.class)){
+                inClause.append("'" + items.get(i) + "'");
+            } else {
+                inClause.append(items.get(i));
+            }
             inClause.append(',');
         }
         if (inClause.length() == 0){

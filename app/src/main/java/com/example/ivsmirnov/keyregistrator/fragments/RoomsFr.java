@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -24,6 +25,8 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerLoader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
@@ -59,7 +62,7 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
         mContext = rootView.getContext();
 
         mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.auditroom_fragment_room_grid);
-        //mRoomsGrid.setHasFixedSize(true);
+        mRoomsGrid.setHasFixedSize(true);
 
         FloatingActionButton mAddFAB = (FloatingActionButton) rootView.findViewById(R.id.auditroom_fragment_fab);
 
@@ -117,6 +120,10 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
+            case R.id.menu_auditrooms_synch_to_server:
+                new ServerWriter(mContext, true).execute(ServerWriter.ROOMS_ALL);
+                new ServerLoader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerLoader.LOAD_ROOMS);
+                return true;
             case R.id.menu_auditrooms_set_columns_number:
                 Dialogs dialogs = new Dialogs();
                 Bundle bundle = new Bundle();

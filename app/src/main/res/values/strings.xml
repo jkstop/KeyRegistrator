@@ -47,7 +47,7 @@
 
     <string name="dialog_clear_teachers_message">Из базы данных преподавателей будут удалены все записи. Продолжить?</string>
 
-    <string name="dialog_clear_rooms_title">ВНИМАНИЕ!</string>
+    <string name="dialog_clear_rooms_title">Очистка базы помещений</string>
     <string name="dialog_clear_rooms_message">Из базы  будут удалены все записи. Продолжить?</string>
 
     <string name="fragment_add_new_staff_edit_hint">Начните вводить фамилию</string>
@@ -70,9 +70,13 @@
     <string name="message_dialog_delete_journal_item_from_journal">Удалить из журнала</string>
     <string name="message_dialg_delete_journal_item_from_server_also">Удалить с сервера</string>
 
+    <string name="title_dailog_delete_room_item">Удаление помещения </string>
+    <string name="message_dialog_delete_room_item_local">Удалить с устройства</string>
+    <string name="message_dialog_delete_room_item_server">Удалить с сервера</string>
+
     <!-- Toasts -->
     <string name="text_toast_put_card">Для сдачи ключей просто приложите карту</string>
-    <string name="text_toast_choise_room_in_first">Выберите аудиторию!</string>
+    <string name="text_toast_choise_room_in_first">Вы не выбрали аудиторию!</string>
     <string name="text_toast_incorrect_card">Не удалось считать карту!</string>
     <string name="text_toast_thanks">Спасибо!</string>
     <string name="text_toast_take_key">Возьмите ключ</string>
@@ -171,6 +175,7 @@
     <string name="menu_auditrooms_save_to_file">Сохранить</string>
     <string name="menu_auditrooms_load_from_file">Загрузить</string>
     <string name="menu_auditrooms_clear">Очистить</string>
+    <string name="menu_auditrooms_synch_to_server">Синхронизировать с сервером</string>
     <string name="menu_journal_save_to_file">Сохранить</string>
     <string name="menu_journal_download_from_file">Загрузить из файла</string>
     <string name="menu_journal_delete">Очистить</string>

@@ -146,6 +146,15 @@ public class FavoriteDB {
         }
     }
 
+    public static String getPersonPhoto (int photoDimension){
+        switch (photoDimension){
+            case PREVIEW_PHOTO:
+                break;
+            case FULLSIZE_PHOTO:
+                break; //сделать возвращение фото
+        }
+    }
+
     public static void updatePersonItem(String tag, PersonItem personItem){
         Cursor cursor = null;
         try {

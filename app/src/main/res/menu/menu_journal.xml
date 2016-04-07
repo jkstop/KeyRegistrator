@@ -5,7 +5,7 @@
     <item android:id="@+id/menu_journal_save_to_file"
         android:title="@string/menu_journal_save_to_file"
         android:icon="@drawable/ic_save_black_24dp"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
     <item android:id="@+id/menu_journal_download_from_file"
         android:title="@string/menu_journal_download_from_file"
@@ -24,6 +24,7 @@
     <item
         android:id="@+id/menu_journal_synch_to_server"
         android:title="@string/menu_journal_synch_to_server"
-        app:showAsAction="never"/>
+        android:icon="@drawable/ic_update_black_24dp"
+        app:showAsAction="ifRoom"/>
 
 </menu>

@@ -258,8 +258,8 @@ public class PersonsFr extends Fragment implements UpdateInterface {
                 startActivityForResult(iLC,REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
                 return true;
             case R.id.menu_teachers_synch_to_server:
-                new ServerWriter(mContext, true).execute(ServerWriter.PERSON_ALL);
-                new ServerLoader(mContext,this).execute(ServerLoader.LOAD_TEACHERS);
+                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_ALL);
+                new ServerLoader(mContext,this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerLoader.LOAD_TEACHERS);
             default:
                 return super.onOptionsItemSelected(item);
         }

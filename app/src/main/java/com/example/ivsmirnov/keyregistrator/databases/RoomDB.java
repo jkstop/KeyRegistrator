@@ -108,18 +108,16 @@ public class RoomDB {
             cursor = DbShare.getCursor(DbShare.DB_ROOM,
                     RoomDBinit.TABLE_ROOMS,
                     new String[]{RoomDBinit._ID, RoomDBinit.COLUMN_ROOM},
+                    RoomDBinit.COLUMN_ROOM + " =?",
+                    new String[]{aud},
                     null,
                     null,
-                    null,
-                    null,
-                    null);
+                    "1");
             cursor.moveToPosition(-1);
             while (cursor.moveToNext()){
-                if (aud.equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_ROOM)))){
-                    DbShare.getDataBase(DbShare.DB_ROOM).delete(RoomDBinit.TABLE_ROOMS,
+                DbShare.getDataBase(DbShare.DB_ROOM).delete(RoomDBinit.TABLE_ROOMS,
                             RoomDBinit._ID + "=" + cursor.getString(cursor.getColumnIndex(RoomDBinit._ID)),
                             null);
-                }
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -176,35 +174,26 @@ public class RoomDB {
         }
     }
 
-    public static RoomItem getRoomItem (String tag, String aud){
+    public static RoomItem getRoomItem (String aud){
         Cursor cursor = null;
         try {
-            String selection;
-            String selectionArg;
-            if (tag!=null){
-                selection = RoomDBinit.COLUMN_TAG;
-                selectionArg = tag;
-            } else {
-                selection = RoomDBinit.COLUMN_ROOM;
-                selectionArg = aud;
-            }
             cursor = DbShare.getCursor(DbShare.DB_ROOM,
                     RoomDBinit.TABLE_ROOMS,
                     null,
-                    selection + " =?",
-                    new String[]{selectionArg},
+                    RoomDBinit.COLUMN_ROOM + " =?",
+                    new String[]{aud},
                     null,
                     null,
                     "1");
             if (cursor.getCount() > 0){
                 cursor.moveToFirst();
+
                 return new RoomItem().setAuditroom(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_ROOM)))
                         .setStatus(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_STATUS)))
                         .setAccessType(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_ACCESS)))
                         .setTime(cursor.getLong(cursor.getColumnIndex(RoomDBinit.COLUMN_TIME)))
                         .setLastVisiter(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_LAST_VISITER)))
-                        .setTag(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG)))
-                        .setPhoto(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_PHOTO_PATH)));
+                        .setTag(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG)));
             }
         } catch (Exception e){
             e.printStackTrace();

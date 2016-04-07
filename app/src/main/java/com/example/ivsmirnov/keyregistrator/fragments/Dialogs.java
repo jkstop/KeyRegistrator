@@ -254,16 +254,24 @@ public class Dialogs extends DialogFragment{
                 return builderEdit.create();
             case DELETE_ROOM_DIALOG:
                 final String aud = getArguments().getString("aud");
+                View dialogDeleteRoomView = View.inflate(mContext, R.layout.view_dialog_delete_room_item, null);
+                final CheckBox deleteRoomLocalCheck = (CheckBox)dialogDeleteRoomView.findViewById(R.id.view_dialog_delete_room_item_local);
+                final CheckBox deleteRoomServerCheck = (CheckBox)dialogDeleteRoomView.findViewById(R.id.view_dialog_delete_room_item_server);
                 return new AlertDialog.Builder(getActivity())
-                        .setTitle(getResources().getString(R.string.title_delete_room_dialog))
-                        .setMessage(getResources().getString(R.string.dialog_delete_room_message) + " "+ aud + "?")
+                        .setTitle(getResources().getString(R.string.title_dailog_delete_room_item) + " " + aud)
+                        .setView(dialogDeleteRoomView)
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                RoomDB.deleteFromRoomsDB(aud);
+                                if (deleteRoomLocalCheck.isChecked()){
+                                    RoomDB.deleteFromRoomsDB(aud);
+                                    updateInformation();
+                                }
 
-                                updateInformation();
+                                if (deleteRoomServerCheck.isChecked()){
+                                    new ServerWriter(aud).execute(ServerWriter.ROOMS_DELETE_ONE);
+                                }
 
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                                 dialog.cancel();
@@ -277,9 +285,12 @@ public class Dialogs extends DialogFragment{
                         })
                         .create();
             case DIALOG_CLEAR_ROOMS:
+                View dialogEraseRoomsView = View.inflate(mContext, R.layout.view_dialog_clear, null);
+                final CheckBox eraseLocalRoomsCheck = (CheckBox)dialogEraseRoomsView.findViewById(R.id.view_dialog_clear_delete_local);
+                final CheckBox eraseServerRoomsCheck = (CheckBox)dialogEraseRoomsView.findViewById(R.id.view_dialog_clear_delete_server);
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.dialog_clear_rooms_title)
-                        .setMessage(R.string.dialog_clear_rooms_message)
+                        .setView(dialogEraseRoomsView)
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -290,9 +301,15 @@ public class Dialogs extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                RoomDB.clearRoomsDB();
+                                if (eraseLocalRoomsCheck.isChecked()){
+                                    RoomDB.clearRoomsDB();
+                                    updateInformation();
+                                }
 
-                                updateInformation();
+                                if (eraseServerRoomsCheck.isChecked()){
+                                    new ServerWriter().execute(ServerWriter.ROOMS_DELETE_ALL);
+                                }
+
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                             }
                         })
@@ -313,9 +330,15 @@ public class Dialogs extends DialogFragment{
                         } else if (auditroomList.contains(inputText)){
                             enterAuditroomLayout.setError(getResources().getString(R.string.input_already_exist_error));
                         } else {
-                            RoomDB.writeInRoomsDB(new RoomItem().setAuditroom(inputText)
+                            RoomItem newRoomItem = new RoomItem().setAuditroom(inputText)
                                     .setStatus(RoomDB.ROOM_IS_FREE)
-                                    .setAccessType(JournalDB.ACCESS_BY_CLICK));
+                                    .setAccessType(JournalDB.ACCESS_BY_CLICK);
+                            RoomDB.writeInRoomsDB(newRoomItem);
+
+                            //пишем на сервер
+                            if (Settings.getWriteServerStatus() && Settings.getWriteRoomsServerStatus()){
+                                new ServerWriter(newRoomItem).execute(ServerWriter.ROOMS_NEW);
+                            }
 
                             enterAuditroomText.getText().clear();
                             updateInformation();

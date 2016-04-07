@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/default_content_margin">
+
+    <CheckBox
+        android:id="@+id/view_dialog_delete_room_item_local"
+        android:layout_alignParentTop="true"
+        android:checked="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/message_dialog_delete_room_item_local"/>
+
+    <CheckBox
+        android:id="@+id/view_dialog_delete_room_item_server"
+        android:layout_below="@id/view_dialog_delete_room_item_local"
+        android:text="@string/message_dialog_delete_room_item_server"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
