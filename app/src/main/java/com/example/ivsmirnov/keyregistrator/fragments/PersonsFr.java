@@ -31,7 +31,7 @@ import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerLoader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
@@ -259,7 +259,7 @@ public class PersonsFr extends Fragment implements UpdateInterface {
                 return true;
             case R.id.menu_teachers_synch_to_server:
                 new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_ALL);
-                new ServerLoader(mContext,this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerLoader.LOAD_TEACHERS);
+                new ServerReader(mContext,this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_TEACHERS);
             default:
                 return super.onOptionsItemSelected(item);
         }

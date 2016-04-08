@@ -9,6 +9,7 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Properties;
 
 /**
  * Соединение с сервером
@@ -75,8 +76,11 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
 
             DriverManager.setLoginTimeout(5);
 
+            Properties properties = new Properties();
+            properties.put("connectTimeout", "60000");
+
             if (SQLconnect == null){
-                SQLconnect = DriverManager.getConnection(ConnURL);
+                SQLconnect = DriverManager.getConnection(ConnURL, properties);
             }
 
             return null;

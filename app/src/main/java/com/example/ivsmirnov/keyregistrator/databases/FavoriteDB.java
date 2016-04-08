@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.App;
@@ -146,13 +147,33 @@ public class FavoriteDB {
         }
     }
 
-    public static String getPersonPhoto (int photoDimension){
-        switch (photoDimension){
-            case PREVIEW_PHOTO:
-                break;
-            case FULLSIZE_PHOTO:
-                break; //сделать возвращение фото
+    public static String getPersonPhoto (String userTag, int photoDimension){
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
+                    FavoriteDBinit.TABLE_TEACHER,
+                    new String[]{FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE, FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE},
+                    FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
+                    new String[]{userTag},
+                    null,
+                    null,
+                    "1");
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
+                switch (photoDimension){
+                    case PREVIEW_PHOTO:
+                        return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE));
+                    case FULLSIZE_PHOTO:
+                        return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE));
+                }
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
         }
+        return null;
     }
 
     public static void updatePersonItem(String tag, PersonItem personItem){
@@ -342,6 +363,11 @@ public class FavoriteDB {
                     deleteUser(personItem.getRadioLabel());
                 }
                 DbShare.getDataBase(DbShare.DB_FAVORITE).insert(FavoriteDBinit.TABLE_TEACHER, null, cv);
+
+                //добавляем на сервер
+                if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
+                    new ServerWriter(personItem).execute(ServerWriter.PERSON_NEW);
+                }
                 return true;
             } else {
                 return false;

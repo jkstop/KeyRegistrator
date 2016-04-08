@@ -191,10 +191,6 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
         FavoriteDB.writeInDBTeachers(personItem);
 
-        if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
-            new ServerWriter(personItem).execute(ServerWriter.PERSON_NEW);
-        }
-
         if (getView()!=null){
             Snackbar.make(getView(),R.string.snack_user_added,Snackbar.LENGTH_LONG)
                     .setAction(R.string.snack_cancel, new View.OnClickListener() {

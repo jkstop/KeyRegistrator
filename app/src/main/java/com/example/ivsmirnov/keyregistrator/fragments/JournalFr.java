@@ -33,7 +33,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterJournalList;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetJournal;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerLoader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
@@ -140,7 +140,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
                 return true;
             case R.id.menu_journal_synch_to_server:
                 new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_ALL);
-                new ServerLoader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerLoader.LOAD_JOURNAL);
+                new ServerReader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_JOURNAL);
                 return true;
             case R.id.menu_journal_download_from_file:
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);

@@ -12,6 +12,7 @@ import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -43,11 +44,8 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
     private PersonItem mPersonItem;
     private RoomItem mRoomItem;
 
-    private long taskDurationStart, taskDurationEnd;
-
-    public ServerWriter (JournalItem journalItem, Context context, boolean isShowProgress){
+    public ServerWriter (JournalItem journalItem){
         mJournalItem = journalItem;
-        if (isShowProgress) mProgressDialog = new ProgressDialog(context);
     }
 
     public ServerWriter (Long journalItemTag){
@@ -76,12 +74,10 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        taskDurationStart = System.currentTimeMillis();
-        System.out.println("start server writer");
         if (mProgressDialog!=null){
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             mProgressDialog.setCancelable(false);
-            mProgressDialog.setMessage("Запись на сервер...");
+            mProgressDialog.setMessage("Синхронизация...");
             mProgressDialog.show();
         }
     }
@@ -96,6 +92,7 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                 switch (params[0]){
                     case JOURNAL_NEW:
                         if (mJournalItem!=null){
+                            System.out.println("TIME IN " + mJournalItem.getTimeIn());
                             mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " = " + mJournalItem.getTimeIn());
                             mResult.first();
                             if (mResult.getRow() == 0){
@@ -111,7 +108,8 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                         ArrayList<Long> mJournalTags = JournalDB.getJournalItemTags(null);
                         ArrayList<Long> mJournalServerTags = new ArrayList<>();
 
-                        mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " FROM " + SQL_Connection.JOURNAL_TABLE);
+                        mResult = mConnection.prepareStatement("SELECT " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " FROM " + SQL_Connection.JOURNAL_TABLE).executeQuery();
+                        //mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " FROM " + SQL_Connection.JOURNAL_TABLE);
                         while (mResult.next()){
                             mJournalServerTags.add(mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN));
                         }
@@ -119,6 +117,19 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                         for (Long unWriteTag : compareJournalTags(mJournalTags, mJournalServerTags)){
                             mJournalItem = JournalDB.getJournalItem(unWriteTag);
                             writeJournalItemToServer(mStatement, mJournalItem);
+                        }
+
+                        //если в журнале помещение закрылось, а на сервере нет, то исправляем
+                        mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + "," + SQL_Connection.COLUMN_JOURNAL_TIME_OUT
+                                + " FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_OUT + " =0");
+                        long timeIn;
+                        while (mResult.next()){
+                            timeIn = mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN);
+                            if (!JournalDB.isItemOpened(timeIn)){
+                                mJournalItem = JournalDB.getJournalItem(timeIn);
+                                mResult.updateLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT, mJournalItem.getTimeOut());
+                                mResult.updateRow();
+                            }
                         }
 
                         break;
@@ -152,20 +163,15 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                             serverTags.add(mResult.getString(SQL_Connection.COLUMN_PERSONS_RADIO_LABEL));
                         }
 
-                        System.out.println("localTags " + localTags.size());
-                        System.out.println("serverTags " + serverTags.size());
-
                         //получаем список тэгов, которых нет на сервере. Для каждого пишем пользователя
                         for (String tag : compareStringLists(localTags, serverTags)){
                             writePersonItemToServer(mStatement, FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER, FavoriteDB.ALL_PHOTO));
-                            System.out.println("write " + tag);
                         }
 
                         break;
                     case PERSON_DELETE_ONE:
                         if (mTag!=null){
                             mStatement.execute("DELETE FROM " + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " ='" + mTag + "'");
-                            System.out.println("deleted " + mTag);
                         }
                         break;
                     case PERSON_DELETE_ALL:
@@ -179,33 +185,28 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                             mResult.first();
                             if (mResult.getRow() == 0){
                                 writeRoomItemToServer(mStatement, mRoomItem);
-                                System.out.println("write room " + mRoomItem.getAuditroom());
                             } else { //если такое помещение уже есть, то проверяем открыто оно или нет
                                 if (mRoomItem.getStatus() != mResult.getInt(SQL_Connection.COLUMN_ROOMS_STATUS)){
                                     //статусы не совпали, надо обновить на сервере
-                                    //надо получить фото
-                                    PersonItem personForPhoto = FavoriteDB.getPersonItem(mRoomItem.getTag(),FavoriteDB.LOCAL_USER,FavoriteDB.PREVIEW_PHOTO);
-
+                                    //получаем фото
+                                    String userPhoto = FavoriteDB.getPersonPhoto(mRoomItem.getTag(), FavoriteDB.PREVIEW_PHOTO);
+                                    //обновляем
                                     mResult.updateInt(SQL_Connection.COLUMN_ROOMS_STATUS, mRoomItem.getStatus());
                                     mResult.updateInt(SQL_Connection.COLUMN_ROOMS_ACCESS, mRoomItem.getAccessType());
                                     mResult.updateLong(SQL_Connection.COLUMN_ROOMS_TIME, mRoomItem.getTime());
                                     mResult.updateString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER, mRoomItem.getLastVisiter());
                                     mResult.updateString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL, mRoomItem.getTag());
-                                    mResult.updateString(SQL_Connection.COLUMN_ROOMS_PHOTO, personForPhoto.getPhotoPreview());
+                                    mResult.updateString(SQL_Connection.COLUMN_ROOMS_PHOTO, userPhoto);
                                     mResult.updateRow();
-
-                                    System.out.println("updated " + mRoomItem.getAuditroom());
                                 }
-
                             }
-
                         }
                         break;
                     case ROOMS_ALL:
                         //получаем локальный список помещений и список помещений на сервере
                         ArrayList<String> localRooms = RoomDB.getRoomList();
                         ArrayList<String> serverRooms = new ArrayList<>();
-                        mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_ROOMS_ROOM + " FROM " + SQL_Connection.ROOMS_TABLE);
+                        mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_ROOMS_ROOM + "," + SQL_Connection.COLUMN_ROOMS_STATUS + " FROM " + SQL_Connection.ROOMS_TABLE);
                         while (mResult.next()){
                             serverRooms.add(mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM));
                         }
@@ -213,7 +214,6 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                         //получаем список аудиторий, которых нет на сервере.пишем
                         for (String aud : compareStringLists(localRooms,serverRooms)){
                             writeRoomItemToServer(mStatement, RoomDB.getRoomItem(aud));
-                            System.out.println("write " + aud);
                         }
                         break;
                     case ROOMS_DELETE_ONE:
@@ -318,8 +318,6 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        taskDurationEnd = System.currentTimeMillis();
-        System.out.println("WRITE TASK DURATION " + (taskDurationEnd - taskDurationStart));
         if (mProgressDialog!=null && mProgressDialog.isShowing()) mProgressDialog.cancel();
     }
 }

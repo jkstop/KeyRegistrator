@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.IBinder;
 
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
@@ -45,7 +46,9 @@ public class CloseDayService extends Service implements CloseDayInterface {
 
             //запись на сервер
             if (Settings.getWriteServerStatus()){
-                if (Settings.getWriteJournalServerStatus()) new ServerWriter().execute(ServerWriter.JOURNAL_ALL);
+                if (Settings.getWriteJournalServerStatus()) new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_ALL);
+                if (Settings.getWriteTeachersServerStatus()) new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_ALL);
+                if (Settings.getWriteRoomsServerStatus()) new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_ALL);
             }
 
             //рассылка email

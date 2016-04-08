@@ -22,7 +22,7 @@
     <item android:id="@+id/menu_auditrooms_synch_to_server"
         android:title="@string/menu_auditrooms_synch_to_server"
         android:icon="@drawable/ic_update_black_24dp"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
 
 </menu>

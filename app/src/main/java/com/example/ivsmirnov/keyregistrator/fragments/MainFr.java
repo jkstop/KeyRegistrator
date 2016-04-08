@@ -1,6 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -23,6 +24,8 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
@@ -94,6 +97,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     }
 
     private void initializeAuditroomGrid(){
+        mRoomItems = RoomDB.readRoomsDB();
         AdapterMainRoomGrid mAuditroomGridAdapter = new AdapterMainRoomGrid(mContext, mRoomItems,this);
         mAuditroomGrid.setAdapter(mAuditroomGridAdapter);
 
@@ -136,6 +140,14 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
                 dialog_resize.setArguments(bundle_dialog_resize);
                 dialog_resize.setTargetFragment(this,0);
                 dialog_resize.show(getFragmentManager(),"dialog_resize");
+                return true;
+            case R.id.menu_main_synch_all_to_server:
+                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_ALL);
+                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_ALL);
+                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_ALL);
+                new ServerReader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_ROOMS);
+                new ServerReader(mContext, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_TEACHERS);
+                new ServerReader(mContext, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_JOURNAL);
                 return true;
             //case R.id.test:
                 //new insert(mContext).execute();

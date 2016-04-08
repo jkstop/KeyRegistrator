@@ -8,6 +8,7 @@ import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
@@ -25,7 +26,11 @@ public class LoadImageFromWeb extends AsyncTask<Void,Bitmap,Bitmap> {
     @Override
     protected Bitmap doInBackground(Void... params) {
         try{
-            InputStream inputStream = (InputStream)new URL(mUrl).getContent();
+            URL imageUrl = new URL(mUrl);
+            HttpURLConnection httpURLConnection = (HttpURLConnection)imageUrl.openConnection();
+            httpURLConnection.setConnectTimeout(5000);
+            httpURLConnection.setReadTimeout(5000);
+            InputStream inputStream = httpURLConnection.getInputStream();
             return BitmapFactory.decodeStream(inputStream);
         } catch (IOException e) {
             e.printStackTrace();

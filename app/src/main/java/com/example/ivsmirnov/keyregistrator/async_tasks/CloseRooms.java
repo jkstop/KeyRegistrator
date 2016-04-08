@@ -22,6 +22,7 @@ public class CloseRooms extends AsyncTask<Void, Void, Integer> {
     private String mTag;
     private CloseRoomInterface mCloseRoomInterface;
     private RoomItem mRoomItemUpdated;
+    private long mRoomTime;
 
     public CloseRooms (Context context, String tag, CloseRoomInterface closeRoomInterface){
         mContext = context;
@@ -37,12 +38,16 @@ public class CloseRooms extends AsyncTask<Void, Void, Integer> {
     @Override
     protected Integer doInBackground(Void... params) {
 
+        mRoomItemUpdated = RoomDB.getRoomItemForCurrentUser(mTag);
+        mRoomTime = mRoomItemUpdated.getTime();
 
-        mRoomItemUpdated = RoomDB.getRoomItemForCurrentUser(mTag).setTag(Values.EMPTY).setStatus(RoomDB.ROOM_IS_FREE);
-        int closedRooms = RoomDB.updateRoom(mRoomItemUpdated);
         JournalDB.updateDB(mRoomItemUpdated.getTime(), System.currentTimeMillis());
 
-        return closedRooms;
+        return RoomDB.updateRoom(mRoomItemUpdated
+                .setTime(0)
+                .setLastVisiter(Values.EMPTY)
+                .setTag(Values.EMPTY)
+                .setStatus(RoomDB.ROOM_IS_FREE));
     }
 
     @Override
@@ -53,7 +58,7 @@ public class CloseRooms extends AsyncTask<Void, Void, Integer> {
         }
 
         if (Settings.getWriteServerStatus()){
-            if (Settings.getWriteJournalServerStatus()) new ServerWriter(new JournalItem().setTimeIn(mRoomItemUpdated.getTime()), null, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_NEW);
+            if (Settings.getWriteJournalServerStatus()) new ServerWriter(new JournalItem().setTimeIn(mRoomTime)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_NEW);
             if (Settings.getWriteRoomsServerStatus()) new ServerWriter(mRoomItemUpdated).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_NEW);
         }
     }

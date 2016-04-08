@@ -22,18 +22,16 @@ import java.util.ArrayList;
 /**
  * Загрузка с сервера
  */
-public class ServerLoader extends AsyncTask<Integer,Void,Void> {
+public class ServerReader extends AsyncTask<Integer,Void,Void> {
 
     public static final int LOAD_JOURNAL = 100;
     public static final int LOAD_TEACHERS = 200;
     public static final int LOAD_ROOMS = 300;
 
-    private long taskDurationStart, taskDurationEnd;
-
     private ProgressDialog mProgressDialog;
     private UpdateInterface mListener;
 
-    public ServerLoader(Context context, UpdateInterface updateInterface){
+    public ServerReader(Context context, UpdateInterface updateInterface){
         this.mListener = updateInterface;
         mProgressDialog = new ProgressDialog(context);
 
@@ -42,12 +40,12 @@ public class ServerLoader extends AsyncTask<Integer,Void,Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        taskDurationStart = System.currentTimeMillis();
-        System.out.println("start server loader");
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setMessage("Загрузка с сервера...");
-        mProgressDialog.show();
+        if (mProgressDialog!=null){
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.setMessage("Синхронизация...");
+            mProgressDialog.show();
+        }
     }
 
     @Override
@@ -116,8 +114,10 @@ public class ServerLoader extends AsyncTask<Integer,Void,Void> {
                     case LOAD_ROOMS:
                         //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
                         ArrayList<String> mRooms = RoomDB.getRoomList();
-                        mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.ROOMS_TABLE
-                                + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " NOT IN (" + getInClause(mRooms) + ")");
+                        mResult = connection.prepareStatement("SELECT * FROM " + SQL_Connection.ROOMS_TABLE
+                                + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " NOT IN (" + getInClause(mRooms) + ")").executeQuery();
+                        //mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.ROOMS_TABLE
+                        //        + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " NOT IN (" + getInClause(mRooms) + ")");
                         while (mResult.next()){
                             RoomDB.writeInRoomsDB(new RoomItem()
                                     .setAuditroom(mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM))
@@ -127,7 +127,54 @@ public class ServerLoader extends AsyncTask<Integer,Void,Void> {
                                     .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
                                     .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL))
                                     .setPhoto(mResult.getString(SQL_Connection.COLUMN_ROOMS_PHOTO)));
-                            System.out.println("write " + mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM));
+                        }
+
+                        //для всех записей проверяем статус. Если на устройстве не совпадает с сервером, пишем в устройство новый статус
+                        //сначала получаем с сервера список всех помещений и их статусы
+                        mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.ROOMS_TABLE);
+                        //для каждого значения сравниваем статус с локальным
+                        String aud;
+                        int status;
+                        long timeServer;
+                        long timeLocal;
+                        while (mResult.next()){
+                            aud = mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM);
+                            status = mResult.getInt(SQL_Connection.COLUMN_ROOMS_STATUS);
+                            //статус не совпал, пишем в устройство новый статус
+                            if (status != RoomDB.getRoomStatus(aud)){
+                                switch (status){
+                                    case RoomDB.ROOM_IS_FREE: //освобождаем помещение
+                                        RoomDB.updateRoom(new RoomItem()
+                                                .setAuditroom(aud)
+                                                .setStatus(status));
+                                        break;
+                                    case RoomDB.ROOM_IS_BUSY: //занимаем помещение
+                                        RoomDB.updateRoom(new RoomItem()
+                                                .setAuditroom(aud)
+                                                .setStatus(status)
+                                                .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL))
+                                                .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
+                                                .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
+                                                .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME))
+                                                .setPhoto(mResult.getString(SQL_Connection.COLUMN_ROOMS_PHOTO)));
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } else { //статус совпал, проверяем время входа
+                                timeServer = mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME);
+                                timeLocal = RoomDB.getRoomTimeIn(aud);
+                                if (timeServer != timeLocal){ //время отличается, обновляем на устройстве
+                                    RoomDB.updateRoom(new RoomItem()
+                                            .setAuditroom(aud)
+                                            .setStatus(status)
+                                            .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL))
+                                            .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
+                                            .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
+                                            .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME))
+                                            .setPhoto(mResult.getString(SQL_Connection.COLUMN_ROOMS_PHOTO)));
+                                }
+                            }
                         }
                         break;
                     default:
@@ -160,14 +207,10 @@ public class ServerLoader extends AsyncTask<Integer,Void,Void> {
         return inClause.toString();
     }
 
-
-
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        taskDurationEnd = System.currentTimeMillis();
-        System.out.println("LOAD TASK DURATION " + (taskDurationEnd - taskDurationStart));
-        if (mProgressDialog.isShowing()){
+        if (mProgressDialog!=null && mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }
         if (mListener!=null) mListener.updateInformation();

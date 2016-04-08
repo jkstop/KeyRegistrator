@@ -25,7 +25,7 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerLoader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
@@ -122,7 +122,7 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
         switch (item.getItemId()){
             case R.id.menu_auditrooms_synch_to_server:
                 new ServerWriter(mContext, true).execute(ServerWriter.ROOMS_ALL);
-                new ServerLoader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerLoader.LOAD_ROOMS);
+                new ServerReader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_ROOMS);
                 return true;
             case R.id.menu_auditrooms_set_columns_number:
                 Dialogs dialogs = new Dialogs();

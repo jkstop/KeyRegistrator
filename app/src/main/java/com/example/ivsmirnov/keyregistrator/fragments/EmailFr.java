@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterEmailExtras;
 import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
@@ -90,7 +91,7 @@ public class EmailFr extends Fragment implements GetAccountInterface, EmailInter
         if (mAccount!=null){
             mAccountName.setText(mAccount.getLastname());
             mAccountEmail.setText(mAccount.getEmail());
-            new LoadImageFromWeb(mAccount.getPhoto(), this).execute();
+            if (Launcher.isNetworkAvailable()) new LoadImageFromWeb(mAccount.getPhoto(), this).execute();
         }else{
             mAccountName.setText(getResources().getString(R.string.email_fragment_logon));
             mAccountEmail.setText(Values.EMPTY);

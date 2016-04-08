@@ -203,6 +203,50 @@ public class RoomDB {
         return null;
     }
 
+    public static int getRoomStatus(String aud){
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.DB_ROOM, RoomDBinit.TABLE_ROOMS,
+                    new String[]{RoomDBinit.COLUMN_STATUS},
+                    RoomDBinit.COLUMN_ROOM + " =?",
+                    new String[]{aud},
+                    null,
+                    null,
+                    "1");
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
+                return cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_STATUS));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+        return -1;
+    }
+
+    public static long getRoomTimeIn (String aud){
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.DB_ROOM, RoomDBinit.TABLE_ROOMS,
+                    new String[]{RoomDBinit.COLUMN_TIME},
+                    RoomDBinit.COLUMN_ROOM + " =?",
+                    new String[]{aud},
+                    null,
+                    null,
+                    "1");
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
+                return cursor.getLong(cursor.getColumnIndex(RoomDBinit.COLUMN_TIME));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+        return 0;
+    }
+
 
     public static ArrayList<String> getRoomList(){
         Cursor cursor = null;
@@ -286,7 +330,7 @@ public class RoomDB {
                 JournalDB.updateDB(roomItem.getTime(), System.currentTimeMillis());
 
                 if (Settings.getWriteServerStatus()){
-                    if (Settings.getWriteJournalServerStatus()) new ServerWriter(new JournalItem().setTimeIn(roomItem.getTime()), null, false).execute(ServerWriter.JOURNAL_NEW);
+                    if (Settings.getWriteJournalServerStatus()) new ServerWriter(new JournalItem().setTimeIn(roomItem.getTime())).execute(ServerWriter.JOURNAL_NEW);
                 }
 
                 closedRooms++;

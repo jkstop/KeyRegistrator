@@ -11,11 +11,14 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -91,7 +94,6 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
             "Present", "Swallowed", "Powered", "Negotiable", "Specific" };
 
     public static final int REQUEST_CODE_LOG_ON = 205;
-    static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 
     private Context mContext;
     private Resources mResources;
@@ -158,7 +160,9 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
         if (savedInstanceState==null){
             showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.navigation_drawer_item_home);
+
         }
+        //getSupportFragmentManager().beginTransaction().add(MainFr.newInstance(), getStringFromResources(R.string.navigation_drawer_item_home)).commit();
     }
 
     private void initGoogleAPI(){
@@ -335,7 +339,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
             String text = mAccount.getLastname();
             mAccountName.setText(text);
             mAccountEmail.setText(mAccount.getEmail());
-            new LoadImageFromWeb(mAccount.getPhoto(), mGetAccountInterface).execute();
+            if (isNetworkAvailable()) new LoadImageFromWeb(mAccount.getPhoto(), mGetAccountInterface).execute();
         } else {
             mAccountName.setText(getStringFromResources(R.string.navigation_drawer_account_info_text_user));
             mAccountEmail.setText(Values.EMPTY);
@@ -387,9 +391,17 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         }
 
         mAdapterNavigationDrawerList.notifyDataSetChanged();
-        fragmentManager.beginTransaction().replace(R.id.main_frame_for_fragment,fragment,getStringFromResources(fragmentTagId)).commit();
-    }
 
+        //если стэков больше 3, то 1 выкидываем
+        if (fragmentManager.getBackStackEntryCount()>3){
+            fragmentManager.popBackStack();
+        }
+
+        fragmentManager.beginTransaction()
+                .replace(R.id.main_frame_for_fragment,fragment,getStringFromResources(fragmentTagId))
+                .addToBackStack(getStringFromResources(fragmentTagId))
+                .commit();
+    }
 
     @Override
     public void onUserRecoverableAuthException(UserRecoverableAuthException e) {
@@ -488,25 +500,25 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
     @Override
     public void onBackPressed() {
-        if (back_pressed + 2000 > System.currentTimeMillis()) {
+        if (getSupportFragmentManager().getBackStackEntryCount() != 1){
             super.onBackPressed();
-        } else {
-            SearchFr search_fr = (SearchFr) getFragmentByTag(R.string.fragment_tag_search);
-            if (search_fr !=null && search_fr.isVisible()){
-                PersonsFr persons_fr = PersonsFr.newInstance();
-                Bundle bundle = new Bundle();
-                bundle.putInt(PersonsFr.PERSONS_FRAGMENT_TYPE, PersonsFr.PERSONS_FRAGMENT_SELECTOR);
-                bundle.putString(Settings.AUDITROOM, Settings.getLastClickedAuditroom());
-                persons_fr.setArguments(bundle);
-                showFragment(getSupportFragmentManager(), persons_fr, R.string.navigation_drawer_item_persons);
-            }else{
+        } else {  //если в стэке 1 фрагмент (главный)
+            if (back_pressed + 2000 > System.currentTimeMillis()){
+                finish();
+            } else {
                 Toast.makeText(getBaseContext(), getStringFromResources(R.string.toast_press_back_again), Toast.LENGTH_SHORT).show();
-                //getSupportFragmentManager().beginTransaction()
-                //        .replace(R.id.main_frame_for_fragment, MainFr.newInstance(),getResources().getString(R.string.navigation_drawer_item_home))
-                //        .commit();
-                showFragment(getSupportFragmentManager(), MainFr.newInstance(), R.string.navigation_drawer_item_home);
                 back_pressed = System.currentTimeMillis();
             }
+        }
+    }
+
+    public static boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager)App.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null){
+            return false;
+        } else{
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            return netInfo!=null && netInfo.getState() == NetworkInfo.State.CONNECTED;
         }
     }
 

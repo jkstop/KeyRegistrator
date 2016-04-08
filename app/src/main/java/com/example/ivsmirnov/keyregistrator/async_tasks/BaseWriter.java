@@ -74,7 +74,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
         if (mBaseWriterInterface!=null) mBaseWriterInterface.onSuccessBaseWrite();
 
         if (Settings.getWriteServerStatus()){
-            if (Settings.getWriteJournalServerStatus()) new ServerWriter(mJournalItem, null, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_NEW);
+            if (Settings.getWriteJournalServerStatus()) new ServerWriter(mJournalItem).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_NEW);
             if (Settings.getWriteRoomsServerStatus()) new ServerWriter(mRoomItem).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_NEW);
         }
     }
