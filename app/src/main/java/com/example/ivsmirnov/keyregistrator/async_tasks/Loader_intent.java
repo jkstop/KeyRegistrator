@@ -157,8 +157,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                             .setStatus(Integer.parseInt(split[1]))
                                             .setAccessType(Integer.parseInt(split[2]))
                                             .setLastVisiter(split[3])
-                                            .setTag(split[4])
-                                            .setPhoto(split[5]));
+                                            .setTag(split[4]));
                                     publishProgress(i);
                                     i++;
                                 }

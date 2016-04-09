@@ -304,7 +304,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
 
-            //if (resultCode == RESULT_OK){
+            if (resultCode == RESULT_OK){
                 if (requestCode == REQUEST_CODE_LOG_ON){
                     Toast.makeText(mContext, "LOGON " + String.valueOf(resultCode), Toast.LENGTH_SHORT).show();
                     GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
@@ -313,7 +313,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                         final GoogleSignInAccount acct = result.getSignInAccount();
                         AccountItem accountItem = new AccountItem().setLastname(acct.getDisplayName())
                                 .setEmail(acct.getEmail())
-                                .setPhoto(acct.getPhotoUrl().toString())
+                                .setPhoto(String.valueOf(acct.getPhotoUrl().toString()))
                                 .setAccountID(acct.getId());
 
                         AccountDB.writeAccount(accountItem);
@@ -327,7 +327,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                         initNavigationDrawer();
                     }
                 }
-           // }
+            }
 
     }
 

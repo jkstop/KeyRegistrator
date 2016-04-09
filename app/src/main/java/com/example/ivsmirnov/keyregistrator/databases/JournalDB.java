@@ -3,8 +3,10 @@ package com.example.ivsmirnov.keyregistrator.databases;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Environment;
 
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
@@ -35,8 +37,6 @@ public class JournalDB {
     public static final int COUNT_TOTAL = 3;
 
     public static long writeInDBJournal(JournalItem journalItem){
-
-        System.out.println("writeInJournal");
 
         SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.DB_JOURNAL);
         Cursor cursor = null;

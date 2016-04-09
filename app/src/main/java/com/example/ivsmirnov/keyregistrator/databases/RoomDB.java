@@ -2,6 +2,7 @@ package com.example.ivsmirnov.keyregistrator.databases;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Environment;
 
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
@@ -32,7 +33,7 @@ public class RoomDB {
             cv.put(RoomDBinit.COLUMN_TIME, roomItem.getTime());
             cv.put(RoomDBinit.COLUMN_LAST_VISITER, roomItem.getLastVisiter());
             cv.put(RoomDBinit.COLUMN_TAG,roomItem.getTag());
-            cv.put(RoomDBinit.COLUMN_PHOTO_PATH, roomItem.getPhoto());
+            //cv.put(RoomDBinit.COLUMN_PHOTO_PATH, roomItem.getPhoto());
             DbShare.getDataBase(DbShare.DB_ROOM).insert(RoomDBinit.TABLE_ROOMS, null, cv);
         } catch (Exception e){
             e.printStackTrace();
@@ -330,7 +331,7 @@ public class RoomDB {
                 JournalDB.updateDB(roomItem.getTime(), System.currentTimeMillis());
 
                 if (Settings.getWriteServerStatus()){
-                    if (Settings.getWriteJournalServerStatus()) new ServerWriter(new JournalItem().setTimeIn(roomItem.getTime())).execute(ServerWriter.JOURNAL_NEW);
+                    if (Settings.getWriteJournalServerStatus()) new ServerWriter(new JournalItem().setTimeIn(roomItem.getTime())).execute(ServerWriter.JOURNAL_UPDATE);
                 }
 
                 closedRooms++;

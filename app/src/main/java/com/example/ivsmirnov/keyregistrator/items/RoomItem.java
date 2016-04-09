@@ -44,10 +44,6 @@ public class RoomItem {
         return this;
     }
 
-    public RoomItem setPhoto(String photo){
-        this.Photo = photo;
-        return this;
-    }
 
     public String getAuditroom(){
         return Auditroom;
@@ -71,10 +67,6 @@ public class RoomItem {
 
     public String getTag(){
         return Tag;
-    }
-
-    public String getPhoto(){
-        return Photo;
     }
 
 }

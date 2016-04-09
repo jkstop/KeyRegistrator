@@ -10,6 +10,8 @@
     <string name="fragment_tag_main">fragment_tag_main</string>
     -->
 
+    <string name="server_client_id">127775171233-cudgtb5mc7s0e83jj3nbofkb5thhig8q.apps.googleusercontent.com</string>
+
     <string name="text_empty_auds">Список пуст. Добавьте аудитории через настройки.</string>
     <string name="fragment_tag_nfc">fragment_tag_nfc</string>
     <string name="fragment_tag_search">fragment_tag_search</string>
@@ -175,21 +177,23 @@
     <string name="menu_auditrooms_save_to_file">Сохранить</string>
     <string name="menu_auditrooms_load_from_file">Загрузить</string>
     <string name="menu_auditrooms_clear">Очистить</string>
-    <string name="menu_auditrooms_synch_to_server">Синхронизировать с сервером</string>
+    <string name="menu_auditrooms_upload_to_server">Загрузить на сервер</string>
+    <string name="menu_auditrooms_download_from_server">Загрузить с сервера</string>
     <string name="menu_journal_save_to_file">Сохранить</string>
     <string name="menu_journal_download_from_file">Загрузить из файла</string>
     <string name="menu_journal_delete">Очистить</string>
     <string name="menu_journal_select_location_for_copy">Указать папку для копии</string>
-    <string name="menu_journal_download_to_server">Загрузить на сервер</string>
+    <string name="menu_journal_upload_to_server">Загрузить на сервер</string>
     <string name="menu_journal_download_from_server">Загрузить с сервера</string>
-    <string name="menu_journal_synch_to_server">Синхронизировать с сервером</string>
     <string name="menu_teachers_save_to_file">Сохранить</string>
     <string name="menu_teachers_download_favorite">Загрузить из файла</string>
     <string name="menu_teachers_delete">Очистить</string>
     <string name="menu_teachers_select_location_for_copy">Указать папку для копии</string>
-    <string name="menu_teachers_synch_to_server">Синхронизировать с сервером</string>
+    <string name="menu_teachers_upload_to_server">Загрузить на сервер</string>
+    <string name="menu_teachers_download_from_server">Загрузить с сервера</string>
     <string name="menu_main_items_size">Размер элементов</string>
-    <string name="menu_main_synch_all_to_server">Синхронизировать</string>
+    <string name="menu_main_upload_all_to_server">Загрузить все на сервер</string>
+    <string name="menu_main_download_all_from_server">Загрузить все с сервера</string>
     <string name="menu_nfc_all_persons">Все пользователи</string>
 
     <!--Preferences-->

@@ -366,7 +366,7 @@ public class FavoriteDB {
 
                 //добавляем на сервер
                 if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
-                    new ServerWriter(personItem).execute(ServerWriter.PERSON_NEW);
+                    new ServerWriter(personItem).execute(ServerWriter.PERSON_UPDATE);
                 }
                 return true;
             } else {

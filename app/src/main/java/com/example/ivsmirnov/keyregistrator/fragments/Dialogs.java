@@ -337,7 +337,7 @@ public class Dialogs extends DialogFragment{
 
                             //пишем на сервер
                             if (Settings.getWriteServerStatus() && Settings.getWriteRoomsServerStatus()){
-                                new ServerWriter(newRoomItem).execute(ServerWriter.ROOMS_NEW);
+                                new ServerWriter(newRoomItem).execute(ServerWriter.ROOMS_UPDATE);
                             }
 
                             enterAuditroomText.getText().clear();

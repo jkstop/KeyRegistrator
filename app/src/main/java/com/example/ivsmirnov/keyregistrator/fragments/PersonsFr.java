@@ -257,9 +257,12 @@ public class PersonsFr extends Fragment implements UpdateInterface {
                 iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getPersonsBackupLocation());
                 startActivityForResult(iLC,REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
                 return true;
-            case R.id.menu_teachers_synch_to_server:
-                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_ALL);
+            case R.id.menu_teachers_upload_to_server:
+                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
+                return true;
+            case R.id.menu_teachers_download_from_server:
                 new ServerReader(mContext,this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_TEACHERS);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -281,7 +284,6 @@ public class PersonsFr extends Fragment implements UpdateInterface {
             }
         }
     }
-
 
     @Override
     public void updateInformation() {

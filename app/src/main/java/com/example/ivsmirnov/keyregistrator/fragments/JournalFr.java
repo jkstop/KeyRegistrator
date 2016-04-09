@@ -138,8 +138,10 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
                 FileWriter saveToFile = new FileWriter(mContext, FileWriter.WRITE_JOURNAL, true);
                 saveToFile.execute();
                 return true;
-            case R.id.menu_journal_synch_to_server:
-                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_ALL);
+            case R.id.menu_journal_upload_to_server:
+                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
+                return true;
+            case R.id.menu_journal_download_from_server:
                 new ServerReader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_JOURNAL);
                 return true;
             case R.id.menu_journal_download_from_file:

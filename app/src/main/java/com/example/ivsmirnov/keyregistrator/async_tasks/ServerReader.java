@@ -63,19 +63,21 @@ public class ServerReader extends AsyncTask<Integer,Void,Void> {
 
                         //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
                         mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " NOT IN (" + getInClause(mJournalTags) + ")");
-                        while (mResult.next()){
-                            JournalDB.writeInDBJournal(new JournalItem()
-                                    .setAccountID(mResult.getString(SQL_Connection.COLUMN_JOURNAL_ACCOUNT_ID))
-                                    .setAuditroom(mResult.getString(SQL_Connection.COLUMN_JOURNAL_AUDITROOM))
-                                    .setTimeIn(mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN))
-                                    .setTimeOut(mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT))
-                                    .setAccessType(mResult.getInt(SQL_Connection.COLUMN_JOURNAL_ACCESS))
-                                    .setPersonLastname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_LASTNAME))
-                                    .setPersonFirstname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_FIRSTNAME))
-                                    .setPersonMidname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_MIDNAME))
-                                    .setPersonPhoto(mResult.getString(SQL_Connection.COLUMN_JOURNAL_PHOTO)));
+                        mResult.first();
+                        if (mResult.getRow()!=0){
+                            while (mResult.next()){
+                                JournalDB.writeInDBJournal(new JournalItem()
+                                        .setAccountID(mResult.getString(SQL_Connection.COLUMN_JOURNAL_ACCOUNT_ID))
+                                        .setAuditroom(mResult.getString(SQL_Connection.COLUMN_JOURNAL_AUDITROOM))
+                                        .setTimeIn(mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN))
+                                        .setTimeOut(mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT))
+                                        .setAccessType(mResult.getInt(SQL_Connection.COLUMN_JOURNAL_ACCESS))
+                                        .setPersonLastname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_LASTNAME))
+                                        .setPersonFirstname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_FIRSTNAME))
+                                        .setPersonMidname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_MIDNAME))
+                                        .setPersonPhoto(mResult.getString(SQL_Connection.COLUMN_JOURNAL_PHOTO)));
+                            }
                         }
-
                         //проверяем открытые помещения. Если на сервере они закрыты, то обновляем локальный журнал.
                         //сначала получаем тэги открытых помещений  в журнале (они же время входа)
                         ArrayList<Long> mOpenTags = JournalDB.getOpenRoomsTags();
@@ -125,8 +127,7 @@ public class ServerReader extends AsyncTask<Integer,Void,Void> {
                                     .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
                                     .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME))
                                     .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
-                                    .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL))
-                                    .setPhoto(mResult.getString(SQL_Connection.COLUMN_ROOMS_PHOTO)));
+                                    .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL)));
                         }
 
                         //для всех записей проверяем статус. Если на устройстве не совпадает с сервером, пишем в устройство новый статус
@@ -155,8 +156,7 @@ public class ServerReader extends AsyncTask<Integer,Void,Void> {
                                                 .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL))
                                                 .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
                                                 .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
-                                                .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME))
-                                                .setPhoto(mResult.getString(SQL_Connection.COLUMN_ROOMS_PHOTO)));
+                                                .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME)));
                                         break;
                                     default:
                                         break;
@@ -171,8 +171,7 @@ public class ServerReader extends AsyncTask<Integer,Void,Void> {
                                             .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL))
                                             .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
                                             .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
-                                            .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME))
-                                            .setPhoto(mResult.getString(SQL_Connection.COLUMN_ROOMS_PHOTO)));
+                                            .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME)));
                                 }
                             }
                         }
