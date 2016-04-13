@@ -21,6 +21,7 @@ public class LoadImageFromWeb extends AsyncTask<Void,Bitmap,Bitmap> {
     public LoadImageFromWeb(String url, GetAccountInterface getAccountInterface){
         this.mUrl = url;
         this.mGetAccountInterface = getAccountInterface;
+        System.out.println("load image from web *********************************");
     }
 
     @Override
@@ -40,6 +41,7 @@ public class LoadImageFromWeb extends AsyncTask<Void,Bitmap,Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
+        System.out.println("load image from web -------------------------------------");
         if (bitmap!=null){
             mGetAccountInterface.onAccountImageLoaded(bitmap);
         }

@@ -42,6 +42,7 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
     @Override
     protected void onPreExecute() {
+        System.out.println("get persons **************************************");
         if (personCard!=null) personCard.setVisibility(View.INVISIBLE);
     }
 
@@ -68,6 +69,8 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
     @Override
     protected void onPostExecute(PersonItem personItem) {
+
+        System.out.println("get persons ---------------------------------");
 
         if (personItem != null){
             if (mPersonImage!=null){

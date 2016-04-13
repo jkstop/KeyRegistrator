@@ -15,6 +15,7 @@ public class PersonItem {
     private String PhotoPreview;
     private String PhotoOriginal;
     private String RadioLabel;
+    private int AccessType;
 
     public boolean isEmpty(){
         return Lastname.equals(Values.EMPTY) &&
@@ -22,6 +23,15 @@ public class PersonItem {
                 Midname.equals(Values.EMPTY) &&
                 Division.equals(Values.EMPTY) &&
                 RadioLabel.equals(Values.EMPTY);
+    }
+
+    public PersonItem setAccessType (int accessType){
+        this.AccessType = accessType;
+        return this;
+    }
+
+    public int getAccessType(){
+        return AccessType;
     }
 
     public PersonItem setLastname (String lastname){

@@ -162,8 +162,9 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
     public void updateGrid(ArrayList<String> personTagList) {
         if (!personTagList.isEmpty()){
             mPersonTagList = personTagList;
+            ArrayList<PersonItem> items = new ArrayList<>(); //заглушка
             mPersonsRecycler.setAdapter(new AdapterPersonsGrid(mContext,
-                    mPersonTagList,
+                    items,
                     AdapterPersonsGrid.SHOW_ALL_PERSONS,
                     this));
         }
@@ -210,11 +211,13 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
         @Override
         protected PersonItem doInBackground(Integer... params) {
+            System.out.println("person transport from server ****************************");
             return FavoriteDB.getPersonItem(mPersonTagList.get(params[0]), FavoriteDB.SERVER_USER, FavoriteDB.ALL_PHOTO);
         }
 
         @Override
         protected void onPostExecute(PersonItem personItem) {
+            System.out.println("person transport from server ----------------------");
             if (personItem != null) {
                 addUserInFavorite(personItem);
             }

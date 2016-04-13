@@ -34,6 +34,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
 
     @Override
     protected void onPreExecute() {
+        System.out.println("base writer ******************************************************");
         Toasts.showFullscreenToast(mContext, mContext.getString(R.string.text_toast_take_key), Toasts.TOAST_POSITIVE);
     }
 
@@ -71,6 +72,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
+        System.out.println("base writer -------------------------------------");
         if (mBaseWriterInterface!=null) mBaseWriterInterface.onSuccessBaseWrite();
 
         if (Settings.getWriteServerStatus()){

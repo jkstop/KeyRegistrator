@@ -50,6 +50,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        System.out.println("loader intent **************************");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setCancelable(false);
         progressDialog.setMessage("Загрузка...");
@@ -183,6 +184,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        System.out.println("loader intent -----------------------------");
         if (progressDialog.isShowing()){
             progressDialog.cancel();
         }

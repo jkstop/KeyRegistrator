@@ -47,6 +47,7 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
 
     @Override
     protected void onPreExecute() {
+        System.out.println("get journal ***************************************");
         mCard.setVisibility(View.INVISIBLE);
     }
 
@@ -58,6 +59,7 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
 
     @Override
     protected void onPostExecute(JournalItem journalItem) {
+        System.out.println("get journal ---------------------------------");
         if (mTextAuditroom!=null){
             mTextAuditroom.setText(journalItem.getAuditroom());
         }
@@ -86,7 +88,7 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
         }
 
         if (mImageAccess!=null){
-            if (journalItem.getAccessType() == JournalDB.ACCESS_BY_CARD){
+            if (journalItem.getAccessType() == FavoriteDB.CARD_USER_ACCESS){
                 mImageAccess.setImageResource(R.drawable.ic_credit_card_black_18dp);
             } else {
                 mImageAccess.setImageResource(R.drawable.ic_touch_app_black_24dp);

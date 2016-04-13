@@ -30,9 +30,6 @@ import jxl.write.WritableWorkbook;
  */
 public class JournalDB {
 
-    public static final int ACCESS_BY_CLICK = 0;
-    public static final int ACCESS_BY_CARD = 1;
-
     public static final int COUNT_TODAY = 2;
     public static final int COUNT_TOTAL = 3;
 

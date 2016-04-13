@@ -51,6 +51,7 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
 
     @Override
     protected void onPreExecute() {
+        System.out.println("send mail *****************************");
         if (isDialogShow){
             mProgressDialog = new ProgressDialog(mContext);
             mProgressDialog.setMessage("Отправка сообщения");
@@ -60,6 +61,7 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
+        System.out.println("send mail -------------------------------");
         if (mProgressDialog!=null && mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }

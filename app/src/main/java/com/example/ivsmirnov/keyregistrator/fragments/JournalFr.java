@@ -296,6 +296,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
 
         @Override
         protected void onPreExecute() {
+            System.out.println("get journal for date ************************");
             mLoadingBar.setVisibility(View.VISIBLE);
         }
 
@@ -309,6 +310,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            System.out.println("get journal for date -------------------------");
             mLoadingBar.setVisibility(View.INVISIBLE);
 
             initializeJournal();

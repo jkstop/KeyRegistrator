@@ -149,42 +149,6 @@ public class Settings {
         return getPreferences().getString(MAIL_BODY, null);
     }
 
-    public static void setFreeUsers(ArrayList<String> tags){
-
-        Set<String> stringSet = new HashSet<>();
-        stringSet.addAll(tags);
-        getPreferencesEditor().putStringSet(FREE_USERS, stringSet).apply();
-    }
-
-    public static void addFreeUser(String tag){
-        ArrayList <String> freeUsers = getFreeUsers();
-        if (!freeUsers.contains(tag)) freeUsers.add(tag);
-        setFreeUsers(freeUsers);
-    }
-
-    public static void deleteFreeUser(String tag){
-        ArrayList <String> freeUsers = getFreeUsers();
-        if (tag!=null){
-            freeUsers.remove(tag);
-        } else {
-            freeUsers.clear();
-        }
-        setFreeUsers(freeUsers);
-    }
-
-    public static void clearFreeUsers(){
-        mPreferencesEditor.remove(FREE_USERS);
-    }
-
-    public static ArrayList<String> getFreeUsers(){
-        ArrayList<String>items = new ArrayList<>();
-        Set<String> freeUsers = getPreferences().getStringSet(FREE_USERS,null);
-        if (freeUsers!=null){
-            items.addAll(freeUsers);
-        }
-        return items;
-    }
-
     public static void setAttachments(ArrayList<String>attachments){
         Set<String> stringSet = new HashSet<>();
         stringSet.addAll(attachments);

@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.items;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.CardView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
@@ -14,6 +15,8 @@ public class GetPersonParams{
     private String personTag;
     private int personLocation;
     private int personPhotoDimension;
+    private int personPhotoLocation;
+    private ProgressBar personImageLoadProgressBar;
     private FavoriteDB favoriteDB;
     private ImageView personImageView, accessImageView;
     private TextView personLastname, personFirstname, personMidname, personDivision;
@@ -22,11 +25,29 @@ public class GetPersonParams{
     private boolean isAnimatedPhoto;
     private AppCompatCheckBox accessTypeContainer;
 
+    public GetPersonParams setPersonImageLoadProgressBar (ProgressBar progressBar){
+        this.personImageLoadProgressBar = progressBar;
+        return this;
+    }
+
+    public ProgressBar getPersonImageLoadProgressBar(){
+        return personImageLoadProgressBar;
+    }
+
+    public GetPersonParams setPersonPhotoLocation(int photoLocation){
+        this.personPhotoLocation = photoLocation;
+        return this;
+    }
+
+    public int getPersonPhotoLocation(){
+        return personPhotoLocation;
+    }
+
+
     public GetPersonParams setIsAnimatedPhoto(boolean isAnimatedPhoto){
         this.isAnimatedPhoto = isAnimatedPhoto;
         return this;
     }
-
 
     public GetPersonParams setAccessTypeContainer(AppCompatCheckBox appCompatCheckBox){
         this.accessTypeContainer = appCompatCheckBox;

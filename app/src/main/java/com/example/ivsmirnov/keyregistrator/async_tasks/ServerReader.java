@@ -22,7 +22,7 @@ import java.util.ArrayList;
 /**
  * Загрузка с сервера
  */
-public class ServerReader extends AsyncTask<Integer,Void,Void> {
+public class ServerReader extends AsyncTask<Integer,Integer,Void> {
 
     public static final int LOAD_JOURNAL = 100;
     public static final int LOAD_TEACHERS = 200;
@@ -40,8 +40,9 @@ public class ServerReader extends AsyncTask<Integer,Void,Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        System.out.println("server reader *******************************");
         if (mProgressDialog!=null){
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             mProgressDialog.setCancelable(false);
             mProgressDialog.setMessage("Синхронизация...");
             mProgressDialog.show();
@@ -100,6 +101,13 @@ public class ServerReader extends AsyncTask<Integer,Void,Void> {
                         //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
                         mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.PERSONS_TABLE
                                 + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " NOT IN (" + getInClause(mPersonsTags) + ")");
+
+                        if (mProgressDialog!=null){
+                            mResult.last();
+                            mProgressDialog.setMax(mResult.getRow());
+                            mResult.beforeFirst();
+                        }
+
                         while (mResult.next()){
                             FavoriteDB.writeInDBTeachers(new PersonItem()
                                     .setLastname(mResult.getString(SQL_Connection.COLUMN_PERSONS_LASTNAME))
@@ -110,6 +118,9 @@ public class ServerReader extends AsyncTask<Integer,Void,Void> {
                                     .setSex(mResult.getString(SQL_Connection.COLUMN_PERSONS_SEX))
                                     .setPhotoPreview(mResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_PREVIEW))
                                     .setPhotoOriginal(mResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_ORIGINAL)));
+
+                            publishProgress(mResult.getRow());
+
                             System.out.println("write in local " + mResult.getString(SQL_Connection.COLUMN_PERSONS_LASTNAME));
                         }
                         break;
@@ -188,27 +199,40 @@ public class ServerReader extends AsyncTask<Integer,Void,Void> {
         return null;
     }
 
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+
+        if (mProgressDialog!=null) mProgressDialog.setProgress(values[0]);
+    }
+
     private String getInClause(ArrayList items){
         StringBuilder inClause = new StringBuilder();
-        for (int i=0; i < items.size(); i++) {
-            if (items.get(i).getClass().equals(String.class)){
-                inClause.append("'" + items.get(i) + "'");
-            } else {
-                inClause.append(items.get(i));
+        if (items.size() != 0){
+            for (int i=0; i < items.size(); i++) {
+                if (items.get(i).getClass().equals(String.class)){
+                    inClause.append("'" + items.get(i) + "'");
+                } else {
+                    inClause.append(items.get(i));
+                }
+                inClause.append(',');
             }
-            inClause.append(',');
-        }
-        if (inClause.length() == 0){
-            inClause.append(0);
+            if (inClause.length() == 0){
+                inClause.append(0);
+            } else {
+                inClause.delete(inClause.length()-1,inClause.length());
+            }
+            return inClause.toString();
         } else {
-            inClause.delete(inClause.length()-1,inClause.length());
+            return "'?'";
         }
-        return inClause.toString();
+
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        System.out.println("server reader -----------------------------");
         if (mProgressDialog!=null && mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }

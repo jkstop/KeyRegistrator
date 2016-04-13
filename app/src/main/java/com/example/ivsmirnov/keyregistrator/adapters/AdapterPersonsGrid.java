@@ -10,13 +10,16 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.util.ArrayList;
@@ -26,19 +29,20 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
     public static final int SHOW_FAVORITE_PERSONS = 0;
     public static final int SHOW_ALL_PERSONS = 1;
 
-    private ArrayList <String> mTags;
+   // private ArrayList <String> mTags;
+    private ArrayList <PersonItem> mPersonList;
     private int mType;
     private Context mContext;
     private RecycleItemClickListener mListener;
-    private ArrayList<String> isFreeUsers;
+    //private ArrayList<String> isFreeUsers;
 
-    public AdapterPersonsGrid(Context c, ArrayList<String> tagList, int type, RecycleItemClickListener listener) {
-        mTags = tagList;
+    public AdapterPersonsGrid(Context c, ArrayList<PersonItem> personItems, int type, RecycleItemClickListener listener) {
+        mPersonList = personItems;
         mContext = c;
         mType = type;
 
         this.mListener = listener;
-        isFreeUsers = Settings.getFreeUsers();
+        //isFreeUsers = Settings.getFreeUsers();
     }
 
 
@@ -49,6 +53,7 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
         public TextView textMidname;
         public TextView textDivision;
         public CardView personCard;
+        public ProgressBar progressBar;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -59,6 +64,7 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
             textMidname = (TextView)itemView.findViewById(R.id.person_card_text_midname);
             textDivision = (TextView)itemView.findViewById(R.id.person_card_text_division);
             personCard = (CardView)itemView.findViewById(R.id.person_card);
+            progressBar = (ProgressBar)itemView.findViewById(R.id.person_card_image_load_progress);
         }
     }
 
@@ -95,7 +101,25 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
         Animation fadeInanimation = AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in);
         if (mType== SHOW_FAVORITE_PERSONS){
 
-            new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams()
+            holder.textLastname.setText(mPersonList.get(position).getLastname());
+            holder.textFirstname.setText(mPersonList.get(position).getFirstname());
+            holder.textMidname.setText(mPersonList.get(position).getMidname());
+            holder.textDivision.setText(mPersonList.get(position).getDivision());
+
+            if (mPersonList.get(position).getAccessType() == FavoriteDB.CLICK_USER_ACCESS){
+                holder.accessImageView.setImageResource(R.drawable.ic_touch_app_black_24dp);
+            } else {
+                holder.accessImageView.setImageResource(R.drawable.ic_credit_card_black_24dp);
+            }
+
+            new GetPersonPhoto(new GetPersonParams()
+                    .setPersonTag(mPersonList.get(position).getRadioLabel())
+                    .setPersonPhotoLocation(FavoriteDB.LOCAL_PHOTO)
+                    .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO)
+                    .setPersonImageView(holder.imageView)
+                    .setPersonImageLoadProgressBar(holder.progressBar)).execute();
+
+            /*new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams()
                     .setPersonTag(mTags.get(position))
                     .setPersonImageView(holder.imageView)
                     .setPersonLastname(holder.textLastname)
@@ -105,24 +129,25 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
                     .setAccessImageView(holder.accessImageView)
                     .setFreeUser(isFreeUsers.contains(mTags.get(position)))
                     .setPersonLocation(FavoriteDB.LOCAL_USER)
-                    .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO));
+                    .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO));*/
 
         }else if (mType == SHOW_ALL_PERSONS){
 
-            new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams().setPersonTag(mTags.get(position))
+            /*new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams()
+                    .setPersonTag(mTags.get(position))
                     .setPersonImageView(holder.imageView)
                     .setPersonLastname(holder.textLastname)
                     .setPersonFirstname(holder.textFirstname)
                     .setPersonMidname(holder.textMidname)
                     .setPersonDivision(holder.textDivision)
                     .setPersonLocation(FavoriteDB.SERVER_USER)
-                    .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO));
+                    .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO));*/
         }
     }
 
     @Override
     public int getItemCount() {
-        return mTags.size();
+        return mPersonList.size();
     }
 
 }

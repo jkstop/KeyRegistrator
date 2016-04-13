@@ -25,10 +25,12 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterFreeUsersList;
 import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.custom_views.RecyclerWrapContentHeightManager;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.util.ArrayList;
@@ -40,7 +42,8 @@ public class UserAuthFr extends Fragment {
 
     private Context mContext;
     private RecyclerView mFreeUsersRecycler;
-    private ArrayList<String> mTags;
+    //private ArrayList<String> mTags;
+    private ArrayList<PersonItem> mFreeAccessPersonsList;
 
     public static UserAuthFr newInstance(){
         return new UserAuthFr();
@@ -52,7 +55,8 @@ public class UserAuthFr extends Fragment {
         final View rootView = inflater.inflate(R.layout.layout_nfc_fr,container,false);
         mContext = rootView.getContext();
 
-        mTags = Settings.getFreeUsers();
+        //mTags = Settings.getFreeUsers();
+        mFreeAccessPersonsList = FavoriteDB.getPersonItems(null, FavoriteDB.CLICK_USER_ACCESS);
 
         TextView mTextAud = (TextView)rootView.findViewById(R.id.nfc_fragment_aud);
         mTextAud.setText(Settings.getLastClickedAuditroom());
@@ -85,16 +89,16 @@ public class UserAuthFr extends Fragment {
 
                 popup.showAsDropDown(showPopupButton, 0, 0);
 
-                mFreeUsersRecycler.setAdapter(new AdapterFreeUsersList(mContext, mTags, new RecycleItemClickListener() {
+                mFreeUsersRecycler.setAdapter(new AdapterFreeUsersList(mContext, mFreeAccessPersonsList, new RecycleItemClickListener() {
                     @Override
                     public void onItemClick(View v, int position, int viewID) {
 
                         popup.dismiss();
 
                         new BaseWriter(mContext, (BaseWriterInterface)getActivity()).execute(new BaseWriterParams()
-                                .setAccessType(JournalDB.ACCESS_BY_CLICK)
+                                .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
                                 .setAuditroom(Settings.getLastClickedAuditroom())
-                                .setPersonTag(mTags.get(position)));
+                                .setPersonTag(mFreeAccessPersonsList.get(position).getRadioLabel()));
                     }
 
                     @Override

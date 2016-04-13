@@ -27,6 +27,7 @@ public class TagSearcher extends AsyncTask<Connection,Void,ArrayList<String>> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        System.out.println("tag searcher ************************************");
         mTagSearcherInterface.changeProgressBar(View.VISIBLE);
     }
 
@@ -48,6 +49,7 @@ public class TagSearcher extends AsyncTask<Connection,Void,ArrayList<String>> {
 
     @Override
     protected void onPostExecute(ArrayList<String> personTags) {
+        System.out.println("tag searcher ---------------------------------");
         mTagSearcherInterface.changeProgressBar(View.INVISIBLE);
         mTagSearcherInterface.updateGrid(personTags);
     }

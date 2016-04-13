@@ -67,6 +67,7 @@ public class DbShare {
 
     public static Cursor getCursor(int db, String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String orderBy, String limit){
         mCursor = getDataBase(db).query(table, columns, selection, selectionArgs, groupBy, null, orderBy, limit);
+
         return mCursor;
     }
 

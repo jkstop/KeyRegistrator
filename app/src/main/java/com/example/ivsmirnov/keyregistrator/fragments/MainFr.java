@@ -26,6 +26,7 @@ import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
@@ -187,7 +188,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
 
         } else {
-            if (mRoomItems.get(position).getAccessType() == JournalDB.ACCESS_BY_CLICK) {
+            if (mRoomItems.get(position).getAccessType() == FavoriteDB.CLICK_USER_ACCESS) {
                 new CloseRooms(mContext, mRoomItems.get(position).getTag(), mCloseRoomInterface).execute();
             }else{
                 Toasts.showFullscreenToast(mContext,getResources().getString(R.string.text_toast_put_card),Toasts.TOAST_NEGATIVE);
@@ -199,7 +200,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     @Override
     public void onItemLongClick(View v, int position, long timeIn) {
         if (mRoomItems.get(position).getStatus() == RoomDB.ROOM_IS_BUSY){
-            if (mRoomItems.get(position).getAccessType()== JournalDB.ACCESS_BY_CARD){
+            if (mRoomItems.get(position).getAccessType()== FavoriteDB.CARD_USER_ACCESS){
                 Dialogs dialogs = new Dialogs();
                 Bundle bundle = new Bundle();
                 //bundle.putLong(Values.POSITION_IN_BASE_FOR_ROOM,mRoomItems.get(position).getTime());

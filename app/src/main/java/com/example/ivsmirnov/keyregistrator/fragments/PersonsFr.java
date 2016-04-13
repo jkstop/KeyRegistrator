@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -36,6 +38,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
+import com.example.ivsmirnov.keyregistrator.interfaces.Updatable;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
@@ -46,7 +49,7 @@ import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
 
-public class PersonsFr extends Fragment implements UpdateInterface {
+public class PersonsFr extends Fragment implements UpdateInterface, Updatable {
 
     public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
     public static final String PERSONS_FRAGMENT_TYPE = "persons_fragment_type";
@@ -57,8 +60,12 @@ public class PersonsFr extends Fragment implements UpdateInterface {
     private static RecyclerView mRecyclerView;
     private ListView mListView;
 
+    private Handler mHandler;
+
     private static ArrayList<String> mPersonTagList;
+    private ArrayList <PersonItem> mPersonsList;
     public AdapterPersonsGrid mAdapter;
+    private AdapterPersonsCharacters mListCharAdapter;
 
     private BaseWriterInterface mBaseWriterInterface;
 
@@ -83,6 +90,14 @@ public class PersonsFr extends Fragment implements UpdateInterface {
         if (extras != null) {
             type = extras.getInt(PERSONS_FRAGMENT_TYPE);
         }
+
+        mHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                mListCharAdapter.notifyDataSetChanged();
+                mAdapter.notifyDataSetChanged();
+            }
+        };
     }
 
     @Override
@@ -100,15 +115,16 @@ public class PersonsFr extends Fragment implements UpdateInterface {
 
     }
 
-    private void initializeRecyclerAdapter(){
+    private void initRecyclerAdapter(){
         if (type == PERSONS_FRAGMENT_EDITOR){
-            mAdapter = new AdapterPersonsGrid(mContext, mPersonTagList, AdapterPersonsGrid.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
+            mAdapter = new AdapterPersonsGrid(mContext, mPersonsList, AdapterPersonsGrid.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position, int viewID) {
 
                     Bundle b = new Bundle();
                     b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_EDIT);
-                    b.putString(Dialogs.DIALOG_PERSON_INFORMATION_KEY_TAG, mPersonTagList.get(position));
+                    b.putString(Dialogs.DIALOG_PERSON_INFORMATION_KEY_TAG, mPersonsList.get(position).getRadioLabel());
+                    b.putInt(Dialogs.DIALOG_PERSON_INFORMATION_KEY_POSITION, position);
 
                     Dialogs dialog = new Dialogs();
                     dialog.setArguments(b);
@@ -121,7 +137,7 @@ public class PersonsFr extends Fragment implements UpdateInterface {
                 }
             });
         }else if (type == PERSONS_FRAGMENT_SELECTOR){
-            mAdapter = new AdapterPersonsGrid(mContext, mPersonTagList, AdapterPersonsGrid.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
+            mAdapter = new AdapterPersonsGrid(mContext, mPersonsList, AdapterPersonsGrid.SHOW_FAVORITE_PERSONS, new RecycleItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position, int viewID) {
 
@@ -130,7 +146,7 @@ public class PersonsFr extends Fragment implements UpdateInterface {
                     }
 
                     new BaseWriter(mContext, mBaseWriterInterface).execute(new BaseWriterParams()
-                            .setAccessType(JournalDB.ACCESS_BY_CLICK)
+                            .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
                             .setAuditroom(Settings.getLastClickedAuditroom())
                             .setPersonTag(mPersonTagList.get(position)));
 
@@ -144,7 +160,7 @@ public class PersonsFr extends Fragment implements UpdateInterface {
                     }
 
                     new BaseWriter(mContext, mBaseWriterInterface).execute(new BaseWriterParams()
-                            .setAccessType(JournalDB.ACCESS_BY_CARD)
+                            .setAccessType(FavoriteDB.CARD_USER_ACCESS)
                             .setAuditroom(Settings.getLastClickedAuditroom())
                             .setPersonTag(mPersonTagList.get(position)));
 
@@ -157,19 +173,16 @@ public class PersonsFr extends Fragment implements UpdateInterface {
     }
 
 
-
-
-    //private void showMainAuditroomsGrid(){
-    //    getFragmentManager().beginTransaction().replace(R.id.main_frame_for_fragment, MainFr.newInstance(),getResources().getString(R.string.fragment_tag_main)).commit();
-    //}
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_persons_fr, container, false);
         mContext = rootView.getContext();
 
+
         mPersonTagList = new ArrayList<>();
+        mListCharacters = new ArrayList<>();
+        mPersonsList = new ArrayList<>();
 
         mBaseWriterInterface = (BaseWriterInterface)getActivity();
 
@@ -194,9 +207,14 @@ public class PersonsFr extends Fragment implements UpdateInterface {
                 }
                 mListCharacters.get(i).setSelection(true);
 
-                setmListCharactersAdapter();
-                getTagsForSelectedCharacher(i);
-                initializeRecyclerAdapter();
+                //initListCharactersAdapter();
+
+                initPersons(mListCharacters.get(i).getCharacter(), false).start();
+
+                //getPersonsItems(mListCharacters.get(i).getCharacter());
+
+//                mAdapter.notifyDataSetChanged();
+  //              mListCharAdapter.notifyDataSetChanged();
             }
         });
 
@@ -207,20 +225,29 @@ public class PersonsFr extends Fragment implements UpdateInterface {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new GridLayoutManager(mContext,3));
 
-        new getPersonTags().execute();
+        initListCharactersAdapter();
+        initRecyclerAdapter();
+
+        initPersons("#",true).start();
         return rootView;
     }
 
-    private void setmListCharactersAdapter(){
-        AdapterPersonsCharacters mListAdapter = new AdapterPersonsCharacters(mContext, mListCharacters);
-        mListView.setAdapter(mListAdapter);
+    private void initListCharactersAdapter(){
+        //AdapterPersonsCharacters mListAdapter = new AdapterPersonsCharacters(mContext, mListCharacters);
+        mListCharAdapter = new AdapterPersonsCharacters(mContext, mListCharacters);
+        mListView.setAdapter(mListCharAdapter);
     }
 
-
-    private void initListCharacters(){
-        mListCharacters = FavoriteDB.getPersonsCharacters();
+    private void getPersonsItems(String character){
+        if (mPersonsList.size()!=0) mPersonsList.clear();
+        mPersonsList.addAll(FavoriteDB.getPersonItems(character, 0));
+        //mPersonsList = FavoriteDB.getPersonItems(character);
     }
 
+    private void getPersonsCharacters(){
+        if (mListCharacters.size()!=0) mListCharacters.clear();
+        mListCharacters.addAll(FavoriteDB.getPersonsCharacters());
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -288,39 +315,73 @@ public class PersonsFr extends Fragment implements UpdateInterface {
     @Override
     public void updateInformation() {
 
-        new getPersonTags().execute();
+        initPersons("#", true).start();
+        //new getPersonTags().execute();
     }
 
 
-    private void getTagsForSelectedCharacher(int position){
+  //  private void getTagsForSelectedCharacher(int position){
 
-        if (!mPersonTagList.isEmpty()) mPersonTagList.clear();
+   //     if (!mPersonTagList.isEmpty()) mPersonTagList.clear();
+//
+       // mPersonTagList.addAll(FavoriteDB.getTagsForCurrentCharacter(mListCharacters.get(position).getCharacter())); //надо получать список personItems для конкретного символа
+  //  }
 
-        mPersonTagList.addAll(FavoriteDB.getTagsForCurrentCharacter(mListCharacters.get(position).getCharacter()));
+    private Thread initPersons (final String character, final boolean isInitAllCharacters){
+        return new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (isInitAllCharacters) getPersonsCharacters();
+                getPersonsItems(character);
+
+                mHandler.sendEmptyMessage(0);
+            }
+        });
     }
 
-    private class getPersonTags extends AsyncTask<Void,PersonItem,Void>{
+    @Override
+    public void onUserDeleted(int position) {
+        mPersonsList.remove(position);
+        mAdapter.notifyItemRemoved(position);
+    }
+
+    @Override
+    public void onUserChanged(String tag, int position) {
+        PersonItem updatedPerson = FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER, FavoriteDB.NO_PHOTO);
+
+        mPersonsList.get(position)
+                .setLastname(updatedPerson.getLastname())
+                .setFirstname(updatedPerson.getFirstname())
+                .setMidname(updatedPerson.getMidname())
+                .setDivision(updatedPerson.getDivision())
+                .setAccessType(updatedPerson.getAccessType());
+        mAdapter.notifyItemChanged(position);
+    }
+
+
+   /* private class getPersonTags extends AsyncTask<Void,PersonItem,Void>{
 
         @Override
         protected void onPreExecute() {
+            System.out.println("get personTags ************************************");
             mLoadingBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-
-            initListCharacters();
-
+            getPersonsCharacters();
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
 
-            setmListCharactersAdapter();
+            initListCharactersAdapter();
             getTagsForSelectedCharacher(0);
-            initializeRecyclerAdapter();
+            initRecyclerAdapter();
             mLoadingBar.setVisibility(View.INVISIBLE);
+            System.out.println("getPersonTags ------------------------------");
         }
-    }
+    }*/
 }

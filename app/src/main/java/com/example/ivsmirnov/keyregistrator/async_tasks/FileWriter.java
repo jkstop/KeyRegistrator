@@ -45,6 +45,7 @@ public class FileWriter extends AsyncTask <Void,Integer,Void> {
 
     @Override
     protected void onPreExecute() {
+        System.out.println("file writer ***********************************");
         if (isShowDialog){
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             mProgressDialog.setCancelable(false);
@@ -82,6 +83,7 @@ public class FileWriter extends AsyncTask <Void,Integer,Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
+        System.out.println("file writer ------------------------------------------");
         if (mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }

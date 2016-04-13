@@ -22,6 +22,7 @@ public class NFC_Reader{
 
         @Override
         protected Void doInBackground(UsbDevice... params) {
+            System.out.println("open reader *****************************");
             try {
                 mReader.open(params[0]);
             }catch (Exception e){
@@ -32,6 +33,7 @@ public class NFC_Reader{
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            System.out.println("open reder ----------------------");
             if (mReader.getReaderName()!=null){
                 Log.d("ReaderName: ", mReader.getReaderName());
             }
@@ -52,11 +54,13 @@ public class NFC_Reader{
 
         @Override
         protected Void doInBackground(PowerParams... params) {
+            System.out.println("set reader power *********************");
             try {
                 mReader.power(params[0].slotNum, params[0].action);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            System.out.println("set reader power -----------------------");
             return null;
         }
     }
@@ -68,11 +72,13 @@ public class NFC_Reader{
         }
         @Override
         protected Void doInBackground(ProtocolParams... params) {
+            System.out.println("set reader protocol ***************");
             try {
                 mReader.setProtocol(params[0].slotNum, params[0].preferredProtocols);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            System.out.println("set reader protocol -----------------------");
             return null;
         }
     }
@@ -87,6 +93,7 @@ public class NFC_Reader{
 
         @Override
         protected TransmitResult doInBackground(TransmitParams... params) {
+            System.out.println("reader transmit *********************************");
             TransmitResult result = new TransmitResult();
             byte[] command = params[0].command;
             byte[] response = new byte[100];
@@ -112,6 +119,7 @@ public class NFC_Reader{
 
 
             }
+            System.out.println("reader transmit ------------------------");
         }
     }
 

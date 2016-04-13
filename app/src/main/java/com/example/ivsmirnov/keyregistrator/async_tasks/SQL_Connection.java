@@ -57,6 +57,7 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
     public SQL_Connection (ServerConnectionItem serverConnectionItem, SQL_Connection_interface sql_connection_interface){
         this.mServerConnectionItem = serverConnectionItem;
         this.mConnectionInterface = sql_connection_interface;
+        System.out.println("sql connection ***************************************");
     }
 
     @Override
@@ -94,6 +95,7 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
 
     @Override
     protected void onPostExecute(Exception e) {
+        System.out.println("sql connection -------------------------------------");
         if (e != null){
             Settings.setServerStatus(false);
             if (mConnectionInterface!=null) mConnectionInterface.onServerConnectException(e);

@@ -32,6 +32,7 @@ public class CloseRooms extends AsyncTask<Void, Void, Integer> {
 
     @Override
     protected void onPreExecute() {
+        System.out.println("close rooms ***********************************");
         Toasts.showFullscreenToast(mContext, mContext.getString(R.string.text_toast_thanks), Toasts.TOAST_POSITIVE);
     }
 
@@ -52,7 +53,7 @@ public class CloseRooms extends AsyncTask<Void, Void, Integer> {
 
     @Override
     protected void onPostExecute(Integer closedRooms) {
-        System.out.println(closedRooms);
+        System.out.println("close rooms --------------------------------------");
         if (mCloseRoomInterface !=null){
             mCloseRoomInterface.onRoomClosed();
         }

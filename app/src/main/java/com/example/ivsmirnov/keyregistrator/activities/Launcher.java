@@ -427,7 +427,32 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     @Override
     public void onAccountImageLoaded(Bitmap bitmap) {
         mAccountImage.setImageBitmap(bitmap);
-        new updateUserAccount().execute(bitmap);
+
+        checkUserInBase(bitmap).start();
+        //new updateUserAccount().execute(bitmap);
+    }
+
+    private Thread checkUserInBase(final Bitmap bitmap){
+        return new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("START check user");
+                if (!FavoriteDB.isUserInBase(Settings.getActiveAccountID())){
+                    System.out.println("USER NOT FOUND!!! WRITING...");
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
+                    byte[] byteArray = byteArrayOutputStream.toByteArray();
+                    String photo = Base64.encodeToString(byteArray,Base64.NO_WRAP);
+                    AccountItem account = AccountDB.getAccount(Settings.getActiveAccountID());
+                    FavoriteDB.writeInDBTeachers(new PersonItem()
+                            .setRadioLabel(account.getAccountID())
+                            .setLastname(account.getLastname())
+                            .setDivision(account.getEmail())
+                            .setPhotoOriginal(photo)
+                            .setPhotoPreview(FavoriteDB.getPhotoPreview(photo)));
+                }
+            }
+        });
     }
 
     //обновление аккаунта в базе
@@ -435,6 +460,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
         @Override
         protected Void doInBackground(Bitmap... params) {
+            System.out.println("update user account **********************");
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             params[0].compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
@@ -453,6 +479,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                         .setPhotoOriginal(photo)
                         .setPhotoPreview(FavoriteDB.getPhotoPreview(photo)));
             }
+            System.out.println("update user account ------------------------------");
             return null;
         }
     }
@@ -527,6 +554,8 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         @Override
         protected Void doInBackground(Void... params) {
 
+            System.out.println("init reader *************************");
+
             UsbManager mUsbManager = (UsbManager)getSystemService(Context.USB_SERVICE);
             mReader = new Reader(mUsbManager);
             PendingIntent mPermissionIntent = PendingIntent.getBroadcast(mContext, 0, new Intent(ACTION_USB_PERMISSION), 0);
@@ -595,6 +624,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
             mReader.setOnStateChangeListener(sReaderStateChangeListener);
 
+            System.out.println("init reader ------------------------------");
             return null;
         }
     }
@@ -644,6 +674,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
         @Override
         protected String doInBackground(String... params) {
+            System.out.println("get user ******************************");
             try{
                 //если нет в базе, то добавить
                 if (!FavoriteDB.isUserInBase(params[0])){
@@ -666,13 +697,14 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
         @Override
         protected void onPostExecute(String personTag) {
+            System.out.println("get user ---------------------------");
             if (personTag!=null && mValidUser){
                 switch (mType){
                     case NFC:
                         new BaseWriter(mContext, mBaseWriterInterface).execute(new BaseWriterParams()
                                 .setPersonTag(personTag)
                                 .setAuditroom(Settings.getLastClickedAuditroom())
-                                .setAccessType(JournalDB.ACCESS_BY_CARD));
+                                .setAccessType(FavoriteDB.CARD_USER_ACCESS));
                         break;
                     case PERSONS:
                         PersonsFr persons_fr = (PersonsFr) getFragmentByTag(R.string.navigation_drawer_item_persons);

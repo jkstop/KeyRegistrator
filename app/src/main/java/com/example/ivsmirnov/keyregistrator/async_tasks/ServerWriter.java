@@ -75,6 +75,7 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        System.out.println("server writer ***************************");
         if (mProgressDialog!=null){
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             mProgressDialog.setCancelable(false);
@@ -312,7 +313,7 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
         try {
             String userPhoto = null;
             //если радиометка не пустая (в помещении кто-то есть), нужно получить фото
-            if (roomItem.getTag() != null) userPhoto = FavoriteDB.getPersonPhoto(roomItem.getTag(), FavoriteDB.PREVIEW_PHOTO);
+            if (roomItem.getTag() != null) userPhoto = FavoriteDB.getPersonPhoto(roomItem.getTag(), FavoriteDB.LOCAL_PHOTO, FavoriteDB.PREVIEW_PHOTO);
             statement.executeUpdate("INSERT INTO " + SQL_Connection.ROOMS_TABLE + " VALUES ('"
             +roomItem.getAuditroom() + "',"
             +roomItem.getStatus() + ","
@@ -329,7 +330,7 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
     private void updateRoomItemToServer (ResultSet resultSet, RoomItem roomItem){
         try {
             String userPhoto = null;
-            if (roomItem.getTag() != null) userPhoto = FavoriteDB.getPersonPhoto(roomItem.getTag(), FavoriteDB.PREVIEW_PHOTO);
+            if (roomItem.getTag() != null) userPhoto = FavoriteDB.getPersonPhoto(roomItem.getTag(), FavoriteDB.LOCAL_PHOTO, FavoriteDB.PREVIEW_PHOTO);
             resultSet.updateInt(SQL_Connection.COLUMN_ROOMS_STATUS, roomItem.getStatus());
             resultSet.updateInt(SQL_Connection.COLUMN_ROOMS_ACCESS, roomItem.getAccessType());
             resultSet.updateLong(SQL_Connection.COLUMN_ROOMS_TIME, roomItem.getTime());
@@ -346,6 +347,7 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        System.out.println("server writer --------------------------------");
         if (mProgressDialog!=null && mProgressDialog.isShowing()) mProgressDialog.cancel();
     }
 }

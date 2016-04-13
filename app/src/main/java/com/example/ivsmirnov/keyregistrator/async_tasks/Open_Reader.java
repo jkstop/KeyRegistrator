@@ -15,6 +15,7 @@ public class Open_Reader extends AsyncTask<UsbDevice,Void,Exception> {
 
     public Open_Reader(Reader reader){
         this.mReader = reader;
+        System.out.println("open reader ***********************");
     }
 
     @Override
@@ -30,6 +31,7 @@ public class Open_Reader extends AsyncTask<UsbDevice,Void,Exception> {
 
     @Override
     protected void onPostExecute(Exception e) {
+        System.out.println("open reader ---------------------");
         if (e!=null){
             Log.d("Exception", e.toString());
         }else{

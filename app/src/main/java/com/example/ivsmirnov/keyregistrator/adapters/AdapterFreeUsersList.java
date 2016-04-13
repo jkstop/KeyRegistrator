@@ -26,12 +26,12 @@ import java.util.ArrayList;
 public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersList.viewHolder> {
 
     private Context mContext;
-    private ArrayList<String> mTags;
+    private ArrayList<PersonItem> mPersons;
     private RecycleItemClickListener mListener;
 
-    public AdapterFreeUsersList(Context context, ArrayList<String> tags, RecycleItemClickListener recycleItemClickListener){
+    public AdapterFreeUsersList(Context context, ArrayList<PersonItem> persons, RecycleItemClickListener recycleItemClickListener){
         this.mContext = context;
-        this.mTags = tags;
+        this.mPersons = persons;
         this.mListener = recycleItemClickListener;
 
     }
@@ -58,12 +58,14 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
     @Override
     public void onBindViewHolder(viewHolder holder, int position) {
 
-        new getPersonItem(holder.mCard, AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in))
-                .execute(new GetPersonParams()
-                        .setPersonTag(mTags.get(position))
-                        .setPersonLastname(holder.mTextLastName)
-                        .setPersonLocation(FavoriteDB.LOCAL_USER)
-                        .setPersonPhotoDimension(-1));
+        //new getPersonItem(holder.mCard, AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in))
+        //        .execute(new GetPersonParams()
+        //                .setPersonTag(mTags.get(position))
+        //                .setPersonLastname(holder.mTextLastName)
+        //                .setPersonLocation(FavoriteDB.LOCAL_USER)
+        //                .setPersonPhotoDimension(-1));
+        holder.mTextLastName.setText(FavoriteDB
+                .getPersonInitials(FavoriteDB.SHORT_INITIALS, mPersons.get(position).getLastname(), mPersons.get(position).getFirstname(), mPersons.get(position).getMidname()));
     }
 
     static class viewHolder extends RecyclerView.ViewHolder {
@@ -79,7 +81,7 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
 
     @Override
     public int getItemCount() {
-        return mTags.size();
+        return mPersons.size();
     }
 
     private class getPersonItem extends AsyncTask<GetPersonParams,Void,PersonItem>{
@@ -95,6 +97,7 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
 
         @Override
         protected void onPreExecute() {
+            System.out.println("get person item ********************************");
             mPersonCard.setVisibility(View.INVISIBLE);
         }
 
@@ -109,6 +112,7 @@ public class AdapterFreeUsersList extends RecyclerView.Adapter<AdapterFreeUsersL
 
         @Override
         protected void onPostExecute(PersonItem personItem) {
+            System.out.println("get person item --------------------------");
             if (personItem!=null){
                 if (mPersonInitials!=null) mPersonInitials.setText(FavoriteDB.getPersonInitials(FavoriteDB.SHORT_INITIALS, personItem.getLastname(),personItem.getFirstname(),personItem.getMidname()));
 

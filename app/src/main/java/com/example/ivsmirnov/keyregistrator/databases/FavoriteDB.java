@@ -34,15 +34,21 @@ import java.util.Comparator;
  */
 public class FavoriteDB {
 
-    public static final int LOCAL_USER = 0;
-    public static final int SERVER_USER = 1;
-    public static final int FULLSIZE_PHOTO = 2;
-    public static final int PREVIEW_PHOTO = 3;
-    public static final int ALL_PHOTO = 4;
-    public static final int NO_PHOTO = 5;
+    public static final int LOCAL_USER = 1;
+    public static final int SERVER_USER = 2;
+    public static final int FULLSIZE_PHOTO = 3;
+    public static final int PREVIEW_PHOTO = 4;
+    public static final int ALL_PHOTO = 5;
+    public static final int NO_PHOTO = 6;
 
-    public static final int SHORT_INITIALS = 6;
-    public static final int FULL_INITIALS = 7;
+    public static final int LOCAL_PHOTO = 7;
+    public static final int SERVER_PHOTO = 8;
+
+    public static final int SHORT_INITIALS = 9;
+    public static final int FULL_INITIALS = 10;
+
+    public static final int CARD_USER_ACCESS = 11;
+    public static final int CLICK_USER_ACCESS = 12;
 
 
     public static PersonItem getPersonItem(String tag, int userLocation, int photoType){
@@ -67,6 +73,7 @@ public class FavoriteDB {
                             .setMidname(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE)))
                             .setDivision(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_DIVISION_FAVORITE)))
                             .setSex(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_SEX_FAVORITE)))
+                            .setAccessType(cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE)))
                             .setRadioLabel(tag);
 
                     switch (photoType){
@@ -147,33 +154,40 @@ public class FavoriteDB {
         }
     }
 
-    public static String getPersonPhoto (String userTag, int photoDimension){
+    public static String getPersonPhoto (String userTag, int photoLocation, int photoDimension){
         Cursor cursor = null;
         try {
-            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_TEACHER,
-                    new String[]{FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE, FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE},
-                    FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
-                    new String[]{userTag},
-                    null,
-                    null,
-                    "1");
-            if (cursor.getCount()>0){
-                cursor.moveToFirst();
-                switch (photoDimension){
-                    case PREVIEW_PHOTO:
-                        return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE));
-                    case FULLSIZE_PHOTO:
-                        return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE));
-                }
+            switch (photoLocation){
+                case LOCAL_PHOTO:
+                    cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
+                            FavoriteDBinit.TABLE_TEACHER,
+                            new String[]{FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE, FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE},
+                            FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
+                            new String[]{userTag},
+                            null,
+                            null,
+                            "1");
+                    if (cursor.getCount()>0){
+                        cursor.moveToFirst();
+                        switch (photoDimension){
+                            case PREVIEW_PHOTO:
+                                return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE));
+                            case FULLSIZE_PHOTO:
+                                return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE));
+                        }
+                    }
+                    return null;
+                case SERVER_PHOTO:
+                    return null;
+                default:
+                    return null;
             }
-
         } catch (Exception e){
             e.printStackTrace();
+            return null;
         } finally {
             closeCursor(cursor);
         }
-        return null;
     }
 
     public static void updatePersonItem(String tag, PersonItem personItem){
@@ -203,6 +217,9 @@ public class FavoriteDB {
                 }
                 if (!personItem.getDivision().equals(Values.EMPTY)){
                     cv.put(FavoriteDBinit.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
+                }
+                if (personItem.getAccessType() != 0 ){
+                    cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE, personItem.getAccessType());
                 }
                 if (cv.size()!=0){
                     DbShare.getDataBase(DbShare.DB_FAVORITE).update(FavoriteDBinit.TABLE_TEACHER,
@@ -316,6 +333,106 @@ public class FavoriteDB {
         } finally {
             closeCursor(cursor);
         }
+    }
+
+    //получение всех PersonItems для конкретной буквы c конкретным уровнем доступа !!! без фото !!!
+    public static ArrayList<PersonItem> getPersonItems(String character, int accessType){
+        ArrayList <PersonItem> items = new ArrayList<>();
+        Cursor cursor = null;
+        try {
+            String selection = null;
+            String[] selectionArgs = null;
+            if (accessType != 0){
+                selection = FavoriteDBinit.COLUMN_ACCESS_TYPE + " =?";
+                selectionArgs = new String[]{String.valueOf(accessType)};
+            } else {
+                if (!character.equals("#")){
+                    selection = FavoriteDBinit.COLUMN_LASTNAME_FAVORITE + " LIKE ?";
+                    selectionArgs = new String[]{character + "%"};
+                }
+            }
+
+            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
+                    FavoriteDBinit.TABLE_TEACHER,
+                    new String[]{FavoriteDBinit.COLUMN_LASTNAME_FAVORITE,
+                            FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE,
+                            FavoriteDBinit.COLUMN_MIDNAME_FAVORITE,
+                            FavoriteDBinit.COLUMN_DIVISION_FAVORITE,
+                            FavoriteDBinit.COLUMN_TAG_FAVORITE,
+                            FavoriteDBinit.COLUMN_SEX_FAVORITE,
+                            FavoriteDBinit.COLUMN_ACCESS_TYPE},
+                    selection,
+                    selectionArgs,
+                    null,
+                    FavoriteDBinit.COLUMN_LASTNAME_FAVORITE + " ASC",
+                    null);
+
+            if (cursor.getCount()>0){
+                cursor.moveToPosition(-1);
+                while (cursor.moveToNext()){
+                    items.add(new PersonItem().setLastname(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE)))
+                            .setFirstname(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE)))
+                            .setMidname(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE)))
+                            .setDivision(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_DIVISION_FAVORITE)))
+                            .setSex(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_SEX_FAVORITE)))
+                            .setRadioLabel(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_TAG_FAVORITE)))
+                            .setAccessType(cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE))));
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+        return items;
+    }
+
+    public static void setPersonAccessType (String tag, int accessType){
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
+                    FavoriteDBinit.TABLE_TEACHER,
+                    new String[]{FavoriteDBinit._ID, FavoriteDBinit.COLUMN_ACCESS_TYPE},
+                    FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
+                    new String[]{tag},
+                    null,
+                    null,
+                    "1");
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
+                ContentValues cv = new ContentValues();
+                cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE, accessType);
+                DbShare.getDataBase(DbShare.DB_FAVORITE)
+                        .update(FavoriteDBinit.TABLE_TEACHER, cv, FavoriteDBinit._ID + " = " + cursor.getInt(cursor.getColumnIndex(FavoriteDBinit._ID)), null);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+    }
+
+    public static int getPersonAccessType (String tag){
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
+                    FavoriteDBinit.TABLE_TEACHER,
+                    new String[]{FavoriteDBinit.COLUMN_ACCESS_TYPE},
+                    FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
+                    new String[]{tag},
+                    null,
+                    null,
+                    "1");
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
+                return cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+        return -1;
     }
 
     public static boolean isUserInBase(String tag){
@@ -451,7 +568,7 @@ public class FavoriteDB {
     public static void clearTeachersDB(){
         try {
             DbShare.getDataBase(DbShare.DB_FAVORITE).delete(FavoriteDBinit.TABLE_TEACHER, null, null);
-            Settings.deleteFreeUser(null);
+            //Settings.deleteFreeUser(null);
         } catch (Exception e){
             e.printStackTrace();
         }

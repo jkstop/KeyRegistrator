@@ -45,6 +45,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
+import com.example.ivsmirnov.keyregistrator.interfaces.Updatable;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
@@ -62,6 +63,7 @@ public class Dialogs extends DialogFragment{
     public static final String DIALOG_TYPE = "dialog_type";
     public static final String DIALOG_ENTER_PASSWORD_TYPE = "dialog_enter_password_type";
     public static final String DIALOG_PERSON_INFORMATION_KEY_TAG = "DIALOG_PERSON_INFORMATION_KEY_TAG";
+    public static final String DIALOG_PERSON_INFORMATION_KEY_POSITION = "DIALOG_PERSON_INFORMATION_KEY_POSITION";
 
     public static final int DIALOG_EDIT = 100;
     public static final int DIALOG_CLEAR_JOURNAL = 101;
@@ -152,7 +154,6 @@ public class Dialogs extends DialogFragment{
 
                                 if (checkClearTeachersLocal.isChecked()){
                                     FavoriteDB.clearTeachersDB();
-                                    Settings.clearFreeUsers();
                                     updateInformation();
                                 }
 
@@ -173,8 +174,12 @@ public class Dialogs extends DialogFragment{
                 final TextInputLayout inputFirstname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_firstname_layout);
                 final TextInputLayout inputMidname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_midname_layout);
                 final TextInputLayout inputDivision = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_division_layout);
-                AppCompatCheckBox accessType = (AppCompatCheckBox) dialogView.findViewById(R.id.person_information_access_type);
+                final AppCompatCheckBox accessType = (AppCompatCheckBox) dialogView.findViewById(R.id.person_information_access_type);
                 final String tag = getArguments().getString(DIALOG_PERSON_INFORMATION_KEY_TAG);
+                final int position = getArguments().getInt(DIALOG_PERSON_INFORMATION_KEY_POSITION);
+
+                //интерфейс
+                final Updatable updateInterface = (Updatable)getTargetFragment();
 
                 //получаем пользователя и заполняем поля
                 new GetPersons(mContext, null, null).execute(new GetPersonParams()
@@ -186,17 +191,8 @@ public class Dialogs extends DialogFragment{
                         .setPersonFirstname(inputFirstname.getEditText())
                         .setPersonMidname(inputMidname.getEditText())
                         .setAccessTypeContainer(accessType)
-                        .setFreeUser(Settings.getFreeUsers().contains(tag))
+                        .setFreeUser(FavoriteDB.getPersonAccessType(tag) == FavoriteDB.CLICK_USER_ACCESS)
                         .setPersonDivision(inputDivision.getEditText()));
-
-                accessType.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) Settings.addFreeUser(tag);
-                                else Settings.deleteFreeUser(tag);
-                    }
-                });
-
 
                 AlertDialog.Builder builderEdit = new AlertDialog.Builder(getActivity());
                 builderEdit.setView(dialogView);
@@ -207,17 +203,16 @@ public class Dialogs extends DialogFragment{
                         public void onClick(DialogInterface dialog, int which) {
                             if (tag!=null){
 
-                                FavoriteDB.deleteUser(tag);
+                                updateInterface.onUserDeleted(position);
 
-                                //удаление метки в free_users
-                                Settings.deleteFreeUser(tag);
+                                FavoriteDB.deleteUser(tag);
 
                                 //удаление с сервера
                                 if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
                                     new ServerWriter(tag).execute(ServerWriter.PERSON_DELETE_ONE);
                                 }
 
-                                updateInformation();
+                                //updateInformation();
                             }
                         }
                     });
@@ -231,13 +226,22 @@ public class Dialogs extends DialogFragment{
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
+                            int access;
+                            if (accessType.isChecked()){
+                                access = FavoriteDB.CLICK_USER_ACCESS;
+                            }else{
+                                access = FavoriteDB.CARD_USER_ACCESS;
+                            }
+
                             FavoriteDB.updatePersonItem(tag, new PersonItem()
                                     .setLastname(inputLastname.getEditText().getText().toString())
                                     .setFirstname(inputFirstname.getEditText().getText().toString())
                                     .setMidname(inputMidname.getEditText().getText().toString())
-                                    .setDivision(inputDivision.getEditText().getText().toString()));
+                                    .setDivision(inputDivision.getEditText().getText().toString())
+                                    .setAccessType(access));
 
-                            updateInformation();
+                           updateInterface.onUserChanged(tag, position);
+                            //updateInformation();
                         }
                     });
                 }else{
@@ -332,7 +336,7 @@ public class Dialogs extends DialogFragment{
                         } else {
                             RoomItem newRoomItem = new RoomItem().setAuditroom(inputText)
                                     .setStatus(RoomDB.ROOM_IS_FREE)
-                                    .setAccessType(JournalDB.ACCESS_BY_CLICK);
+                                    .setAccessType(FavoriteDB.CLICK_USER_ACCESS);
                             RoomDB.writeInRoomsDB(newRoomItem);
 
                             //пишем на сервер
