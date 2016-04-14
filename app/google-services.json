@@ -1,0 +1,64 @@
+{
+  "project_info": {
+    "project_id": "keyregistrator",
+    "project_number": "127775171233",
+    "name": "KeyRegistrator"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:127775171233:android:13c823251475b3be",
+        "client_id": "android:com.example.ivsmirnov.keyregistrator",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.example.ivsmirnov.keyregistrator",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "127775171233-ihlk3ehi994f4fcfhlg3mudmgnog1bp5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ivsmirnov.keyregistrator",
+            "certificate_hash": "0A90861AFD68EEEFFDFA17220BD90DE837328A2A"
+          }
+        },
+        {
+          "client_id": "127775171233-edv3qn7f1icukqo21hpkq3v58l982n6b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ivsmirnov.keyregistrator",
+            "certificate_hash": "2245A60DF63C35E1CCD9616A28E7D661463163FF"
+          }
+        },
+        {
+          "client_id": "127775171233-fvqq0qcq22ar8ih31fgfqol9rov29c7i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
