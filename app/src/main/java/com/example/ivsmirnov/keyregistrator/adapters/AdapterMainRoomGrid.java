@@ -165,15 +165,6 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 ((auditroomBusyViewHolder)holder).mBusyImagePerson.setLayoutParams(imagePersonParams);
 
-
-                //загрузка и отображение фото из БД
-                /*new GetPersons(App.getAppContext(),null, AnimationUtils.loadAnimation(App.getAppContext(),android.R.anim.fade_in)).execute(new GetPersonParams()
-                        .setIsAnimatedPhoto(true)
-                        .setPersonImageView(((auditroomBusyViewHolder)holder).mBusyImagePerson)
-                       .setPersonLocation(FavoriteDB.LOCAL_USER)
-                        .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO)
-                       .setPersonTag(mRoomItems.get(position).getTag()));
-*/
                 new GetPersonPhoto(new GetPersonParams()
                         .setPersonTag(mRoomItems.get(position).getTag())
                 .setPersonPhotoLocation(FavoriteDB.LOCAL_PHOTO)
