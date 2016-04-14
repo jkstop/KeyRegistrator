@@ -76,6 +76,7 @@ public class Dialogs extends DialogFragment{
     public static final int DIALOG_RESIZE_ITEMS = 108;
     public static final int DIALOG_ENTER_PASSWORD = 109;
     public static final int DIALOG_LOG_OUT = 110;
+    public static final int SEARCH_PERSONS = 111;
 
     public static final int DIALOG_ENTER_PASSWORD_TYPE_ACCESS_FOR_PERSONS = 111;
     public static final int DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM = 112;

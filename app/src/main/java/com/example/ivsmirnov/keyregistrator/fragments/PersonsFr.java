@@ -35,7 +35,6 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
-import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.Updatable;
@@ -56,13 +55,16 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable {
     public static final int PERSONS_FRAGMENT_EDITOR = 115;
     public static final int PERSONS_FRAGMENT_SELECTOR = 116;
 
+    private static final int HANDLER_SHOW_PROGRESS = 100;
+    private static final int HANDLER_HIDE_PROGRESS = 101;
+    private static final int HANDLER_DATA_CHANGED = 102;
+
     private Context mContext;
     private static RecyclerView mRecyclerView;
     private ListView mListView;
 
     private Handler mHandler;
 
-    private static ArrayList<String> mPersonTagList;
     private ArrayList <PersonItem> mPersonsList;
     public AdapterPersonsGrid mAdapter;
     private AdapterPersonsCharacters mListCharAdapter;
@@ -94,8 +96,21 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable {
         mHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
-                mListCharAdapter.notifyDataSetChanged();
-                mAdapter.notifyDataSetChanged();
+                switch (msg.what){
+                    case HANDLER_SHOW_PROGRESS:
+                        if (mLoadingBar!=null) mLoadingBar.setVisibility(View.VISIBLE);
+                        break;
+                    case HANDLER_HIDE_PROGRESS:
+                        if (mLoadingBar!=null) mLoadingBar.setVisibility(View.INVISIBLE);
+                        break;
+                    case HANDLER_DATA_CHANGED:
+                        mListCharAdapter.notifyDataSetChanged();
+                        mAdapter.notifyDataSetChanged();
+                        break;
+                    default:
+                        break;
+                }
+
             }
         };
     }
@@ -148,7 +163,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable {
                     new BaseWriter(mContext, mBaseWriterInterface).execute(new BaseWriterParams()
                             .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
                             .setAuditroom(Settings.getLastClickedAuditroom())
-                            .setPersonTag(mPersonTagList.get(position)));
+                            .setPersonTag(mPersonsList.get(position).getRadioLabel()));
 
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
@@ -162,7 +177,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable {
                     new BaseWriter(mContext, mBaseWriterInterface).execute(new BaseWriterParams()
                             .setAccessType(FavoriteDB.CARD_USER_ACCESS)
                             .setAuditroom(Settings.getLastClickedAuditroom())
-                            .setPersonTag(mPersonTagList.get(position)));
+                            .setPersonTag(mPersonsList.get(position).getRadioLabel()));
 
                     lastClickTime = SystemClock.elapsedRealtime();
                 }
@@ -179,8 +194,6 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable {
         View rootView = inflater.inflate(R.layout.layout_persons_fr, container, false);
         mContext = rootView.getContext();
 
-
-        mPersonTagList = new ArrayList<>();
         mListCharacters = new ArrayList<>();
         mPersonsList = new ArrayList<>();
 
@@ -192,6 +205,14 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable {
             public void onClick(View v) {
 
                 Launcher.showFragment(getActivity().getSupportFragmentManager(), SearchFr.new_Instance(), R.string.fragment_tag_search);
+                //SearchFr searchFr = SearchFr.new_Instance();
+                //searchFr.show(getFragmentManager(),"seacrh");
+
+                /*Dialogs dialogs = new Dialogs();
+                Bundle bundle = new Bundle();
+                bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.SEARCH_PERSONS);
+                dialogs.setArguments(bundle);
+                dialogs.show(getFragmentManager(),"search_persons");*/
             }
         });
 
@@ -332,10 +353,13 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable {
             @Override
             public void run() {
 
+                mHandler.sendEmptyMessage(HANDLER_SHOW_PROGRESS);
+
                 if (isInitAllCharacters) getPersonsCharacters();
                 getPersonsItems(character);
 
-                mHandler.sendEmptyMessage(0);
+                mHandler.sendEmptyMessage(HANDLER_HIDE_PROGRESS);
+                mHandler.sendEmptyMessage(HANDLER_DATA_CHANGED);
             }
         });
     }

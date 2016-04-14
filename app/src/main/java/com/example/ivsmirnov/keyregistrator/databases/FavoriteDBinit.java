@@ -31,6 +31,7 @@ public class FavoriteDBinit extends SQLiteOpenHelper implements BaseColumns {
             + COLUMN_DIVISION_FAVORITE + " text, "
             + COLUMN_TAG_FAVORITE + " text, "
             + COLUMN_SEX_FAVORITE + " text, "
+            + COLUMN_ACCESS_TYPE + " integer, "
             + COLUMN_PHOTO_PREVIEW_FAVORITE + " text, "
             + COLUMN_PHOTO_ORIGINAL_FAVORITE + " text);";
 

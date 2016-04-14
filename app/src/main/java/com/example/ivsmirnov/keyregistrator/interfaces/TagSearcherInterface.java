@@ -1,5 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.interfaces;
 
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
+
 import java.util.ArrayList;
 
 /**
@@ -8,5 +10,6 @@ import java.util.ArrayList;
 public interface TagSearcherInterface {
 
     void changeProgressBar(int visibility);
-    void updateGrid(ArrayList<String> personTagList);
+    void updateGrid(ArrayList<PersonItem> personItems);
+    void onPersonGet(PersonItem personItem);
 }

@@ -12,10 +12,12 @@ import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.fragments.MainFr;
@@ -61,6 +63,7 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
         public TextView mBusyTextAuditroom;
         public TextView mBusyTextPerson;
         public CardView mBusyCard;
+        public ProgressBar mProgress;
 
         public auditroomBusyViewHolder(View itemView) {
             super(itemView);
@@ -69,6 +72,7 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
             mBusyTextAuditroom = (TextView)itemView.findViewById(R.id.card_auditroom_busy_text_auditroom);
             mBusyTextPerson = (TextView)itemView.findViewById(R.id.card_auditroom_busy_text_person);
             mBusyCard = (CardView)itemView.findViewById(R.id.card_auditroom_busy);
+            mProgress = (ProgressBar)itemView.findViewById(R.id.card_auditroom_busy_image_progress);
         }
     }
 
@@ -163,12 +167,18 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
                 //загрузка и отображение фото из БД
-                new GetPersons(App.getAppContext(),null, AnimationUtils.loadAnimation(App.getAppContext(),android.R.anim.fade_in)).execute(new GetPersonParams()
+                /*new GetPersons(App.getAppContext(),null, AnimationUtils.loadAnimation(App.getAppContext(),android.R.anim.fade_in)).execute(new GetPersonParams()
                         .setIsAnimatedPhoto(true)
                         .setPersonImageView(((auditroomBusyViewHolder)holder).mBusyImagePerson)
-                        .setPersonLocation(FavoriteDB.LOCAL_USER)
+                       .setPersonLocation(FavoriteDB.LOCAL_USER)
                         .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO)
-                        .setPersonTag(mRoomItems.get(position).getTag()));
+                       .setPersonTag(mRoomItems.get(position).getTag()));
+*/
+                new GetPersonPhoto(new GetPersonParams()
+                        .setPersonTag(mRoomItems.get(position).getTag())
+                .setPersonPhotoLocation(FavoriteDB.LOCAL_PHOTO)
+                .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO)
+                .setPersonImageView(((auditroomBusyViewHolder)holder).mBusyImagePerson)).execute();
 
                 break;
         }

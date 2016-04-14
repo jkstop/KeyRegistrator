@@ -31,6 +31,7 @@ public class GetPersonPhoto extends AsyncTask<Void,Void,Bitmap> {
         mPersonTag = getPersonParams.getPersonTag();
         mPersonImageView = new WeakReference<>(getPersonParams.getPersonImageView()).get();
         mProgressBar = new WeakReference<>(getPersonParams.getPersonImageLoadProgressBar()).get();
+        System.out.println("getPersonPhoto");
     }
 
     @Override
@@ -38,7 +39,7 @@ public class GetPersonPhoto extends AsyncTask<Void,Void,Bitmap> {
         super.onPreExecute();
 
         mPersonImageView.setVisibility(View.INVISIBLE);
-        mProgressBar.setVisibility(View.VISIBLE);
+        if (mProgressBar!=null) mProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class GetPersonPhoto extends AsyncTask<Void,Void,Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         super.onPostExecute(bitmap);
-        mProgressBar.setVisibility(View.INVISIBLE);
+        if (mProgressBar!=null) mProgressBar.setVisibility(View.INVISIBLE);
         mPersonImageView.setVisibility(View.VISIBLE);
         mPersonImageView.startAnimation(AnimationUtils.loadAnimation(App.getAppContext(), android.R.anim.fade_in));
         mPersonImageView.setImageBitmap(bitmap);

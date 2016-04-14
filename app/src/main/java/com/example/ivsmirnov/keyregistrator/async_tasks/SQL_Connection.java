@@ -20,6 +20,7 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
     public static final String JOURNAL_TABLE = "JOURNAL";
     public static final String PERSONS_TABLE = "TEACHERS";
     public static final String ROOMS_TABLE = "ROOMS";
+    public static final String ALL_STAFF_TABLE = "STAFF_NEW";
 
     //колонки
     public static final String COLUMN_JOURNAL_ACCOUNT_ID = "ACCOUNT_ID";
@@ -48,6 +49,15 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
     public static final String COLUMN_ROOMS_LAST_VISITER = "LAST_VISITER";
     public static final String COLUMN_ROOMS_RADIO_LABEL = "RADIO_LABEL";
     public static final String COLUMN_ROOMS_PHOTO = "PHOTO";
+
+    public static final String COLUMN_ALL_STAFF_DIVISION = "NAME_DIVISION";
+    public static final String COLUMN_ALL_STAFF_POSITION = "NAME_POSITION";
+    public static final String COLUMN_ALL_STAFF_LASTNAME = "LASTNAME";
+    public static final String COLUMN_ALL_STAFF_FIRSTNAME = "FIRSTNAME";
+    public static final String COLUMN_ALL_STAFF_MIDNAME = "MIDNAME";
+    public static final String COLUMN_ALL_STAFF_SEX = "SEX";
+    public static final String COLUMN_ALL_STAFF_PHOTO = "PHOTO";
+    public static final String COLUMN_ALL_STAFF_TAG = "RADIO_LABEL";
 
     public static Connection SQLconnect;
 

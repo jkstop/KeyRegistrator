@@ -178,6 +178,36 @@ public class FavoriteDB {
                     }
                     return null;
                 case SERVER_PHOTO:
+                    Connection mConnection = SQL_Connection.SQLconnect;
+                    if (mConnection!=null){
+                        try {
+                            String mPhoto;
+                            Statement mStatement = mConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
+                            ResultSet mResult = mStatement.executeQuery("SELECT "
+                                    + SQL_Connection.COLUMN_ALL_STAFF_SEX + ","
+                                    + SQL_Connection.COLUMN_ALL_STAFF_PHOTO
+                                    + " FROM " + SQL_Connection.ALL_STAFF_TABLE
+                                    + " WHERE " + SQL_Connection.COLUMN_ALL_STAFF_TAG
+                                    + " = '" + userTag + "'");
+                            mResult.first();
+                            if (mResult.getRow()!=0){
+                                mPhoto = mResult.getString(SQL_Connection.COLUMN_ALL_STAFF_PHOTO);
+                                if (mPhoto == null) mPhoto = getBase64DefaultPhotoFromResources(mResult.getString(SQL_Connection.COLUMN_ALL_STAFF_SEX));
+                                switch (photoDimension){
+                                        case FULLSIZE_PHOTO:
+                                            return mPhoto;
+                                        case PREVIEW_PHOTO:
+                                            return getPhotoPreview(mPhoto);
+                                        default:
+                                            return mPhoto;
+                                }
+                            }
+                            if (mStatement!=null) mStatement.close();
+                            if (mResult!=null) mResult.close();
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
                     return null;
                 default:
                     return null;

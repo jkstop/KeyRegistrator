@@ -41,6 +41,7 @@ import java.util.ArrayList;
 public class MainFr extends Fragment implements UpdateInterface,RecycleItemClickListener {
 
     public static RecyclerView mAuditroomGrid;
+    private AdapterMainRoomGrid mAdapter;
 
     private Context mContext;
     private ArrayList<RoomItem> mRoomItems;
@@ -69,7 +70,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         mContext = rootView.getContext();
 
 
-        mRoomItems = RoomDB.readRoomsDB();
+        mRoomItems = new ArrayList<>();
 
         mCloseRoomInterface = (CloseRoomInterface)getActivity();
 
@@ -81,6 +82,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         initializeAuditroomGrid();
 
         TextView textEmptyAud = (TextView)rootView.findViewById(R.id.text_empty_aud_list);
+
         if (mRoomItems.isEmpty()){
             textEmptyAud.setVisibility(View.VISIBLE);
         }
@@ -98,9 +100,11 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     }
 
     private void initializeAuditroomGrid(){
-        mRoomItems = RoomDB.readRoomsDB();
-        AdapterMainRoomGrid mAuditroomGridAdapter = new AdapterMainRoomGrid(mContext, mRoomItems,this);
-        mAuditroomGrid.setAdapter(mAuditroomGridAdapter);
+        if (!mRoomItems.isEmpty()) mRoomItems.clear();
+        mRoomItems.addAll(RoomDB.readRoomsDB());
+
+        mAdapter = new AdapterMainRoomGrid(mContext, mRoomItems,this);
+        mAuditroomGrid.setAdapter(mAdapter);
 
         //Layout manager для сетки с пользователями, отключение прокрутки
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(mContext, Settings.getAuditroomColumnsCount()){
@@ -109,7 +113,6 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
                 return false;
             }
         };
-
         mAuditroomGrid.setLayoutManager(mGridLayoutManager);
     }
 

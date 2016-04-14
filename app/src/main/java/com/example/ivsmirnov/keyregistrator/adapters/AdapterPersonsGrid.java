@@ -99,12 +99,14 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         Animation fadeInanimation = AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in);
-        if (mType== SHOW_FAVORITE_PERSONS){
 
-            holder.textLastname.setText(mPersonList.get(position).getLastname());
-            holder.textFirstname.setText(mPersonList.get(position).getFirstname());
-            holder.textMidname.setText(mPersonList.get(position).getMidname());
-            holder.textDivision.setText(mPersonList.get(position).getDivision());
+        holder.textLastname.setText(mPersonList.get(position).getLastname());
+        holder.textFirstname.setText(mPersonList.get(position).getFirstname());
+        holder.textMidname.setText(mPersonList.get(position).getMidname());
+        holder.textDivision.setText(mPersonList.get(position).getDivision());
+        holder.imageView.setImageDrawable(null);
+
+        if (mType== SHOW_FAVORITE_PERSONS){
 
             if (mPersonList.get(position).getAccessType() == FavoriteDB.CLICK_USER_ACCESS){
                 holder.accessImageView.setImageResource(R.drawable.ic_touch_app_black_24dp);
@@ -119,29 +121,15 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
                     .setPersonImageView(holder.imageView)
                     .setPersonImageLoadProgressBar(holder.progressBar)).execute();
 
-            /*new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams()
-                    .setPersonTag(mTags.get(position))
-                    .setPersonImageView(holder.imageView)
-                    .setPersonLastname(holder.textLastname)
-                    .setPersonFirstname(holder.textFirstname)
-                    .setPersonMidname(holder.textMidname)
-                    .setPersonDivision(holder.textDivision)
-                    .setAccessImageView(holder.accessImageView)
-                    .setFreeUser(isFreeUsers.contains(mTags.get(position)))
-                    .setPersonLocation(FavoriteDB.LOCAL_USER)
-                    .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO));*/
-
         }else if (mType == SHOW_ALL_PERSONS){
 
-            /*new GetPersons(mContext, holder.personCard, fadeInanimation).execute(new GetPersonParams()
-                    .setPersonTag(mTags.get(position))
+            new GetPersonPhoto(new GetPersonParams()
+                    .setPersonTag(mPersonList.get(position).getRadioLabel())
+                    .setPersonPhotoLocation(FavoriteDB.SERVER_PHOTO)
+                    .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO)
                     .setPersonImageView(holder.imageView)
-                    .setPersonLastname(holder.textLastname)
-                    .setPersonFirstname(holder.textFirstname)
-                    .setPersonMidname(holder.textMidname)
-                    .setPersonDivision(holder.textDivision)
-                    .setPersonLocation(FavoriteDB.SERVER_USER)
-                    .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO));*/
+                    .setPersonImageLoadProgressBar(holder.progressBar)).execute();
+
         }
     }
 

@@ -13,7 +13,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,17 +24,16 @@ import android.widget.Toast;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsGrid;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
-import com.example.ivsmirnov.keyregistrator.async_tasks.TagSearcher;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.TagSearcherInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -48,9 +46,13 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
     private TagSearcherInterface mTagSeacherInterface;
 
     private ArrayList<String> mPersonTagList;
+    private ArrayList<PersonItem> mPersonItemsList;
+
+    private TagSearcher tagSearcher;
 
     private ProgressBar mProgressBar;
     private RecyclerView mPersonsRecycler;
+    private AdapterPersonsGrid mAdapter;
 
     public static SearchFr new_Instance(){
         return new SearchFr();
@@ -66,8 +68,13 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
         mTagSeacherInterface = this;
 
+        mPersonItemsList = new ArrayList<>();
+
         mPersonsRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_search_persons);
         mPersonsRecycler.setLayoutManager(new GridLayoutManager(mContext,3));
+
+        mAdapter = new AdapterPersonsGrid(mContext,mPersonItemsList,AdapterPersonsGrid.SHOW_ALL_PERSONS,this);
+        mPersonsRecycler.setAdapter(mAdapter);
 
         Button mAddButton = (Button) rootView.findViewById(R.id.layout_add_new_staff_input_button);
 
@@ -78,7 +85,6 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
             getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         }
 
-
         mInputText.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -87,24 +93,24 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("s",String.valueOf(s.length()));
-
-                Log.d("count", String.valueOf(count));
 
                 if (s.length()>=3 && s.length()<=6){
                     if (connection!=null){
                         try {
-                            TagSearcher tagSearcher;
                             if (count != 0){
-                                tagSearcher = new TagSearcher(s, mTagSeacherInterface);
-                                tagSearcher.execute(connection);
+                                mPersonItemsList.clear();
+                                tagSearcher = new TagSearcher(connection, mTagSeacherInterface);
+                                tagSearcher.execute(s);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }else{
-                        Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
+                        mInputLayout.setError("Нет подключения к серверу!");
                     }
+                } else if (s.length()<3) {
+                    mPersonItemsList.clear();
+                    mAdapter.notifyDataSetChanged();
                 }
             }
             @Override
@@ -159,15 +165,19 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
     }
 
     @Override
-    public void updateGrid(ArrayList<String> personTagList) {
-        if (!personTagList.isEmpty()){
-            mPersonTagList = personTagList;
-            ArrayList<PersonItem> items = new ArrayList<>(); //заглушка
-            mPersonsRecycler.setAdapter(new AdapterPersonsGrid(mContext,
-                    items,
-                    AdapterPersonsGrid.SHOW_ALL_PERSONS,
-                    this));
-        }
+    public void updateGrid(ArrayList<PersonItem> personItems) {
+
+        if (!mPersonItemsList.isEmpty()) mPersonItemsList.clear();
+        mPersonItemsList.addAll(personItems);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPersonGet(PersonItem personItem) {
+        System.out.println("person item " + personItem.getLastname());
+
+        mPersonItemsList.add(personItem);
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -181,7 +191,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
     @Override
     public void onItemClick(View v, final int position, int viewID) {
-       new PersonTransporterFromServer().execute(position);
+       new PersonTransporterFromServer().execute(mPersonItemsList.get(position).getRadioLabel());
     }
 
     @Override
@@ -207,20 +217,81 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
     }
 
     //получение информации о пользователе и запись в базу
-    private class PersonTransporterFromServer extends AsyncTask<Integer,Void,PersonItem>{
+    private class PersonTransporterFromServer extends AsyncTask<String,Void,PersonItem>{
 
         @Override
-        protected PersonItem doInBackground(Integer... params) {
-            System.out.println("person transport from server ****************************");
-            return FavoriteDB.getPersonItem(mPersonTagList.get(params[0]), FavoriteDB.SERVER_USER, FavoriteDB.ALL_PHOTO);
+        protected PersonItem doInBackground(String... params) {
+            return FavoriteDB.getPersonItem(params[0], FavoriteDB.SERVER_USER, FavoriteDB.ALL_PHOTO);
         }
 
         @Override
         protected void onPostExecute(PersonItem personItem) {
-            System.out.println("person transport from server ----------------------");
             if (personItem != null) {
                 addUserInFavorite(personItem);
             }
+        }
+    }
+
+    private class TagSearcher extends AsyncTask<CharSequence,PersonItem,ArrayList<PersonItem>> {
+
+        private TagSearcherInterface mTagSearcherInterface;
+        private Connection mConnection;
+
+        public TagSearcher(Connection connection, TagSearcherInterface tagSearcherInterface){
+            this.mConnection = connection;
+            mTagSearcherInterface = tagSearcherInterface;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mTagSearcherInterface.changeProgressBar(View.VISIBLE);
+        }
+
+
+        @Override
+        protected ArrayList<PersonItem> doInBackground(CharSequence... params) {
+            ArrayList<PersonItem> mItems = new ArrayList<>();
+            try {
+                Statement statement = mConnection.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT "
+                        + SQL_Connection.COLUMN_ALL_STAFF_DIVISION + ","
+                        + SQL_Connection.COLUMN_ALL_STAFF_LASTNAME + ","
+                        + SQL_Connection.COLUMN_ALL_STAFF_FIRSTNAME + ","
+                        + SQL_Connection.COLUMN_ALL_STAFF_MIDNAME + ","
+                        + SQL_Connection.COLUMN_ALL_STAFF_SEX + ","
+                        + SQL_Connection.COLUMN_ALL_STAFF_TAG
+                        + " FROM " + SQL_Connection.ALL_STAFF_TABLE
+                        + " WHERE " + SQL_Connection.COLUMN_ALL_STAFF_LASTNAME
+                        + " LIKE '" + params[0] + "%'");
+                while (resultSet.next()){
+
+
+                   // mItems.add();
+
+                    publishProgress(new PersonItem().setLastname(resultSet.getString(SQL_Connection.COLUMN_ALL_STAFF_LASTNAME))
+                            .setFirstname(resultSet.getString(SQL_Connection.COLUMN_ALL_STAFF_FIRSTNAME))
+                            .setMidname(resultSet.getString(SQL_Connection.COLUMN_ALL_STAFF_MIDNAME))
+                            .setDivision(resultSet.getString(SQL_Connection.COLUMN_ALL_STAFF_DIVISION))
+                            .setRadioLabel(resultSet.getString(SQL_Connection.COLUMN_ALL_STAFF_TAG)));
+
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return mItems;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<PersonItem> personItems) {
+            System.out.println("tag searcher ---------------------------------");
+            mTagSearcherInterface.changeProgressBar(View.INVISIBLE);
+          //  mTagSearcherInterface.updateGrid(personItems);
+        }
+
+        @Override
+        protected void onProgressUpdate(PersonItem... values) {
+            mTagSearcherInterface.onPersonGet(values[0]);
         }
     }
 
