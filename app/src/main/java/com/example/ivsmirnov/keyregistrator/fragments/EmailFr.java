@@ -22,9 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterEmailExtras;
-import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.databases.AccountDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.EmailInterface;
@@ -35,6 +33,7 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.nononsenseapps.filepicker.FilePickerActivity;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -91,7 +90,8 @@ public class EmailFr extends Fragment implements GetAccountInterface, EmailInter
         if (mAccount!=null){
             mAccountName.setText(mAccount.getLastname());
             mAccountEmail.setText(mAccount.getEmail());
-            if (Launcher.isNetworkAvailable()) new LoadImageFromWeb(mAccount.getPhoto(), this).execute();
+            Picasso.with(mContext).load(mAccount.getPhoto()).into(mAccountImage);
+            //if (Launcher.isNetworkAvailable()) new LoadImageFromWeb(mAccount.getPhoto(), this).execute();
         }else{
             mAccountName.setText(getResources().getString(R.string.email_fragment_logon));
             mAccountEmail.setText(Values.EMPTY);

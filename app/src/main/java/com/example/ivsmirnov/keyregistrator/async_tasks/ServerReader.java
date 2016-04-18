@@ -44,6 +44,7 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
         if (mProgressDialog!=null){
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             mProgressDialog.setCancelable(false);
+            mProgressDialog.setMax(0);
             mProgressDialog.setMessage("Синхронизация...");
             mProgressDialog.show();
         }
@@ -62,23 +63,47 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
                     case LOAD_JOURNAL:
                         ArrayList<Long> mJournalTags = JournalDB.getJournalItemTags(null);
 
-                        //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
-                        mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " NOT IN (" + getInClause(mJournalTags) + ")");
-                        mResult.first();
-                        if (mResult.getRow()!=0){
-                            while (mResult.next()){
-                                JournalDB.writeInDBJournal(new JournalItem()
-                                        .setAccountID(mResult.getString(SQL_Connection.COLUMN_JOURNAL_ACCOUNT_ID))
-                                        .setAuditroom(mResult.getString(SQL_Connection.COLUMN_JOURNAL_AUDITROOM))
-                                        .setTimeIn(mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN))
-                                        .setTimeOut(mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT))
-                                        .setAccessType(mResult.getInt(SQL_Connection.COLUMN_JOURNAL_ACCESS))
-                                        .setPersonLastname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_LASTNAME))
-                                        .setPersonFirstname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_FIRSTNAME))
-                                        .setPersonMidname(mResult.getString(SQL_Connection.COLUMN_JOURNAL_MIDNAME))
-                                        .setPersonPhoto(mResult.getString(SQL_Connection.COLUMN_JOURNAL_PHOTO)));
-                            }
+                        //если есть диалог, то получаем счетчик всех записей и ставим значение как максимум
+                        if (mProgressDialog!=null){
+                            ResultSet getCountResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_JOURNAL_TIME_IN
+                                            + " FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN
+                                            + " NOT IN (" + getInClause(mJournalTags) + ")"
+                                    , ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+                                    .executeQuery();
+                            getCountResult.last();
+                            mProgressDialog.setMax(getCountResult.getRow());
                         }
+
+                        //выбираем тэги записей, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
+                        //можно было бы получить сразу всю строчку целиком, а не только тэги, но тогда все зависает нафиг
+                        ResultSet getJournalTagsResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_JOURNAL_TIME_IN
+                                + " FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN
+                                + " NOT IN (" + getInClause(mJournalTags) + ")"
+                                ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
+                        ResultSet journalItemResult;
+
+                        while (getJournalTagsResult.next()){
+                               //для каждого тэга получаем journalItem и пишем в устройство
+                                journalItemResult = mStatement.executeQuery("SELECT * FROM " +SQL_Connection.JOURNAL_TABLE
+                                        + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " = " + getJournalTagsResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN));
+
+                                journalItemResult.first();
+                                if (journalItemResult.getRow() != 0){
+                                    JournalDB.writeInDBJournal(new JournalItem()
+                                            .setAccountID(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_ACCOUNT_ID))
+                                            .setAuditroom(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_AUDITROOM))
+                                            .setTimeIn(journalItemResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN))
+                                            .setTimeOut(journalItemResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT))
+                                            .setAccessType(journalItemResult.getInt(SQL_Connection.COLUMN_JOURNAL_ACCESS))
+                                            .setPersonLastname(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_LASTNAME))
+                                            .setPersonFirstname(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_FIRSTNAME))
+                                            .setPersonMidname(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_MIDNAME))
+                                            .setPersonPhoto(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_PHOTO)));
+                                }
+
+                            publishProgress(getJournalTagsResult.getRow());
+                        }
+
                         //проверяем открытые помещения. Если на сервере они закрыты, то обновляем локальный журнал.
                         //сначала получаем тэги открытых помещений  в журнале (они же время входа)
                         ArrayList<Long> mOpenTags = JournalDB.getOpenRoomsTags();
@@ -98,30 +123,43 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
                         break;
                     case LOAD_TEACHERS:
                         ArrayList<String> mPersonsTags = FavoriteDB.getPersonsTags();
+
                         //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
-                        mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.PERSONS_TABLE
-                                + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " NOT IN (" + getInClause(mPersonsTags) + ")");
 
                         if (mProgressDialog!=null){
-                            mResult.last();
-                            mProgressDialog.setMax(mResult.getRow());
-                            mResult.beforeFirst();
+                            ResultSet getCountResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " FROM " + SQL_Connection.PERSONS_TABLE
+                                            + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " NOT IN (" + getInClause(mPersonsTags) + ")"
+                                    ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
+                            getCountResult.last();
+                            mProgressDialog.setMax(getCountResult.getRow());
+
                         }
 
-                        while (mResult.next()){
-                            FavoriteDB.writeInDBTeachers(new PersonItem()
-                                    .setLastname(mResult.getString(SQL_Connection.COLUMN_PERSONS_LASTNAME))
-                                    .setFirstname(mResult.getString(SQL_Connection.COLUMN_PERSONS_FIRSTNAME))
-                                    .setMidname(mResult.getString(SQL_Connection.COLUMN_PERSONS_MIDNAME))
-                                    .setDivision(mResult.getString(SQL_Connection.COLUMN_PERSONS_DIVISION))
-                                    .setRadioLabel(mResult.getString(SQL_Connection.COLUMN_PERSONS_RADIO_LABEL))
-                                    .setSex(mResult.getString(SQL_Connection.COLUMN_PERSONS_SEX))
-                                    .setPhotoPreview(mResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_PREVIEW))
-                                    .setPhotoOriginal(mResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_ORIGINAL)));
+                        //выбираем тэги записей, которые есть на сервере, но нет в устройстве. Получаем по тэгу запись,пишем в устройство
+                        //можно было бы получить сразу всю строчку целиком, а не только тэги, но тогда все зависает нафиг
+                        ResultSet getPesonsTagsResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " FROM " + SQL_Connection.PERSONS_TABLE
+                                + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " NOT IN (" + getInClause(mPersonsTags) + ")"
+                                ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
+                        ResultSet personItemResult;
 
-                            publishProgress(mResult.getRow());
+                        while (getPesonsTagsResult.next()){
+                            personItemResult = mStatement.executeQuery("SELECT * FROM " +SQL_Connection.PERSONS_TABLE
+                                    + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL
+                                    + " = '" + getPesonsTagsResult.getString(SQL_Connection.COLUMN_PERSONS_RADIO_LABEL) + "'");
+                            personItemResult.first();
+                            if (personItemResult.getRow() != 0){
+                                FavoriteDB.writeInDBTeachers(new PersonItem()
+                                        .setLastname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_LASTNAME))
+                                        .setFirstname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_FIRSTNAME))
+                                        .setMidname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_MIDNAME))
+                                        .setDivision(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_DIVISION))
+                                        .setRadioLabel(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_RADIO_LABEL))
+                                        .setSex(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_SEX))
+                                        .setPhotoPreview(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_PREVIEW))
+                                        .setPhotoOriginal(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_ORIGINAL)));
+                            }
 
-                            System.out.println("write in local " + mResult.getString(SQL_Connection.COLUMN_PERSONS_LASTNAME));
+                            publishProgress(getPesonsTagsResult.getRow());
                         }
                         break;
                     case LOAD_ROOMS:
@@ -224,7 +262,7 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
             }
             return inClause.toString();
         } else {
-            return "'?'";
+            return "'0'";
         }
 
     }

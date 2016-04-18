@@ -46,6 +46,7 @@ public class GetPersonPhoto extends AsyncTask<Void,Void,Bitmap> {
     protected Bitmap doInBackground(Void... params) {
 
         String photo = FavoriteDB.getPersonPhoto(mPersonTag, mPhotoLocation, mPhotoDimension);
+        if (photo == null) photo = FavoriteDB.getBase64DefaultPhotoFromResources("М");
         byte [] decodedString = Base64.decode(photo, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }

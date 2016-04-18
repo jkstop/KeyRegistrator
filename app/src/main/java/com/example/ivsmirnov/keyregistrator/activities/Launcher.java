@@ -1,7 +1,5 @@
 package com.example.ivsmirnov.keyregistrator.activities;
 
-import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,7 +16,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -38,16 +35,13 @@ import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterNavigationDrawerList;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
-import com.example.ivsmirnov.keyregistrator.async_tasks.LoadImageFromWeb;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.databases.DbShare;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
-import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.fragments.MainFr;
 import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
-import com.example.ivsmirnov.keyregistrator.fragments.SearchFr;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
@@ -74,13 +68,11 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -313,7 +305,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                         final GoogleSignInAccount acct = result.getSignInAccount();
                         AccountItem accountItem = new AccountItem().setLastname(acct.getDisplayName())
                                 .setEmail(acct.getEmail())
-                                .setPhoto(String.valueOf(acct.getPhotoUrl().toString()))
+                                .setPhoto(String.valueOf(acct.getPhotoUrl()))
                                 .setAccountID(acct.getId());
 
                         AccountDB.writeAccount(accountItem);
@@ -339,7 +331,8 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
             String text = mAccount.getLastname();
             mAccountName.setText(text);
             mAccountEmail.setText(mAccount.getEmail());
-            if (isNetworkAvailable()) new LoadImageFromWeb(mAccount.getPhoto(), mGetAccountInterface).execute();
+            Picasso.with(mContext).load(mAccount.getPhoto()).into(mAccountImage);
+            //if (isNetworkAvailable()) new LoadImageFromWeb(mAccount.getPhoto(), mGetAccountInterface).execute();
         } else {
             mAccountName.setText(getStringFromResources(R.string.navigation_drawer_account_info_text_user));
             mAccountEmail.setText(Values.EMPTY);

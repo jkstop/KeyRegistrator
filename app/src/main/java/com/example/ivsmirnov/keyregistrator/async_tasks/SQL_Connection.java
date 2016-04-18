@@ -23,6 +23,7 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
     public static final String ALL_STAFF_TABLE = "STAFF_NEW";
 
     //колонки
+    public static final String COLUMN_JOURNAL_ID = "_ID";
     public static final String COLUMN_JOURNAL_ACCOUNT_ID = "ACCOUNT_ID";
     public static final String COLUMN_JOURNAL_AUDITROOM = "AUDITROOM";
     public static final String COLUMN_JOURNAL_TIME_IN = "TIME_IN";
