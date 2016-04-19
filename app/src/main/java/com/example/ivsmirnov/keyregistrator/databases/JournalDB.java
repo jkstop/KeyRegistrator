@@ -47,7 +47,7 @@ public class JournalDB {
             cv.put(JournalDBinit.COLUMN_PERSON_LASTNAME,journalItem.getPersonLastname());
             cv.put(JournalDBinit.COLUMN_PERSON_FIRSTNAME, journalItem.getPersonFirstname());
             cv.put(JournalDBinit.COLUMN_PERSON_MIDNAME, journalItem.getPersonMidname());
-            cv.put(JournalDBinit.COLUMN_PERSON_PHOTO, journalItem.getPersonPhoto());
+            cv.put(JournalDBinit.COLUMN_PERSON_PHOTO_PATH, journalItem.getPersonPhotoPath());
 
             long position = mDataBase.insert(JournalDBinit.TABLE_JOURNAL, null, cv);
 
@@ -172,7 +172,7 @@ public class JournalDB {
                         .setPersonLastname(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_LASTNAME)))
                         .setPersonFirstname(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_FIRSTNAME)))
                         .setPersonMidname(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_MIDNAME)))
-                        .setPersonPhoto(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_PHOTO)));
+                        .setPersonPhotoPath(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_PHOTO_PATH)));
             } else {
                 return null;
             }
@@ -411,7 +411,7 @@ public class JournalDB {
                                 +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_LASTNAME))+";"
                                 +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_FIRSTNAME))+";"
                                 +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_MIDNAME))+";"
-                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_PHOTO));
+                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_PHOTO_PATH));
                         fileOutputStream.write(row.getBytes());
                         fileOutputStream.write("\n".getBytes());
                     }

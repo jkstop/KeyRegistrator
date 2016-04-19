@@ -41,7 +41,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
     @Override
     protected Void doInBackground(BaseWriterParams... params) {
 
-        PersonItem person = FavoriteDB.getPersonItem(params[0].getPersonTag(), FavoriteDB.LOCAL_USER, FavoriteDB.PREVIEW_PHOTO);
+        PersonItem person = FavoriteDB.getPersonItem(params[0].getPersonTag(), FavoriteDB.LOCAL_USER);
 
         final long timeIn = System.currentTimeMillis();
 
@@ -52,8 +52,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
                 .setTimeIn(timeIn)
                 .setPersonLastname(person.getLastname())
                 .setPersonFirstname(person.getFirstname())
-                .setPersonMidname(person.getMidname())
-                .setPersonPhoto(person.getPhotoPreview());
+                .setPersonMidname(person.getMidname());
 
         mRoomItem = new RoomItem()
                 .setAuditroom(mJournalItem.getAuditroom())

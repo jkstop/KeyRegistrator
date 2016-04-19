@@ -12,8 +12,8 @@ public class PersonItem {
     private String Midname;
     private String Division;
     private String Sex;
-    private String PhotoPreview;
-    private String PhotoOriginal;
+    private String PhotoPath;
+    private String Photo;
     private String RadioLabel;
     private int AccessType = 0;
 
@@ -31,8 +31,7 @@ public class PersonItem {
         Midname = null;
         Division = null;
         Sex = null;
-        PhotoPreview = null;
-        PhotoOriginal = null;
+        PhotoPath = null;
         RadioLabel = null;
         AccessType = 0;
     }
@@ -97,22 +96,22 @@ public class PersonItem {
 
     }
 
-    public PersonItem setPhotoPreview (String photoPreview){
-        this.PhotoPreview = photoPreview;
+    public PersonItem setPhotoPath(String path){
+       this.PhotoPath = path;
+       return this;
+    }
+
+    public String getPhotoPath (){
+        return PhotoPath;
+    }
+
+    public PersonItem setPhoto (String photo){
+        this.Photo = photo;
         return this;
     }
 
-    public String getPhotoPreview(){
-        return PhotoPreview;
-    }
-
-    public PersonItem setPhotoOriginal (String photoOriginal){
-        this.PhotoOriginal = photoOriginal;
-        return this;
-    }
-
-    public String getPhotoOriginal(){
-        return PhotoOriginal;
+    public String getPhoto (){
+        return Photo;
     }
 
     public PersonItem setRadioLabel (String radioLabel){

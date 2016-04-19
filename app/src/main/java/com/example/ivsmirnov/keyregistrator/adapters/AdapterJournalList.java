@@ -51,7 +51,7 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
 
     @Override
     public void onBindViewHolder(ViewHolderJournalItem holder, int position) {
-
+//сделать загрузку из JourbalItem, фотку из Picasso
         new GetJournal(new GetJournalParams()
                 .setTimeIn(mJournalItemTags.get(position))
                 .setCard(holder.mCard)

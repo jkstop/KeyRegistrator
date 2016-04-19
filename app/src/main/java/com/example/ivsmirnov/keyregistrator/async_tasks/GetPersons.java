@@ -51,7 +51,7 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
         photoDimension = params[0].getPersonPhotoDimension();
 
-        PersonItem personItem = FavoriteDB.getPersonItem(params[0].getPersonTag(), params[0].getPersonLocation(), photoDimension);
+        PersonItem personItem = FavoriteDB.getPersonItem(params[0].getPersonTag(), params[0].getPersonLocation());
 
         mPersonImage = new WeakReference<>(params[0].getPersonImageView()).get();
         mAccessImage = new WeakReference<>(params[0].getAccessImageView()).get();
@@ -78,7 +78,7 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
                 if (isAnimatedPhoto) mPersonImage.setVisibility(View.INVISIBLE);
 
                 byte[] decodedString;
-
+/*
                 switch (photoDimension){
                     case FavoriteDB.FULLSIZE_PHOTO:
                         if (personItem.getPhotoOriginal()==null) personItem.setPhotoOriginal(FavoriteDB.getBase64DefaultPhotoFromResources(personItem.getSex()));
@@ -91,9 +91,9 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
                     default:
                         decodedString = Base64.decode(FavoriteDB.getPhotoPreview(FavoriteDB.getBase64DefaultPhotoFromResources(personItem.getSex())), Base64.DEFAULT);
                         break;
-                }
+                }*/
 
-                mPersonImage.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+                //mPersonImage.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
 
                 if (isAnimatedPhoto) mPersonImage.setVisibility(View.VISIBLE);
                 if (isAnimatedPhoto) mPersonImage.startAnimation(mAnimation);

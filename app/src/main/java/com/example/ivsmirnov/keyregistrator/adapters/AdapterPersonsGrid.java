@@ -16,12 +16,15 @@ import android.widget.TextView;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ImageSaver;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.ViewHolder>{
@@ -114,15 +117,24 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
                 holder.accessImageView.setImageResource(R.drawable.ic_credit_card_black_24dp);
             }
 
-            new GetPersonPhoto(new GetPersonParams()
+            //загрузка фото из хранилища
+            Picasso.with(mContext)
+                    .load(new ImageSaver(mContext).setFileName(mPersonList.get(position).getRadioLabel()).getImage())
+                    .fit()
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_user_not_found)
+                    .into(holder.imageView);
+
+            /*new GetPersonPhoto(new GetPersonParams()
                     .setPersonTag(mPersonList.get(position).getRadioLabel())
                     .setPersonPhotoLocation(FavoriteDB.LOCAL_PHOTO)
                     .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO)
                     .setPersonImageView(holder.imageView)
-                    .setPersonImageLoadProgressBar(holder.progressBar)).execute();
+                    .setPersonImageLoadProgressBar(holder.progressBar)).execute();*/
 
         }else if (mType == SHOW_ALL_PERSONS){
 
+            //загрузка фото с сервера, сборка в Bitmap и вывод в ImageView
             new GetPersonPhoto(new GetPersonParams()
                     .setPersonTag(mPersonList.get(position).getRadioLabel())
                     .setPersonPhotoLocation(FavoriteDB.SERVER_PHOTO)

@@ -15,6 +15,16 @@ public class JournalItem {
     private String PersonFirstname = Values.EMPTY;
     private String PersonMidname = Values.EMPTY;
     private String PersonPhoto;
+    private String PersonPhotoPath;
+
+    public JournalItem setPersonPhotoPath(String photoPath){
+        this.PersonPhotoPath = photoPath;
+        return this;
+    }
+
+    public String getPersonPhotoPath(){
+        return PersonPhotoPath;
+    }
 
     public JournalItem setAccountID(String accountID){
         this.AccountID = accountID;

@@ -3,7 +3,6 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
@@ -93,15 +92,15 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                         if (split[j].equals("null")) split[j] = null;
                                     }
 
-                                    FavoriteDB.writeInDBTeachers(new PersonItem()
+                                    FavoriteDB.addNewUser(new PersonItem()
                                             .setLastname(split[0])
                                             .setFirstname(split[1])
                                             .setMidname(split[2])
                                             .setDivision(split[3])
                                             .setSex(split[4])
-                                            .setPhotoPreview(split[5])
-                                            .setPhotoOriginal(split[6])
+                                            .setPhoto(split[6])
                                             .setRadioLabel(split[7]));
+
                                     publishProgress(i);
                                     i++;
                                 }catch (Exception e){

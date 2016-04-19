@@ -10,6 +10,7 @@ import android.util.Base64;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ImageSaver;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
@@ -51,7 +52,7 @@ public class FavoriteDB {
     public static final int CLICK_USER_ACCESS = 12;
 
 
-    public static PersonItem getPersonItem(String tag, int userLocation, int photoType){
+    public static PersonItem getPersonItem(String tag, int userLocation){
 
         Cursor cursor = null;
         try {
@@ -74,9 +75,10 @@ public class FavoriteDB {
                             .setDivision(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_DIVISION_FAVORITE)))
                             .setSex(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_SEX_FAVORITE)))
                             .setAccessType(cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE)))
-                            .setRadioLabel(tag);
+                            .setRadioLabel(tag)
+                            .setPhotoPath(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE)));
 
-                    switch (photoType){
+                   /* switch (photoType){
                         case FULLSIZE_PHOTO:
                             personItem.setPhotoOriginal(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
                             break;
@@ -91,30 +93,36 @@ public class FavoriteDB {
                             break;
                         default:
                             break;
-                    }
+                    }*/
 
                     return personItem;
                 } else {
                     return null;
                 }
             }else if (userLocation == SERVER_USER){
-                Connection connection = SQL_Connection.SQLconnect;
 
+                Connection connection = SQL_Connection.SQLconnect;
                 if (connection!=null){
                     try {
-                        Statement statement = connection.createStatement();
-                        ResultSet resultSet = statement.executeQuery("select * from STAFF_NEW where [RADIO_LABEL] = '" + tag + "'");
-                        while (resultSet.next()) {
-                            personItem = new PersonItem().setLastname(resultSet.getString("LASTNAME"))
+                        //получаем всю инфу с сервера о пользователе
+                        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                        ResultSet resultSet = statement.executeQuery("SELECT * FROM " + SQL_Connection.ALL_STAFF_TABLE
+                                + " WHERE " + SQL_Connection.COLUMN_ALL_STAFF_TAG + " = '" + tag + "'");
+                        resultSet.first();
+                        if (resultSet.getRow() !=0){
+                            return new PersonItem().setLastname(resultSet.getString("LASTNAME"))
                                     .setFirstname(resultSet.getString("FIRSTNAME"))
                                     .setMidname(resultSet.getString("MIDNAME"))
                                     .setDivision(resultSet.getString("NAME_DIVISION"))
                                     .setSex(resultSet.getString("SEX"))
-                                    .setRadioLabel(resultSet.getString("RADIO_LABEL"));
-                            String photo = resultSet.getString("PHOTO");
+                                    .setRadioLabel(resultSet.getString("RADIO_LABEL"))
+                                    .setPhoto(resultSet.getString("PHOTO"));
+                        }
+
+                        /*    String photo = resultSet.getString("PHOTO");
 
                             if (photo == null)
-                                photo = getBase64DefaultPhotoFromResources(resultSet.getString("SEX"));
+                                photo = getBase64DefaultPhotoFromResources();
 
                             switch (photoType) {
                                 case FULLSIZE_PHOTO:
@@ -131,10 +139,7 @@ public class FavoriteDB {
                                     break;
                                 default:
                                     break;
-                            }
-                            return personItem;
-                        }
-
+                            }*/
                     } catch (SQLException e) {
                         e.printStackTrace();
                         return null;
@@ -161,7 +166,7 @@ public class FavoriteDB {
                 case LOCAL_PHOTO:
                     cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
                             FavoriteDBinit.TABLE_TEACHER,
-                            new String[]{FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE, FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE},
+                            new String[]{FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE},
                             FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
                             new String[]{userTag},
                             null,
@@ -169,12 +174,7 @@ public class FavoriteDB {
                             "1");
                     if (cursor.getCount()>0){
                         cursor.moveToFirst();
-                        switch (photoDimension){
-                            case PREVIEW_PHOTO:
-                                return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE));
-                            case FULLSIZE_PHOTO:
-                                return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE));
-                        }
+                        return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE));
                     }
                     return null;
                 case SERVER_PHOTO:
@@ -192,7 +192,7 @@ public class FavoriteDB {
                             mResult.first();
                             if (mResult.getRow()!=0){
                                 mPhoto = mResult.getString(SQL_Connection.COLUMN_ALL_STAFF_PHOTO);
-                                if (mPhoto == null) mPhoto = getBase64DefaultPhotoFromResources(mResult.getString(SQL_Connection.COLUMN_ALL_STAFF_SEX));
+                                if (mPhoto == null) mPhoto = getBase64DefaultPhotoFromResources();
                                 switch (photoDimension){
                                         case FULLSIZE_PHOTO:
                                             return mPhoto;
@@ -218,6 +218,29 @@ public class FavoriteDB {
         } finally {
             closeCursor(cursor);
         }
+    }
+
+    public static File getPersonPhotoPath(String personTag){
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
+                    FavoriteDBinit.TABLE_TEACHER,
+                    new String[]{FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE},
+                    FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
+                    new String[]{personTag},
+                    null,
+                    null,
+                    "1");
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
+                return new File(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE)));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+        return null;
     }
 
     public static void updatePersonItem(String tag, PersonItem personItem){
@@ -487,14 +510,17 @@ public class FavoriteDB {
         }
     }
 
-    public static boolean writeInDBTeachers(PersonItem personItem) {
+    public static boolean addNewUser(PersonItem personItem) {
+        String photoPath;
         try {
             if (personItem!=null){
 
-                if (personItem.getPhotoOriginal() == null){
-                    personItem.setPhotoOriginal(getBase64DefaultPhotoFromResources(personItem.getSex()));
-                    personItem.setPhotoPreview(getPhotoPreview(getBase64DefaultPhotoFromResources(personItem.getSex())));
-                }
+                if (personItem.getPhoto() == null) personItem.setPhoto(getBase64DefaultPhotoFromResources());
+
+                //сохраняем фото в память
+                photoPath = new ImageSaver(App.getAppContext())
+                        .setFileName(personItem.getRadioLabel())
+                        .save(personItem.getPhoto());
 
                 ContentValues cv = new ContentValues();
                 if (personItem.getLastname()!=null) cv.put(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
@@ -503,18 +529,22 @@ public class FavoriteDB {
                 if (personItem.getDivision()!=null) cv.put(FavoriteDBinit.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
                 if (personItem.getRadioLabel()!=null) cv.put(FavoriteDBinit.COLUMN_TAG_FAVORITE, personItem.getRadioLabel());
                 if (personItem.getSex()!=null) cv.put(FavoriteDBinit.COLUMN_SEX_FAVORITE, personItem.getSex());
-                if (personItem.getPhotoPreview()!=null) cv.put(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE, personItem.getPhotoPreview());
-                if (personItem.getPhotoOriginal()!=null) cv.put(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE, personItem.getPhotoOriginal());
+                if (photoPath!=null) cv.put(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE, photoPath);
 
+                //если пользователь уже есть в базе, то удаляем старую запись
                 if (isUserInBase(personItem.getRadioLabel())){
                     deleteUser(personItem.getRadioLabel());
                 }
+
+                //пишем в базу
                 DbShare.getDataBase(DbShare.DB_FAVORITE).insert(FavoriteDBinit.TABLE_TEACHER, null, cv);
 
                 //добавляем на сервер
                 if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
                     new ServerWriter(personItem).execute(ServerWriter.PERSON_UPDATE);
                 }
+
+
                 return true;
             } else {
                 return false;
@@ -547,8 +577,8 @@ public class FavoriteDB {
                                 +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE))+";"
                                 +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_DIVISION_FAVORITE))+";"
                                 +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_SEX_FAVORITE))+";"
-                                +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE))+";"
-                                +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE))+";"
+                               // +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE))+";"
+                               // +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE))+";" сделать Task с бекапом. Фотки брать из хранилища и разбирать на base64
                                 +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_TAG_FAVORITE));
                         fileOutputStream.write(row.getBytes());
                         fileOutputStream.write("\n".getBytes());
@@ -663,15 +693,9 @@ public class FavoriteDB {
         return inSampleSize;
     }
 
-    public static String getBase64DefaultPhotoFromResources(String sex){
+    public static String getBase64DefaultPhotoFromResources(){
         try {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            Bitmap bitmap;
-            if (sex.equalsIgnoreCase("М")){
-                bitmap = BitmapFactory.decodeResource(App.getAppContext().getResources(), R.drawable.person_male_colored, options);
-            } else {
-                bitmap = BitmapFactory.decodeResource(App.getAppContext().getResources(), R.drawable.person_female_colored, options);
-            }
+            Bitmap bitmap = BitmapFactory.decodeResource(App.getAppContext().getResources(), R.drawable.ic_user_not_found);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();

@@ -31,7 +31,6 @@ public class GetPersonPhoto extends AsyncTask<Void,Void,Bitmap> {
         mPersonTag = getPersonParams.getPersonTag();
         mPersonImageView = new WeakReference<>(getPersonParams.getPersonImageView()).get();
         mProgressBar = new WeakReference<>(getPersonParams.getPersonImageLoadProgressBar()).get();
-        System.out.println("getPersonPhoto");
     }
 
     @Override
@@ -46,7 +45,7 @@ public class GetPersonPhoto extends AsyncTask<Void,Void,Bitmap> {
     protected Bitmap doInBackground(Void... params) {
 
         String photo = FavoriteDB.getPersonPhoto(mPersonTag, mPhotoLocation, mPhotoDimension);
-        if (photo == null) photo = FavoriteDB.getBase64DefaultPhotoFromResources("М");
+        if (photo == null) photo = FavoriteDB.getBase64DefaultPhotoFromResources();
         byte [] decodedString = Base64.decode(photo, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }

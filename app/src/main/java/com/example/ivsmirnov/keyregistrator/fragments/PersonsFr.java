@@ -372,7 +372,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable {
 
     @Override
     public void onUserChanged(String tag, int position) {
-        PersonItem updatedPerson = FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER, FavoriteDB.NO_PHOTO);
+        PersonItem updatedPerson = FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER);
 
         mPersonsList.get(position)
                 .setLastname(updatedPerson.getLastname())

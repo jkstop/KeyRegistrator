@@ -13,7 +13,6 @@ import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -148,15 +147,15 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
                                     + " = '" + getPesonsTagsResult.getString(SQL_Connection.COLUMN_PERSONS_RADIO_LABEL) + "'");
                             personItemResult.first();
                             if (personItemResult.getRow() != 0){
-                                FavoriteDB.writeInDBTeachers(new PersonItem()
+                                FavoriteDB.addNewUser(new PersonItem()
                                         .setLastname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_LASTNAME))
                                         .setFirstname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_FIRSTNAME))
                                         .setMidname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_MIDNAME))
                                         .setDivision(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_DIVISION))
                                         .setRadioLabel(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_RADIO_LABEL))
-                                        .setSex(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_SEX))
-                                        .setPhotoPreview(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_PREVIEW))
-                                        .setPhotoOriginal(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_ORIGINAL)));
+                                        .setSex(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_SEX)));
+                                        //.setPhotoPreview(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_PREVIEW))
+                                        //.setPhotoOriginal(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_ORIGINAL)));
                             }
 
                             publishProgress(getPesonsTagsResult.getRow());

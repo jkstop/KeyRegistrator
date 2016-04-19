@@ -26,7 +26,9 @@ import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -34,10 +36,12 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
     private ArrayList<RoomItem> mRoomItems;
     private RecycleItemClickListener mListener;
     private int itemWidth;
+    private Context mContext;
 
     public AdapterMainRoomGrid(Context context, ArrayList<RoomItem> roomItems, RecycleItemClickListener listener) {
         this.mRoomItems = roomItems;
         this.mListener = listener;
+        this.mContext = context;
 
         WindowManager mWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
         Display mDisplay = mWindowManager.getDefaultDisplay();
@@ -165,11 +169,18 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 ((auditroomBusyViewHolder)holder).mBusyImagePerson.setLayoutParams(imagePersonParams);
 
-                new GetPersonPhoto(new GetPersonParams()
+                Picasso.with(mContext)
+                        .load(FavoriteDB.getPersonPhotoPath(mRoomItems.get(position).getTag()))
+                        .fit()
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_user_not_found)
+                        .into(((auditroomBusyViewHolder)holder).mBusyImagePerson);
+
+               /* new GetPersonPhoto(new GetPersonParams()
                         .setPersonTag(mRoomItems.get(position).getTag())
                 .setPersonPhotoLocation(FavoriteDB.LOCAL_PHOTO)
                 .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO)
-                .setPersonImageView(((auditroomBusyViewHolder)holder).mBusyImagePerson)).execute();
+                .setPersonImageView(((auditroomBusyViewHolder)holder).mBusyImagePerson)).execute();*/
 
                 break;
         }

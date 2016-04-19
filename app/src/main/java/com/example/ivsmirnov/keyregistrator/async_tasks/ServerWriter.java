@@ -164,7 +164,7 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                             }
                             //получаем список тэгов, которых нет на сервере. Для каждого пишем пользователя
                             for (String tag : compareStringLists(localTags, serverTags)){
-                                writePersonItemToServer(mStatement, FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER, FavoriteDB.ALL_PHOTO));
+                                writePersonItemToServer(mStatement, FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER));
                             }
                         }
                         break;
@@ -301,9 +301,9 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                     +personItem.getMidname() + "','"
                     +personItem.getDivision() + "','"
                     +personItem.getRadioLabel() + "','"
-                    +personItem.getSex() + "','"
-                    +personItem.getPhotoPreview() + "','"
-                    +personItem.getPhotoOriginal() + "')");
+                    +personItem.getSex() + "')");
+                    //+personItem.getPhotoPreview() + "','"
+                    //+personItem.getPhotoOriginal() + "')");
         } catch (Exception e){
             e.printStackTrace();
         }

@@ -19,11 +19,11 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsGrid;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ImageSaver;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
@@ -131,7 +131,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
                     String firstname = null;
                     String midname = null;
 
-                    String photo = FavoriteDB.getBase64DefaultPhotoFromResources("М");
+                    String photo = FavoriteDB.getBase64DefaultPhotoFromResources();
                     try {
                         lastname = split[0];
                         firstname = split[1];
@@ -145,8 +145,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
                     addUserInFavorite(new PersonItem().setLastname(lastname)
                             .setFirstname(firstname)
                             .setMidname(midname)
-                            .setPhotoPreview(FavoriteDB.getPhotoPreview(photo))
-                            .setPhotoOriginal(photo)
+                            .setPhoto(photo)
                             .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1));
                 }
             }
@@ -174,7 +173,6 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
     @Override
     public void onPersonGet(PersonItem personItem) {
-        System.out.println("person item " + personItem.getLastname());
 
         mPersonItemsList.add(personItem);
         mAdapter.notifyDataSetChanged();
@@ -200,7 +198,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
     private void addUserInFavorite(final PersonItem personItem){
 
-        FavoriteDB.writeInDBTeachers(personItem);
+        FavoriteDB.addNewUser(personItem);
 
         if (getView()!=null){
             Snackbar.make(getView(),R.string.snack_user_added,Snackbar.LENGTH_LONG)
@@ -221,7 +219,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
         @Override
         protected PersonItem doInBackground(String... params) {
-            return FavoriteDB.getPersonItem(params[0], FavoriteDB.SERVER_USER, FavoriteDB.ALL_PHOTO);
+            return FavoriteDB.getPersonItem(params[0], FavoriteDB.SERVER_USER);
         }
 
         @Override
