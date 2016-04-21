@@ -81,7 +81,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
         switch (mLoadType){
             case REQUEST_CODE_LOAD_FAVORITE_STAFF:
 
-                FavoriteDB.clearTeachersDB();
+                FavoriteDB.clear();
                 try {
                     while ((line = fin.readLine())!=null){
                         if (i<count){
@@ -124,15 +124,12 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                     String [] split = line.split(";");
 
                                     JournalDB.writeInDBJournal(new JournalItem()
-                                    .setAccountID(split[0])
-                                    .setAuditroom(split[1])
-                                    .setTimeIn(Long.parseLong(split[2]))
-                                    .setTimeOut(Long.parseLong(split[3]))
-                                    .setAccessType(Integer.parseInt(split[4]))
-                                    .setPersonLastname(split[5])
-                                    .setPersonFirstname(split[6])
-                                    .setPersonMidname(split[7])
-                                    .setPersonPhoto(split[8]));
+                                            .setAccountID(split[0])
+                                            .setAuditroom(split[1])
+                                            .setTimeIn(Long.parseLong(split[2]))
+                                            .setTimeOut(Long.parseLong(split[3]))
+                                            .setAccessType(Integer.parseInt(split[4]))
+                                            .setPersonInitials(FavoriteDB.getPersonInitials(FavoriteDB.FULL_INITIALS, split[5], split[6], split[7])));
                                 }catch (Exception e){
                                     e.printStackTrace();
                                 }

@@ -15,7 +15,7 @@ public class PersonItem {
     private String PhotoPath;
     private String Photo;
     private String RadioLabel;
-    private int AccessType = 0;
+    private int AccessType;
 
     public boolean isEmpty(){
         return Lastname.equals(Values.EMPTY) &&

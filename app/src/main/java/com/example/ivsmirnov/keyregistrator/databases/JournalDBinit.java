@@ -12,29 +12,25 @@ import android.util.Log;
 public class JournalDBinit extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String name = "Journal.db";
-    private static final int version = 5;
+    private static final int version = 7;
 
-    public static final String TABLE_JOURNAL = "Журнал";
+    public static final String TABLE_JOURNAL = "Journal";
     public static final String COLUMN_USER_ID = "id_пользователя";
-    public static final String COLUMN_AUD = "Аудитория";
-    public static final String COLUMN_TIME_IN = "Взял";
-    public static final String COLUMN_TIME_OUT = "Сдал";
+    public static final String COLUMN_AUD = "Помещение";
+    public static final String COLUMN_TIME_IN = "Вход";
+    public static final String COLUMN_TIME_OUT = "Выход";
     public static final String COLUMN_ACCESS_TYPE = "Доступ";
-    public static final String COLUMN_PERSON_LASTNAME = "Фамилия";
-    public static final String COLUMN_PERSON_FIRSTNAME = "Имя";
-    public static final String COLUMN_PERSON_MIDNAME = "Отчество";
-    public static final String COLUMN_PERSON_PHOTO_PATH = "Фото";
+    public static final String COLUMN_PERSON_INITIALS = "ФИО";
+    public static final String COLUMN_PERSON_TAG = "Тэг";
 
     private static final String SQL_CREATE_BASE_JOURNAL = "create table " + TABLE_JOURNAL + " (" + BaseColumns._ID + " integer primary key autoincrement, "
-            + COLUMN_USER_ID + " text not null, "
-            + COLUMN_AUD + " text not null, "
+            + COLUMN_USER_ID + " text, "
+            + COLUMN_AUD + " text, "
             + COLUMN_TIME_IN + " long, "
             + COLUMN_TIME_OUT + " long, "
             + COLUMN_ACCESS_TYPE + " integer, "
-            + COLUMN_PERSON_LASTNAME + " text not null, "
-            + COLUMN_PERSON_FIRSTNAME + " text not null, "
-            + COLUMN_PERSON_MIDNAME + " text not null, "
-            + COLUMN_PERSON_PHOTO_PATH + " text not null);";
+            + COLUMN_PERSON_INITIALS + " text, "
+            + COLUMN_PERSON_TAG + " text);";
 
     private static final String SQL_DELETE_BASE_JOURNAL = "DROP TABLE IF EXISTS "
             + TABLE_JOURNAL;

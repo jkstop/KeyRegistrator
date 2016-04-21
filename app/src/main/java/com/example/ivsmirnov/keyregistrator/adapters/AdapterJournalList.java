@@ -12,21 +12,27 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetJournal;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.items.JournalItem;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
+import com.squareup.picasso.Picasso;
 
+import java.sql.Time;
 import java.util.ArrayList;
 
 public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.ViewHolderJournalItem> {
 
     private final Context context;
-    private ArrayList<Long> mJournalItemTags;
+    private ArrayList<JournalItem> mJournalItems;
     private RecycleItemClickListener mListener;
+    private JournalItem mBindedItem;
 
 
-    public AdapterJournalList(Context context, RecycleItemClickListener recycleItemClickListener, ArrayList<Long> mJournalItemTags) {
+    public AdapterJournalList(Context context, RecycleItemClickListener recycleItemClickListener, ArrayList<JournalItem> journalItems) {
         this.context = context;
-        this.mJournalItemTags = mJournalItemTags;
+        this.mJournalItems = journalItems;
         this.mListener = recycleItemClickListener;
     }
 
@@ -37,7 +43,7 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
         rowView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                mListener.onItemLongClick(v,viewHolderJournalItem.getLayoutPosition(), mJournalItemTags.get(viewHolderJournalItem.getLayoutPosition()));
+                mListener.onItemLongClick(v,viewHolderJournalItem.getLayoutPosition(), mJournalItems.get(viewHolderJournalItem.getLayoutPosition()).getTimeIn());
                 return true;
             }
         });
@@ -51,8 +57,32 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
 
     @Override
     public void onBindViewHolder(ViewHolderJournalItem holder, int position) {
-//сделать загрузку из JourbalItem, фотку из Picasso
-        new GetJournal(new GetJournalParams()
+        mBindedItem = mJournalItems.get(position);
+
+        holder.mTextPesonInitials.setText(mBindedItem.getPersonInitials());
+        holder.mTextAuditroom.setText(mBindedItem.getAuditroom());
+        holder.mTextTimeIn.setText(String.valueOf(new Time(mBindedItem.getTimeIn())));
+
+        if (mBindedItem.getTimeOut() == 0){
+            holder.mTextTimeOut.setText(R.string.journal_card_during_lesson);
+        } else {
+            holder.mTextTimeOut.setText(String.valueOf(new Time(mBindedItem.getTimeOut())));
+        }
+
+        if (mBindedItem.getAccessType() == FavoriteDB.CLICK_USER_ACCESS){
+            holder.mImageAccess.setImageResource(R.drawable.ic_touch_app_black_24dp);
+        } else {
+            holder.mImageAccess.setImageResource(R.drawable.ic_credit_card_black_24dp);
+        }
+
+        Picasso.with(context)
+                .load(FavoriteDB.getPersonPhotoPath(mBindedItem.getPersonTag()))
+                .resizeDimen(R.dimen.journal_item_card_image_width, R.dimen.journal_item_card_height)
+                .centerCrop()
+                .placeholder(R.drawable.ic_user_not_found)
+                .into(holder.mImagePerson);
+
+        /*new GetJournal(new GetJournalParams()
                 .setTimeIn(mJournalItemTags.get(position))
                 .setCard(holder.mCard)
                 .setImagePerson(holder.mImagePerson)
@@ -64,12 +94,17 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
                 //.setTextMidname(holder.mTextMidname)
                 .setTextTimeIn(holder.mTextTimeIn)
                 .setTextTimeOut(holder.mTextTimeOut),
-                AnimationUtils.loadAnimation(context, android.R.anim.fade_in)).execute();
+                AnimationUtils.loadAnimation(context, android.R.anim.fade_in)).execute();*/
     }
 
     @Override
     public int getItemCount() {
-        return mJournalItemTags.size();
+        return mJournalItems.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return mJournalItems.get(position).getTimeIn();
     }
 
     static class ViewHolderJournalItem extends RecyclerView.ViewHolder{

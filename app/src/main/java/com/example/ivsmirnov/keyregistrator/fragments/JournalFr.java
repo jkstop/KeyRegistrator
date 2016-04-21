@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -39,11 +41,14 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
+import com.example.ivsmirnov.keyregistrator.interfaces.Updatable;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
+import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,16 +56,21 @@ import java.util.Date;
 import java.util.Locale;
 
 
-public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnNavigationListener {
+public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnNavigationListener, RecycleItemClickListener, Updatable {
 
     public static final int REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION = 203;
+
+    private static final int HANDLER_SHOW_PROGRESS = 100;
+    private static final int HANDLER_HIDE_PROGRESS = 101;
+    private static final int HANDLER_DATA_CHANGED = 102;
 
     private Context mContext;
     private RecyclerView mJournalRecycler;
     private ActionBar mActionBar;
     private ArrayList<String> mDates;
     private AdapterJournalList mAdapterjournallist;
-    private ArrayList <Long> mJournalTags;
+    private ArrayList <JournalItem> mJournalItems;
+    private static Handler mHandler;
 
     private ProgressBar mLoadingBar;
 
@@ -72,6 +82,25 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        mHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what){
+                    case HANDLER_SHOW_PROGRESS:
+                        mLoadingBar.setVisibility(View.VISIBLE);
+                        break;
+                    case HANDLER_HIDE_PROGRESS:
+                        mLoadingBar.setVisibility(View.INVISIBLE);
+                        break;
+                    case HANDLER_DATA_CHANGED:
+                        mAdapterjournallist.notifyDataSetChanged();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
     }
 
     @Override
@@ -84,8 +113,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
         showDateSpinner();
     }
 
-    public static ArrayList<String> getDates(Context context){
-
+    public static ArrayList<String> getDates(){
         return JournalDB.readJournalDatesFromDB();
     }
 
@@ -117,10 +145,18 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_journal_fr,container,false);
         mContext = rootView.getContext();
+        mJournalItems = new ArrayList<>();
+        mDates = new ArrayList<>();
 
         mJournalRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_journal);
         mLoadingBar = (ProgressBar)rootView.findViewById(R.id.layout_journal_fragment_loading_progress_bar);
-        mDates = getDates(mContext);
+        mDates.addAll(getDates());
+
+        mAdapterjournallist = new AdapterJournalList(mContext, this, mJournalItems);
+        mAdapterjournallist.setHasStableIds(true);
+        mJournalRecycler.setLayoutManager(new LinearLayoutManager(mContext));
+        mJournalRecycler.setAdapter(mAdapterjournallist);
+        mJournalRecycler.scrollToPosition(mJournalItems.size()-1);
         return rootView;
 
     }
@@ -189,97 +225,24 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
 
     @Override
     public void updateInformation() {
-        mDates = getDates(mContext);
-        Date date = null;
-        if (mDates.size()!=0){
-            try {
-                date = new SimpleDateFormat("dd MMM yyyy", new Locale("RU","ru")).parse(mDates.get(0));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }else{
-            date = new Date(System.currentTimeMillis());
+        if (!mDates.isEmpty()) mDates.clear();
+        mDates.addAll(getDates());
+
+        if (mDates.size() == 0){ //если дат нет (т.е. журнал пуст), то очищаем список
+            mJournalItems.clear();
+            mAdapterjournallist.notifyDataSetChanged();
         }
 
-        try {
-            new getJournalForDate(date).execute();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         showDateSpinner();
-    }
-
-    private void initializeJournal(){
-        mAdapterjournallist = new AdapterJournalList(mContext, new RecycleItemClickListener() {
-            @Override
-            public void onItemClick(View v, int position, int viewID) {
-
-            }
-
-            @Override
-            public void onItemLongClick(View v, final int position, final long timeIn) {
-                showDeleteItemDialog(position, timeIn);
-            }
-        }, mJournalTags);
-
-        mJournalRecycler.setLayoutManager(new LinearLayoutManager(mContext));
-        mJournalRecycler.setAdapter(mAdapterjournallist);
-        mJournalRecycler.scrollToPosition(mJournalTags.size()-1);
-    }
-
-    private void showDeleteItemDialog(final int clickedPosition, final long clickedTag){
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        View dialogView = View.inflate(mContext, R.layout.view_dialog_delete_journal_item, null);
-        CardView selectedCard = (CardView)dialogView.findViewById(R.id.view_dialog_delete_journal_item_card);
-        final CheckBox deleteFromJournalCheck = (CheckBox)dialogView.findViewById(R.id.view_dialog_delete_journal_item_delete_from_journal_check);
-        final CheckBox deleteFromServerCheck = (CheckBox)dialogView.findViewById(R.id.view_dialog_delete_journal_item_delete_from_server_check);
-
-        new GetJournal(new GetJournalParams()
-                .setCard(selectedCard)
-                .setTextAuditroom((TextView)selectedCard.findViewById(R.id.card_journal_item_text_auditroom))
-                .setImagePerson((ImageView)selectedCard.findViewById(R.id.card_journal_item_person_image))
-                .setTextInitials((TextView)selectedCard.findViewById(R.id.card_journal_item_person_initials))
-                .setTextTimeIn((TextView)selectedCard.findViewById(R.id.card_journal_item_time_in))
-                .setTextTimeOut((TextView)selectedCard.findViewById(R.id.card_journal_item_time_out))
-                .setTimeIn(clickedTag),
-                AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in))
-                .execute();
-        builder.setTitle(R.string.title_dialog_delete_journal_item)
-                .setView(dialogView)
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                })
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        if (deleteFromJournalCheck.isChecked()){ //удаление из журнала
-                            mJournalTags.remove(clickedPosition);
-                            mAdapterjournallist.notifyItemRemoved(clickedPosition);
-                            JournalDB.deleteFromDB(clickedTag);
-                        }
-
-                        if (deleteFromServerCheck.isChecked()){ //удаление с сервера
-                            new ServerWriter(clickedTag).execute(ServerWriter.JOURNAL_DELETE_ONE);
-                        }
-
-
-                    }
-                })
-                .setCancelable(true);
-        Dialog dialog = builder.create();
-        dialog.show();
     }
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        System.out.println("selected navigation item " + mDates.get(itemPosition));
         Date date;
         try {
             date = new SimpleDateFormat("dd MMM yyyy", new Locale("RU","ru")).parse(mDates.get(itemPosition));
-            new getJournalForDate(date).execute();
+            getJournal(date).start();
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -287,33 +250,43 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
         return false;
     }
 
-    private class getJournalForDate extends AsyncTask<Void,Void,Void>{
+    @Override
+    public void onItemClick(View v, int position, int viewID) {
 
-        private Date mDate;
-        private getJournalForDate(Date date){
-            this.mDate = date;
-        }
+    }
 
-        @Override
-        protected void onPreExecute() {
-            System.out.println("get journal for date ************************");
-            mLoadingBar.setVisibility(View.VISIBLE);
-        }
+    @Override
+    public void onItemLongClick(View v, int position, long timeIn) {
+        Dialogs dialogs = new Dialogs();
+        Bundle bundle = new Bundle();
+        bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.DELETE_JOURNAL_ITEM);
+        bundle.putLong(Dialogs.BUNDLE_TAG, timeIn);
+        bundle.putInt(Dialogs.BUNDLE_POSITION, position);
+        dialogs.setArguments(bundle);
+        dialogs.setTargetFragment(this,0);
+        dialogs.show(getFragmentManager(), getResources().getString(R.string.title_dialog_delete_journal_item));
+    }
 
-        @Override
-        protected Void doInBackground(Void... params) {
+    private Thread getJournal (final Date date){
+        return new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mHandler.sendEmptyMessage(HANDLER_SHOW_PROGRESS);
+                if (!mJournalItems.isEmpty()) mJournalItems.clear();
+                mJournalItems.addAll(JournalDB.getJournalItemsForCurrentDate(date));
+                mHandler.sendEmptyMessage(HANDLER_HIDE_PROGRESS);
+                mHandler.sendEmptyMessage(HANDLER_DATA_CHANGED);
+            }
+        });
+    }
 
-            mJournalTags = JournalDB.getJournalItemTags(mDate);
+    @Override
+    public void onItemDeleted(int position) {
+        mJournalItems.remove(position);
+        mAdapterjournallist.notifyDataSetChanged();
+    }
 
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            System.out.println("get journal for date -------------------------");
-            mLoadingBar.setVisibility(View.INVISIBLE);
-
-            initializeJournal();
-        }
+    @Override
+    public void onItemChanged(String tag, int position) {
     }
 }

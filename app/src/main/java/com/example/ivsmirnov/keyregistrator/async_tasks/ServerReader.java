@@ -90,14 +90,12 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
                                 if (journalItemResult.getRow() != 0){
                                     JournalDB.writeInDBJournal(new JournalItem()
                                             .setAccountID(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_ACCOUNT_ID))
-                                            .setAuditroom(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_AUDITROOM))
+                                            .setAuditroom(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_ROOM))
                                             .setTimeIn(journalItemResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN))
                                             .setTimeOut(journalItemResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT))
                                             .setAccessType(journalItemResult.getInt(SQL_Connection.COLUMN_JOURNAL_ACCESS))
-                                            .setPersonLastname(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_LASTNAME))
-                                            .setPersonFirstname(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_FIRSTNAME))
-                                            .setPersonMidname(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_MIDNAME))
-                                            .setPersonPhoto(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_PHOTO)));
+                                            .setPersonInitials(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_PERSON_INITIALS))
+                                            .setPersonTag(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_PERSON_TAG)));
                                 }
 
                             publishProgress(getJournalTagsResult.getRow());
@@ -125,9 +123,10 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
 
                         //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
 
+                        //получаем число отсутствующих в устройстве записей и устанавливаем это значение как MAX в диалоге
                         if (mProgressDialog!=null){
-                            ResultSet getCountResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " FROM " + SQL_Connection.PERSONS_TABLE
-                                            + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " NOT IN (" + getInClause(mPersonsTags) + ")"
+                            ResultSet getCountResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_PERSONS_TAG + " FROM " + SQL_Connection.PERSONS_TABLE
+                                            + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " NOT IN (" + getInClause(mPersonsTags) + ")"
                                     ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
                             getCountResult.last();
                             mProgressDialog.setMax(getCountResult.getRow());
@@ -136,15 +135,15 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
 
                         //выбираем тэги записей, которые есть на сервере, но нет в устройстве. Получаем по тэгу запись,пишем в устройство
                         //можно было бы получить сразу всю строчку целиком, а не только тэги, но тогда все зависает нафиг
-                        ResultSet getPesonsTagsResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " FROM " + SQL_Connection.PERSONS_TABLE
-                                + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " NOT IN (" + getInClause(mPersonsTags) + ")"
+                        ResultSet getPesonsTagsResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_PERSONS_TAG + " FROM " + SQL_Connection.PERSONS_TABLE
+                                + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " NOT IN (" + getInClause(mPersonsTags) + ")"
                                 ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
                         ResultSet personItemResult;
 
                         while (getPesonsTagsResult.next()){
                             personItemResult = mStatement.executeQuery("SELECT * FROM " +SQL_Connection.PERSONS_TABLE
-                                    + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL
-                                    + " = '" + getPesonsTagsResult.getString(SQL_Connection.COLUMN_PERSONS_RADIO_LABEL) + "'");
+                                    + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG
+                                    + " = '" + getPesonsTagsResult.getString(SQL_Connection.COLUMN_PERSONS_TAG) + "'");
                             personItemResult.first();
                             if (personItemResult.getRow() != 0){
                                 FavoriteDB.addNewUser(new PersonItem()
@@ -152,10 +151,9 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
                                         .setFirstname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_FIRSTNAME))
                                         .setMidname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_MIDNAME))
                                         .setDivision(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_DIVISION))
-                                        .setRadioLabel(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_RADIO_LABEL))
-                                        .setSex(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_SEX)));
-                                        //.setPhotoPreview(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_PREVIEW))
-                                        //.setPhotoOriginal(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_ORIGINAL)));
+                                        .setRadioLabel(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_TAG))
+                                        .setSex(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_SEX))
+                                        .setPhoto(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_BASE64)));
                             }
 
                             publishProgress(getPesonsTagsResult.getRow());
@@ -166,8 +164,7 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
                         ArrayList<String> mRooms = RoomDB.getRoomList();
                         mResult = connection.prepareStatement("SELECT * FROM " + SQL_Connection.ROOMS_TABLE
                                 + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " NOT IN (" + getInClause(mRooms) + ")").executeQuery();
-                        //mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.ROOMS_TABLE
-                        //        + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " NOT IN (" + getInClause(mRooms) + ")");
+
                         while (mResult.next()){
                             RoomDB.writeInRoomsDB(new RoomItem()
                                     .setAuditroom(mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM))

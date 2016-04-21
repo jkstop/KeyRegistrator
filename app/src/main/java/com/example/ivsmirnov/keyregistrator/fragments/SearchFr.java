@@ -146,6 +146,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
                             .setFirstname(firstname)
                             .setMidname(midname)
                             .setPhoto(photo)
+                            .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
                             .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1));
                 }
             }
@@ -219,7 +220,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
         @Override
         protected PersonItem doInBackground(String... params) {
-            return FavoriteDB.getPersonItem(params[0], FavoriteDB.SERVER_USER);
+            return FavoriteDB.getPersonItem(params[0], FavoriteDB.SERVER_USER,false);
         }
 
         @Override

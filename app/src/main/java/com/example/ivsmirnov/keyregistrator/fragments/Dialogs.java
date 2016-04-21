@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -39,6 +38,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGridResizer;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.async_tasks.GetJournal;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
@@ -46,6 +46,7 @@ import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.Updatable;
+import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
 import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
@@ -54,6 +55,7 @@ import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -62,7 +64,8 @@ public class Dialogs extends DialogFragment{
 
     public static final String DIALOG_TYPE = "dialog_type";
     public static final String DIALOG_ENTER_PASSWORD_TYPE = "dialog_enter_password_type";
-    public static final String DIALOG_PERSON_INFORMATION_KEY_TAG = "DIALOG_PERSON_INFORMATION_KEY_TAG";
+    public static final String BUNDLE_TAG = "BUNDLE_TAG";
+    public static final String BUNDLE_POSITION = "BUNDLE_POSITION";
     public static final String DIALOG_PERSON_INFORMATION_KEY_POSITION = "DIALOG_PERSON_INFORMATION_KEY_POSITION";
 
     public static final int DIALOG_EDIT = 100;
@@ -77,6 +80,7 @@ public class Dialogs extends DialogFragment{
     public static final int DIALOG_ENTER_PASSWORD = 109;
     public static final int DIALOG_LOG_OUT = 110;
     public static final int SEARCH_PERSONS = 111;
+    public static final int DELETE_JOURNAL_ITEM = 112;
 
     public static final int DIALOG_ENTER_PASSWORD_TYPE_ACCESS_FOR_PERSONS = 111;
     public static final int DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM = 112;
@@ -154,7 +158,7 @@ public class Dialogs extends DialogFragment{
                             public void onClick(DialogInterface dialog, int which) {
 
                                 if (checkClearTeachersLocal.isChecked()){
-                                    FavoriteDB.clearTeachersDB();
+                                    FavoriteDB.clear();
                                     updateInformation();
                                 }
 
@@ -176,7 +180,7 @@ public class Dialogs extends DialogFragment{
                 final TextInputLayout inputMidname = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_midname_layout);
                 final TextInputLayout inputDivision = (TextInputLayout)dialogView.findViewById(R.id.person_information_text_division_layout);
                 final AppCompatCheckBox accessType = (AppCompatCheckBox) dialogView.findViewById(R.id.person_information_access_type);
-                final String tag = getArguments().getString(DIALOG_PERSON_INFORMATION_KEY_TAG);
+                final String tag = getArguments().getString(BUNDLE_TAG);
                 final int position = getArguments().getInt(DIALOG_PERSON_INFORMATION_KEY_POSITION);
 
                 //интерфейс
@@ -185,15 +189,20 @@ public class Dialogs extends DialogFragment{
                 //получаем пользователя и заполняем поля
                 new GetPersons(mContext, null, null).execute(new GetPersonParams()
                         .setPersonLocation(FavoriteDB.LOCAL_USER)
-                        .setPersonPhotoDimension(FavoriteDB.FULLSIZE_PHOTO)
                         .setPersonTag(tag)
-                        .setPersonImageView(personImage)
                         .setPersonLastname(inputLastname.getEditText())
                         .setPersonFirstname(inputFirstname.getEditText())
                         .setPersonMidname(inputMidname.getEditText())
                         .setAccessTypeContainer(accessType)
                         .setFreeUser(FavoriteDB.getPersonAccessType(tag) == FavoriteDB.CLICK_USER_ACCESS)
                         .setPersonDivision(inputDivision.getEditText()));
+
+                Picasso.with(mContext)
+                        .load(FavoriteDB.getPersonPhotoPath(tag))
+                        .fit()
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_user_not_found)
+                        .into(personImage);
 
                 AlertDialog.Builder builderEdit = new AlertDialog.Builder(getActivity());
                 builderEdit.setView(dialogView);
@@ -204,7 +213,7 @@ public class Dialogs extends DialogFragment{
                         public void onClick(DialogInterface dialog, int which) {
                             if (tag!=null){
 
-                                updateInterface.onUserDeleted(position);
+                                updateInterface.onItemDeleted(position);
 
                                 FavoriteDB.deleteUser(tag);
 
@@ -241,7 +250,7 @@ public class Dialogs extends DialogFragment{
                                     .setDivision(inputDivision.getEditText().getText().toString())
                                     .setAccessType(access));
 
-                           updateInterface.onUserChanged(tag, position);
+                           updateInterface.onItemChanged(tag, position);
                             //updateInformation();
                         }
                     });
@@ -383,12 +392,13 @@ public class Dialogs extends DialogFragment{
                         .create();
 
             case DIALOG_RESIZE_ITEMS:
+                /*
                 View rootView =  View.inflate(mContext, R.layout.view_resize_main_fragment_items, null);
-                final CardView cardView = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
+                //final CardView cardView = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
                 final SeekBar mResizeSeekBar = (SeekBar)rootView.findViewById(R.id.view_resize_vertical_seekbar);
                 mFrameGrid = (FrameLayout)rootView.findViewById(R.id.frame_for_grid_aud);
 
-                final LinearLayout.LayoutParams cardViewLayoutParams = (LinearLayout.LayoutParams)cardView.getLayoutParams();
+                //final LinearLayout.LayoutParams cardViewLayoutParams = (LinearLayout.LayoutParams)cardView.getLayoutParams();
                 final LinearLayout.LayoutParams frameGridParams = (LinearLayout.LayoutParams)mFrameGrid.getLayoutParams();
 
                 RecyclerView mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
@@ -400,15 +410,15 @@ public class Dialogs extends DialogFragment{
                 int weightCard = Settings.getDisclaimerWeight();
                 mResizeSeekBar.setMax(100);
                 mResizeSeekBar.setProgress(weightCard);
-                cardViewLayoutParams.weight = weightCard;
+                //cardViewLayoutParams.weight = weightCard;
                 frameGridParams.weight = mResizeSeekBar.getMax() - weightCard;
                 mResizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-                        cardViewLayoutParams.weight = progress;
+                        //cardViewLayoutParams.weight = progress;
                         frameGridParams.weight = mResizeSeekBar.getMax() - progress;
-                        cardView.requestLayout();
+                        //cardView.requestLayout();
                         mFrameGrid.requestLayout();
                         mAdapter.notifyDataSetChanged();
 
@@ -447,7 +457,7 @@ public class Dialogs extends DialogFragment{
                                 dismiss();
                             }
                         })
-                        .show();
+                        .show();*/
             case DIALOG_ENTER_PASSWORD:
 
                 final CloseRoomInterface mCloseRoomInterface = (CloseRoomInterface)getActivity();
@@ -604,6 +614,48 @@ public class Dialogs extends DialogFragment{
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
+                            }
+                        })
+                        .create();
+            case DELETE_JOURNAL_ITEM:
+                final long timeInTag = getArguments().getLong(BUNDLE_TAG);
+                final int clickedPosition = getArguments().getInt(BUNDLE_POSITION);
+                View deleteJournalItemView = View.inflate(mContext, R.layout.view_dialog_delete_journal_item, null);
+                CardView selectedCard = (CardView)deleteJournalItemView.findViewById(R.id.view_dialog_delete_journal_item_card);
+                final CheckBox deleteFromJournalCheck = (CheckBox)deleteJournalItemView.findViewById(R.id.view_dialog_delete_journal_item_delete_from_journal_check);
+                final CheckBox deleteFromServerCheck = (CheckBox)deleteJournalItemView.findViewById(R.id.view_dialog_delete_journal_item_delete_from_server_check);
+                final Updatable updatable = (Updatable)getTargetFragment();
+                new GetJournal(new GetJournalParams()
+                        .setCard(selectedCard)
+                        .setTextAuditroom((TextView)selectedCard.findViewById(R.id.card_journal_item_text_auditroom))
+                        .setImagePerson((ImageView)selectedCard.findViewById(R.id.card_journal_item_person_image))
+                        .setTextInitials((TextView)selectedCard.findViewById(R.id.card_journal_item_person_initials))
+                        .setTextTimeIn((TextView)selectedCard.findViewById(R.id.card_journal_item_time_in))
+                        .setTextTimeOut((TextView)selectedCard.findViewById(R.id.card_journal_item_time_out))
+                        .setTimeIn(timeInTag),
+                        AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in))
+                        .execute();
+
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.title_dialog_delete_journal_item)
+                        .setView(deleteJournalItemView)
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (deleteFromJournalCheck.isChecked()){ //удаление из журнала
+                                    JournalDB.deleteFromDB(timeInTag);
+                                    updatable.onItemDeleted(clickedPosition);
+                                }
+
+                                if (deleteFromServerCheck.isChecked()){ //удаление с сервера
+                                    new ServerWriter(timeInTag).execute(ServerWriter.JOURNAL_DELETE_ONE);
+                                }
                             }
                         })
                         .create();

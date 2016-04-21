@@ -670,7 +670,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
             try{
                 //если нет в базе, то добавить
                 if (!FavoriteDB.isUserInBase(params[0])){
-                    mValidUser = FavoriteDB.addNewUser(FavoriteDB.getPersonItem(params[0], FavoriteDB.SERVER_USER));
+                    mValidUser = FavoriteDB.addNewUser(FavoriteDB.getPersonItem(params[0], FavoriteDB.SERVER_USER, false));
 
                     //если не удалось добавить, то карта некорректна. Показать тост
                     if (!mValidUser) runOnUiThread(new Runnable() {
@@ -703,7 +703,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
                         Bundle b = new Bundle();
                         b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_EDIT);
-                        b.putString(Dialogs.DIALOG_PERSON_INFORMATION_KEY_TAG, personTag);
+                        b.putString(Dialogs.BUNDLE_TAG, personTag);
 
                         Dialogs dialog = new Dialogs();
                         dialog.setArguments(b);

@@ -16,6 +16,27 @@ public class JournalItem {
     private String PersonMidname = Values.EMPTY;
     private String PersonPhoto;
     private String PersonPhotoPath;
+    private String PersonInitials;
+    private String PersonTag;
+
+    public JournalItem setPersonTag (String tag){
+        this.PersonTag = tag;
+        return this;
+    }
+
+    public String getPersonTag(){
+        return PersonTag;
+    }
+
+    public JournalItem setPersonInitials (String initials){
+        this.PersonInitials = initials;
+        return this;
+    }
+
+    public String getPersonInitials(){
+        return PersonInitials;
+    }
+
 
     public JournalItem setPersonPhotoPath(String photoPath){
         this.PersonPhotoPath = photoPath;

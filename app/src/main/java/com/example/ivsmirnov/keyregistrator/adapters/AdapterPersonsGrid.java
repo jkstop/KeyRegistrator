@@ -110,31 +110,22 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
         holder.imageView.setImageDrawable(null);
 
         if (mType== SHOW_FAVORITE_PERSONS){
-
             if (mPersonList.get(position).getAccessType() == FavoriteDB.CLICK_USER_ACCESS){
                 holder.accessImageView.setImageResource(R.drawable.ic_touch_app_black_24dp);
             } else {
                 holder.accessImageView.setImageResource(R.drawable.ic_credit_card_black_24dp);
             }
-
             //загрузка фото из хранилища
             Picasso.with(mContext)
-                    .load(new ImageSaver(mContext).setFileName(mPersonList.get(position).getRadioLabel()).getImage())
+                    .load(FavoriteDB.getPersonPhotoPath(mPersonList.get(position).getRadioLabel()))
                     .fit()
                     .centerCrop()
                     .placeholder(R.drawable.ic_user_not_found)
                     .into(holder.imageView);
 
-            /*new GetPersonPhoto(new GetPersonParams()
-                    .setPersonTag(mPersonList.get(position).getRadioLabel())
-                    .setPersonPhotoLocation(FavoriteDB.LOCAL_PHOTO)
-                    .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO)
-                    .setPersonImageView(holder.imageView)
-                    .setPersonImageLoadProgressBar(holder.progressBar)).execute();*/
-
         }else if (mType == SHOW_ALL_PERSONS){
 
-            //загрузка фото с сервера, сборка в Bitmap и вывод в ImageView
+            //загрузка фото с сервера, сборка в Bitmap и вывод в ImageView. Пока так, а вообще надо хранить фотки на сервере и обращаться к ним по url
             new GetPersonPhoto(new GetPersonParams()
                     .setPersonTag(mPersonList.get(position).getRadioLabel())
                     .setPersonPhotoLocation(FavoriteDB.SERVER_PHOTO)

@@ -138,7 +138,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable {
 
                     Bundle b = new Bundle();
                     b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_EDIT);
-                    b.putString(Dialogs.DIALOG_PERSON_INFORMATION_KEY_TAG, mPersonsList.get(position).getRadioLabel());
+                    b.putString(Dialogs.BUNDLE_TAG, mPersonsList.get(position).getRadioLabel());
                     b.putInt(Dialogs.DIALOG_PERSON_INFORMATION_KEY_POSITION, position);
 
                     Dialogs dialog = new Dialogs();
@@ -365,14 +365,14 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable {
     }
 
     @Override
-    public void onUserDeleted(int position) {
+    public void onItemDeleted(int position) {
         mPersonsList.remove(position);
         mAdapter.notifyItemRemoved(position);
     }
 
     @Override
-    public void onUserChanged(String tag, int position) {
-        PersonItem updatedPerson = FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER);
+    public void onItemChanged(String tag, int position) {
+        PersonItem updatedPerson = FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER, false);
 
         mPersonsList.get(position)
                 .setLastname(updatedPerson.getLastname())

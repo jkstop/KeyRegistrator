@@ -35,7 +35,7 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private ArrayList<RoomItem> mRoomItems;
     private RecycleItemClickListener mListener;
-    private int itemWidth;
+    //private int itemWidth;
     private Context mContext;
 
     public AdapterMainRoomGrid(Context context, ArrayList<RoomItem> roomItems, RecycleItemClickListener listener) {
@@ -45,7 +45,7 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
 
         WindowManager mWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
         Display mDisplay = mWindowManager.getDefaultDisplay();
-        itemWidth = (mDisplay.getWidth() - (context.getResources().getDimensionPixelSize(R.dimen.layout_margin_right)*2)) / 3;
+        //itemWidth = (mDisplay.getWidth() - (context.getResources().getDimensionPixelSize(R.dimen.layout_margin_right)*2)) / 3;
     }
 
     static class auditroomFreeViewHolder extends RecyclerView.ViewHolder{
@@ -142,13 +142,9 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
                 ((auditroomFreeViewHolder) holder).mFreeTextAuditroom.setText(mRoomItems.get(position).getAuditroom());
 
                 RelativeLayout.LayoutParams imageKeyLayoutParams = (RelativeLayout.LayoutParams) ((auditroomFreeViewHolder)holder).mFreeImageKey.getLayoutParams();
-                imageKeyLayoutParams.width = (int)Math.round(itemWidth /3.5);
+                //imageKeyLayoutParams.width = (int)Math.round(itemWidth /3.5);
 
-                //if (itemWidth / 2 > getItemScaleHeight()){
-                //    imageKeyLayoutParams.width = imageKeyLayoutParams.height = (int) (getItemScaleHeight()/2);
-                //} else {
-                //    imageKeyLayoutParams.width = imageKeyLayoutParams.height = (int) (getItemScaleHeight()/3);
-                //}
+
 
                 break;
             case 0:
@@ -160,12 +156,8 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 RelativeLayout.LayoutParams imagePersonParams = (RelativeLayout.LayoutParams) ((auditroomBusyViewHolder)holder).mBusyImagePerson.getLayoutParams();
 
-                //if (itemWidth / 2 > getItemScaleHeight()){
-                //    imagePersonParams.width = getItemScaleHeight()/2;
-                //} else {
-                //    imagePersonParams.width = getItemScaleHeight()/3;
-                //}
-                imagePersonParams.width = (int)Math.round(itemWidth /3.5);
+
+                //imagePersonParams.width = (int)Math.round(itemWidth /3.5);
 
                 ((auditroomBusyViewHolder)holder).mBusyImagePerson.setLayoutParams(imagePersonParams);
 
@@ -176,11 +168,6 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
                         .placeholder(R.drawable.ic_user_not_found)
                         .into(((auditroomBusyViewHolder)holder).mBusyImagePerson);
 
-               /* new GetPersonPhoto(new GetPersonParams()
-                        .setPersonTag(mRoomItems.get(position).getTag())
-                .setPersonPhotoLocation(FavoriteDB.LOCAL_PHOTO)
-                .setPersonPhotoDimension(FavoriteDB.PREVIEW_PHOTO)
-                .setPersonImageView(((auditroomBusyViewHolder)holder).mBusyImagePerson)).execute();*/
 
                 break;
         }
@@ -198,71 +185,4 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
         return recyclerHeight/recyclerRows;
     }
 
-/*
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        View view;
-
-        Button button;
-        ImageView image;
-        TextView textAud,textPerson;
-
-        if (convertView == null) {
-                if (mRoomItems.get(position).Status==1){
-                    view = inflater.inflate(R.layout.cell_for_grid_is_free, null);
-                }else{
-                    view = inflater.inflate(R.layout.cell_for_grid_is_busy,null);
-                }
-            }else{
-                view = convertView;
-            }
-
-        //int space = (int) context.getResources().getDimension(R.dimen.grid_vertical_spacing);
-        //int heightGrid = MainFr.gridView.getHeight();
-        //int childCount = MainFr.gridView.getCount();
-        //int rows;
-       // rows = (int) Math.ceil((double) childCount / preferences.getInt(Values.COLUMNS_AUD_COUNT, 1));
-        //int btnHeight = heightGrid/rows - space;
-
-        //AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-        //        btnHeight);
-        //view.setLayoutParams(layoutParams);
-
-        if (mRoomItems.get(position).Status==1){
-            image = (ImageView)view.findViewById(R.id.imageButton);
-            textAud = (TextView)view.findViewById(R.id.textButton);
-            textAud.setText(mRoomItems.get(position).Auditroom);
-            view.setBackgroundResource(R.drawable.button_background);
-            image.setImageResource(R.drawable.key_colored);
-        }else{
-            image = (ImageView)view.findViewById(R.id.image_key_person);
-            textAud = (TextView)view.findViewById(R.id.text_aud);
-            textPerson = (TextView)view.findViewById(R.id.textButton);
-
-            if (!mRoomItems.get(position).Photo.equalsIgnoreCase("")){
-                ImageLoader imageLoader = ImageLoader.getInstance();
-                if (!imageLoader.isInited()){
-                    imageLoader.init(ImageLoaderConfiguration.createDefault(context));
-                }
-                imageLoader.displayImage("file://"+mRoomItems.get(position).Photo,image);
-            }else{
-                image.setImageResource(R.drawable.person_male_colored);
-            }
-            textAud.setText(String.valueOf(mRoomItems.get(position).Auditroom));
-            textPerson.setText(mRoomItems.get(position).LastVisiter);
-
-            if (mRoomItems.get(position).Tag.equalsIgnoreCase("99 80 DC 1A 00 00")
-                    ||mRoomItems.get(position).Tag.equalsIgnoreCase("EF 36 83 D9 00 00")
-                    ||mRoomItems.get(position).Tag.equalsIgnoreCase("0F 4B 7C D9 00 00")
-                    ||mRoomItems.get(position).Tag.equalsIgnoreCase("69 B1 D2 29 00 00")){
-                view.setBackgroundResource(R.drawable.button_background_support);
-            }else{
-                view.setBackgroundResource(R.drawable.button_background_selected);
-            }
-        }
-
-        view.setTag(mRoomItems.get(position).Auditroom);
-
-        return view;
-    }*/
 }

@@ -17,31 +17,28 @@ import java.util.Properties;
 public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
 
     //таблицы
-    public static final String JOURNAL_TABLE = "JOURNAL";
-    public static final String PERSONS_TABLE = "TEACHERS";
+    public static final String JOURNAL_TABLE = "JOURNAL_V2";
+    public static final String PERSONS_TABLE = "PERSONS";
     public static final String ROOMS_TABLE = "ROOMS";
     public static final String ALL_STAFF_TABLE = "STAFF_NEW";
 
     //колонки
-    public static final String COLUMN_JOURNAL_ID = "_ID";
     public static final String COLUMN_JOURNAL_ACCOUNT_ID = "ACCOUNT_ID";
-    public static final String COLUMN_JOURNAL_AUDITROOM = "AUDITROOM";
+    public static final String COLUMN_JOURNAL_ROOM = "ROOM";
     public static final String COLUMN_JOURNAL_TIME_IN = "TIME_IN";
     public static final String COLUMN_JOURNAL_TIME_OUT = "TIME_OUT";
     public static final String COLUMN_JOURNAL_ACCESS = "ACCESS";
-    public static final String COLUMN_JOURNAL_LASTNAME = "PERSON_LASTNAME";
-    public static final String COLUMN_JOURNAL_FIRSTNAME = "PERSON_FIRSTNAME";
-    public static final String COLUMN_JOURNAL_MIDNAME = "PERSON_MIDNAME";
-    public static final String COLUMN_JOURNAL_PHOTO = "PERSON_PHOTO";
+    public static final String COLUMN_JOURNAL_PERSON_INITIALS = "PERSON_INITIALS";
+    public static final String COLUMN_JOURNAL_PERSON_TAG = "PERSON_TAG";
 
+    public static final String COLUMN_PERSONS_ACCOUNT_ID = "ACCOUNT_ID";
     public static final String COLUMN_PERSONS_LASTNAME = "LASTNAME";
     public static final String COLUMN_PERSONS_FIRSTNAME = "FIRSTNAME";
     public static final String COLUMN_PERSONS_MIDNAME = "MIDNAME";
     public static final String COLUMN_PERSONS_DIVISION = "DIVISION";
-    public static final String COLUMN_PERSONS_RADIO_LABEL = "RADIO_LABEL";
+    public static final String COLUMN_PERSONS_TAG = "TAG";
     public static final String COLUMN_PERSONS_SEX = "SEX";
-    public static final String COLUMN_PERSONS_PHOTO_PREVIEW = "PHOTO_PREVIEW";
-    public static final String COLUMN_PERSONS_PHOTO_ORIGINAL = "PHOTO_ORIGINAL";
+    public static final String COLUMN_PERSONS_PHOTO_BASE64 = "PHOTO_BASE64";
 
     public static final String COLUMN_ROOMS_ROOM = "ROOM";
     public static final String COLUMN_ROOMS_STATUS = "STATUS";
@@ -86,10 +83,10 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
                     + "database=" + db +";user=" + mServerConnectionItem.getUserName() + ";password="
                     + mServerConnectionItem.getUserPassword() + ";";
 
-            DriverManager.setLoginTimeout(5);
+            DriverManager.setLoginTimeout(10);
 
             Properties properties = new Properties();
-            properties.put("connectTimeout", "60000");
+            properties.put("connectTimeout", "300000");
 
             if (SQLconnect == null){
                 SQLconnect = DriverManager.getConnection(ConnURL, properties);

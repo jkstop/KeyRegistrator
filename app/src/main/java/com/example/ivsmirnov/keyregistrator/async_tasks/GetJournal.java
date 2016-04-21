@@ -14,6 +14,8 @@ import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
+import com.example.ivsmirnov.keyregistrator.others.App;
+import com.squareup.picasso.Picasso;
 
 import java.lang.ref.WeakReference;
 import java.sql.Time;
@@ -76,15 +78,14 @@ public class GetJournal extends AsyncTask<Void,Void,JournalItem> {
             }
         }
 
-        if (mTextInitials!=null) mTextInitials.setText(FavoriteDB
-                .getPersonInitials(FavoriteDB.FULL_INITIALS, journalItem.getPersonLastname(), journalItem.getPersonFirstname(), journalItem.getPersonMidname()));
-
+        if (mTextInitials!=null) mTextInitials.setText(journalItem.getPersonInitials());
 
         if (mImagePerson!=null){
-            if (journalItem.getPersonPhoto()!=null){
-                byte[] decodedString = Base64.decode(journalItem.getPersonPhoto(), Base64.DEFAULT);
-                mImagePerson.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
-            }
+            Picasso.with(App.getAppContext())
+                    .load(FavoriteDB.getPersonPhotoPath(journalItem.getPersonTag()))
+                    .fit()
+                    .centerCrop()
+                    .into(mImagePerson);
         }
 
         if (mImageAccess!=null){

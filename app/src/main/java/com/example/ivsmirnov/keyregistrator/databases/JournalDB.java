@@ -44,10 +44,8 @@ public class JournalDB {
             cv.put(JournalDBinit.COLUMN_TIME_IN, journalItem.getTimeIn());
             cv.put(JournalDBinit.COLUMN_TIME_OUT, journalItem.getTimeOut());
             cv.put(JournalDBinit.COLUMN_ACCESS_TYPE,journalItem.getAccessType());
-            cv.put(JournalDBinit.COLUMN_PERSON_LASTNAME,journalItem.getPersonLastname());
-            cv.put(JournalDBinit.COLUMN_PERSON_FIRSTNAME, journalItem.getPersonFirstname());
-            cv.put(JournalDBinit.COLUMN_PERSON_MIDNAME, journalItem.getPersonMidname());
-            cv.put(JournalDBinit.COLUMN_PERSON_PHOTO_PATH, journalItem.getPersonPhotoPath());
+            cv.put(JournalDBinit.COLUMN_PERSON_INITIALS,journalItem.getPersonInitials());
+            cv.put(JournalDBinit.COLUMN_PERSON_TAG, journalItem.getPersonTag());
 
             long position = mDataBase.insert(JournalDBinit.TABLE_JOURNAL, null, cv);
 
@@ -100,6 +98,54 @@ public class JournalDB {
         }
         return items;
     }
+
+    public static ArrayList<JournalItem> getJournalItemsForCurrentDate (Date date){
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        ArrayList <JournalItem> items = new ArrayList<>();
+        Cursor cursor = null;
+        try {
+            cursor = DbShare.getCursor(DbShare.DB_JOURNAL,
+                    JournalDBinit.TABLE_JOURNAL,
+                    null,
+                    JournalDBinit.COLUMN_USER_ID + " =?",
+                    new String[]{Settings.getActiveAccountID()},
+                    null,
+                    JournalDBinit.COLUMN_TIME_IN,
+                    null);
+            if (cursor.getCount()>0){
+                cursor.moveToPosition(-1);
+                while (cursor.moveToNext()){
+                    if (date!=null){ //если есть дата, то добавляем в список JournalItem с этой датой
+                        if (dateFormat.format(date).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN)))))){
+                            items.add(new JournalItem()
+                                    .setAccountID(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_USER_ID)))
+                                    .setAuditroom(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_AUD)))
+                                    .setAccessType(cursor.getInt(cursor.getColumnIndex(JournalDBinit.COLUMN_ACCESS_TYPE)))
+                                    .setTimeIn(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN)))
+                                    .setTimeOut(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_OUT)))
+                                    .setPersonInitials(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_INITIALS)))
+                                    .setPersonTag(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_TAG))));
+                        }
+                    } else {
+                        items.add(new JournalItem()
+                                .setAccountID(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_USER_ID)))
+                                .setAuditroom(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_AUD)))
+                                .setAccessType(cursor.getInt(cursor.getColumnIndex(JournalDBinit.COLUMN_ACCESS_TYPE)))
+                                .setTimeIn(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN)))
+                                .setTimeOut(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_OUT)))
+                                .setPersonInitials(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_INITIALS)))
+                                .setPersonTag(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_TAG))));
+                    }
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            closeCursor(cursor);
+        }
+        return items;
+    }
+
 
     public static boolean isItemOpened(long timeIn){
         Cursor cursor = null;
@@ -169,10 +215,8 @@ public class JournalDB {
                         .setTimeIn(timeIn)
                         .setTimeOut(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_OUT)))
                         .setAccessType(cursor.getInt(cursor.getColumnIndex(JournalDBinit.COLUMN_ACCESS_TYPE)))
-                        .setPersonLastname(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_LASTNAME)))
-                        .setPersonFirstname(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_FIRSTNAME)))
-                        .setPersonMidname(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_MIDNAME)))
-                        .setPersonPhotoPath(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_PHOTO_PATH)));
+                        .setPersonInitials(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_INITIALS)))
+                        .setPersonTag(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_TAG)));
             } else {
                 return null;
             }
@@ -334,7 +378,7 @@ public class JournalDB {
                 cursor = DbShare.getCursor(DbShare.DB_JOURNAL,
                         JournalDBinit.TABLE_JOURNAL,
                         new String[]{JournalDBinit.COLUMN_USER_ID, JournalDBinit.COLUMN_AUD, JournalDBinit.COLUMN_TIME_IN, JournalDBinit.COLUMN_TIME_OUT,
-                                JournalDBinit.COLUMN_PERSON_LASTNAME, JournalDBinit.COLUMN_PERSON_FIRSTNAME, JournalDBinit.COLUMN_PERSON_MIDNAME},
+                                JournalDBinit.COLUMN_PERSON_INITIALS},
                         JournalDBinit.COLUMN_USER_ID + " =?",
                         new String[]{Settings.getActiveAccountID()},
                         null,
@@ -351,9 +395,7 @@ public class JournalDB {
                         daySheet.addCell(new Label(0,0,cursor.getColumnName(cursor.getColumnIndex(JournalDBinit.COLUMN_AUD))));
                         daySheet.addCell(new Label(1,0,cursor.getColumnName(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN))));
                         daySheet.addCell(new Label(2,0,cursor.getColumnName(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_OUT))));
-                        daySheet.addCell(new Label(3,0,cursor.getColumnName(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_LASTNAME))));
-                        daySheet.addCell(new Label(4,0,cursor.getColumnName(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_FIRSTNAME))));
-                        daySheet.addCell(new Label(5,0,cursor.getColumnName(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_MIDNAME))));
+                        daySheet.addCell(new Label(3,0,cursor.getColumnName(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_INITIALS))));
 
                         while (cursor.moveToNext()){
                             if (datesString.get(i).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN)))))){
@@ -361,9 +403,7 @@ public class JournalDB {
                                     daySheet.addCell(new Label(0,row,cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_AUD))));
                                     daySheet.addCell(new Label(1,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN))))));
                                     daySheet.addCell(new Label(2,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_OUT))))));
-                                    daySheet.addCell(new Label(3,row,cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_LASTNAME))));
-                                    daySheet.addCell(new Label(4,row,cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_FIRSTNAME))));
-                                    daySheet.addCell(new Label(5,row,cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_MIDNAME))));
+                                    daySheet.addCell(new Label(3,row,cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_INITIALS))));
                                     row++;
                                 }
                             }
@@ -408,10 +448,7 @@ public class JournalDB {
                                 +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN))+";"
                                 +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_OUT))+";"
                                 +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_ACCESS_TYPE))+";"
-                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_LASTNAME))+";"
-                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_FIRSTNAME))+";"
-                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_MIDNAME))+";"
-                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_PHOTO_PATH));
+                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_INITIALS));
                         fileOutputStream.write(row.getBytes());
                         fileOutputStream.write("\n".getBytes());
                     }

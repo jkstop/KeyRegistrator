@@ -10,9 +10,9 @@ import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -146,11 +146,12 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                         //Если передан PersonItem, то перезаписываем его. Если нет - пишем всех.
                         if (mPersonItem != null){
                             mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_PERSONS_LASTNAME + " FROM "
-                                    + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " = '" + mPersonItem.getRadioLabel() + "'");
+                                    + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " = '" + mPersonItem.getRadioLabel() + "'"
+                            + " AND " + SQL_Connection.COLUMN_PERSONS_ACCOUNT_ID + " = '" + Settings.getActiveAccountID() + "'");
                             mResult.first();
                             if (mResult.getRow() == 1){ //если такой уже есть, то удаляем
                                 mStatement.executeUpdate("DELETE FROM "
-                                        + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " = '" + mPersonItem.getRadioLabel() + "'");
+                                        + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " = '" + mPersonItem.getRadioLabel() + "'");
                             }
                             //пишем нового пользователя на сервер
                             writePersonItemToServer(mStatement, mPersonItem);
@@ -158,19 +159,19 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                             //Получаем список тегов локальных пользователей и на сервере
                             ArrayList<String> localTags = FavoriteDB.getPersonsTags();
                             ArrayList<String> serverTags = new ArrayList<>();
-                            mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " FROM " + SQL_Connection.PERSONS_TABLE);
+                            mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_PERSONS_TAG + " FROM " + SQL_Connection.PERSONS_TABLE);
                             while (mResult.next()){
-                                serverTags.add(mResult.getString(SQL_Connection.COLUMN_PERSONS_RADIO_LABEL));
+                                serverTags.add(mResult.getString(SQL_Connection.COLUMN_PERSONS_TAG));
                             }
                             //получаем список тэгов, которых нет на сервере. Для каждого пишем пользователя
                             for (String tag : compareStringLists(localTags, serverTags)){
-                                writePersonItemToServer(mStatement, FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER));
+                                writePersonItemToServer(mStatement, FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER, true));
                             }
                         }
                         break;
                     case PERSON_DELETE_ONE:
                         if (mTag!=null){
-                            mStatement.execute("DELETE FROM " + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_RADIO_LABEL + " ='" + mTag + "'");
+                            mStatement.execute("DELETE FROM " + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " ='" + mTag + "'");
                         }
                         break;
                     case PERSON_DELETE_ALL:
@@ -284,26 +285,35 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
                     +journalItem.getTimeIn()+","
                     +journalItem.getTimeOut()+","
                     +journalItem.getAccessType()+",'"
-                    +journalItem.getPersonLastname()+"','"
-                    +journalItem.getPersonFirstname()+"','"
-                    +journalItem.getPersonMidname()+"','"
-                    +journalItem.getPersonPhoto()+"')");
+                    +journalItem.getPersonInitials()+"','"
+                    +journalItem.getPersonTag()+"')");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     private void writePersonItemToServer(Statement statement, PersonItem personItem){
+        System.out.println(Settings.getActiveAccountID());
+        System.out.println(personItem.getLastname());
+        System.out.println(personItem.getFirstname());
+        System.out.println(personItem.getMidname());
+        System.out.println(personItem.getDivision());
+        System.out.println(personItem.getRadioLabel());
+        System.out.println(personItem.getSex());
+        System.out.println(personItem.getAccessType());
+        System.out.println(personItem.getPhotoPath());
+        System.out.println(personItem.getPhoto());
         try {
             statement.executeUpdate("INSERT INTO " + SQL_Connection.PERSONS_TABLE + " VALUES ('"
-                    +personItem.getLastname() + "','"
-                    +personItem.getFirstname() + "','"
-                    +personItem.getMidname() + "','"
-                    +personItem.getDivision() + "','"
-                    +personItem.getRadioLabel() + "','"
-                    +personItem.getSex() + "')");
-                    //+personItem.getPhotoPreview() + "','"
-                    //+personItem.getPhotoOriginal() + "')");
+                    + Settings.getActiveAccountID() + "','"
+                    + personItem.getLastname() + "','"
+                    + personItem.getFirstname() + "','"
+                    + personItem.getMidname() + "','"
+                    + personItem.getDivision() + "','"
+                    + personItem.getRadioLabel() + "','"
+                    + personItem.getSex() + "','"
+                    + personItem.getAccessType() + "','"
+                    + personItem.getPhoto() + "')");
         } catch (Exception e){
             e.printStackTrace();
         }

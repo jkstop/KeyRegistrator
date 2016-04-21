@@ -41,12 +41,13 @@ import java.util.ArrayList;
 public class MainFr extends Fragment implements UpdateInterface,RecycleItemClickListener {
 
     public static RecyclerView mAuditroomGrid;
+
     private AdapterMainRoomGrid mAdapter;
 
     private Context mContext;
     private ArrayList<RoomItem> mRoomItems;
     private FrameLayout mFrameForGrid;
-    private CardView mDisclaimerCard;
+    //private CardView mDisclaimerCard;
     private CloseRoomInterface mCloseRoomInterface;
 
     private static long lastClickTime = 0;
@@ -87,7 +88,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
             textEmptyAud.setVisibility(View.VISIBLE);
         }
 
-        mDisclaimerCard = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
+        //mDisclaimerCard = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
 
         setLayoutsWeight();
         return rootView;
@@ -95,7 +96,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
     private void setLayoutsWeight(){
         int weightCard = Settings.getDisclaimerWeight();
-        ((LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams()).weight = weightCard;
+        //((LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams()).weight = weightCard;
         ((LinearLayout.LayoutParams) mFrameForGrid.getLayoutParams()).weight = 100 - weightCard;
     }
 
@@ -106,14 +107,8 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         mAdapter = new AdapterMainRoomGrid(mContext, mRoomItems,this);
         mAuditroomGrid.setAdapter(mAdapter);
 
-        //Layout manager для сетки с пользователями, отключение прокрутки
-        GridLayoutManager mGridLayoutManager = new GridLayoutManager(mContext, Settings.getAuditroomColumnsCount()){
-            @Override
-            public boolean canScrollVertically() {
-                return false;
-            }
-        };
-        mAuditroomGrid.setLayoutManager(mGridLayoutManager);
+
+        mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext, getResources().getInteger(R.integer.room_grid_count)));
     }
 
 

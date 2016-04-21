@@ -1,13 +1,11 @@
 package com.example.ivsmirnov.keyregistrator.databases;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Base64;
-import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ImageSaver;
@@ -48,18 +46,19 @@ public class FavoriteDB {
     public static final int SHORT_INITIALS = 9;
     public static final int FULL_INITIALS = 10;
 
-    public static final int CARD_USER_ACCESS = 11;
-    public static final int CLICK_USER_ACCESS = 12;
+    public static final int CLICK_USER_ACCESS = 100;
+    public static final int CARD_USER_ACCESS = 101;
 
 
-    public static PersonItem getPersonItem(String tag, int userLocation){
+
+    public static PersonItem getPersonItem(String tag, int userLocation, boolean withBase64Photo){
 
         Cursor cursor = null;
         try {
             PersonItem personItem;
             if (userLocation == LOCAL_USER){
                 cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                        FavoriteDBinit.TABLE_TEACHER,
+                        FavoriteDBinit.TABLE_PERSONS,
                             null,
                             FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
                             new String[]{tag},
@@ -69,7 +68,8 @@ public class FavoriteDB {
 
                 if (cursor!=null && cursor.getCount()>0){
                     cursor.moveToFirst();
-                    personItem = new PersonItem().setLastname(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE)))
+                    personItem = new PersonItem()
+                            .setLastname(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE)))
                             .setFirstname(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE)))
                             .setMidname(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE)))
                             .setDivision(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_DIVISION_FAVORITE)))
@@ -77,24 +77,15 @@ public class FavoriteDB {
                             .setAccessType(cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE)))
                             .setRadioLabel(tag)
                             .setPhotoPath(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE)));
-
-                   /* switch (photoType){
-                        case FULLSIZE_PHOTO:
-                            personItem.setPhotoOriginal(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
-                            break;
-                        case PREVIEW_PHOTO:
-                            personItem.setPhotoPreview(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE)));
-                            break;
-                        case ALL_PHOTO:
-                            personItem.setPhotoOriginal(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE)));
-                            personItem.setPhotoPreview(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE)));
-                            break;
-                        case NO_PHOTO:
-                            break;
-                        default:
-                            break;
-                    }*/
-
+                    if (withBase64Photo){
+                        if (personItem.getPhotoPath()!=null){
+                            Bitmap personImageBitmap = BitmapFactory.decodeFile(personItem.getPhotoPath());
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            personImageBitmap.compress(Bitmap.CompressFormat.WEBP, 100, byteArrayOutputStream);
+                            byte[] imageByte = byteArrayOutputStream.toByteArray();
+                            personItem.setPhoto(Base64.encodeToString(imageByte, Base64.NO_WRAP));
+                        }
+                    }
                     return personItem;
                 } else {
                     return null;
@@ -159,13 +150,70 @@ public class FavoriteDB {
         }
     }
 
+    public static boolean addNewUser(PersonItem personItem) {
+        String photoPath;
+        int acccessType;
+        try {
+            if (personItem!=null){
+
+                if (personItem.getPhoto() == null) personItem.setPhoto(getBase64DefaultPhotoFromResources());
+
+                //сохраняем фото в память
+                photoPath = new ImageSaver(App.getAppContext())
+                        .setFileName(personItem.getRadioLabel())
+                        .save(personItem.getPhoto());
+                personItem.setPhotoPath(photoPath);
+
+                if (personItem.getAccessType() == 0){
+                    acccessType = CARD_USER_ACCESS;
+                    personItem.setAccessType(acccessType);
+                } else {
+                    acccessType = personItem.getAccessType();
+                }
+
+                ContentValues cv = new ContentValues();
+                cv.put(FavoriteDBinit.COLUMN_USER_ID_FAVORITE, Settings.getActiveAccountID());
+                cv.put(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
+                cv.put(FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
+                cv.put(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE, personItem.getMidname());
+                cv.put(FavoriteDBinit.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
+                cv.put(FavoriteDBinit.COLUMN_TAG_FAVORITE, personItem.getRadioLabel());
+                cv.put(FavoriteDBinit.COLUMN_SEX_FAVORITE, personItem.getSex());
+                cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE, acccessType);
+
+                if (photoPath!=null) cv.put(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE, photoPath);
+
+                //если пользователь уже есть в базе, то удаляем старую запись
+                if (isUserInBase(personItem.getRadioLabel())){
+                    deleteUser(personItem.getRadioLabel());
+                }
+
+                //пишем в базу
+                DbShare.getDataBase(DbShare.DB_FAVORITE).insert(FavoriteDBinit.TABLE_PERSONS, null, cv);
+
+                //добавляем на сервер
+                if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
+                    new ServerWriter(personItem).execute(ServerWriter.PERSON_UPDATE);
+                }
+
+
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static String getPersonPhoto (String userTag, int photoLocation, int photoDimension){
         Cursor cursor = null;
         try {
             switch (photoLocation){
                 case LOCAL_PHOTO:
                     cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                            FavoriteDBinit.TABLE_TEACHER,
+                            FavoriteDBinit.TABLE_PERSONS,
                             new String[]{FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE},
                             FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
                             new String[]{userTag},
@@ -221,24 +269,28 @@ public class FavoriteDB {
     }
 
     public static File getPersonPhotoPath(String personTag){
+
         Cursor cursor = null;
-        try {
-            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_TEACHER,
-                    new String[]{FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE},
-                    FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
-                    new String[]{personTag},
-                    null,
-                    null,
-                    "1");
-            if (cursor.getCount()>0){
-                cursor.moveToFirst();
-                return new File(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE)));
+        if (personTag!=null){
+            try {
+                cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
+                        FavoriteDBinit.TABLE_PERSONS,
+                        new String[]{FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE},
+                        FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
+                        new String[]{personTag},
+                        null,
+                        null,
+                        "1");
+
+                if (cursor.getCount()>0){
+                    cursor.moveToFirst();
+                    return new File(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE)));
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            } finally {
+                closeCursor(cursor);
             }
-        }catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            closeCursor(cursor);
         }
         return null;
     }
@@ -248,7 +300,7 @@ public class FavoriteDB {
         try {
 
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_TEACHER,
+                    FavoriteDBinit.TABLE_PERSONS,
                     new String[]{FavoriteDBinit._ID, FavoriteDBinit.COLUMN_LASTNAME_FAVORITE, FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE,
                             FavoriteDBinit.COLUMN_MIDNAME_FAVORITE, FavoriteDBinit.COLUMN_DIVISION_FAVORITE},
                     FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
@@ -275,7 +327,7 @@ public class FavoriteDB {
                     cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE, personItem.getAccessType());
                 }
                 if (cv.size()!=0){
-                    DbShare.getDataBase(DbShare.DB_FAVORITE).update(FavoriteDBinit.TABLE_TEACHER,
+                    DbShare.getDataBase(DbShare.DB_FAVORITE).update(FavoriteDBinit.TABLE_PERSONS,
                             cv,
                             FavoriteDBinit._ID + "=" + cursor.getInt(cursor.getColumnIndex(FavoriteDBinit._ID)),
                             null);
@@ -303,7 +355,7 @@ public class FavoriteDB {
                 selectionArgs = new String[]{character + "%"};
             }
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_TEACHER,
+                    FavoriteDBinit.TABLE_PERSONS,
                     new String[]{FavoriteDBinit.COLUMN_TAG_FAVORITE},
                     selection,
                     selectionArgs,
@@ -331,7 +383,7 @@ public class FavoriteDB {
         try {
             ArrayList <CharacterItem> characters = new ArrayList<>();
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_TEACHER,
+                    FavoriteDBinit.TABLE_PERSONS,
                     new String[]{FavoriteDBinit.COLUMN_LASTNAME_FAVORITE},
                     null,null,null,null,null);
             cursor.moveToPosition(-1);
@@ -372,7 +424,7 @@ public class FavoriteDB {
         Cursor cursor = null;
         try {
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_TEACHER,
+                    FavoriteDBinit.TABLE_PERSONS,
                     new String[]{FavoriteDBinit.COLUMN_TAG_FAVORITE},
                     null,null,null,null,null);
             cursor.moveToPosition(-1);
@@ -406,7 +458,7 @@ public class FavoriteDB {
             }
 
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_TEACHER,
+                    FavoriteDBinit.TABLE_PERSONS,
                     new String[]{FavoriteDBinit.COLUMN_LASTNAME_FAVORITE,
                             FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE,
                             FavoriteDBinit.COLUMN_MIDNAME_FAVORITE,
@@ -444,7 +496,7 @@ public class FavoriteDB {
         Cursor cursor = null;
         try {
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_TEACHER,
+                    FavoriteDBinit.TABLE_PERSONS,
                     new String[]{FavoriteDBinit._ID, FavoriteDBinit.COLUMN_ACCESS_TYPE},
                     FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
                     new String[]{tag},
@@ -456,7 +508,7 @@ public class FavoriteDB {
                 ContentValues cv = new ContentValues();
                 cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE, accessType);
                 DbShare.getDataBase(DbShare.DB_FAVORITE)
-                        .update(FavoriteDBinit.TABLE_TEACHER, cv, FavoriteDBinit._ID + " = " + cursor.getInt(cursor.getColumnIndex(FavoriteDBinit._ID)), null);
+                        .update(FavoriteDBinit.TABLE_PERSONS, cv, FavoriteDBinit._ID + " = " + cursor.getInt(cursor.getColumnIndex(FavoriteDBinit._ID)), null);
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -469,7 +521,7 @@ public class FavoriteDB {
         Cursor cursor = null;
         try {
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_TEACHER,
+                    FavoriteDBinit.TABLE_PERSONS,
                     new String[]{FavoriteDBinit.COLUMN_ACCESS_TYPE},
                     FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
                     new String[]{tag},
@@ -492,10 +544,10 @@ public class FavoriteDB {
         //SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.DB_FAVORITE);
         Cursor cursor = null;
         try {
-          //  /mDataBase.compileStatement("SELECT * FROM " + FavoriteDBinit.TABLE_TEACHER
+          //  /mDataBase.compileStatement("SELECT * FROM " + FavoriteDBinit.TABLE_PERSONS
             //        + " WHERE " + FavoriteDBinit.COLUMN_TAG_FAVORITE + " = '" + tag + "'").simpleQueryForString();
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_TEACHER,
+                    FavoriteDBinit.TABLE_PERSONS,
                     new String[]{FavoriteDBinit.COLUMN_TAG_FAVORITE},
                     FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
                     new String[]{tag},
@@ -510,50 +562,7 @@ public class FavoriteDB {
         }
     }
 
-    public static boolean addNewUser(PersonItem personItem) {
-        String photoPath;
-        try {
-            if (personItem!=null){
 
-                if (personItem.getPhoto() == null) personItem.setPhoto(getBase64DefaultPhotoFromResources());
-
-                //сохраняем фото в память
-                photoPath = new ImageSaver(App.getAppContext())
-                        .setFileName(personItem.getRadioLabel())
-                        .save(personItem.getPhoto());
-
-                ContentValues cv = new ContentValues();
-                if (personItem.getLastname()!=null) cv.put(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
-                if (personItem.getFirstname()!=null) cv.put(FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
-                if (personItem.getMidname()!=null) cv.put(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE, personItem.getMidname());
-                if (personItem.getDivision()!=null) cv.put(FavoriteDBinit.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
-                if (personItem.getRadioLabel()!=null) cv.put(FavoriteDBinit.COLUMN_TAG_FAVORITE, personItem.getRadioLabel());
-                if (personItem.getSex()!=null) cv.put(FavoriteDBinit.COLUMN_SEX_FAVORITE, personItem.getSex());
-                if (photoPath!=null) cv.put(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE, photoPath);
-
-                //если пользователь уже есть в базе, то удаляем старую запись
-                if (isUserInBase(personItem.getRadioLabel())){
-                    deleteUser(personItem.getRadioLabel());
-                }
-
-                //пишем в базу
-                DbShare.getDataBase(DbShare.DB_FAVORITE).insert(FavoriteDBinit.TABLE_TEACHER, null, cv);
-
-                //добавляем на сервер
-                if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
-                    new ServerWriter(personItem).execute(ServerWriter.PERSON_UPDATE);
-                }
-
-
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return false;
-    }
 
     public static void backupFavoriteStaffToFile(){
         Cursor cursor = null;
@@ -563,7 +572,7 @@ public class FavoriteDB {
             String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
             File file = new File(mPath + "/Teachers.csv");
 
-            cursor = DbShare.getCursor(DbShare.DB_FAVORITE, FavoriteDBinit.TABLE_TEACHER, null,null,null,null,null,null);
+            cursor = DbShare.getCursor(DbShare.DB_FAVORITE, FavoriteDBinit.TABLE_PERSONS, null,null,null,null,null,null);
             cursor.moveToPosition(-1);
 
             if (file != null) {
@@ -595,13 +604,17 @@ public class FavoriteDB {
         }
     }
 
+    //удаление пользователя
     public static void deleteUser(String tag){
 
         Cursor cursor = null;
         try{
 
+            //удаляем фото из хранилища
+            getPersonPhotoPath(tag).delete();
+
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_TEACHER,
+                    FavoriteDBinit.TABLE_PERSONS,
                     new String[]{FavoriteDBinit._ID},
                     FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
                     new String[]{tag},
@@ -612,10 +625,11 @@ public class FavoriteDB {
             if (cursor.getCount()>0){
                 cursor.moveToPosition(-1);
                 while (cursor.moveToNext()){
-                    //Log.d("delete", cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE)));
-                    DbShare.getDataBase(DbShare.DB_FAVORITE).delete(FavoriteDBinit.TABLE_TEACHER, FavoriteDBinit._ID + "=" + cursor.getInt(cursor.getColumnIndex(FavoriteDBinit._ID)), null);
+                    DbShare.getDataBase(DbShare.DB_FAVORITE).delete(FavoriteDBinit.TABLE_PERSONS, FavoriteDBinit._ID + "=" + cursor.getInt(cursor.getColumnIndex(FavoriteDBinit._ID)), null);
                 }
             }
+
+
         } catch (Exception e){
             e.printStackTrace();
         } finally {
@@ -625,10 +639,16 @@ public class FavoriteDB {
 
 
 
-    public static void clearTeachersDB(){
+    public static void clear(){
         try {
-            DbShare.getDataBase(DbShare.DB_FAVORITE).delete(FavoriteDBinit.TABLE_TEACHER, null, null);
-            //Settings.deleteFreeUser(null);
+            File filesDir = App.getAppContext().getFilesDir();
+            if (filesDir.isDirectory()){
+                File[]files = filesDir.listFiles();
+                for (File file : files) {
+                    file.delete();
+                }
+            }
+            DbShare.getDataBase(DbShare.DB_FAVORITE).delete(FavoriteDBinit.TABLE_PERSONS, null, null);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -665,7 +685,7 @@ public class FavoriteDB {
         Cursor cursor = null;
         try {
 
-            cursor = DbShare.getCursor(DbShare.DB_FAVORITE, FavoriteDBinit.TABLE_TEACHER, new String[]{FavoriteDBinit.COLUMN_TAG_FAVORITE},null,null,null,null,null);
+            cursor = DbShare.getCursor(DbShare.DB_FAVORITE, FavoriteDBinit.TABLE_PERSONS, new String[]{FavoriteDBinit.COLUMN_TAG_FAVORITE},null,null,null,null,null);
             if (cursor.getCount()>0){
                 return cursor.getCount();
             }

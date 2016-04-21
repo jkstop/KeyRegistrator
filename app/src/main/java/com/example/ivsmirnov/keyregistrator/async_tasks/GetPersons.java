@@ -51,7 +51,7 @@ public class GetPersons extends AsyncTask<GetPersonParams,Void,PersonItem>{
 
         photoDimension = params[0].getPersonPhotoDimension();
 
-        PersonItem personItem = FavoriteDB.getPersonItem(params[0].getPersonTag(), params[0].getPersonLocation());
+        PersonItem personItem = FavoriteDB.getPersonItem(params[0].getPersonTag(), params[0].getPersonLocation(),false);
 
         mPersonImage = new WeakReference<>(params[0].getPersonImageView()).get();
         mAccessImage = new WeakReference<>(params[0].getAccessImageView()).get();

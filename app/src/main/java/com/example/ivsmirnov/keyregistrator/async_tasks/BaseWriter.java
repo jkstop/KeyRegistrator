@@ -41,7 +41,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
     @Override
     protected Void doInBackground(BaseWriterParams... params) {
 
-        PersonItem person = FavoriteDB.getPersonItem(params[0].getPersonTag(), FavoriteDB.LOCAL_USER);
+        PersonItem person = FavoriteDB.getPersonItem(params[0].getPersonTag(), FavoriteDB.LOCAL_USER, false);
 
         final long timeIn = System.currentTimeMillis();
 
@@ -50,16 +50,15 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
                 .setAuditroom(params[0].getAuditroom())
                 .setAccessType(params[0].getAccessType())
                 .setTimeIn(timeIn)
-                .setPersonLastname(person.getLastname())
-                .setPersonFirstname(person.getFirstname())
-                .setPersonMidname(person.getMidname());
+                .setPersonInitials(FavoriteDB.getPersonInitials(FavoriteDB.FULL_INITIALS, person.getLastname(), person.getFirstname(), person.getMidname()))
+                .setPersonTag(person.getRadioLabel());
 
         mRoomItem = new RoomItem()
                 .setAuditroom(mJournalItem.getAuditroom())
                 .setStatus(RoomDB.ROOM_IS_BUSY)
                 .setAccessType(mJournalItem.getAccessType())
                 .setTime(timeIn)
-                .setLastVisiter(FavoriteDB.getPersonInitials(FavoriteDB.SHORT_INITIALS, mJournalItem.getPersonLastname(),mJournalItem.getPersonFirstname(),mJournalItem.getPersonMidname()))
+                .setLastVisiter(FavoriteDB.getPersonInitials(FavoriteDB.SHORT_INITIALS, person.getLastname(), person.getFirstname(), person.getMidname()))
                 .setTag(params[0].getPersonTag());
 
         JournalDB.writeInDBJournal(mJournalItem);
