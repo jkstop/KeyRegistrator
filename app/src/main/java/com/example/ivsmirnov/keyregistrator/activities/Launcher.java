@@ -120,39 +120,47 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.launcher);
 
         mContext = this;
         mResources = getResources();
 
-        //init DataBases
-        new DbShare();
 
-        //init SharedPreferences
-        new Settings();
 
-        //connect to server
-        new SQL_Connection(Settings.getServerConnectionParams(), null).execute();
+
 
         //init interfaces
         mBaseWriterInterface = this;
         mGetAccountInterface = this;
         mCloseRoomInterface = this;
 
-        //init and set auto close alarm
-        setSheduler();
+
 
         setNavigationItems();
 
         initNavigationDrawer();
 
-        initGoogleAPI();
 
-        new initReader().execute();
 
         if (savedInstanceState==null){
-            showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.navigation_drawer_item_home);
+            //connect to server
+            new SQL_Connection(Settings.getServerConnectionParams(), null).execute();
 
+            //init DataBases
+            new DbShare();
+
+            //init SharedPreferences
+            new Settings();
+
+            //init and set auto close alarm
+            setSheduler();
+
+            initGoogleAPI();
+
+            new initReader().execute();
+
+            showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.navigation_drawer_item_home);
         }
         //getSupportFragmentManager().beginTransaction().add(MainFr.newInstance(), getStringFromResources(R.string.navigation_drawer_item_home)).commit();
     }

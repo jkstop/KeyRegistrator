@@ -6,6 +6,7 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
+
     <style name="PreferenceThemeOverlay">
         <item name="preferenceScreenStyle">@style/Preference.PreferenceScreen</item>
         <item name="preferenceFragmentStyle">@style/PreferenceFragment</item>

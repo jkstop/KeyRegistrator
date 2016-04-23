@@ -12,7 +12,6 @@
 
     <application
         android:name=".others.App"
-        android:configChanges="keyboardHidden|orientation"
         android:allowBackup="true"
         android:largeHeap="true"
         android:icon="@mipmap/ic_launcher"

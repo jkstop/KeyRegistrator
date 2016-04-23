@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/view_table_x"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="X"
+        android:layout_centerInParent="true"/>
+
+    <biz.kasual.materialnumberpicker.MaterialNumberPicker
+        android:id="@+id/view_table_picker_columns"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/view_table_x"
+        android:layout_toStartOf="@id/view_table_x"
+        android:layout_centerVertical="true"
+        app:npMinValue="1"
+        app:npMaxValue="4"
+        app:npSeparatorColor="@color/primary"/>
+
+
+
+    <biz.kasual.materialnumberpicker.MaterialNumberPicker
+        android:id="@+id/view_table_picker_rows"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/view_table_x"
+        android:layout_toEndOf="@id/view_table_x"
+        android:layout_centerVertical="true"
+        app:npMinValue="1"
+        app:npMaxValue="4"
+        app:npDefaultValue="3"
+        app:npSeparatorColor="@color/primary"/>
+
+
+</android.support.percent.PercentRelativeLayout>

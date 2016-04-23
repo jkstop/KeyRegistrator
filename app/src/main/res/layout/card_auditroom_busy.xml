@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="@dimen/auditroom_card_width"
-    android:layout_height="@dimen/auditroom_card_height"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
     android:id="@+id/card_auditroom_busy"
     app:cardElevation="@dimen/auditroom_card_elevation"
     app:contentPadding="@dimen/auditroom_card_content_padding"
@@ -16,8 +16,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
-            app:layout_widthPercent="35%"
+        <android.support.percent.PercentRelativeLayout
+            app:layout_widthPercent="40%"
             android:id="@+id/card_auditroom_busy_image_layout"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -26,10 +26,10 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true">
 
-            <ImageView
+          <ImageView
                 android:id="@+id/card_auditroom_busy_image_person"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/auditroom_grid_busy_image_person_description"
                 android:scaleType="centerCrop"/>
 
@@ -40,6 +40,8 @@
                 android:layout_alignRight="@id/card_auditroom_busy_image_person"
                 android:src="@drawable/ic_key_color"
                 android:layout_alignParentBottom="true"
+                android:scaleType="fitEnd"
+                app:layout_widthPercent="40%"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -50,10 +52,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-        </RelativeLayout>
+        </android.support.percent.PercentRelativeLayout>
 
-        <LinearLayout
-            android:orientation="vertical"
+        <android.support.percent.PercentRelativeLayout
             android:layout_toEndOf="@+id/card_auditroom_busy_image_layout"
             android:layout_toRightOf="@+id/card_auditroom_busy_image_layout"
             android:layout_marginStart="@dimen/auditroom_card_divider"
@@ -64,27 +65,26 @@
             <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                 android:id="@+id/card_auditroom_busy_text_auditroom"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.6"
+                android:layout_height="wrap_content"
+                app:layout_heightPercent="70%"
                 android:maxLines="2"
                 android:textColor="@color/black"
-                android:textSize="@dimen/auditroom_card_busy_text_aud_size"
+                android:textSize="200sp"
                 android:gravity="center" />
 
             <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                 android:id="@+id/card_auditroom_busy_text_person"
+                android:layout_below="@id/card_auditroom_busy_text_auditroom"
                 android:maxLines="2"
                 android:textColor="@color/black"
-                android:textSize="50sp"
+                android:textSize="150sp"
+                app:layout_heightPercent="30%"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.4"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 />
 
-        </LinearLayout>
-
-
+        </android.support.percent.PercentRelativeLayout>
 
     </android.support.percent.PercentRelativeLayout>
 

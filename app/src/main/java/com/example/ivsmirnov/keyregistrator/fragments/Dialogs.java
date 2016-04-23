@@ -59,6 +59,9 @@ import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Set;
+
+import biz.kasual.materialnumberpicker.MaterialNumberPicker;
 
 public class Dialogs extends DialogFragment{
 
@@ -392,6 +395,24 @@ public class Dialogs extends DialogFragment{
                         .create();
 
             case DIALOG_RESIZE_ITEMS:
+                View dialogPickersView = View.inflate(mContext, R.layout.view_table, null);
+                final MaterialNumberPicker pickerColumns = (MaterialNumberPicker)dialogPickersView.findViewById(R.id.view_table_picker_columns);
+                final MaterialNumberPicker pickerRows = (MaterialNumberPicker)dialogPickersView.findViewById(R.id.view_table_picker_rows);
+                pickerColumns.setValue(Settings.getColumnsLandscape());
+                pickerRows.setValue(Settings.getRowsLandscape());
+                return new AlertDialog.Builder(getActivity())
+                        .setTitle("pickers")
+                        .setView(dialogPickersView)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Settings.setColumnsLandscape(pickerColumns.getValue());
+                                Settings.setRowsLandscape(pickerRows.getValue());
+
+                                updateInformation();
+                            }
+                        })
+                        .create();
                 /*
                 View rootView =  View.inflate(mContext, R.layout.view_resize_main_fragment_items, null);
                 //final CardView cardView = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);

@@ -90,7 +90,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
         //mDisclaimerCard = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
 
-        setLayoutsWeight();
+        //setLayoutsWeight();
         return rootView;
     }
 
@@ -107,8 +107,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         mAdapter = new AdapterMainRoomGrid(mContext, mRoomItems,this);
         mAuditroomGrid.setAdapter(mAdapter);
 
-
-        mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext, getResources().getInteger(R.integer.room_grid_count)));
+        mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getColumnsLandscape()));
     }
 
 
@@ -118,7 +117,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
         mRoomItems = RoomDB.readRoomsDB();
 
-        setLayoutsWeight();
+        //setLayoutsWeight();
 
         initializeAuditroomGrid();
     }
@@ -215,7 +214,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
     @Override
     public void updateInformation() {
-        setLayoutsWeight();
+        //setLayoutsWeight();
         initializeAuditroomGrid();
     }
 

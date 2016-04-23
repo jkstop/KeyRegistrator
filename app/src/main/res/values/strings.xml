@@ -216,5 +216,12 @@
     <string name="shared_preferences_write_teachers_server">Список пользователей</string>
     <string name="shared_preferences_write_rooms_server">Список помещений</string>
 
+    <array name="picker">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </array>
+
 
 </resources>

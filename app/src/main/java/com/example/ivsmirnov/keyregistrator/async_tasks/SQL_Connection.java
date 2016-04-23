@@ -83,13 +83,8 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
                     + "database=" + db +";user=" + mServerConnectionItem.getUserName() + ";password="
                     + mServerConnectionItem.getUserPassword() + ";";
 
-            DriverManager.setLoginTimeout(10);
-
-            Properties properties = new Properties();
-            properties.put("connectTimeout", "300000");
-
             if (SQLconnect == null){
-                SQLconnect = DriverManager.getConnection(ConnURL, properties);
+                SQLconnect = DriverManager.getConnection(ConnURL);
             }
 
             return null;

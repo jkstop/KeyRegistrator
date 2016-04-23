@@ -46,6 +46,8 @@ public class Settings {
     public static final String SERVER_WRITE_TEACHERS = getStringFromRes(R.string.shared_preferences_write_teachers_server);
     public static final String SERVER_WRITE_ROOMS = getStringFromRes(R.string.shared_preferences_write_rooms_server);
     public static final String last_room_time_in = "timein";
+    public static final String COLUMNS_LAND = "COLUMNS_LAND";
+    public static final String ROWS_LAND = "ROWS_LAND";
 
     private static SharedPreferences mPreferences;
     private static SharedPreferences.Editor mPreferencesEditor;
@@ -72,6 +74,22 @@ public class Settings {
             mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(App.getAppContext()).edit();
         }
         return mPreferencesEditor;
+    }
+
+    public static void setColumnsLandscape (int columnsLandscape){
+        getPreferencesEditor().putInt(COLUMNS_LAND, columnsLandscape).apply();
+    }
+
+    public static int getColumnsLandscape (){
+        return getPreferences().getInt(COLUMNS_LAND, 3);
+    }
+
+    public static void setRowsLandscape (int rowsLandscape){
+        getPreferencesEditor().putInt(ROWS_LAND, rowsLandscape).apply();
+    }
+
+    public static int getRowsLandscape (){
+        return getPreferences().getInt(ROWS_LAND, 3);
     }
 
     public static void setLAstRoomTimeIn(long timeIn){
