@@ -4,37 +4,34 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/view_table_x"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="X"
-        android:layout_centerInParent="true"/>
+    <GridView
+        android:id="@+id/view_table_grid"
+        android:layout_centerInParent="true"
+        android:layout_width="200dp"
+        android:layout_height="200dp"/>
 
     <biz.kasual.materialnumberpicker.MaterialNumberPicker
         android:id="@+id/view_table_picker_columns"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/view_table_x"
-        android:layout_toStartOf="@id/view_table_x"
-        android:layout_centerVertical="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         app:npMinValue="1"
         app:npMaxValue="4"
-        app:npSeparatorColor="@color/primary"/>
-
+        app:npSeparatorColor="@color/colorAccent"/>
 
 
     <biz.kasual.materialnumberpicker.MaterialNumberPicker
         android:id="@+id/view_table_picker_rows"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/view_table_x"
-        android:layout_toEndOf="@id/view_table_x"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
+        android:orientation="horizontal"
         app:npMinValue="1"
         app:npMaxValue="4"
         app:npDefaultValue="3"
-        app:npSeparatorColor="@color/primary"/>
-
+        app:npSeparatorColor="@color/colorAccent"/>
 
 </android.support.percent.PercentRelativeLayout>

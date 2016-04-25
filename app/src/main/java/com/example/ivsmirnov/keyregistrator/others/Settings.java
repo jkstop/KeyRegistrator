@@ -48,6 +48,8 @@ public class Settings {
     public static final String last_room_time_in = "timein";
     public static final String COLUMNS_LAND = "COLUMNS_LAND";
     public static final String ROWS_LAND = "ROWS_LAND";
+    public static final String COLUMNS_PORT = "COLUMNS_PORT";
+    public static final String ROWS_PORT = "ROWS_PORT";
 
     private static SharedPreferences mPreferences;
     private static SharedPreferences.Editor mPreferencesEditor;
@@ -74,6 +76,22 @@ public class Settings {
             mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(App.getAppContext()).edit();
         }
         return mPreferencesEditor;
+    }
+
+    public static void setColumnsPortrait (int columnsPortrait){
+        getPreferencesEditor().putInt(COLUMNS_PORT, columnsPortrait).apply();
+    }
+
+    public static void setRowsPortrait (int rowsPortrait){
+        getPreferencesEditor().putInt(ROWS_PORT, rowsPortrait).apply();
+    }
+
+    public static int getColumnsPortrait(){
+        return getPreferences().getInt(COLUMNS_PORT, 2);
+    }
+
+    public static int getRowsPortrait(){
+        return getPreferences().getInt(ROWS_PORT, 3);
     }
 
     public static void setColumnsLandscape (int columnsLandscape){

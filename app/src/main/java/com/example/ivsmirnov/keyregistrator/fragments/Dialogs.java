@@ -3,8 +3,14 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Dialog;
 import android.graphics.Paint;
 import android.os.Build;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 
 import android.content.Context;
@@ -21,7 +27,10 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
@@ -59,6 +68,7 @@ import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import biz.kasual.materialnumberpicker.MaterialNumberPicker;
@@ -101,16 +111,15 @@ public class Dialogs extends DialogFragment{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         mDialogId = getArguments().getInt(DIALOG_TYPE,0);
         mContext = getActivity();
         mResources = mContext.getResources();
     }
 
-
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
         switch (mDialogId){
             case DIALOG_CLEAR_JOURNAL:
                 View dialogClearJournalView = View.inflate(mContext, R.layout.view_dialog_clear,null);
@@ -395,19 +404,30 @@ public class Dialogs extends DialogFragment{
                         .create();
 
             case DIALOG_RESIZE_ITEMS:
-                View dialogPickersView = View.inflate(mContext, R.layout.view_table, null);
-                final MaterialNumberPicker pickerColumns = (MaterialNumberPicker)dialogPickersView.findViewById(R.id.view_table_picker_columns);
-                final MaterialNumberPicker pickerRows = (MaterialNumberPicker)dialogPickersView.findViewById(R.id.view_table_picker_rows);
-                pickerColumns.setValue(Settings.getColumnsLandscape());
-                pickerRows.setValue(Settings.getRowsLandscape());
+                //View pagerView = View.inflate(mContext, R.layout.layout_tab, null);
+                //ViewPager viewPager = (ViewPager)pagerView.findViewById(R.id.pager_pickers);
+                //ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
+                //viewPagerAdapter.addFragment(new Picker(),"ONE");
+                //viewPagerAdapter.addFragment(new Picker(), "TWO");
+                //viewPager.setAdapter(viewPagerAdapter);
+
+                //TabLayout tabLayout = (TabLayout)pagerView.findViewById(R.id.tabs);
+                //tabLayout.setupWithViewPager(viewPager);
+
+                //View dialogPickersView = View.inflate(mContext, R.layout.view_table, null);
+                //final MaterialNumberPicker pickerColumns = (MaterialNumberPicker)dialogPickersView.findViewById(R.id.view_table_picker_columns);
+                //final MaterialNumberPicker pickerRows = (MaterialNumberPicker)dialogPickersView.findViewById(R.id.view_table_picker_rows);
+                //pickerColumns.setValue(Settings.getColumnsLandscape());
+                //pickerRows.setValue(Settings.getRowsLandscape());
+                getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
                 return new AlertDialog.Builder(getActivity())
                         .setTitle("pickers")
-                        .setView(dialogPickersView)
+                        //.setView(pagerView)
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Settings.setColumnsLandscape(pickerColumns.getValue());
-                                Settings.setRowsLandscape(pickerRows.getValue());
+                                //Settings.setColumnsLandscape(pickerColumns.getValue());
+                                //Settings.setRowsLandscape(pickerRows.getValue());
 
                                 updateInformation();
                             }
@@ -685,6 +705,22 @@ public class Dialogs extends DialogFragment{
         }
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        switch (mDialogId){
+            //case DIALOG_RESIZE_ITEMS:
+
+
+
+
+                //return pagerView;
+            default:
+                return super.onCreateView(inflater, container, savedInstanceState);
+        }
+
+    }
+
     public static boolean setNumberPickerTextColor(NumberPicker numberPicker, int color)
     {
         final int count = numberPicker.getChildCount();
@@ -712,5 +748,7 @@ public class Dialogs extends DialogFragment{
         UpdateInterface updateInterface = (UpdateInterface)getTargetFragment();
         updateInterface.updateInformation();
     }
+
+
 
 }

@@ -1,6 +1,8 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -144,8 +146,15 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     private int getItemScaleHeight(){
-        int recyclerRows = (int) Math.ceil(12 / App.getAppContext().getResources().getInteger(R.integer.room_grid_count));
-        return MainFr.mAuditroomGrid.getHeight()/ Settings.getRowsLandscape();
+        //int recyclerRows = (int) Math.ceil(12 / App.getAppContext().getResources().getInteger(R.integer.room_grid_count));
+
+        if (App.getAppContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            return MainFr.mAuditroomGrid.getHeight()/ Settings.getRowsLandscape();
+        } else {
+            return MainFr.mAuditroomGrid.getHeight()/ Settings.getRowsPortrait();
+        }
+
+
     }
 
 }

@@ -1,6 +1,8 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -107,7 +109,16 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         mAdapter = new AdapterMainRoomGrid(mContext, mRoomItems,this);
         mAuditroomGrid.setAdapter(mAdapter);
 
-        mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getColumnsLandscape()));
+        switch (getResources().getConfiguration().orientation){
+            case Configuration.ORIENTATION_LANDSCAPE:
+                mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getColumnsLandscape()));
+                break;
+            case Configuration.ORIENTATION_PORTRAIT:
+                mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getColumnsPortrait()));
+                break;
+            default:
+                break;
+        }
     }
 
 
@@ -132,12 +143,16 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_main_items_size:
-                Dialogs dialog_resize = new Dialogs();
-                Bundle bundle_dialog_resize = new Bundle();
-                bundle_dialog_resize.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_RESIZE_ITEMS);
-                dialog_resize.setArguments(bundle_dialog_resize);
-                dialog_resize.setTargetFragment(this,0);
-                dialog_resize.show(getFragmentManager(),"dialog_resize");
+
+                DialogPickers dialogPickers = new DialogPickers();
+                dialogPickers.setTargetFragment(this,0);
+                dialogPickers.show(getFragmentManager(),"dialog_pickers");
+                //Dialogs dialog_resize = new Dialogs();
+                //Bundle bundle_dialog_resize = new Bundle();
+                //bundle_dialog_resize.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_RESIZE_ITEMS);
+                //dialog_resize.setArguments(bundle_dialog_resize);
+                //dialog_resize.setTargetFragment(this,0);
+                //dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
             case R.id.menu_main_upload_all_to_server:
                 new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
