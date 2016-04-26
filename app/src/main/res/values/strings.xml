@@ -32,8 +32,8 @@
     <string name="label_add_button">Добавить</string>
 
     <string name="text_warning">Уважаемые преподаватели!\n
-    Брать и сдавать ключи по завершении занятий необходимо ЛИЧНО ВАМ!\n
-    Категорически запрещается передавать ключи другому преподавателю и оставлять компьютерный класс открытым в ваше отсутствие в нём!</string>
+    Брать и сдавать ключи необходимо лично Вам!\n
+    Не оставляйте компьютерный класс открытым!</string>
 
 
     <!-- Navigation Drawer -->
@@ -222,6 +222,10 @@
         <item>3</item>
         <item>4</item>
     </array>
+
+    <string name="view_table_landscape">Альбомный</string>
+    <string name="view_table_portrait">Портретный</string>
+    <string name="view_table_title">Размер сетки</string>
 
 
 </resources>

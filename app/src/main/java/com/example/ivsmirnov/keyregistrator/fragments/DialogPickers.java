@@ -1,11 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
@@ -13,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +16,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.interfaces.Updatable;
+import com.example.ivsmirnov.keyregistrator.adapters.ViewPagerAdapter;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.others.App;
 
@@ -33,26 +28,18 @@ import java.util.List;
  */
 public class DialogPickers extends DialogFragment implements UpdateInterface {
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        System.out.println("create");
-        super.onCreate(savedInstanceState);
-    }
-
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        System.out.println("create view");
         View pagerView = View.inflate(getContext(), R.layout.layout_tab, null);
         ViewPager viewPager = (ViewPager)pagerView.findViewById(R.id.pager_pickers);
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
-        viewPagerAdapter.addFragment(Picker.newInstance(Picker.PICKER_PORTRAIT),"Портретный");
-        viewPagerAdapter.addFragment(Picker.newInstance(Picker.PICKER_LANDSCAPE), "Альбомный");
+        viewPagerAdapter.addFragment(Picker.newInstance(Picker.PICKER_PORTRAIT), getString(R.string.view_table_portrait));
+        viewPagerAdapter.addFragment(Picker.newInstance(Picker.PICKER_LANDSCAPE), getString(R.string.view_table_landscape));
         viewPager.setAdapter(viewPagerAdapter);
 
         Toolbar toolbar = (Toolbar)pagerView.findViewById(R.id.toolbar_pickers);
-        toolbar.setTitle("Размер сетки");
+        toolbar.setTitle(getString(R.string.view_table_title));
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,32 +68,5 @@ public class DialogPickers extends DialogFragment implements UpdateInterface {
         updateInterface.updateInformation();
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
 
-        public ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-        }
-    }
 }

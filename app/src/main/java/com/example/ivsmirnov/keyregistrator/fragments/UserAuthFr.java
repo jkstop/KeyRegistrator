@@ -1,19 +1,25 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -45,27 +51,42 @@ public class UserAuthFr extends Fragment {
     //private ArrayList<String> mTags;
     private ArrayList<PersonItem> mFreeAccessPersonsList;
 
+    private ActionBar mActionBar;
+
     public static UserAuthFr newInstance(){
         return new UserAuthFr();
     }
 
+
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.layout_nfc_fr,container,false);
+        final View rootView = inflater.inflate(R.layout.layout_autorization,container,false);
         mContext = rootView.getContext();
 
+
+
+        //Toolbar toolbar = (Toolbar)rootView.findViewById(R.id.user_auth_toolbar);
+        //toolbar.setTitle("Авторизация пользователя");
+        //toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        //toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        //    @Override
+        //    public void onClick(View v) {
+        //        getActivity().onBackPressed();
+        //    }
+        //});
+
         //mTags = Settings.getFreeUsers();
-        mFreeAccessPersonsList = FavoriteDB.getPersonItems(null, FavoriteDB.CLICK_USER_ACCESS);
+        //mFreeAccessPersonsList = FavoriteDB.getPersonItems(null, FavoriteDB.CLICK_USER_ACCESS);
 
-        TextView mTextAud = (TextView)rootView.findViewById(R.id.nfc_fragment_aud);
-        mTextAud.setText(Settings.getLastClickedAuditroom());
+        //TextView mTextAud = (TextView)rootView.findViewById(R.id.nfc_fragment_aud);
+        //mTextAud.setText(Settings.getLastClickedAuditroom());
 
-        ImageView imageView = (ImageView)rootView.findViewById(R.id.nfc_fragment_reader_image);
-        AnimationDrawable animationDrawable = (AnimationDrawable)imageView.getDrawable();
-        animationDrawable.start();
+        //ImageView imageView = (ImageView)rootView.findViewById(R.id.nfc_fragment_reader_image);
+        //AnimationDrawable animationDrawable = (AnimationDrawable)imageView.getDrawable();
+        //animationDrawable.start();
 
-        final Button showPopupButton = (Button)rootView.findViewById(R.id.nfc_fragment_free_users_button);
+        /*final Button showPopupButton = (Button)rootView.findViewById(R.id.nfc_fragment_free_users_button);
         showPopupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,24 +128,40 @@ public class UserAuthFr extends Fragment {
                     }
                 }));
             }
-        });
+        });*/
 
         return rootView;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mActionBar!= null){
+            mActionBar.setBackgroundDrawable(null);
+        }
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (((Launcher) getActivity()).getSupportActionBar() != null) {
-            ((Launcher) getActivity()).getSupportActionBar().setTitle("");
+        mActionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (mActionBar != null){
+            mActionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorAccent)));
+            mActionBar.setTitle("Авторизация пользователя");
+
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+            mActionBar.setDisplayShowHomeEnabled(true);
         }
+        //if (((Launcher) getActivity()).getSupportActionBar() != null) {
+        //    ((Launcher) getActivity()).getSupportActionBar().setTitle("");
+        //}
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+//getActivity().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
     }
 
     @Override
@@ -136,6 +173,9 @@ public class UserAuthFr extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
+            case android.R.id.home:
+                getActivity().onBackPressed();
+                return true;
             case R.id.menu_nfc_all_persons:
                 //запуск диалога ввода пароля
                 Dialogs dialogs = new Dialogs();

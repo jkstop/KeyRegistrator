@@ -32,9 +32,6 @@ public class Picker extends Fragment {
 
     private int pickersType = 0;
 
-    private GridView gridView;
-    private BaseAdapter adapter;
-
     public static Picker newInstance (int pickerType){
         Picker picker = new Picker();
         Bundle args = new Bundle();
@@ -58,19 +55,10 @@ public class Picker extends Fragment {
 
         pickerColumns.setOnScrollListener(scrollListener);
         pickerRows.setOnScrollListener(scrollListener);
-
-        String [] values;
-
-        gridView = (GridView)rootView.findViewById(R.id.view_table_grid);
-
         switch (pickersType){
             case PICKER_LANDSCAPE:
                 pickerColumns.setValue(Settings.getColumnsLandscape());
                 pickerRows.setValue(Settings.getRowsLandscape());
-
-                adapter = new GridAdapter(Settings.getColumnsLandscape()*Settings.getRowsLandscape(),RoomDB.getRoomList().size());
-                gridView.setNumColumns(Settings.getColumnsLandscape());
-                gridView.setAdapter(adapter);
                 break;
             case PICKER_PORTRAIT:
                 pickerColumns.setValue(Settings.getColumnsPortrait());
@@ -115,42 +103,4 @@ public class Picker extends Fragment {
             }
         }
     };
-
-    private class GridAdapter extends BaseAdapter{
-
-        private int totalItemsCount, currentItemsCount;
-        private Integer[] totalItems, currentItems;
-
-        public GridAdapter (int totalItemsCount, int currentItemsCount){
-            System.out.println("new adapter " + totalItemsCount);
-            this.totalItemsCount = totalItemsCount;
-            this.currentItemsCount = currentItemsCount;
-            this.totalItems = new Integer[totalItemsCount];
-            this.currentItems = new Integer[currentItemsCount];
-        }
-
-
-        @Override
-        public int getCount() {
-            return totalItemsCount;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return totalItems[position];
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return totalItems[position];
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            System.out.println("getView");
-            View rootView = new Button(getContext());
-            rootView.setBackgroundColor(Color.LTGRAY);
-            return rootView;
-        }
-    }
 }

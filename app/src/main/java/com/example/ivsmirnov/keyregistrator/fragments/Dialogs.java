@@ -342,7 +342,6 @@ public class Dialogs extends DialogFragment{
                         .create();
             case ADD_ROOM_DIALOG:
                 //добавление нового помещения
-
                 final TextInputLayout enterAuditroomLayout = (TextInputLayout) View.inflate(mContext, R.layout.view_enter_auditroom, null);
                 final AppCompatEditText enterAuditroomText = (AppCompatEditText)enterAuditroomLayout.findViewById(R.id.view_auditroom_enter_room);
                 AppCompatButton enterAuditroomOkButton = (AppCompatButton)enterAuditroomLayout.findViewById(R.id.view_auditroom_ok_button);
@@ -403,102 +402,6 @@ public class Dialogs extends DialogFragment{
                         .setView(pickerView)
                         .create();
 
-            case DIALOG_RESIZE_ITEMS:
-                //View pagerView = View.inflate(mContext, R.layout.layout_tab, null);
-                //ViewPager viewPager = (ViewPager)pagerView.findViewById(R.id.pager_pickers);
-                //ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
-                //viewPagerAdapter.addFragment(new Picker(),"ONE");
-                //viewPagerAdapter.addFragment(new Picker(), "TWO");
-                //viewPager.setAdapter(viewPagerAdapter);
-
-                //TabLayout tabLayout = (TabLayout)pagerView.findViewById(R.id.tabs);
-                //tabLayout.setupWithViewPager(viewPager);
-
-                //View dialogPickersView = View.inflate(mContext, R.layout.view_table, null);
-                //final MaterialNumberPicker pickerColumns = (MaterialNumberPicker)dialogPickersView.findViewById(R.id.view_table_picker_columns);
-                //final MaterialNumberPicker pickerRows = (MaterialNumberPicker)dialogPickersView.findViewById(R.id.view_table_picker_rows);
-                //pickerColumns.setValue(Settings.getColumnsLandscape());
-                //pickerRows.setValue(Settings.getRowsLandscape());
-                getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-                return new AlertDialog.Builder(getActivity())
-                        .setTitle("pickers")
-                        //.setView(pagerView)
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //Settings.setColumnsLandscape(pickerColumns.getValue());
-                                //Settings.setRowsLandscape(pickerRows.getValue());
-
-                                updateInformation();
-                            }
-                        })
-                        .create();
-                /*
-                View rootView =  View.inflate(mContext, R.layout.view_resize_main_fragment_items, null);
-                //final CardView cardView = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
-                final SeekBar mResizeSeekBar = (SeekBar)rootView.findViewById(R.id.view_resize_vertical_seekbar);
-                mFrameGrid = (FrameLayout)rootView.findViewById(R.id.frame_for_grid_aud);
-
-                //final LinearLayout.LayoutParams cardViewLayoutParams = (LinearLayout.LayoutParams)cardView.getLayoutParams();
-                final LinearLayout.LayoutParams frameGridParams = (LinearLayout.LayoutParams)mFrameGrid.getLayoutParams();
-
-                RecyclerView mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
-                mRoomsGrid.setClickable(false);
-                mRoomsGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getAuditroomColumnsCount()));
-                final AdapterMainRoomGridResizer mAdapter = new AdapterMainRoomGridResizer(RoomDB.readRoomsDB());
-                mRoomsGrid.setAdapter(mAdapter);
-
-                int weightCard = Settings.getDisclaimerWeight();
-                mResizeSeekBar.setMax(100);
-                mResizeSeekBar.setProgress(weightCard);
-                //cardViewLayoutParams.weight = weightCard;
-                frameGridParams.weight = mResizeSeekBar.getMax() - weightCard;
-                mResizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                        //cardViewLayoutParams.weight = progress;
-                        frameGridParams.weight = mResizeSeekBar.getMax() - progress;
-                        //cardView.requestLayout();
-                        mFrameGrid.requestLayout();
-                        mAdapter.notifyDataSetChanged();
-
-                        mProgress = progress;
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
-                    }
-                });
-                return new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.view_resize_title)
-                        .setView(rootView)
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dismiss();
-                            }
-                        })
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (mProgress==0){
-                                    Settings.setDisclaimerWeight(mResizeSeekBar.getProgress());
-                                }else{
-                                    Settings.setDisclaimerWeight(mProgress);
-                                }
-
-                                updateInformation();
-                                dismiss();
-                            }
-                        })
-                        .show();*/
             case DIALOG_ENTER_PASSWORD:
 
                 final CloseRoomInterface mCloseRoomInterface = (CloseRoomInterface)getActivity();
@@ -703,22 +606,6 @@ public class Dialogs extends DialogFragment{
             default:
                 return null;
         }
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        switch (mDialogId){
-            //case DIALOG_RESIZE_ITEMS:
-
-
-
-
-                //return pagerView;
-            default:
-                return super.onCreateView(inflater, container, savedInstanceState);
-        }
-
     }
 
     public static boolean setNumberPickerTextColor(NumberPicker numberPicker, int color)

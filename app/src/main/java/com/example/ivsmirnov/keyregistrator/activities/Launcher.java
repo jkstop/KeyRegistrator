@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -120,15 +121,10 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.launcher);
 
         mContext = this;
         mResources = getResources();
-
-
-
-
 
         //init interfaces
         mBaseWriterInterface = this;
@@ -191,10 +187,11 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
     // Navigation Drawer init; Toolbar init
     private void initNavigationDrawer(){
+        System.out.println("init nav drawer");
         Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            System.out.println("init act bar");
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }

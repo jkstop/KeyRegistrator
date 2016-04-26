@@ -176,9 +176,14 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        System.out.println("init mainFr toolbar 1");
         ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
         if (actionBar != null) {
+            System.out.println("init mainFr toolbar 2");
             actionBar.setTitle(getResources().getString(R.string.toolbar_title_main));
+            //actionBar.setDisplayHomeAsUpEnabled(true);
+            //actionBar.setDisplayShowHomeEnabled(true);
+            //actionBar.setHomeButtonEnabled(true);
         }
     }
 
@@ -189,14 +194,16 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         }
         if (mRoomItems.get(position).getStatus() == RoomDB.ROOM_IS_FREE) {
             Settings.setLastClickedAuditroom(mRoomItems.get(position).getAuditroom());
-            Bundle bundle = new Bundle();
-            bundle.putInt(PersonsFr.PERSONS_FRAGMENT_TYPE, PersonsFr.PERSONS_FRAGMENT_SELECTOR);
-            UserAuthFr nfc_fr = UserAuthFr.newInstance();
-            nfc_fr.setArguments(bundle);
+            //Bundle bundle = new Bundle();
+            //bundle.putInt(PersonsFr.PERSONS_FRAGMENT_TYPE, PersonsFr.PERSONS_FRAGMENT_SELECTOR);
+            //UserAuthFr nfc_fr = UserAuthFr.newInstance();
+            //nfc_fr.setArguments(bundle);
 
-            Launcher.showFragment(getActivity().getSupportFragmentManager(), nfc_fr, R.string.fragment_tag_nfc);
+            //Launcher.showFragment(getActivity().getSupportFragmentManager(), nfc_fr, R.string.fragment_tag_nfc);
 
-            if (Launcher.sCardConnected && Launcher.sReaderStateChangeListener!=null) Launcher.sReaderStateChangeListener.onStateChange(0, 1, 2);
+            //if (Launcher.sCardConnected && Launcher.sReaderStateChangeListener!=null) Launcher.sReaderStateChangeListener.onStateChange(0, 1, 2);
+
+            new DialogUserAuth().show(getFragmentManager(),"user_auth_fragment");
 
 
         } else {
