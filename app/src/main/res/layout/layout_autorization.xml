@@ -13,13 +13,13 @@
     <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
         android:id="@id/user_auth_disclaimer"
         android:layout_below="@id/user_auth_toolbar"
+        app:layout_heightPercent = "13%"
         android:background="@color/primary"
-        app:layout_heightPercent = "15%"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:ellipsize="none"
         android:textStyle="italic"
-        android:maxLines="7"
+        android:maxLines="5"
         android:text="@string/text_warning"
         android:textColor="#ffffff"
         android:gravity="center"
@@ -39,7 +39,6 @@
         android:id="@id/user_auth_pager_view"
         android:layout_below="@id/user_auth_tabs"
         android:layout_width="match_parent"
-        android:background="@color/grey_400"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"  />
 

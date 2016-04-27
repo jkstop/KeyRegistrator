@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.util.Base64;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -20,11 +21,13 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -377,15 +380,26 @@ public class FavoriteDB {
         }
     }
 
-    public static ArrayList<CharacterItem> getPersonsCharacters(){
+    public static ArrayList<CharacterItem> getPersonsCharacters(int accessType){
 
         Cursor cursor = null;
         try {
+            String selection = null;
+            String[] selectionArgs = null;
+            if (accessType != 0){
+                selection = FavoriteDBinit.COLUMN_ACCESS_TYPE + " =?";
+                selectionArgs = new String[]{String.valueOf(accessType)};
+            }
+
             ArrayList <CharacterItem> characters = new ArrayList<>();
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
                     FavoriteDBinit.TABLE_PERSONS,
                     new String[]{FavoriteDBinit.COLUMN_LASTNAME_FAVORITE},
-                    null,null,null,null,null);
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    null);
             cursor.moveToPosition(-1);
             ArrayList<String> uniqueCharacters = new ArrayList<>();
             while (cursor.moveToNext()){
@@ -445,16 +459,33 @@ public class FavoriteDB {
         ArrayList <PersonItem> items = new ArrayList<>();
         Cursor cursor = null;
         try {
-            String selection = null;
-            String[] selectionArgs = null;
+            String selectionType = null, selectionChar = null, selection = null;
+            String[] selectionArgsType = null, selectionArgsChar = null, selectionArgs = null;
+
+            //если есть инфа о доступе
             if (accessType != 0){
-                selection = FavoriteDBinit.COLUMN_ACCESS_TYPE + " =?";
-                selectionArgs = new String[]{String.valueOf(accessType)};
-            } else {
-                if (!character.equals("#")){
-                    selection = FavoriteDBinit.COLUMN_LASTNAME_FAVORITE + " LIKE ?";
-                    selectionArgs = new String[]{character + "%"};
-                }
+                selectionType = FavoriteDBinit.COLUMN_ACCESS_TYPE + " =?";
+                selectionArgsType = new String[]{String.valueOf(accessType)};
+            }
+
+            //если есть инфа о первой букве
+            if (!character.equals("#")){
+                selectionChar = FavoriteDBinit.COLUMN_LASTNAME_FAVORITE + " LIKE ?";
+                selectionArgsChar = new String[]{character + "%"};
+            }
+
+            //проверяем что передано в метод и на основе этого формируем запрос
+            if (selectionType!=null && selectionChar!=null){
+                selection = selectionType + " AND " + selectionChar;
+                selectionArgs = new String[selectionArgsType.length+selectionArgsChar.length];
+                System.arraycopy(selectionArgsType,0,selectionArgs,0,selectionArgsType.length);
+                System.arraycopy(selectionArgsChar,0,selectionArgs,selectionArgsType.length,selectionArgsChar.length);
+            } else if (selectionType!=null && selectionChar==null){
+                selection = selectionType;
+                selectionArgs = selectionArgsType;
+            } else if (selectionType == null && selectionChar!=null){
+                selection = selectionChar;
+                selectionArgs = selectionArgsChar;
             }
 
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,

@@ -407,8 +407,8 @@ public class Dialogs extends DialogFragment{
                 final CloseRoomInterface mCloseRoomInterface = (CloseRoomInterface)getActivity();
                 final int dialog_enter_password_type = getArguments().getInt(DIALOG_ENTER_PASSWORD_TYPE);
                 final TextInputLayout textInputLayout = (TextInputLayout) View.inflate(mContext, R.layout.view_enter_password, null);
-                final AppCompatEditText editPassword = (AppCompatEditText)textInputLayout.findViewById(R.id.view_enter_password_edit_text);
-                AppCompatButton okButton = (AppCompatButton)textInputLayout.findViewById(R.id.view_enter_password_ok_button);
+                final AppCompatEditText editPassword = (AppCompatEditText)textInputLayout.findViewById(R.id.enter_pass_input_text);
+                AppCompatButton okButton = (AppCompatButton)textInputLayout.findViewById(R.id.enter_pass_ok_button);
                 okButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -419,13 +419,7 @@ public class Dialogs extends DialogFragment{
                                     dismiss();
                                     break;
                                 case DIALOG_ENTER_PASSWORD_TYPE_ACCESS_FOR_PERSONS:
-                                    Bundle bundle = new Bundle();
-                                    bundle.putInt(PersonsFr.PERSONS_FRAGMENT_TYPE, PersonsFr.PERSONS_FRAGMENT_SELECTOR);
-                                    bundle.putString(Settings.AUDITROOM, getArguments().getString(Settings.AUDITROOM));
-                                    PersonsFr persons_fr = PersonsFr.newInstance();
-                                    persons_fr.setArguments(bundle);
-
-                                    Launcher.showFragment(getActivity().getSupportFragmentManager(), persons_fr, R.string.navigation_drawer_item_persons);
+                                    Launcher.showFragment(getActivity().getSupportFragmentManager(), PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR, 0, null), R.string.navigation_drawer_item_persons);
                                     break;
                                 default:
                                     break;

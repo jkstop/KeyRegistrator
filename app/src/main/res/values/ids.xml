@@ -5,4 +5,10 @@
     <item name="user_auth_toolbar" type="id"/>
     <item name="user_auth_tabs" type="id"/>
     <item name="user_auth_pager_view" type="id"/>
+    <item name="user_auth_disclaimer_layout" type="id"/>
+    <item name="user_auth_room" type="id"/>
+
+    <item name="enter_pass_input_layout" type="id"/>
+    <item name="enter_pass_input_text" type="id"/>
+    <item name="enter_pass_ok_button" type="id"/>
 </resources>

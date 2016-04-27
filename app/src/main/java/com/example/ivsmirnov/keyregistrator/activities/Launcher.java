@@ -219,11 +219,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                     showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.navigation_drawer_item_home);
                 }else if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_persons))){
                     setToolbarTitle(R.string.toolbar_title_persons);
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(PersonsFr.PERSONS_FRAGMENT_TYPE, PersonsFr.PERSONS_FRAGMENT_EDITOR);
-                    PersonsFr persons_fr = PersonsFr.newInstance();
-                    persons_fr.setArguments(bundle);
-                    showFragment(getSupportFragmentManager(), persons_fr,R.string.navigation_drawer_item_persons);
+                    showFragment(getSupportFragmentManager(),PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_EDITOR, 0, null) ,R.string.navigation_drawer_item_persons);
                 }else if(selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_journal))){
                     setToolbarTitle(R.string.toolbar_title_journal);
                     showFragment(getSupportFragmentManager(), JournalFr.newInstance(),R.string.navigation_drawer_item_journal);
