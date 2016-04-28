@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,8 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
     private ArrayList<RoomItem> mRoomItems;
     private RecycleItemClickListener mListener;
     private Context mContext;
+
+    public View cellFree, cellBusy;
 
     public AdapterMainRoomGrid(Context context, ArrayList<RoomItem> roomItems, RecycleItemClickListener listener) {
         this.mRoomItems = roomItems;
@@ -77,18 +80,18 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
 
         switch (viewType){
             case 1:
-                final View rootViewFree = layoutInflater.inflate(R.layout.card_auditroom_free,parent,false);
-                viewHolder = new auditroomFreeViewHolder(rootViewFree);
-                rootViewFree.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getItemScaleHeight()));
+                cellFree = layoutInflater.inflate(R.layout.card_auditroom_free,parent,false);
+                viewHolder = new auditroomFreeViewHolder(cellFree);
+                scaleCells(cellFree, App.getAppContext().getResources().getConfiguration().orientation);
                 final RecyclerView.ViewHolder finalViewHolder = viewHolder;
-                rootViewFree.setOnClickListener(new View.OnClickListener() {
+                cellFree.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         mListener.onItemClick(v, finalViewHolder.getLayoutPosition(),0);
                     }
                 });
                 final RecyclerView.ViewHolder finalViewHolder1 = viewHolder;
-                rootViewFree.setOnLongClickListener(new View.OnLongClickListener() {
+                cellFree.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
                         mListener.onItemLongClick(v, finalViewHolder1.getLayoutPosition(),0);
@@ -97,17 +100,17 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
                 });
                 break;
             case 0:
-                View rootViewBusy = layoutInflater.inflate(R.layout.card_auditroom_busy,parent,false);
-                viewHolder = new auditroomBusyViewHolder(rootViewBusy);
-                rootViewBusy.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getItemScaleHeight()));
+                cellBusy = layoutInflater.inflate(R.layout.card_auditroom_busy,parent,false);
+                viewHolder = new auditroomBusyViewHolder(cellBusy);
+                scaleCells(cellBusy, App.getAppContext().getResources().getConfiguration().orientation);
                 final RecyclerView.ViewHolder finalViewHolder2 = viewHolder;
-                rootViewBusy.setOnClickListener(new View.OnClickListener() {
+                cellBusy.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         mListener.onItemClick(v, finalViewHolder2.getLayoutPosition(),0);
                     }
                 });
-                rootViewBusy.setOnLongClickListener(new View.OnLongClickListener() {
+                cellBusy.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
                         mListener.onItemLongClick(v,finalViewHolder2.getLayoutPosition(),0);
@@ -118,6 +121,26 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         return viewHolder;
     }
+
+    public void scaleCells(View cell, int orientation){
+
+        int rowsCount = 3;
+        switch (orientation){
+            case Configuration.ORIENTATION_LANDSCAPE:
+                rowsCount = Settings.getRowsLandscape();
+                break;
+            case Configuration.ORIENTATION_PORTRAIT:
+                rowsCount = Settings.getRowsPortrait();
+                break;
+            default:
+                break;
+        }
+        cell.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                MainFr.mAuditroomGrid.getHeight() / rowsCount));
+
+        System.out.println("SCALE CELL " + cell.toString() + "  orient " + orientation + " ROWS " + rowsCount + " GRID_H " + MainFr.mAuditroomGrid.getHeight() + " CELL_H " + MainFr.mAuditroomGrid.getHeight()/rowsCount);
+    }
+
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {

@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -134,6 +135,8 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         View rootView = inflater.inflate(R.layout.layout_persons_fr, container, false);
         mContext = rootView.getContext();
 
+        //showPopup(rootView.findFocus());
+
         mListCharacters = new ArrayList<>();
         mPersonsList = new ArrayList<>();
 
@@ -179,6 +182,17 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
 
         initPersons("#",true).start();
         return rootView;
+    }
+
+    private void showPopup(View ancor){
+        View dialogView = View.inflate(getContext(),R.layout.view_enter_password,null);
+        final PopupWindow popup = new PopupWindow(mContext);
+        popup.setContentView(dialogView);
+        popup.setHeight(getResources().getDimensionPixelOffset(R.dimen.layout_default_margin)*5);
+        popup.setFocusable(true);
+        popup.setWindowLayoutMode(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        popup.showAsDropDown(ancor,0,0);
+        System.out.println("popup");
     }
 
     @Override

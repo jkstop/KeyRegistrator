@@ -1,10 +1,13 @@
 package com.example.ivsmirnov.keyregistrator.activities;
 
+import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.hardware.usb.UsbDevice;
@@ -98,6 +101,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     private DrawerLayout mDrawerLayout;
     private LinearLayout mDrawerRootLayout;
     public static ArrayList<NavigationItem> mNavigationItems;
+    private ListView mNavigationDrawerList;
 
     //account
     private TextView mAccountName, mAccountEmail;
@@ -123,57 +127,52 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.launcher);
 
+        ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+        ComponentName componentName = activityManager.getRunningTasks(1).get(0).topActivity;
+        System.out.println("ACTIVITY " + componentName.getShortClassName());
+
         mContext = this;
         mResources = getResources();
+
+        mNavigationItems = new ArrayList<>();
 
         //init interfaces
         mBaseWriterInterface = this;
         mGetAccountInterface = this;
         mCloseRoomInterface = this;
 
+        //setNavigationItems();
 
+        //initNavigationDrawer();
 
-        setNavigationItems();
+        //connect to server
+        new SQL_Connection(Settings.getServerConnectionParams(), null).execute();
 
-        initNavigationDrawer();
+        //init DataBases
+        new DbShare();
 
+        //init SharedPreferences
+        new Settings();
 
+        //init and set auto close alarm
+        setSheduler();
 
-        if (savedInstanceState==null){
-            //connect to server
-            new SQL_Connection(Settings.getServerConnectionParams(), null).execute();
+        initGoogleAPI();
 
-            //init DataBases
-            new DbShare();
+        new initReader().execute();
 
-            //init SharedPreferences
-            new Settings();
+        initUI();
 
-            //init and set auto close alarm
-            setSheduler();
-
-            initGoogleAPI();
-
-            new initReader().execute();
-
+        if (savedInstanceState == null){
             showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.navigation_drawer_item_home);
         }
+
         //getSupportFragmentManager().beginTransaction().add(MainFr.newInstance(), getStringFromResources(R.string.navigation_drawer_item_home)).commit();
     }
 
-    private void initGoogleAPI(){
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        // Build a GoogleApiClient with access to the Google Sign-In API
-        mGoogleApiClient = new GoogleApiClient.Builder(mContext)
-                .enableAutoManage(this, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-    }
-
-    private void setNavigationItems(){
-        mNavigationItems = new ArrayList<>();
+    private void initUI (){
+        //элементы бокового меню
+        if (!mNavigationItems.isEmpty()) mNavigationItems.clear();
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_home)).setIcon(R.drawable.ic_home_black_24dp).setSelected(true));
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_persons)).setIcon(R.drawable.ic_person_black_24dp));
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_journal)).setIcon(R.drawable.ic_format_list_bulleted_black_24dp));
@@ -183,38 +182,35 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_mail)).setIcon(R.drawable.ic_attachment_black_24dp));
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_sql)).setIcon(R.drawable.ic_cloud_black_24dp));
         mNavigationItems.add(new NavigationItem().setText(mResources.getString(R.string.navigation_drawer_item_stat)).setIcon(R.drawable.ic_info_black_24dp));
-    }
 
-    // Navigation Drawer init; Toolbar init
-    private void initNavigationDrawer(){
-        System.out.println("init nav drawer");
+        //тулбар
         Toolbar toolbar = (Toolbar)findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+
         if (getSupportActionBar() != null) {
-            System.out.println("init act bar");
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
+
         mDrawerRootLayout = (LinearLayout)findViewById(R.id.main_activity_navigation_drawer_rootLayout);
-        final ListView mNavigationDrawerList = (ListView) findViewById(R.id.left_navigation_drawer_list);
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        RelativeLayout mDrawerAccountView = (RelativeLayout) findViewById(R.id.navigation_drawer_account_view);
         mAccountName = (TextView)findViewById(R.id.navigation_drawer_account_information_display_name);
         mAccountEmail = (TextView)findViewById(R.id.navigation_drawer_account_information_email);
-        ImageView mChangeAccount = (ImageView) findViewById(R.id.navigation_drawer_account_information_change_account);
         mAccountImage = (ImageView)findViewById(R.id.navigation_drawer_account_information_image_person);
+
+        mNavigationDrawerList = (ListView) findViewById(R.id.left_navigation_drawer_list);
+        RelativeLayout mDrawerAccountView = (RelativeLayout) findViewById(R.id.navigation_drawer_account_view);
+        ImageView mChangeAccount = (ImageView) findViewById(R.id.navigation_drawer_account_information_change_account);
 
         mDrawerRootLayout.getLayoutParams().width = (int) calculateDrawerWidth();
         mDrawerAccountView.getLayoutParams().height = (int) calculateDrawerHeight(mDrawerRootLayout.getLayoutParams().width);
 
-        //set NavigationItems
         mAdapterNavigationDrawerList = new AdapterNavigationDrawerList(mContext, mNavigationItems);
         mNavigationDrawerList.setAdapter(mAdapterNavigationDrawerList);
         mNavigationDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem  = mNavigationItems.get(position).getText();
-
                 if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_home))){
                     showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.navigation_drawer_item_home);
                 }else if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_persons))){
@@ -243,11 +239,6 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                 } else if (selectedItem.equals(getStringFromResources(R.string.navigation_drawer_item_settings))){
                     startActivity(new Intent(mContext, Preferences.class));
                 }
-
-                //mNavigationItems.get(position).setSelected(true);
-
-               // mAdapterNavigationDrawerList.notifyDataSetChanged();
-
                 mDrawerLayout.closeDrawer(mDrawerRootLayout);
             }
         });
@@ -274,6 +265,22 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     }
 
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
+    private void initGoogleAPI(){
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        // Build a GoogleApiClient with access to the Google Sign-In API
+        mGoogleApiClient = new GoogleApiClient.Builder(mContext)
+                .enableAutoManage(this, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+    }
+
     View.OnClickListener logOutClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -296,28 +303,23 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
-
             if (resultCode == RESULT_OK){
                 if (requestCode == REQUEST_CODE_LOG_ON){
-                    Toast.makeText(mContext, "LOGON " + String.valueOf(resultCode), Toast.LENGTH_SHORT).show();
                     GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-
                     if (result.isSuccess()) {
                         final GoogleSignInAccount acct = result.getSignInAccount();
                         AccountItem accountItem = new AccountItem().setLastname(acct.getDisplayName())
                                 .setEmail(acct.getEmail())
                                 .setPhoto(String.valueOf(acct.getPhotoUrl()))
                                 .setAccountID(acct.getId());
-
                         AccountDB.writeAccount(accountItem);
-
                         FavoriteDB.addNewUser(new PersonItem()
                                 .setLastname(acct.getDisplayName())
                                 .setDivision(acct.getEmail())
                                 .setRadioLabel(acct.getId()));
 
                         Settings.setActiveAccountID(acct.getId());
-                        initNavigationDrawer();
+                        //initNavigationDrawer();
                     }
                 }
             }
@@ -333,7 +335,6 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
             mAccountName.setText(text);
             mAccountEmail.setText(mAccount.getEmail());
             Picasso.with(mContext).load(mAccount.getPhoto()).into(mAccountImage);
-            //if (isNetworkAvailable()) new LoadImageFromWeb(mAccount.getPhoto(), mGetAccountInterface).execute();
         } else {
             mAccountName.setText(getStringFromResources(R.string.navigation_drawer_account_info_text_user));
             mAccountEmail.setText(Values.EMPTY);
@@ -423,7 +424,6 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         mAccountImage.setImageBitmap(bitmap);
 
         checkUserInBase(bitmap).start();
-        //new updateUserAccount().execute(bitmap);
     }
 
     private Thread checkUserInBase(final Bitmap bitmap){
@@ -483,7 +483,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
         setSheduler();
 
-        if (mNavigationItems == null) setNavigationItems();
+        //if (mNavigationItems == null) setNavigationItems();
     }
 
     private void setSheduler(){
@@ -580,7 +580,10 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                             new NFC_Reader().getTag(mReader, new ReaderInterface() {
                                 @Override
                                 public void onGetPersonTag(String tag) {
-                                    PersonsFr persons_fr = (PersonsFr) getFragmentByTag(R.string.navigation_drawer_item_persons);
+                                    ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+                                    ComponentName componentName = activityManager.getRunningTasks(1).get(0).topActivity;
+                                    System.out.println("ACTIVITY " + componentName.getShortClassName());
+                                    /*PersonsFr persons_fr = (PersonsFr) getFragmentByTag(R.string.navigation_drawer_item_persons);
                                     UserAuthFr nfc_fr = (UserAuthFr)getFragmentByTag(R.string.fragment_tag_nfc);
                                     MainFr main_fr = (MainFr) getFragmentByTag(R.string.navigation_drawer_item_home);
 
@@ -603,7 +606,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                                         }
                                     } else {
                                         Toasts.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_incorrect_card),Toasts.TOAST_NEGATIVE);
-                                    }
+                                    }*/
                                 }
                             });
                         } else {

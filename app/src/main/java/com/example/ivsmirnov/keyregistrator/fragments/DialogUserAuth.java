@@ -2,9 +2,11 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.app.Dialog;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -19,6 +21,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.ViewPagerAdapter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.others.App;
@@ -33,18 +36,35 @@ public class DialogUserAuth extends DialogFragment implements PersonsFr.DialogNe
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
 
+    private int previousTab = 0;
+    private boolean correctPass = false;
+
     @Override
     public void onStart() {
         super.onStart();
+        setRetainInstance(true);
         Dialog dialog = getDialog();
         if (dialog!=null){
             dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         }
     }
 
+    @Override
+    public void onDestroyView() {
+
+        System.out.println("DESTROY");
+        Dialog dialog = getDialog();
+        if (dialog!=null && getRetainInstance()){
+            //dialog.setOnDismissListener(null);
+            dialog.setDismissMessage(null);
+        }
+        super.onDestroyView();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        System.out.println("create VIEW");
         View rootView = inflater.inflate(R.layout.layout_autorization,container, false);
 
         Toolbar toolbar = (Toolbar)rootView.findViewById(R.id.user_auth_toolbar);
@@ -57,15 +77,11 @@ public class DialogUserAuth extends DialogFragment implements PersonsFr.DialogNe
             }
         });
 
-
-
-        UserAuthAllUsers userAuthAllUsers = new UserAuthAllUsers();
-
         mViewPager = (ViewPager)rootView.findViewById(R.id.user_auth_pager_view);
         mViewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
         mViewPagerAdapter.addFragment(UserAuthCard.newInstance("!!SELECTED ROOM!!"), "По карте");
         mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR, FavoriteDB.CLICK_USER_ACCESS, Settings.getLastClickedAuditroom()), "Без карты");
-        mViewPagerAdapter.addFragment(userAuthAllUsers, "Все пользователи");
+        mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR,0,Settings.getLastClickedAuditroom()), "Все пользователи");
 
         mViewPager.setAdapter(mViewPagerAdapter);
 
@@ -75,45 +91,67 @@ public class DialogUserAuth extends DialogFragment implements PersonsFr.DialogNe
         mTabLayout.getTabAt(1).setIcon(R.drawable.ic_touch_app_black_24dp);
         mTabLayout.getTabAt(2).setIcon(R.drawable.ic_supervisor_account_black_24dp);
 
-        View dialogView = View.inflate(getContext(),R.layout.view_enter_password,null);
-        //final AlertDialog dialodPass = new AlertDialog.Builder(mViewPager.getContext())//popupWindow ???
-        //        .setTitle("TITLE")
-        //        .setView(dialogView)
-         //       .create();
-
-        // Creating the PopupWindow
-        final PopupWindow popup = new PopupWindow(mViewPager.getContext());
-        popup.setContentView(dialogView);
-        popup.setHeight(getResources().getDimensionPixelOffset(R.dimen.layout_default_margin)*5);
-        popup.setFocusable(true); //скидывается
-        popup.setWindowLayoutMode(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-        // Clear the default translucent background
-        //popup.setBackgroundDrawable();
-
-        //popup.showAsDropDown(showPopupButton, 0, 0);
-
         mTabLayout.setOnTabSelectedListener(
+
                 new TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
                     @Override
                     public void onTabSelected(TabLayout.Tab tab) {
                         super.onTabSelected(tab);
                         if (tab.getText().equals("Все пользователи")){
-                            popup.showAsDropDown(mTabLayout, 0, 0);
+                            showEnterPassPopup();
                         }
                     }
 
                     @Override
                     public void onTabUnselected(TabLayout.Tab tab) {
                         super.onTabUnselected(tab);
-                        if (tab.getText().equals("Все пользователи")){
-                            //dialodPass.hide();
-                            popup.dismiss();
-                        }
+                        previousTab = tab.getPosition();
                     }
                 });
 
         return rootView;
+    }
+
+    private void showEnterPassPopup(){
+        View dialogView = View.inflate(getContext(),R.layout.view_enter_password,null);
+        final PopupWindow popup = new PopupWindow(getContext());
+        final TextInputLayout mPassInputLayout = (TextInputLayout)dialogView.findViewById(R.id.enter_pass_input_layout);
+        dialogView.findViewById(R.id.enter_pass_ok_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mPassInputLayout.getEditText().getText().toString().equals("1212")){
+                    correctPass = true;
+                    popup.dismiss();
+                } else {
+                    mPassInputLayout.setError("Пароль акбар");
+                }
+            }
+        });
+        popup.setContentView(dialogView);
+        popup.setHeight(getResources().getDimensionPixelOffset(R.dimen.layout_default_margin)*5);
+        popup.setFocusable(true);
+        popup.setOutsideTouchable(true);
+        popup.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
+        popup.setWindowLayoutMode(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        popup.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                if (correctPass){
+                    popup.dismiss();
+                } else {
+                    mTabLayout.getTabAt(previousTab).select();
+                }
+                correctPass = false;
+            }
+        });
+        System.out.println("SHOW POPUP IN " + mTabLayout.toString());
+
+        mTabLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                popup.showAsDropDown(mTabLayout, 0, 0);
+            }
+        });
     }
 
     @Override

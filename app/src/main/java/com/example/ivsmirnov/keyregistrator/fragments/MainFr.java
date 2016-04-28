@@ -45,6 +45,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     public static RecyclerView mAuditroomGrid;
 
     private AdapterMainRoomGrid mAdapter;
+    private GridLayoutManager mGridManager;
 
     private Context mContext;
     private ArrayList<RoomItem> mRoomItems;
@@ -66,12 +67,17 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         setRetainInstance(true);
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        //mAdapter.scaleCells(mAdapter.cellFree, newConfig.orientation);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.layout_main_fr,container,false);
         mContext = rootView.getContext();
-
 
         mRoomItems = new ArrayList<>();
 
@@ -96,6 +102,10 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         return rootView;
     }
 
+    private void initGridLM(){
+
+    }
+
     private void setLayoutsWeight(){
         int weightCard = Settings.getDisclaimerWeight();
         //((LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams()).weight = weightCard;
@@ -107,18 +117,20 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         mRoomItems.addAll(RoomDB.readRoomsDB());
 
         mAdapter = new AdapterMainRoomGrid(mContext, mRoomItems,this);
+        mAdapter.hasStableIds();
         mAuditroomGrid.setAdapter(mAdapter);
-
+        mGridManager = new GridLayoutManager(mContext,2);
         switch (getResources().getConfiguration().orientation){
             case Configuration.ORIENTATION_LANDSCAPE:
-                mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getColumnsLandscape()));
+                mGridManager.setSpanCount(Settings.getColumnsLandscape());
                 break;
             case Configuration.ORIENTATION_PORTRAIT:
-                mAuditroomGrid.setLayoutManager(new GridLayoutManager(mContext, Settings.getColumnsPortrait()));
+                mGridManager.setSpanCount(Settings.getColumnsPortrait());
                 break;
             default:
                 break;
         }
+        mAuditroomGrid.setLayoutManager(mGridManager);
     }
 
 

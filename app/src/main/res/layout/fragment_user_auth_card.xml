@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="#ef5350">
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/layout_default_margin"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-</RelativeLayout>
+    <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
+        android:id="@id/user_auth_card_disclaimer"
+        app:layout_heightPercent = "35%"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:text="@string/nfc_fragment_head"
+        android:textSize="100sp"
+        android:maxLines="2"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"/>
+
+    <ImageView
+        android:id="@id/user_auth_card_arrow_down"
+        android:layout_below="@id/user_auth_card_disclaimer"
+        android:layout_centerHorizontal="true"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+
+</android.support.percent.PercentRelativeLayout>
