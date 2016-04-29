@@ -36,13 +36,6 @@ public class Preferences extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
         getFragmentManager().beginTransaction().replace(R.id.layout_preference_placeholder,new SettingsFr()).commit();
     }
 

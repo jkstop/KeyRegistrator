@@ -2,6 +2,7 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
+import com.example.ivsmirnov.keyregistrator.activities.UserAuth;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
@@ -215,7 +217,9 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
             //if (Launcher.sCardConnected && Launcher.sReaderStateChangeListener!=null) Launcher.sReaderStateChangeListener.onStateChange(0, 1, 2);
 
-            new DialogUserAuth().show(getFragmentManager(),"user_auth_fragment");
+            //new DialogUserAuth().show(getFragmentManager(),);
+
+            startActivity(new Intent(mContext, UserAuth.class));
 
 
         } else {
@@ -232,16 +236,18 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     public void onItemLongClick(View v, int position, long timeIn) {
         if (mRoomItems.get(position).getStatus() == RoomDB.ROOM_IS_BUSY){
             if (mRoomItems.get(position).getAccessType()== FavoriteDB.CARD_USER_ACCESS){
-                Dialogs dialogs = new Dialogs();
-                Bundle bundle = new Bundle();
+                //Dialogs dialogs = new Dialogs();
+                //Bundle bundle = new Bundle();
                 //bundle.putLong(Values.POSITION_IN_BASE_FOR_ROOM,mRoomItems.get(position).getTime());
-                bundle.putString("aud",mRoomItems.get(position).getAuditroom());
-                bundle.putString("tag",mRoomItems.get(position).getTag());
+                //bundle.putString("aud",mRoomItems.get(position).getAuditroom());
+                //bundle.putString("tag",mRoomItems.get(position).getTag());
                 //bundle.putLong("positionInBase",mRoomItems.get(position).getTime());
-                bundle.putInt(Dialogs.DIALOG_ENTER_PASSWORD_TYPE, Dialogs.DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM);
-                bundle.putInt(Dialogs.DIALOG_TYPE,Dialogs.DIALOG_ENTER_PASSWORD);
-                dialogs.setArguments(bundle);
-                dialogs.show(getFragmentManager(),"enter_pin");
+                //bundle.putInt(Dialogs.DIALOG_ENTER_PASSWORD_TYPE, Dialogs.DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM);
+                //bundle.putInt(Dialogs.DIALOG_TYPE,Dialogs.DIALOG_ENTER_PASSWORD);
+                //dialogs.setArguments(bundle);
+                //dialogs.show(getFragmentManager(),"enter_pin");
+                DialogPassword.newInstance(mRoomItems.get(position).getTag())
+                        .show(getFragmentManager(), DialogPassword.ROOMS_ACCESS);
             }
         }
     }

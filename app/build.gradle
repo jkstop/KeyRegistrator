@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.ivsmirnov.keyregistrator"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 23
         versionCode 7
         versionName "3.2"

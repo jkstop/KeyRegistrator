@@ -402,41 +402,6 @@ public class Dialogs extends DialogFragment{
                         .setView(pickerView)
                         .create();
 
-            case DIALOG_ENTER_PASSWORD:
-
-                final CloseRoomInterface mCloseRoomInterface = (CloseRoomInterface)getActivity();
-                final int dialog_enter_password_type = getArguments().getInt(DIALOG_ENTER_PASSWORD_TYPE);
-                final TextInputLayout textInputLayout = (TextInputLayout) View.inflate(mContext, R.layout.view_enter_password, null);
-                final AppCompatEditText editPassword = (AppCompatEditText)textInputLayout.findViewById(R.id.enter_pass_input_text);
-                AppCompatButton okButton = (AppCompatButton)textInputLayout.findViewById(R.id.enter_pass_ok_button);
-                okButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (editPassword.getText().toString().equalsIgnoreCase("1212")){
-                            switch (dialog_enter_password_type){
-                                case DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM:
-                                    new CloseRooms(mContext, getArguments().getString("tag"), mCloseRoomInterface).execute();
-                                    dismiss();
-                                    break;
-                                case DIALOG_ENTER_PASSWORD_TYPE_ACCESS_FOR_PERSONS:
-                                    Launcher.showFragment(getActivity().getSupportFragmentManager(), PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR, 0, null), R.string.navigation_drawer_item_persons);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }else{
-                            textInputLayout.setError(getResources().getString(R.string.view_enter_password_entered_incorrect));
-                            editPassword.getText().clear();
-                        }
-                    }
-                });
-
-                return new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.view_enter_password_title)
-                        .setView(textInputLayout)
-                        .setCancelable(false)
-                        .create();
-
             case DIALOG_SQL_CONNECT:
                 View dialogLayout = View.inflate(mContext, R.layout.layout_dialog_sql_connect, null);
                 final AppCompatEditText inputServer = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_server)).getEditText();

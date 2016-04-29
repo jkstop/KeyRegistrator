@@ -3,6 +3,9 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,6 +20,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -132,7 +136,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.layout_persons_fr, container, false);
+        final View rootView = inflater.inflate(R.layout.layout_persons_fr, container, false);
         mContext = rootView.getContext();
 
         //showPopup(rootView.findFocus());
@@ -146,7 +150,8 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         mAddFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Launcher.showFragment(getActivity().getSupportFragmentManager(), SearchFr.new_Instance(), R.string.fragment_tag_search);
+                //Launcher.showFragment(getActivity().getSupportFragmentManager(), SearchFr.new_Instance(), R.string.fragment_tag_search);
+                //showPopup(rootView, mAddFAB); ну его нафиг, сделать dialogfragment
             }
         });
 
@@ -184,24 +189,46 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         return rootView;
     }
 
-    private void showPopup(View ancor){
+    private void showPopup(View root, View ancor){
         View dialogView = View.inflate(getContext(),R.layout.view_enter_password,null);
         final PopupWindow popup = new PopupWindow(mContext);
         popup.setContentView(dialogView);
         popup.setHeight(getResources().getDimensionPixelOffset(R.dimen.layout_default_margin)*5);
+        popup.setWidth(300);
         popup.setFocusable(true);
-        popup.setWindowLayoutMode(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        popup.showAsDropDown(ancor,0,0);
-        System.out.println("popup");
+        popup.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
+        //popup.setWindowLayoutMode(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        Rect location = locateView(ancor);
+        popup.showAtLocation(root, Gravity.BOTTOM, location.left, location.top);
+    }
+
+    public static Rect locateView(View v)
+    {
+        int[] loc_int = new int[2];
+        if (v == null) return null;
+        try
+        {
+            v.getLocationOnScreen(loc_int);
+        } catch (NullPointerException npe)
+        {
+            //Happens when the view doesn't exist on screen anymore.
+            return null;
+        }
+        Rect location = new Rect();
+        location.left = loc_int[0];
+        location.top = loc_int[1];
+        location.right = location.left + v.getWidth();
+        location.bottom = location.top + v.getHeight();
+        return location;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(getResources().getString(R.string.toolbar_title_persons));
-        }
+        //ActionBar actionBar = getActivity().getSupportActionBar();
+        //if (actionBar != null) {
+        //    actionBar.setTitle(getResources().getString(R.string.toolbar_title_persons));
+        //}
         if (bundleType == PERSONS_FRAGMENT_SELECTOR){
             setHasOptionsMenu(false);
         }else{
@@ -347,10 +374,6 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
                 }
                 lastClickTime = SystemClock.elapsedRealtime();
 
-                //интерфейс для закрытия диалога с выбором
-                DialogNeedClose mCallback = (DialogNeedClose)getParentFragment();
-                if (mCallback!=null) mCallback.close();
-
                 break;
             case PERSONS_FRAGMENT_EDITOR:
                 Bundle b = new Bundle();
@@ -385,7 +408,4 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         }
     }
 
-    public interface DialogNeedClose{
-        void close();
-    }
 }

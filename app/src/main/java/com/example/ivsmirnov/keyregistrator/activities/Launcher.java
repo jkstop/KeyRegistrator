@@ -1,17 +1,10 @@
 package com.example.ivsmirnov.keyregistrator.activities;
 
-import android.app.ActivityManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -26,7 +19,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,18 +30,15 @@ import android.widget.Toast;
 import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterNavigationDrawerList;
-import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.databases.DbShare;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
-import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.fragments.MainFr;
 import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
-import com.example.ivsmirnov.keyregistrator.interfaces.ReaderInterface;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.items.NavigationItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
@@ -57,7 +46,6 @@ import com.example.ivsmirnov.keyregistrator.databases.AccountDB;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialogs;
 import com.example.ivsmirnov.keyregistrator.fragments.EmailFr;
 import com.example.ivsmirnov.keyregistrator.fragments.JournalFr;
-import com.example.ivsmirnov.keyregistrator.fragments.UserAuthFr;
 import com.example.ivsmirnov.keyregistrator.fragments.RoomsFr;
 import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 
@@ -65,7 +53,7 @@ import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.Alarm;
-import com.example.ivsmirnov.keyregistrator.services.NFC_Reader;
+import com.example.ivsmirnov.keyregistrator.services.NFC;
 import com.example.ivsmirnov.keyregistrator.services.Toasts;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
@@ -93,6 +81,9 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
     private Context mContext;
     private Resources mResources;
+
+    //NFC reader
+    private NFC mNFCReader;
 
     //adapters
     public static AdapterNavigationDrawerList mAdapterNavigationDrawerList;
@@ -123,13 +114,20 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     private Alarm mAlarm;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        System.out.println("START");
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        System.out.println("CREATE");
         setContentView(R.layout.launcher);
 
-        ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
-        ComponentName componentName = activityManager.getRunningTasks(1).get(0).topActivity;
-        System.out.println("ACTIVITY " + componentName.getShortClassName());
+       // ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+       /// ComponentName componentName = activityManager.getRunningTasks(1).get(0).topActivity;
+       // System.out.println("ACTIVITY " + this.getClass().getCanonicalName());
 
         mContext = this;
         mResources = getResources();
@@ -140,10 +138,6 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         mBaseWriterInterface = this;
         mGetAccountInterface = this;
         mCloseRoomInterface = this;
-
-        //setNavigationItems();
-
-        //initNavigationDrawer();
 
         //connect to server
         new SQL_Connection(Settings.getServerConnectionParams(), null).execute();
@@ -159,15 +153,17 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
 
         initGoogleAPI();
 
-        new initReader().execute();
+        //new initReader().execute();
+
 
         initUI();
 
         if (savedInstanceState == null){
             showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.navigation_drawer_item_home);
+
+            mNFCReader = new NFC();
         }
 
-        //getSupportFragmentManager().beginTransaction().add(MainFr.newInstance(), getStringFromResources(R.string.navigation_drawer_item_home)).commit();
     }
 
     private void initUI (){
@@ -480,9 +476,9 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     @Override
     protected void onResume() {
         super.onResume();
+        System.out.println("RESUME");
 
-        setSheduler();
-
+        //setSheduler();
         //if (mNavigationItems == null) setNavigationItems();
     }
 
@@ -496,26 +492,21 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        System.out.println("DESTROY");
+
+        if (mAlarm!=null)  mAlarm.cancelAlarm();
 
         //close databases
         DbShare.closeDB();
 
         //close reader
-        try {
-            if (mReader!=null){
-                mReader.close();
-                unregisterReceiver(mReceiver);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        mNFCReader.closeReader();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-
-        if (mAlarm!=null)  mAlarm.cancelAlarm();
+        System.out.println("STOP");
     }
 
     @Override
@@ -541,7 +532,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
             return netInfo!=null && netInfo.getState() == NetworkInfo.State.CONNECTED;
         }
     }
-
+/*
     private class initReader extends AsyncTask<Void,Void,Void> {
 
         @Override
@@ -606,7 +597,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
                                         }
                                     } else {
                                         Toasts.showFullscreenToast(mContext, getStringFromResources(R.string.text_toast_incorrect_card),Toasts.TOAST_NEGATIVE);
-                                    }*/
+                                    }
                                 }
                             });
                         } else {
@@ -624,7 +615,7 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
             return null;
         }
     }
-
+*/
     @Override
     public void onSuccessBaseWrite() {
         showFragment(getSupportFragmentManager(), MainFr.newInstance(), R.string.navigation_drawer_item_home);
@@ -639,21 +630,6 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         return getSupportFragmentManager().findFragmentByTag(getResources().getString(resID));
     }
 
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (ACTION_USB_PERMISSION.equals(intent.getAction())){
-                synchronized (this){
-                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED,false)){
-                        if (device!=null){
-                            new NFC_Reader.openReader(mReader).execute(device);
-                        }
-                    }
-                }
-            }
-        }
-    };
 
     //поиск пользователя в базе; выдача ключей (type = NFC) или показ информации (type = PERSONS)
     private class GetUser extends AsyncTask <String, Void, String> {

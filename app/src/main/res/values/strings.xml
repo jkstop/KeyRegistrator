@@ -27,6 +27,7 @@
     <string name="title_delete_room_dialog">Удаление</string>
     <string name="title_add_new_staff">Добавление нового пользователя</string>
     <string name="title_dialog_log_out">Отсоединение аккаунта</string>
+    <string name="title_activity_user_auth">Авторизация пользователя</string>
 
 
     <string name="label_add_button">Добавить</string>
@@ -123,7 +124,7 @@
 
 
     <string name="view_enter_password_hint_password">Пароль</string>
-    <string name="view_enter_password_title">Введите пароль</string>
+    <string name="view_enter_password_title">Требуется пароль</string>
     <string name="view_enter_password_entered_incorrect">Неверный пароль!</string>
 
     <string name="view_enter_auditroom_hint_room">Помещение</string>
@@ -215,13 +216,6 @@
     <string name="shared_preferences_write_journal_server">Журнал посещений</string>
     <string name="shared_preferences_write_teachers_server">Список пользователей</string>
     <string name="shared_preferences_write_rooms_server">Список помещений</string>
-
-    <array name="picker">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-    </array>
 
     <string name="view_table_landscape">Альбомный</string>
     <string name="view_table_portrait">Портретный</string>
