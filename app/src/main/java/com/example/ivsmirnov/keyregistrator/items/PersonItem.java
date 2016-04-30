@@ -3,6 +3,8 @@ package com.example.ivsmirnov.keyregistrator.items;
 
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
+import java.io.File;
+
 /**
  * User item
  */
@@ -14,6 +16,7 @@ public class PersonItem {
     private String Sex;
     private String PhotoPath;
     private String Photo;
+    private File PhotoFile;
     private String RadioLabel;
     private int AccessType;
 
@@ -108,6 +111,15 @@ public class PersonItem {
     public PersonItem setPhoto (String photo){
         this.Photo = photo;
         return this;
+    }
+
+    public PersonItem setPhoto (File photo){
+        PhotoFile = photo;
+        return this;
+    }
+
+    public File getPhotoFile(){
+        return PhotoFile;
     }
 
     public String getPhoto (){

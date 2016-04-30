@@ -72,7 +72,6 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
         mPersonsRecycler = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_search_persons);
         mPersonsRecycler.setLayoutManager(new GridLayoutManager(mContext,3));
-
         mAdapter = new AdapterPersonsGrid(mContext,mPersonItemsList,AdapterPersonsGrid.SHOW_ALL_PERSONS,this);
         mPersonsRecycler.setAdapter(mAdapter);
 
@@ -264,8 +263,6 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
                         + " WHERE " + SQL_Connection.COLUMN_ALL_STAFF_LASTNAME
                         + " LIKE '" + params[0] + "%'");
                 while (resultSet.next()){
-
-
                    // mItems.add();
 
                     publishProgress(new PersonItem().setLastname(resultSet.getString(SQL_Connection.COLUMN_ALL_STAFF_LASTNAME))

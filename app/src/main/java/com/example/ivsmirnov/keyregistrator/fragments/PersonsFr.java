@@ -152,6 +152,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
             public void onClick(View v) {
                 //Launcher.showFragment(getActivity().getSupportFragmentManager(), SearchFr.new_Instance(), R.string.fragment_tag_search);
                 //showPopup(rootView, mAddFAB); ну его нафиг, сделать dialogfragment
+                new DialogSearch().show(getFragmentManager(),"search");
             }
         });
 

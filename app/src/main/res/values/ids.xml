@@ -15,5 +15,10 @@
     <item name="enter_pass_input_text" type="id"/>
     <item name="enter_pass_ok_button" type="id"/>
 
+    <item name="dialog_search_appbar" type="id"/>
+    <item name="dialog_search_toolbar" type="id"/>
+    <item name="dialog_search_input" type="id"/>
+    <item name="dialog_search_add_button" type="id"/>
+    <item name="dialog_search_recycler" type="id"/>
 
 </resources>

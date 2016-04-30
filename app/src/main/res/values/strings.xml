@@ -122,7 +122,6 @@
     <string name="descryption_card_email_add_new_recipient_save">descryption_card_email_add_new_recipient_save</string>
     <string name="descryption_person_card_icon_access">descryption_person_card_icon_access</string>
 
-
     <string name="view_enter_password_hint_password">Пароль</string>
     <string name="view_enter_password_title">Требуется пароль</string>
     <string name="view_enter_password_entered_incorrect">Неверный пароль!</string>
@@ -220,6 +219,8 @@
     <string name="view_table_landscape">Альбомный</string>
     <string name="view_table_portrait">Портретный</string>
     <string name="view_table_title">Размер сетки</string>
+
+    <string name="dialog_search_query_hint">Начните вводить фамилию</string>
 
 
 </resources>

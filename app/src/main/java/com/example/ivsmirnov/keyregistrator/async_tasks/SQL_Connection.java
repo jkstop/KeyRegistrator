@@ -80,11 +80,13 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
         try {
             Class.forName(classs);
             String ConnURL = "jdbc:jtds:sqlserver://" + mServerConnectionItem.getServerName() + ";"
-                    + "database=" + db +";user=" + mServerConnectionItem.getUserName() + ";password="
+                    + "database=" + db +";socketTimeout=300;loginTimeout=10;user=" + mServerConnectionItem.getUserName() + ";password="
                     + mServerConnectionItem.getUserPassword() + ";";
 
             if (SQLconnect == null){
-                SQLconnect = DriverManager.getConnection(ConnURL);
+                Properties properties = new Properties();
+                properties.put("timeout","5000"); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                SQLconnect = DriverManager.getConnection(ConnURL,properties);
             }
 
             return null;

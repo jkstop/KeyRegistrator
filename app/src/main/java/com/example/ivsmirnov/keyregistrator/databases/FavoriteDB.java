@@ -164,7 +164,7 @@ public class FavoriteDB {
                 //сохраняем фото в память
                 photoPath = new ImageSaver(App.getAppContext())
                         .setFileName(personItem.getRadioLabel())
-                        .save(personItem.getPhoto());
+                        .save(personItem.getPhoto(), null);
                 personItem.setPhotoPath(photoPath);
 
                 if (personItem.getAccessType() == 0){

@@ -500,7 +500,9 @@ public class Launcher extends AppCompatActivity implements GetAccountInterface, 
         DbShare.closeDB();
 
         //close reader
-        mNFCReader.closeReader();
+        if (mNFCReader!=null){
+            mNFCReader.closeReader();
+        }
     }
 
     @Override

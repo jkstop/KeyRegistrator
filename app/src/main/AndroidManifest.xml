@@ -44,7 +44,20 @@
             android:name=".activities.UserAuth"
             android:parentActivityName=".activities.Launcher"
             android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize"
-            android:label="@string/title_activity_user_auth"/>
+            android:label="@string/title_activity_user_auth">
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+        </activity>
+
+        <activity android:name=".activities.Search">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+            </intent-filter>
+        </activity>
+
 
         <activity
             android:name="com.nononsenseapps.filepicker.FilePickerActivity"

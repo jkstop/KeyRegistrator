@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Base64;
 
+import com.example.ivsmirnov.keyregistrator.others.App;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,6 +22,8 @@ public class ImageSaver {
     private Context mContext;
     private String mFileName;
 
+    public static final String TEMP = "/Temp";
+
     public ImageSaver (Context context) {
         mContext = context;
     }
@@ -29,12 +33,12 @@ public class ImageSaver {
         return this;
     }
 
-    public String save (String photo){
+    public String save (String photo, String dir){
         FileOutputStream fileOutputStream = null;
         byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
         Bitmap bitmap;
         try {
-            File file = createFile();
+            File file = createFile(dir);
             fileOutputStream = new FileOutputStream(file);
             bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
             bitmap.compress(Bitmap.CompressFormat.WEBP, 100, fileOutputStream);
@@ -52,7 +56,7 @@ public class ImageSaver {
         return null;
     }
 
-    public Bitmap load (){
+    /*public Bitmap load (){
         FileInputStream fileInputStream = null;
         try {
             fileInputStream = new FileInputStream(createFile());
@@ -67,14 +71,24 @@ public class ImageSaver {
             }
         }
         return null;
+    }*/
+
+   // public File getImage (){
+   //     return createFile();
+   // }
+
+    public static File getCustomPath(){
+        return new File(App.getAppContext().getFilesDir() + TEMP);
     }
 
-    public File getImage (){
-        return createFile();
-    }
-
-    private File createFile(){
-        return new File(mContext.getFilesDir(), mFileName);
+    private File createFile(String customDir){
+        if (customDir == null){
+            return new File(mContext.getFilesDir(), mFileName);
+        } else {
+            File customPath = new File(mContext.getFilesDir() + customDir);
+            customPath.mkdirs();
+            return new File(customPath, mFileName);
+        }
     }
 
 }
