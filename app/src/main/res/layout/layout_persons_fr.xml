@@ -37,6 +37,7 @@
                     android:layout_height="wrap_content"
                     app:backgroundTint="@color/colorAccent"
                     app:elevation="@dimen/persons_fragment_fab_elevation"
+                    android:layout_margin="16dp"
                     android:src="@drawable/fab_ic_add"
                     android:layout_gravity="end|bottom"
                     app:layout_anchor="@+id/recycler_view_for_base_sql"

@@ -1,23 +1,16 @@
 package com.example.ivsmirnov.keyregistrator.activities;
 
-import android.app.SearchManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
-import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.PopupWindow;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.ViewPagerAdapter;
@@ -50,17 +43,6 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
         initUI();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_user_auth, menu);
-
-        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.menu_main_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-        return true;
-    }
-
     private void initUI(){
         //set actionbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.user_auth_toolbar);
@@ -68,6 +50,14 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        //цвет статусбара начиная с lollipop
+       // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+       //     Window window = getWindow();
+       //     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+       //     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+       //     window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        //}
 
         mViewPager = (ViewPager)findViewById(R.id.user_auth_pager_view);
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());

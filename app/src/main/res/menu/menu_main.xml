@@ -7,18 +7,6 @@
         android:title="@string/menu_main_items_size"
         app:showAsAction="never"/>
 
-    <item
-        android:id="@+id/menu_main_upload_all_to_server"
-        android:title="@string/menu_main_upload_all_to_server"
-        android:icon="@drawable/ic_cloud_upload_black_24dp"
-        app:showAsAction="never"/>
-
-    <item
-        android:id="@+id/menu_main_download_all_from_server"
-        android:title="@string/menu_main_download_all_from_server"
-        android:icon="@drawable/ic_cloud_download_black_24dp"
-        app:showAsAction="never"/>
-
 
     <!--<item
          android:id="@+id/test"

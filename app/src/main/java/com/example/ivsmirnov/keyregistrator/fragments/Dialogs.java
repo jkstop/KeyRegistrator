@@ -3,14 +3,8 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Dialog;
 import android.graphics.Paint;
 import android.os.Build;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 
 import android.content.Context;
@@ -24,35 +18,24 @@ import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.NumberPicker;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
-import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGridResizer;
-import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetJournal;
 import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
-import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.Updatable;
 import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
@@ -68,10 +51,6 @@ import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import biz.kasual.materialnumberpicker.MaterialNumberPicker;
 
 public class Dialogs extends DialogFragment{
 
@@ -420,7 +399,7 @@ public class Dialogs extends DialogFragment{
                 if (Settings.getServerStatus()){
                     serverStatusImage.setImageResource(R.drawable.ic_cloud_done_black_48dp);
                     serverStatusText.setText(R.string.dialog_sql_server_connected);
-                    serverStatusText.setTextColor(getResources().getColor(R.color.primary));
+                    serverStatusText.setTextColor(getResources().getColor(R.color.colorPrimary));
                 } else {
                     serverStatusImage.setImageResource(R.drawable.ic_cloud_off_black_48dp);
                     serverStatusText.setText(R.string.dialog_sql_server_disconnected);
@@ -448,14 +427,13 @@ public class Dialogs extends DialogFragment{
                                 .setUserName(inputLogin.getText().toString())
                                 .setUserPassword(inputPassword.getText().toString());
                         try {
-                            SQL_Connection.SQLconnect = null;
-                            new SQL_Connection(newServerConnectionItem, new SQL_Connection.SQL_Connection_interface() {
+                            SQL_Connection.getConnection(new SQL_Connection.Callback() {
                                 @Override
                                 public void onServerConnected() {
                                     serverCheckConnection.clearAnimation();
                                     serverStatusImage.setImageResource(R.drawable.ic_cloud_done_black_48dp);
                                     serverStatusText.setText(R.string.dialog_sql_server_connected);
-                                    serverStatusText.setTextColor(getResources().getColor(R.color.primary));
+                                    serverStatusText.setTextColor(getResources().getColor(R.color.colorPrimary));
                                 }
 
                                 @Override
@@ -475,7 +453,7 @@ public class Dialogs extends DialogFragment{
                                         inputPassword.setError(e.getLocalizedMessage());
                                     }
                                 }
-                            }).execute();
+                            });
                         } catch (Exception e){
                             e.printStackTrace();
                         }

@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.LinearLayoutCompat
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".activities.Preferences"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <include
-        layout="@layout/toolbar"
-        android:id="@+id/layout_preference_toolbar" />
+    <include layout="@layout/app_bar_main" />
 
-    <FrameLayout
-        android:id="@+id/layout_preference_placeholder"
-        android:layout_below="@id/layout_preference_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-</RelativeLayout>
+</android.support.v7.widget.LinearLayoutCompat>

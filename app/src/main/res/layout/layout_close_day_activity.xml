@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <include
-        layout="@layout/toolbar"
+        layout="@layout/app_bar_main"
         android:id="@+id/layout_close_day_text_head"/>
 
     <android.support.v7.widget.CardView
@@ -16,7 +16,7 @@
         android:layout_margin="@dimen/layout_default_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/primary"
+        app:cardBackgroundColor="@color/colorPrimary"
         app:contentPadding="@dimen/layout_default_margin"
         app:cardElevation="@dimen/card_default_elevation">
 

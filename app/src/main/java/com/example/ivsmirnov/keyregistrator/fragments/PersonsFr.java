@@ -150,9 +150,11 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         mAddFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Launcher.showFragment(getActivity().getSupportFragmentManager(), SearchFr.new_Instance(), R.string.fragment_tag_search);
-                //showPopup(rootView, mAddFAB); ну его нафиг, сделать dialogfragment
-                new DialogSearch().show(getFragmentManager(),"search");
+                if (bundleType == PERSONS_FRAGMENT_SELECTOR && bundleRoom!=null){
+                    DialogSearch.newInstance(bundleRoom).show(getFragmentManager(),"search");
+                } else {
+                    new DialogSearch().show(getFragmentManager(), "search");
+                }
             }
         });
 
@@ -162,7 +164,6 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
 
         mListView = (ListView)rootView.findViewById(R.id.persons_fragment_list_characters);
         mLoadingBar = (ProgressBar)rootView.findViewById(R.id.layout_persons_fragment_loading_progress_bar);
-
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -190,43 +191,15 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         return rootView;
     }
 
-    private void showPopup(View root, View ancor){
-        View dialogView = View.inflate(getContext(),R.layout.view_enter_password,null);
-        final PopupWindow popup = new PopupWindow(mContext);
-        popup.setContentView(dialogView);
-        popup.setHeight(getResources().getDimensionPixelOffset(R.dimen.layout_default_margin)*5);
-        popup.setWidth(300);
-        popup.setFocusable(true);
-        popup.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
-        //popup.setWindowLayoutMode(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        Rect location = locateView(ancor);
-        popup.showAtLocation(root, Gravity.BOTTOM, location.left, location.top);
-    }
-
-    public static Rect locateView(View v)
-    {
-        int[] loc_int = new int[2];
-        if (v == null) return null;
-        try
-        {
-            v.getLocationOnScreen(loc_int);
-        } catch (NullPointerException npe)
-        {
-            //Happens when the view doesn't exist on screen anymore.
-            return null;
-        }
-        Rect location = new Rect();
-        location.left = loc_int[0];
-        location.top = loc_int[1];
-        location.right = location.left + v.getWidth();
-        location.bottom = location.top + v.getHeight();
-        return location;
-    }
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //ActionBar actionBar = getActivity().getSupportActionBar();
+
+        //if (actionBar!=null){
+        //    actionBar.setTitle(getResources().getString(R.string.toolbar_title_persons));
+            //actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
+        //}
+        //ActionBar actionBar = getActivity().get
         //if (actionBar != null) {
         //    actionBar.setTitle(getResources().getString(R.string.toolbar_title_persons));
         //}
@@ -236,8 +209,6 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
             setHasOptionsMenu(true);
         }
     }
-
-
 
     private void initRecyclerAdapter(){
         mAdapter = new AdapterPersonsGrid(mContext, mPersonsList, AdapterPersonsGrid.SHOW_FAVORITE_PERSONS, this);
@@ -329,8 +300,6 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         return new Thread(new Runnable() {
             @Override
             public void run() {
-
-                System.out.println("START INIT " + character + " " + isInitAllCharacters);
 
                 mHandler.sendEmptyMessage(HANDLER_SHOW_PROGRESS);
 

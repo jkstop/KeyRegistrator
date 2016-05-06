@@ -85,10 +85,11 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(getResources().getString(R.string.toolbar_title_auditrooms));
-        }
+        ((Launcher)getActivity()).setToolbarTitle(R.string.toolbar_title_auditrooms);
+        //ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
+        //if (actionBar != null) {
+         //   actionBar.setTitle(getResources().getString(R.string.toolbar_title_auditrooms));
+        //}
     }
 
     @Override

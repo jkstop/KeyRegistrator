@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@id/navigation_item_home"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="@string/toolbar_title_main" />
+        <item
+            android:id="@id/navigation_item_persons"
+            android:icon="@drawable/ic_person_black_24dp"
+            android:title="@string/toolbar_title_persons" />
+        <item
+            android:id="@id/navigation_item_journal"
+            android:icon="@drawable/ic_format_list_bulleted_black_24dp"
+            android:title="@string/toolbar_title_journal" />
+        <item
+            android:id="@id/navigation_item_rooms"
+            android:icon="@drawable/ic_room_black_24dp"
+            android:title="@string/toolbar_title_auditrooms"/>
+        <item
+            android:id="@id/navigation_item_email"
+            android:icon="@drawable/ic_attachment_black_24dp"
+            android:title="@string/toolbar_title_email"/>
+        <item
+            android:id="@id/navigation_item_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/navigation_drawer_item_settings"/>
+    </group>
+
+    <item
+        android:title="Синхронизация">
+        <menu>
+            <item
+                android:id="@id/navigation_item_sql_connect"
+                android:icon="@drawable/ic_cloud_black_24dp"
+                android:title="@string/navigation_drawer_item_sql"/>
+            <item
+                android:id="@+id/navigation_item_upload_all_to_server"
+                android:title="@string/menu_main_upload_all_to_server"
+                android:icon="@drawable/ic_cloud_upload_black_24dp" />
+
+            <item
+                android:id="@+id/navigation_item_download_all_from_server"
+                android:title="@string/menu_main_download_all_from_server"
+                android:icon="@drawable/ic_cloud_download_black_24dp" />
+        </menu>
+
+    </item>
+
+
+
+
+</menu>

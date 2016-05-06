@@ -87,7 +87,7 @@ public class ServerWriter extends AsyncTask<Integer,Void,Void> {
     @Override
     protected Void doInBackground(Integer... params) {
         try {
-            Connection mConnection = SQL_Connection.SQLconnect;
+            Connection mConnection = SQL_Connection.getConnection(null);
             Statement mStatement = mConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             ResultSet mResult;
             if (mConnection!=null){

@@ -27,7 +27,7 @@ public class Toasts {
                 toastView.setBackgroundResource(R.color.colorAccent);
                 break;
             case TOAST_POSITIVE:
-                toastView.setBackgroundResource(R.color.primary);
+                toastView.setBackgroundResource(R.color.colorPrimary);
                 break;
             default:
                 break;

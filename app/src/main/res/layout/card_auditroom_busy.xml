@@ -8,7 +8,7 @@
     app:contentPadding="@dimen/auditroom_card_content_padding"
     app:cardUseCompatPadding="true"
     android:foreground="?android:attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/auditroom_busy_card">
+    app:cardBackgroundColor="@color/colorAccent">
 
     <android.support.percent.PercentRelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

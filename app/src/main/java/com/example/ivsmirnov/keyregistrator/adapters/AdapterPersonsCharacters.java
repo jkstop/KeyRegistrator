@@ -34,7 +34,7 @@ public class AdapterPersonsCharacters extends ArrayAdapter<CharacterItem> {
         TextView text = (TextView)rootView.findViewById(R.id.text_for_row_character_list);
         text.setText(mCharacters.get(position).getCharacter());
         if (mCharacters.get(position).getSelection()){
-            rootView.setBackgroundColor(App.getAppContext().getResources().getColor(R.color.primary));
+            rootView.setBackgroundColor(App.getAppContext().getResources().getColor(R.color.colorPrimary));
         }
 
         return rootView;

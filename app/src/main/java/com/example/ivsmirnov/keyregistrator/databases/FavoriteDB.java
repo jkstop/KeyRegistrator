@@ -95,7 +95,7 @@ public class FavoriteDB {
                 }
             }else if (userLocation == SERVER_USER){
 
-                Connection connection = SQL_Connection.SQLconnect;
+                Connection connection = SQL_Connection.getConnection(null);
                 if (connection!=null){
                     try {
                         //получаем всю инфу с сервера о пользователе
@@ -104,13 +104,17 @@ public class FavoriteDB {
                                 + " WHERE " + SQL_Connection.COLUMN_ALL_STAFF_TAG + " = '" + tag + "'");
                         resultSet.first();
                         if (resultSet.getRow() !=0){
-                            return new PersonItem().setLastname(resultSet.getString("LASTNAME"))
+                            PersonItem serverPersonItem = new PersonItem().setLastname(resultSet.getString("LASTNAME"))
                                     .setFirstname(resultSet.getString("FIRSTNAME"))
                                     .setMidname(resultSet.getString("MIDNAME"))
                                     .setDivision(resultSet.getString("NAME_DIVISION"))
                                     .setSex(resultSet.getString("SEX"))
-                                    .setRadioLabel(resultSet.getString("RADIO_LABEL"))
-                                    .setPhoto(resultSet.getString("PHOTO"));
+                                    .setRadioLabel(resultSet.getString("RADIO_LABEL"));
+                            if (withBase64Photo){
+                                serverPersonItem.setPhoto(resultSet.getString("PHOTO"));
+                            }
+                            System.out.println("serverPersonItemPhoto " + serverPersonItem.getPhoto());
+                            return serverPersonItem;
                         }
 
                         /*    String photo = resultSet.getString("PHOTO");
@@ -159,6 +163,11 @@ public class FavoriteDB {
         try {
             if (personItem!=null){
 
+                //если пользователь уже есть в базе, то удаляем старую запись
+                if (isUserInBase(personItem.getRadioLabel())){
+                    deleteUser(personItem.getRadioLabel());
+                }
+
                 if (personItem.getPhoto() == null) personItem.setPhoto(getBase64DefaultPhotoFromResources());
 
                 //сохраняем фото в память
@@ -186,11 +195,6 @@ public class FavoriteDB {
 
                 if (photoPath!=null) cv.put(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE, photoPath);
 
-                //если пользователь уже есть в базе, то удаляем старую запись
-                if (isUserInBase(personItem.getRadioLabel())){
-                    deleteUser(personItem.getRadioLabel());
-                }
-
                 //пишем в базу
                 DbShare.getDataBase(DbShare.DB_FAVORITE).insert(FavoriteDBinit.TABLE_PERSONS, null, cv);
 
@@ -198,7 +202,6 @@ public class FavoriteDB {
                 if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
                     new ServerWriter(personItem).execute(ServerWriter.PERSON_UPDATE);
                 }
-
 
                 return true;
             } else {
@@ -229,7 +232,7 @@ public class FavoriteDB {
                     }
                     return null;
                 case SERVER_PHOTO:
-                    Connection mConnection = SQL_Connection.SQLconnect;
+                    Connection mConnection = SQL_Connection.getConnection(null);
                     if (mConnection!=null){
                         try {
                             String mPhoto;

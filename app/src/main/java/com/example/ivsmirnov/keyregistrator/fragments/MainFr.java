@@ -170,16 +170,12 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
                 //dialog_resize.setTargetFragment(this,0);
                 //dialog_resize.show(getFragmentManager(),"dialog_resize");
                 return true;
-            case R.id.menu_main_upload_all_to_server:
-                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
-                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
-                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
-                return true;
-            case R.id.menu_main_download_all_from_server:
-                new ServerReader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_ROOMS);
-                new ServerReader(mContext, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_TEACHERS);
-                new ServerReader(mContext, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_JOURNAL);
-                return true;
+            //case R.id.menu_main_upload_all_to_server:
+
+              //  return true;
+            //case R.id.menu_main_download_all_from_server:
+
+              //  return true;
             //case R.id.test:
                 //new insert(mContext).execute();
               //  return true;
@@ -192,15 +188,18 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        System.out.println("init mainFr toolbar 1");
-        ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            System.out.println("init mainFr toolbar 2");
-            actionBar.setTitle(getResources().getString(R.string.toolbar_title_main));
+
+        ((Launcher)getActivity()).setToolbarTitle(R.string.toolbar_title_main);
+
+        //System.out.println("init mainFr app_bar_main 1");
+        //ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
+        //if (actionBar != null) {
+            //System.out.println("init mainFr app_bar_main 2");
+            //actionBar.setTitle(getResources().getString(R.string.toolbar_title_main));
             //actionBar.setDisplayHomeAsUpEnabled(true);
             //actionBar.setDisplayShowHomeEnabled(true);
             //actionBar.setHomeButtonEnabled(true);
-        }
+        //}
     }
 
     @Override

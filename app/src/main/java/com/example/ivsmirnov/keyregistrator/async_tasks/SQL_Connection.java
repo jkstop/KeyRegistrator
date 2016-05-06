@@ -4,17 +4,19 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 
+import com.example.ivsmirnov.keyregistrator.fragments.DialogPassword;
 import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Соединение с сервером
  */
-public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
+public class SQL_Connection extends AsyncTask<Void,Void,Connection> {
 
     //таблицы
     public static final String JOURNAL_TABLE = "JOURNAL_V2";
@@ -57,21 +59,46 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
     public static final String COLUMN_ALL_STAFF_PHOTO = "PHOTO";
     public static final String COLUMN_ALL_STAFF_TAG = "RADIO_LABEL";
 
-    public static Connection SQLconnect;
+    private static Connection SQLconnect;
 
     private ServerConnectionItem mServerConnectionItem;
-    private SQL_Connection_interface mConnectionInterface;
+    private Callback mCallback;
+    private static SQL_Connection mConnectTask;
 
-    public SQL_Connection (ServerConnectionItem serverConnectionItem, SQL_Connection_interface sql_connection_interface){
+    String classs = "net.sourceforge.jtds.jdbc.Driver";
+    String db = "KeyRegistratorBase";
+
+    public SQL_Connection (ServerConnectionItem serverConnectionItem, Callback callback){
         this.mServerConnectionItem = serverConnectionItem;
-        this.mConnectionInterface = sql_connection_interface;
-        System.out.println("sql connection ***************************************");
+        this.mCallback = callback;
+    }
+
+    public static Connection getConnection(Callback callback){
+        System.out.println("SQL CONNECT " + SQLconnect);
+        if (SQLconnect!=null){
+            return SQLconnect;
+        } else {
+            ServerConnectionItem serverConnectionItem = Settings.getServerConnectionParams();
+            if (mConnectTask == null){
+                try {
+                    mConnectTask = new SQL_Connection(serverConnectionItem, callback);
+                    mConnectTask.execute();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
     }
 
     @Override
-    protected Exception doInBackground(Void... params) {
-        String classs = "net.sourceforge.jtds.jdbc.Driver";
-        String db = "KeyRegistratorBase";
+    protected void onPreExecute() {
+        super.onPreExecute();
+        System.out.println("********** SQL connection START **********");
+    }
+
+    @Override
+    protected Connection doInBackground(Void... params) {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
@@ -80,38 +107,35 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
         try {
             Class.forName(classs);
             String ConnURL = "jdbc:jtds:sqlserver://" + mServerConnectionItem.getServerName() + ";"
-                    + "database=" + db +";socketTimeout=300;loginTimeout=10;user=" + mServerConnectionItem.getUserName() + ";password="
+                    + "database=" + db +";user=" + mServerConnectionItem.getUserName() + ";password="
                     + mServerConnectionItem.getUserPassword() + ";";
-
-            if (SQLconnect == null){
-                Properties properties = new Properties();
-                properties.put("timeout","5000"); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                SQLconnect = DriverManager.getConnection(ConnURL,properties);
-            }
-
-            return null;
-
+            SQLconnect = DriverManager.getConnection(ConnURL);
+            return SQLconnect;
         }catch (Exception e) {
-            //e.printStackTrace();
-            return e;
+            e.printStackTrace();
+            if (mCallback!=null) mCallback.onServerConnectException(e);
+            return null;
         }
-
     }
 
     @Override
-    protected void onPostExecute(Exception e) {
-        System.out.println("sql connection -------------------------------------");
-        if (e != null){
+    protected void onPostExecute(Connection connection) {
+        System.out.println("********** SQL connection END **********");
+        if (connection == null){
             Settings.setServerStatus(false);
-            if (mConnectionInterface!=null) mConnectionInterface.onServerConnectException(e);
-            if (mConnectionInterface!=null) mConnectionInterface.onServerDisconnected();
+            System.out.println("SERVER DISCONNECTED");
+            if (mCallback!=null) mCallback.onServerDisconnected();
+            //if (mConnectionInterface!=null) mConnectionInterface.onServerConnectException(e);
+            //if (mConnectionInterface!=null) mConnectionInterface.onServerDisconnected();
         } else {
             Settings.setServerStatus(true);
-            if (mConnectionInterface!=null) mConnectionInterface.onServerConnected();
+            if (mCallback!=null) mCallback.onServerConnected();
+            //if (mConnectionInterface!=null) mConnectionInterface.onServerConnected();
+            System.out.println("SERVER CONNECTED");
         }
     }
 
-    public interface SQL_Connection_interface{
+    public interface Callback{
         void onServerConnected();
         void onServerDisconnected();
         void onServerConnectException(Exception e);

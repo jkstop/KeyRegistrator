@@ -29,14 +29,14 @@ public class Preferences extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_preference);
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.layout_preference_toolbar);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.layout_main_app_bar);
 
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        getFragmentManager().beginTransaction().replace(R.id.layout_preference_placeholder,new SettingsFr()).commit();
+        getFragmentManager().beginTransaction().replace(R.id.layout_main_content_frame,new SettingsFr()).commit();
     }
 
 

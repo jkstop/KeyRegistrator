@@ -53,7 +53,7 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
     protected Void doInBackground(Integer... params) {
 
         try {
-            Connection connection = SQL_Connection.SQLconnect;
+            Connection connection = SQL_Connection.getConnection(null);
             if (connection!=null){
 
                 Statement mStatement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);

@@ -35,7 +35,7 @@ public class UserAuthCard extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_user_auth_card, container,false);
         ImageView mImageWayContainer = (ImageView)rootView.findViewById(R.id.user_auth_card_arrow_down);
         Drawable mDrawArrow = getContext().getResources().getDrawable(R.drawable.down);
-        mDrawArrow.setColorFilter(getContext().getResources().getColor(R.color.primaryDark), PorterDuff.Mode.SRC_IN);
+        mDrawArrow.setColorFilter(getContext().getResources().getColor(R.color.colorPrimaryDark), PorterDuff.Mode.SRC_IN);
         mImageWayContainer.setImageDrawable(mDrawArrow);
         Animation fadeAnim = AnimationUtils.loadAnimation(getContext(),R.anim.fade_arrow);
         mImageWayContainer.startAnimation(fadeAnim);

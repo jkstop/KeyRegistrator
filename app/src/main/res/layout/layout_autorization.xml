@@ -6,7 +6,7 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@id/user_auth_toolbar"
-        android:background="@color/primary"
+        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"/>
 
@@ -14,7 +14,7 @@
         android:id="@id/user_auth_disclaimer"
         android:layout_below="@id/user_auth_toolbar"
         app:layout_heightPercent = "13%"
-        android:background="@color/primary"
+        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:ellipsize="none"
@@ -31,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:tabIndicatorColor="@color/colorAccent"
-        android:background="@color/primary"
+        android:background="@color/colorPrimary"
         app:tabMode="fixed"
         app:tabGravity="fill"/>
 

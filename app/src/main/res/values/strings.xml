@@ -12,12 +12,14 @@
 
     <string name="server_client_id">127775171233-cudgtb5mc7s0e83jj3nbofkb5thhig8q.apps.googleusercontent.com</string>
 
+    <string name="local_account">Локальный аккаунт</string>
+
     <string name="text_empty_auds">Список пуст. Добавьте аудитории через настройки.</string>
     <string name="fragment_tag_nfc">fragment_tag_nfc</string>
     <string name="fragment_tag_search">fragment_tag_search</string>
 
     <!-- Titles -->
-    <string name="toolbar_title_main">Выберите при помощи мыши нужную аудиторию</string>
+    <string name="toolbar_title_main">Загруженность аудиторий</string>
     <string name="toolbar_title_persons">Преподаватели</string>
     <string name="toolbar_title_journal">Журнал</string>
     <string name="toolbar_title_auditrooms">Аудитории</string>
@@ -86,7 +88,6 @@
 
     <!-- Navigation drawer -->
     <string name="navigation_drawer_list_item_content_description_image">navigation_drawer_list_item_content_description</string>
-    <string name="navigation_drawer_account_info_text_user">Войти</string>
     <string name="navigation_drawer_item_home">Главная</string>
     <string name="navigation_drawer_item_persons">Преподаватели</string>
     <string name="navigation_drawer_item_journal">Журнал</string>
@@ -221,6 +222,8 @@
     <string name="view_table_title">Размер сетки</string>
 
     <string name="dialog_search_query_hint">Начните вводить фамилию</string>
+    <string name="snack_user_add_success">Пользователь добавлен!</string>
+    <string name="snack_user_add_error">Ошибка при добавлении пользователя!</string>
 
 
 </resources>

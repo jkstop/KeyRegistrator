@@ -55,7 +55,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_toStartOf="@+id/navigation_drawer_account_information_change_account"
                     android:layout_toLeftOf="@+id/navigation_drawer_account_information_change_account"
-                    android:text="@string/navigation_drawer_account_info_text_user" />
+                    />
                 <TextView
                     android:id="@+id/navigation_drawer_account_information_email"
                     style="@style/NavigationDrawerAccountInfoText"

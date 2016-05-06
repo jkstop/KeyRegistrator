@@ -60,7 +60,7 @@ public class NFC {
                 String runnungActivityName = activityManager.getRunningTasks(1).get(0).topActivity.getClassName();
                 System.out.println(runnungActivityName);
                 if (runnungActivityName.equals(Launcher.class.getCanonicalName())){
-                    System.out.println("launcher");
+                    System.out.println("activity_launcher");
                 } else if (runnungActivityName.equals(Preferences.class.getCanonicalName())){
                     System.out.println("settings");
                 } else if (runnungActivityName.equals(CloseDay.class.getCanonicalName())){
@@ -72,7 +72,7 @@ public class NFC {
                 }
                 //switch (componentName.getClassName()){
                 //    case Launcher.class.getCanonicalName():
-                //        System.out.println("launcher");
+                //        System.out.println("activity_launcher");
                 //        break;
                 //    default:
                 //        break;

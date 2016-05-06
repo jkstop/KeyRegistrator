@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/navigation_drawer_account_view"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/nav_header_height"
+    android:background="@drawable/navigation_splash"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@id/navigation_header_account_image"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_above="@id/navigation_header_account_info"
+        android:src="@drawable/ic_account_circle_white_48dp" />
+
+    <RelativeLayout
+        android:id="@id/navigation_header_account_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@id/navigation_header_account_title"
+            android:clickable="true"
+            android:layout_toStartOf="@id/navigation_header_exit"
+            android:layout_toLeftOf="@id/navigation_header_exit"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/local_account" />
+
+        <TextView
+            android:id="@id/navigation_header_account_subtitle"
+            android:layout_below="@id/navigation_header_account_title"
+            android:layout_toStartOf="@id/navigation_header_exit"
+            android:layout_toLeftOf="@id/navigation_header_exit"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@id/navigation_header_exit"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:clickable="true"
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/navigation_drawer_change_account_image_descritpion"
+            android:background="@drawable/ic_exit_to_app_white_24dp"/>
+    </RelativeLayout>
+
+</RelativeLayout>

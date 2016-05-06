@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterEmailExtras;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.databases.AccountDB;
@@ -175,6 +176,12 @@ public class EmailFr extends Fragment implements GetAccountInterface, EmailInter
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        ((Launcher)getActivity()).setToolbarTitle(R.string.toolbar_title_email);
     }
 
     private void checkSendButtonVisibility(){

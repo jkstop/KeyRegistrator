@@ -20,5 +20,26 @@
     <item name="dialog_search_input" type="id"/>
     <item name="dialog_search_add_button" type="id"/>
     <item name="dialog_search_recycler" type="id"/>
+    <item name="dialog_search_progress" type="id"/>
+
+    <item name="layout_main_content_frame" type="id"/>
+    <item name="layout_main_drawer" type="id"/>
+    <item name="layout_main_navigation_view" type="id"/>
+    <item name="layout_main_app_bar" type="id"/>
+
+    <item name="navigation_header_account_image" type="id"/>
+    <item name="navigation_header_account_info" type="id"/>
+    <item name="navigation_header_account_title" type="id"/>
+    <item name="navigation_header_account_subtitle" type="id"/>
+    <item name="navigation_header_exit" type="id" />
+
+    <item name="navigation_item_home" type="id"/>
+    <item name="navigation_item_persons" type="id"/>
+    <item name="navigation_item_journal" type="id"/>
+    <item name="navigation_item_rooms" type="id"/>
+    <item name="navigation_item_settings" type="id"/>
+    <item name="navigation_item_sql_connect" type="id"/>
+    <item name="navigation_item_email" type="id"/>
+    <item name="navigation_item_stat" type="id"/>
 
 </resources>
