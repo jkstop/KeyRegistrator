@@ -95,7 +95,7 @@ public class FavoriteDB {
                 }
             }else if (userLocation == SERVER_USER){
 
-                Connection connection = SQL_Connection.getConnection(null);
+                Connection connection = SQL_Connection.getConnection(null,null);
                 if (connection!=null){
                     try {
                         //получаем всю инфу с сервера о пользователе
@@ -232,7 +232,7 @@ public class FavoriteDB {
                     }
                     return null;
                 case SERVER_PHOTO:
-                    Connection mConnection = SQL_Connection.getConnection(null);
+                    Connection mConnection = SQL_Connection.getConnection(null, null);
                     if (mConnection!=null){
                         try {
                             String mPhoto;

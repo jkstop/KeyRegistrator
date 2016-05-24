@@ -77,6 +77,7 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Set;
 
 
 public class Launcher extends AppCompatActivity implements
@@ -166,7 +167,7 @@ public class Launcher extends AppCompatActivity implements
 
         //connect to server
         //new SQL_Connection(Settings.getServerConnectionParams(), null).execute();
-        SQL_Connection.getConnection(null);
+        SQL_Connection.getConnection(null, null);
 
         //init DataBases
         new DbShare();

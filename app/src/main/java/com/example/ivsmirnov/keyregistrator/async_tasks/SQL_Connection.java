@@ -11,12 +11,13 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 /**
  * Соединение с сервером
  */
-public class SQL_Connection extends AsyncTask<Void,Void,Connection> {
+public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
 
     //таблицы
     public static final String JOURNAL_TABLE = "JOURNAL_V2";
@@ -61,31 +62,27 @@ public class SQL_Connection extends AsyncTask<Void,Void,Connection> {
 
     private static Connection SQLconnect;
 
-    private ServerConnectionItem mServerConnectionItem;
+    private String mServerName;
     private Callback mCallback;
     private static SQL_Connection mConnectTask;
 
     String classs = "net.sourceforge.jtds.jdbc.Driver";
     String db = "KeyRegistratorBase";
 
-    public SQL_Connection (ServerConnectionItem serverConnectionItem, Callback callback){
-        this.mServerConnectionItem = serverConnectionItem;
+    public SQL_Connection (String serverName, Callback callback){
+        this.mServerName = serverName;
         this.mCallback = callback;
     }
 
-    public static Connection getConnection(Callback callback){
+    public static Connection getConnection(String serverName, Callback callback){
         System.out.println("SQL CONNECT " + SQLconnect);
-        if (SQLconnect!=null){
-            return SQLconnect;
+        if (serverName !=null){
+            new SQL_Connection(serverName, callback).execute();
         } else {
-            ServerConnectionItem serverConnectionItem = Settings.getServerConnectionParams();
-            if (mConnectTask == null){
-                try {
-                    mConnectTask = new SQL_Connection(serverConnectionItem, callback);
-                    mConnectTask.execute();
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
+            if (SQLconnect!=null){
+                return SQLconnect;
+            } else {
+                new SQL_Connection(Settings.getServerName(), callback).execute();
             }
         }
         return null;
@@ -98,7 +95,7 @@ public class SQL_Connection extends AsyncTask<Void,Void,Connection> {
     }
 
     @Override
-    protected Connection doInBackground(Void... params) {
+    protected Exception doInBackground(Void... params) {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
@@ -106,25 +103,25 @@ public class SQL_Connection extends AsyncTask<Void,Void,Connection> {
 
         try {
             Class.forName(classs);
-            String ConnURL = "jdbc:jtds:sqlserver://" + mServerConnectionItem.getServerName() + ";"
-                    + "database=" + db +";user=" + mServerConnectionItem.getUserName() + ";password="
-                    + mServerConnectionItem.getUserPassword() + ";";
+            String ConnURL = "jdbc:jtds:sqlserver://" + mServerName + ";"
+                    + "database=" + db +";user=shsupport;password=podderzhka;";
             SQLconnect = DriverManager.getConnection(ConnURL);
-            return SQLconnect;
+            return null;
         }catch (Exception e) {
             e.printStackTrace();
-            if (mCallback!=null) mCallback.onServerConnectException(e);
-            return null;
+            SQLconnect = null;
+            //if (mCallback!=null) mCallback.onServerConnectException(e);
+            return e;
         }
     }
 
     @Override
-    protected void onPostExecute(Connection connection) {
+    protected void onPostExecute(Exception e) {
         System.out.println("********** SQL connection END **********");
-        if (connection == null){
+        if (e != null){
             Settings.setServerStatus(false);
             System.out.println("SERVER DISCONNECTED");
-            if (mCallback!=null) mCallback.onServerDisconnected();
+            if (mCallback!=null) mCallback.onServerConnectException(e);
             //if (mConnectionInterface!=null) mConnectionInterface.onServerConnectException(e);
             //if (mConnectionInterface!=null) mConnectionInterface.onServerDisconnected();
         } else {
@@ -137,7 +134,6 @@ public class SQL_Connection extends AsyncTask<Void,Void,Connection> {
 
     public interface Callback{
         void onServerConnected();
-        void onServerDisconnected();
         void onServerConnectException(Exception e);
     }
 }

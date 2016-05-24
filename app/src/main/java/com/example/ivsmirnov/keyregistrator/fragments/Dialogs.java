@@ -427,7 +427,7 @@ public class Dialogs extends DialogFragment{
                                 .setUserName(inputLogin.getText().toString())
                                 .setUserPassword(inputPassword.getText().toString());
                         try {
-                            SQL_Connection.getConnection(new SQL_Connection.Callback() {
+                            SQL_Connection.getConnection(null, new SQL_Connection.Callback() {
                                 @Override
                                 public void onServerConnected() {
                                     serverCheckConnection.clearAnimation();
@@ -436,13 +436,13 @@ public class Dialogs extends DialogFragment{
                                     serverStatusText.setTextColor(getResources().getColor(R.color.colorPrimary));
                                 }
 
-                                @Override
-                                public void onServerDisconnected() {
-                                    serverCheckConnection.clearAnimation();
-                                    serverStatusImage.setImageResource(R.drawable.ic_cloud_off_black_48dp);
-                                    serverStatusText.setText(R.string.dialog_sql_server_disconnected);
-                                    serverStatusText.setTextColor(getResources().getColor(R.color.colorAccent));
-                                }
+                                //@Override
+                               // public void onServerDisconnected() {
+                                  //  serverCheckConnection.clearAnimation();
+                                 //   serverStatusImage.setImageResource(R.drawable.ic_cloud_off_black_48dp);
+                                 //   serverStatusText.setText(R.string.dialog_sql_server_disconnected);
+                                ///    serverStatusText.setTextColor(getResources().getColor(R.color.colorAccent));
+                                //}
 
                                 @Override
                                 public void onServerConnectException(Exception e) {

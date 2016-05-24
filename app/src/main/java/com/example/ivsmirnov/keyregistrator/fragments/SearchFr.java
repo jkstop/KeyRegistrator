@@ -77,7 +77,7 @@ public class SearchFr extends Fragment implements TagSearcherInterface, RecycleI
 
         Button mAddButton = (Button) rootView.findViewById(R.id.layout_add_new_staff_input_button);
 
-        final Connection connection = SQL_Connection.getConnection(null);
+        final Connection connection = SQL_Connection.getConnection(null, null);
         final TextInputLayout mInputLayout = (TextInputLayout)rootView.findViewById(R.id.layout_add_new_staff_input);
         final AppCompatEditText mInputText = (AppCompatEditText) rootView.findViewById(R.id.layout_add_new_staff_input_text);
         if (mInputText.requestFocus()){

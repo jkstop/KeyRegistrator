@@ -144,6 +144,7 @@
 
     <string name="input_empty_error">Введите хотя бы один символ!</string>
     <string name="input_already_exist_error">Такое помещение уже есть!</string>
+    <string name="input_sql_server_name_error">Имя сервера не может быть пустым!</string>
 
     <string name="view_resize_title">Для изменения размера элементов перетащите ползунок справа</string>
 
@@ -167,7 +168,7 @@
 
     <string name="dialog_sql_server_connected">Соединение установлено</string>
     <string name="dialog_sql_server_disconnected">Отключено</string>
-    <string name="dialog_sql_server_hint_server">Сервер</string>
+    <string name="dialog_sql_server_hint_server">Имя или IP-адрес сервера</string>
     <string name="dialog_sql_server_hint_user">Логин</string>
     <string name="dialog_sql_server_hint_password">Пароль</string>
 
@@ -216,6 +217,7 @@
     <string name="shared_preferences_write_journal_server">Журнал посещений</string>
     <string name="shared_preferences_write_teachers_server">Список пользователей</string>
     <string name="shared_preferences_write_rooms_server">Список помещений</string>
+    <string name="shared_preferences_sql_settings">SQL сервер</string>
 
     <string name="view_table_landscape">Альбомный</string>
     <string name="view_table_portrait">Портретный</string>

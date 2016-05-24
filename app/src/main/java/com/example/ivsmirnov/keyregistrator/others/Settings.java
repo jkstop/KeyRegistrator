@@ -45,6 +45,7 @@ public class Settings {
     public static final String SERVER_WRITE_JOURNAL = getStringFromRes(R.string.shared_preferences_write_journal_server);
     public static final String SERVER_WRITE_TEACHERS = getStringFromRes(R.string.shared_preferences_write_teachers_server);
     public static final String SERVER_WRITE_ROOMS = getStringFromRes(R.string.shared_preferences_write_rooms_server);
+    public static final String SERVER_NAME = getStringFromRes(R.string.shared_preferences_sql_settings);
     public static final String last_room_time_in = "timein";
     public static final String COLUMNS_LAND = "COLUMNS_LAND";
     public static final String ROWS_LAND = "ROWS_LAND";
@@ -76,6 +77,14 @@ public class Settings {
             mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(App.getAppContext()).edit();
         }
         return mPreferencesEditor;
+    }
+
+    public static void setServerName (String serverName){
+        getPreferencesEditor().putString(SERVER_NAME, serverName).apply();
+    }
+
+    public static String getServerName(){
+        return getPreferences().getString(SERVER_NAME, "");
     }
 
     public static void setColumnsPortrait (int columnsPortrait){

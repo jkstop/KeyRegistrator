@@ -42,4 +42,8 @@
     <item name="navigation_item_email" type="id"/>
     <item name="navigation_item_stat" type="id"/>
 
+    <item name="preference_item_sql_input_server" type="id"/>
+    <item name="preference_item_sql_check_connect" type="id"/>
+    <item name="preference_item_sql_status" type="id"/>
+
 </resources>

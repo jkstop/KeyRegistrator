@@ -52,6 +52,11 @@
         android:key="@string/shared_preferences_category_server"
         android:title="@string/shared_preferences_category_server">
 
+        <com.example.ivsmirnov.keyregistrator.custom_views.SQLPreference
+            android:key="@string/shared_preferences_sql_settings"
+            android:title="@string/shared_preferences_sql_settings"
+            android:summary="Нажмите для настройки"/>
+
         <SwitchPreference
             android:key="@string/shared_preferences_write_server"
             android:title="@string/shared_preferences_write_server"

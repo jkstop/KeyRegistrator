@@ -106,7 +106,7 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
             }
         });
 
-        mConnection = SQL_Connection.getConnection(null);
+        mConnection = SQL_Connection.getConnection(null, null);
 
         mPersonsAdapter = new AdapterPersonsGrid(mContext, mPersonList, AdapterPersonsGrid.SHOW_ALL_PERSONS, this);
         mPersonsRecycler = (RecyclerView)dialogView.findViewById(R.id.dialog_search_recycler);
