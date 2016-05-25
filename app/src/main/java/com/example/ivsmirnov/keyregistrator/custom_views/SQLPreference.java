@@ -59,10 +59,8 @@ public class SQLPreference extends DialogPreference implements SQL_Connection.Ca
         mServerName.setText(Settings.getServerName());
 
         mCheckServerConnect.startAnimation(rotationAnim);
-        if (SQL_Connection.getConnection(null, mCallback)!=null){
-            mServerStatus.setImageResource(R.drawable.ic_cloud_done_black_48dp);
-            mCheckServerConnect.clearAnimation();
-        }
+
+        connect(mServerName.getText().toString(), mCallback);
 
         mCheckServerConnect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,7 +70,7 @@ public class SQLPreference extends DialogPreference implements SQL_Connection.Ca
                     mInputServerName.setError(App.getAppContext().getString(R.string.input_sql_server_name_error));
                 } else {
                     mCheckServerConnect.startAnimation(rotationAnim);
-                    SQL_Connection.getConnection(mInputServerName.getEditText().getText().toString(), mCallback);
+                    connect(mServerName.getText().toString(), mCallback);
                 }
             }
         });
@@ -85,12 +83,17 @@ public class SQLPreference extends DialogPreference implements SQL_Connection.Ca
         return dialogLayout;
     }
 
+    private void connect (String serverName, SQL_Connection.Callback callback){
+        SQL_Connection.getConnection(serverName, callback);
+    }
+
     @Override
     public void onClick(DialogInterface dialog, int which) {
         switch (which){
             case DialogInterface.BUTTON_POSITIVE:
                 Settings.setServerName(mServerName.getText().toString());
-                SQL_Connection.getConnection(mServerName.getText().toString(), null);
+                connect(mServerName.getText().toString(), null);
+                //SQL_Connection.getConnection(mServerName.getText().toString(), null);
                 break;
             case DialogInterface.BUTTON_NEGATIVE:
                 dialog.cancel();

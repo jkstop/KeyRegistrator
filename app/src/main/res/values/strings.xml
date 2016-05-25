@@ -199,25 +199,36 @@
     <string name="menu_nfc_all_persons">Все пользователи</string>
 
     <!--Preferences-->
-    <string name="shared_preferences_category_sheduler">Настройки планировщика</string>
-    <string name="shared_preferences_category_server">Запись на сервер</string>
-    <string name="shared_preferences_sheduler">Планировщик</string>
-    <string name="shared_preferences_sheduler_time">Время срабатывания планировщика</string>
+    <string name="shared_preferences_category_sheduler">Планировщик</string>
+    <string name="shared_preferences_category_server">Сервер</string>
+
+    <string name="shared_preferences_sheduler">Сервис задач</string>
     <string name="shared_preferences_sheduler_disabled">отключен</string>
     <string name="shared_preferences_sheduler_enabled">активен</string>
-    <string name="shared_preferences_auto_close">Закрывать открытые помещения</string>
-    <string name="shared_preferences_email_distribution">E-mail рассылка</string>
-    <string name="shared_preferences_file_writer">Запись файлов</string>
-    <string name="shared_preferences_write_journal">Журнал посещений</string>
-    <string name="shared_preferences_write_teachers">Список пользователей</string>
-    <string name="shared_preferences_write_rooms">Список помещений</string>
-    <string name="shared_preferences_write_server">Синхронизация с сервером</string>
+    <string name="shared_preferences_sheduler_time">Время срабатывания</string>
+
+
+    <string name="shared_preferences_write_server">Синхронизация</string>
     <string name="shared_preferences_server_disabled">отключена</string>
     <string name="shared_preferences_server_enabled">активна</string>
-    <string name="shared_preferences_write_journal_server">Журнал посещений</string>
-    <string name="shared_preferences_write_teachers_server">Список пользователей</string>
-    <string name="shared_preferences_write_rooms_server">Список помещений</string>
-    <string name="shared_preferences_sql_settings">SQL сервер</string>
+
+    <string name="shared_preferences_sql_settings">Подключение</string>
+
+    <string name="shared_preferences_write_server_items_key">Параметры синхронизации</string>
+    <string-array name="shared_preferences_write_server_items_entries">
+        <item>Журнал</item>
+        <item>Пользователи</item>
+        <item>Помещения</item>
+    </string-array>
+
+    <string name="shared_preferences_local_tasks_key">Задачи</string>
+    <string name="shared_preferences_local_tasks_summary">Действия, выполняемые сервисом</string>
+    <string-array name="shared_preferences_local_tasks_entries">
+        <item>Закрывать открытые помещения</item>
+        <item>Создавать локальную резервную копию данных</item>
+        <item>Выгружать данные на сервер MSSQL</item>
+        <item>Рассылка E-mail</item>
+    </string-array>
 
     <string name="view_table_landscape">Альбомный</string>
     <string name="view_table_portrait">Портретный</string>

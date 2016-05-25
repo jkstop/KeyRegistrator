@@ -5,9 +5,11 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Environment;
 
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
+import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 
@@ -15,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * ДБ помещений
@@ -330,9 +333,10 @@ public class RoomDB {
                 RoomDB.updateRoom(roomItem);
                 JournalDB.updateDB(roomItem.getTime(), System.currentTimeMillis());
 
-                if (Settings.getWriteServerStatus()){
-                    if (Settings.getWriteJournalServerStatus()) new ServerWriter(new JournalItem().setTimeIn(roomItem.getTime())).execute(ServerWriter.JOURNAL_UPDATE);
-                }
+                //if (Settings.getWriteServerStatus() &&
+                //        Settings.getWriteServerItems().contains(App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries)[0])){
+                //    new ServerWriter(new JournalItem().setTimeIn(roomItem.getTime())).execute(ServerWriter.JOURNAL_UPDATE);
+                //}
 
                 closedRooms++;
             }

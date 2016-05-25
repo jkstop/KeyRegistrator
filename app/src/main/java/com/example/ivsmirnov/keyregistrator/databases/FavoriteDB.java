@@ -199,7 +199,9 @@ public class FavoriteDB {
                 DbShare.getDataBase(DbShare.DB_FAVORITE).insert(FavoriteDBinit.TABLE_PERSONS, null, cv);
 
                 //добавляем на сервер
-                if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
+                if (Settings.getWriteServerStatus() &&
+                        Settings.getWriteServerItems().contains(App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries)[1])){
+
                     new ServerWriter(personItem).execute(ServerWriter.PERSON_UPDATE);
                 }
 

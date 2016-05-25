@@ -16,7 +16,15 @@
             android:title="@string/shared_preferences_sheduler_time"
             android:dependency="@string/shared_preferences_sheduler"/>
 
-        <CheckBoxPreference
+        <MultiSelectListPreference
+            android:key="@string/shared_preferences_local_tasks_key"
+            android:title="@string/shared_preferences_local_tasks_key"
+            android:entries="@array/shared_preferences_local_tasks_entries"
+            android:entryValues="@array/shared_preferences_local_tasks_entries"
+            android:dependency="@string/shared_preferences_sheduler"
+            android:summary="@string/shared_preferences_local_tasks_summary" />
+
+        <!--<CheckBoxPreference
             android:key="@string/shared_preferences_auto_close"
             android:title="@string/shared_preferences_auto_close"
             android:dependency="@string/shared_preferences_sheduler"/>
@@ -44,7 +52,7 @@
         <CheckBoxPreference
             android:key="@string/shared_preferences_write_rooms"
             android:title="@string/shared_preferences_write_rooms"
-            android:dependency="@string/shared_preferences_file_writer"/>
+            android:dependency="@string/shared_preferences_file_writer"/-->
 
     </PreferenceCategory>
 
@@ -55,7 +63,7 @@
         <com.example.ivsmirnov.keyregistrator.custom_views.SQLPreference
             android:key="@string/shared_preferences_sql_settings"
             android:title="@string/shared_preferences_sql_settings"
-            android:summary="Нажмите для настройки"/>
+            android:summary="Параметры соединения с сервером MSSQL"/>
 
         <SwitchPreference
             android:key="@string/shared_preferences_write_server"
@@ -63,7 +71,16 @@
             android:summaryOn="@string/shared_preferences_server_enabled"
             android:summaryOff="@string/shared_preferences_server_disabled"/>
 
-        <CheckBoxPreference
+        <MultiSelectListPreference
+            android:key="@string/shared_preferences_write_server_items_key"
+            android:title="@string/shared_preferences_write_server_items_key"
+            android:entries="@array/shared_preferences_write_server_items_entries"
+            android:entryValues="@array/shared_preferences_write_server_items_entries"
+            android:dependency="@string/shared_preferences_write_server"
+            android:summary="Выберите, что синхронизировать с сервером"
+            />
+
+       <!-- <CheckBoxPreference
             android:key="@string/shared_preferences_write_journal_server"
             android:title="@string/shared_preferences_write_journal_server"
             android:dependency="@string/shared_preferences_write_server"/>
@@ -76,7 +93,7 @@
          <CheckBoxPreference
              android:key="@string/shared_preferences_write_rooms_server"
              android:title="@string/shared_preferences_write_rooms_server"
-             android:dependency="@string/shared_preferences_write_server"/>
+             android:dependency="@string/shared_preferences_write_server"/>-->
 
     </PreferenceCategory>
 

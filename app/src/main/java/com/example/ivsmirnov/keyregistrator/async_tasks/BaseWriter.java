@@ -1,6 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -12,8 +13,11 @@ import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
+import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.services.Toasts;
+
+import java.util.ArrayList;
 
 /**
  * Получение пользователя из базы; создание journalItem, запись в журнал посещений; запись в БД помещений
@@ -76,8 +80,17 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
         if (mBaseWriterInterface!=null) mBaseWriterInterface.onSuccessBaseWrite();
 
         if (Settings.getWriteServerStatus()){
-            if (Settings.getWriteJournalServerStatus()) new ServerWriter(mJournalItem).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
-            if (Settings.getWriteRoomsServerStatus()) new ServerWriter(mRoomItem).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
+
+            ArrayList<String> selectedItemsForWrite = Settings.getWriteServerItems();
+            String[] allItemsForWrite = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries);
+
+            if (selectedItemsForWrite.contains(allItemsForWrite[0])){ //если выбран журнал
+                new ServerWriter(mJournalItem).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
+            }
+
+            if (selectedItemsForWrite.contains(allItemsForWrite[2])){ //если выбраны помещения
+                new ServerWriter(mRoomItem).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
+            }
         }
     }
 }

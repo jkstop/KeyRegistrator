@@ -32,10 +32,6 @@
         android:title="Синхронизация">
         <menu>
             <item
-                android:id="@id/navigation_item_sql_connect"
-                android:icon="@drawable/ic_cloud_black_24dp"
-                android:title="@string/navigation_drawer_item_sql"/>
-            <item
                 android:id="@+id/navigation_item_upload_all_to_server"
                 android:title="@string/menu_main_upload_all_to_server"
                 android:icon="@drawable/ic_cloud_upload_black_24dp" />

@@ -70,7 +70,7 @@ public class CloseDay extends AppCompatActivity {
         } else {
             mTextTitle.setText(R.string.card_statistic_head_close);
             mTextTitle.setTextColor(getResources().getColor(R.color.colorAccent));
-            if (Settings.getAutoCloseStatus()) mTextAutoCloseCount.setText(String.valueOf(Settings.getAutoClosedRoomsCount()));
+            mTextAutoCloseCount.setText(String.valueOf(Settings.getAutoClosedRoomsCount()));
         }
     }
 

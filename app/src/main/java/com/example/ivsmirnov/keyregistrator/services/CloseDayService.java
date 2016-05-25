@@ -7,15 +7,18 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.IBinder;
 
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseDayInterface;
 import com.example.ivsmirnov.keyregistrator.items.MailParams;
+import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.activities.CloseDay;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class CloseDayService extends Service implements CloseDayInterface {
@@ -33,28 +36,36 @@ public class CloseDayService extends Service implements CloseDayInterface {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        System.out.println("START SHEDULER");
+
         try {
 
+            ArrayList<String> selectedTasks = Settings.getShedulerItems();
+            String[] allTasks = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_local_tasks_entries);
+
             //закрываем открытые помещения
-            if (Settings.getAutoCloseStatus()) Settings.setAutoClosedRoomsCount(RoomDB.closeAllRooms());
+            if (selectedTasks.contains(allTasks[0])){
+                Settings.setAutoClosedRoomsCount(RoomDB.closeAllRooms());
+            }
 
             //запись файлов
-            if (Settings.getFileWriterStatus()){
-                if (Settings.getWriteJournalStatus()) new FileWriter(context, FileWriter.WRITE_JOURNAL, false).execute();
-                if (Settings.getWriteTeachersStatus()) new FileWriter(context, FileWriter.WRITE_TEACHERS, false).execute();
+            if (selectedTasks.contains(allTasks[1])){
+                new FileWriter(context, FileWriter.WRITE_JOURNAL, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                new FileWriter(context, FileWriter.WRITE_TEACHERS, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                new FileWriter(context, FileWriter.WRITE_ROOMS, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
             }
 
             //запись на сервер
-            if (Settings.getWriteServerStatus()){
-                if (Settings.getWriteJournalServerStatus()) new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
-                if (Settings.getWriteTeachersServerStatus()) new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
-                if (Settings.getWriteRoomsServerStatus()) new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
+            if (selectedTasks.contains(allTasks[2])){
+                new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
+                new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
+                new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
             }
 
             //рассылка email
             Calendar calendar = Calendar.getInstance();
             if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-                if (Settings.getEmailDistributionStatus()){
+                if (selectedTasks.contains(allTasks[3])){
                     new Send_Email(context, Send_Email.DIALOG_DISABLED).execute(new MailParams()
                             .setTheme(Settings.getMessageTheme())
                             .setBody(Settings.getMessageBody())
@@ -62,6 +73,28 @@ public class CloseDayService extends Service implements CloseDayInterface {
                             .setRecepients(Settings.getRecepients()));
                 }
             }
+
+
+           /* if (Settings.getWriteServerStatus()){
+
+                ArrayList<String> selectedItemsForWrite = Settings.getWriteServerItems();
+                String[] allItemsForWrite = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries);
+
+                if (selectedItemsForWrite.contains(allItemsForWrite[0])){
+
+                }
+
+                if (selectedItemsForWrite.contains(allItemsForWrite[1])){
+
+                }
+
+                if (selectedItemsForWrite.contains(allItemsForWrite[2])){
+
+                }
+
+            }*/
+
+
 
             //установка планировщика
             mAlarm.setAlarm(System.currentTimeMillis() + AlarmManager.INTERVAL_DAY);

@@ -76,13 +76,17 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
 
     public static Connection getConnection(String serverName, Callback callback){
         System.out.println("SQL CONNECT " + SQLconnect);
-        if (serverName !=null){
-            new SQL_Connection(serverName, callback).execute();
+        if (serverName !=null && mConnectTask == null){
+            mConnectTask = new SQL_Connection(serverName, callback);
+            mConnectTask.execute();
         } else {
             if (SQLconnect!=null){
                 return SQLconnect;
             } else {
-                new SQL_Connection(Settings.getServerName(), callback).execute();
+                if (mConnectTask == null){
+                    mConnectTask = new SQL_Connection(Settings.getServerName(), callback);
+                    mConnectTask.execute();
+                }
             }
         }
         return null;
@@ -118,6 +122,7 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
     @Override
     protected void onPostExecute(Exception e) {
         System.out.println("********** SQL connection END **********");
+        mConnectTask = null;
         if (e != null){
             Settings.setServerStatus(false);
             System.out.println("SERVER DISCONNECTED");

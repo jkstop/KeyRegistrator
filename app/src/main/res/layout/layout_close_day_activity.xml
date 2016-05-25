@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <include
-        layout="@layout/app_bar_main"
+        layout="@layout/app_bar_main" переделать
         android:id="@+id/layout_close_day_text_head"/>
 
     <android.support.v7.widget.CardView

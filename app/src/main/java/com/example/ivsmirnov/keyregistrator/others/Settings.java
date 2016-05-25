@@ -34,18 +34,20 @@ public class Settings {
     public static final String MAIL_THEME = "mail_theme";
     public static final String MAIL_BODY = "mail_body";
     public static final String SHEDULER_STATUS = getStringFromRes(R.string.shared_preferences_sheduler);
-    public static final String AUTO_CLOSE_STATUS = getStringFromRes(R.string.shared_preferences_auto_close);
+   // public static final String AUTO_CLOSE_STATUS = getStringFromRes(R.string.shared_preferences_auto_close);
     public static final String SHEDULER_TIME = getStringFromRes(R.string.shared_preferences_sheduler_time);
-    public static final String EMAIL_DISTRIBUTION_STATUS = getStringFromRes(R.string.shared_preferences_email_distribution);
-    public static final String FILE_WRITER = getStringFromRes(R.string.shared_preferences_file_writer);
-    public static final String FILE_WRITE_JOURNAL = getStringFromRes(R.string.shared_preferences_write_journal);
-    public static final String FILE_WRITE_TEACHERS = getStringFromRes(R.string.shared_preferences_write_teachers);
-    public static final String FILE_WRITE_ROOMS = getStringFromRes(R.string.shared_preferences_write_rooms);
+    //public static final String EMAIL_DISTRIBUTION_STATUS = getStringFromRes(R.string.shared_preferences_email_distribution);
+    //public static final String FILE_WRITER = getStringFromRes(R.string.shared_preferences_file_writer);
+    //public static final String FILE_WRITE_JOURNAL = getStringFromRes(R.string.shared_preferences_write_journal);
+    //public static final String FILE_WRITE_TEACHERS = getStringFromRes(R.string.shared_preferences_write_teachers);
+   // public static final String FILE_WRITE_ROOMS = getStringFromRes(R.string.shared_preferences_write_rooms);
     public static final String SERVER_WRITER = getStringFromRes(R.string.shared_preferences_write_server);
-    public static final String SERVER_WRITE_JOURNAL = getStringFromRes(R.string.shared_preferences_write_journal_server);
-    public static final String SERVER_WRITE_TEACHERS = getStringFromRes(R.string.shared_preferences_write_teachers_server);
-    public static final String SERVER_WRITE_ROOMS = getStringFromRes(R.string.shared_preferences_write_rooms_server);
+   // public static final String SERVER_WRITE_JOURNAL = getStringFromRes(R.string.shared_preferences_write_journal_server);
+   // public static final String SERVER_WRITE_TEACHERS = getStringFromRes(R.string.shared_preferences_write_teachers_server);
+   // public static final String SERVER_WRITE_ROOMS = getStringFromRes(R.string.shared_preferences_write_rooms_server);
     public static final String SERVER_NAME = getStringFromRes(R.string.shared_preferences_sql_settings);
+    public static final String WRITE_SERVER_ITEMS = getStringFromRes(R.string.shared_preferences_write_server_items_key);
+    public static final String SHEDULER_ITEMS = getStringFromRes(R.string.shared_preferences_local_tasks_key);
     public static final String last_room_time_in = "timein";
     public static final String COLUMNS_LAND = "COLUMNS_LAND";
     public static final String ROWS_LAND = "ROWS_LAND";
@@ -79,12 +81,20 @@ public class Settings {
         return mPreferencesEditor;
     }
 
+    public static ArrayList<String> getWriteServerItems(){
+        return new ArrayList<>(getPreferences().getStringSet(WRITE_SERVER_ITEMS, null));
+    }
+
+    public static ArrayList<String> getShedulerItems(){
+        return new ArrayList<>(getPreferences().getStringSet(SHEDULER_ITEMS, null));
+    }
+
     public static void setServerName (String serverName){
         getPreferencesEditor().putString(SERVER_NAME, serverName).apply();
     }
 
     public static String getServerName(){
-        return getPreferences().getString(SERVER_NAME, "");
+        return getPreferences().getString(SERVER_NAME, "-");
     }
 
     public static void setColumnsPortrait (int columnsPortrait){
@@ -131,23 +141,11 @@ public class Settings {
         return getPreferences().getBoolean(SERVER_WRITER, false);
     }
 
-    public static boolean getWriteJournalServerStatus(){
-        return getPreferences().getBoolean(SERVER_WRITE_JOURNAL, false);
-    }
-
-    public static boolean getWriteTeachersServerStatus(){
-        return getPreferences().getBoolean(SERVER_WRITE_TEACHERS, false);
-    }
-
-    public static boolean getWriteRoomsServerStatus(){
-        return getPreferences().getBoolean(SERVER_WRITE_ROOMS, false);
-    }
-
     public static boolean getShedulerStatus(){
         return getPreferences().getBoolean(SHEDULER_STATUS, false);
     }
 
-    public static boolean getFileWriterStatus(){
+   /* public static boolean getFileWriterStatus(){
         return getPreferences().getBoolean(FILE_WRITER, false);
     }
 
@@ -169,7 +167,7 @@ public class Settings {
 
     public static boolean getAutoCloseStatus(){
         return getPreferences().getBoolean(AUTO_CLOSE_STATUS, false);
-    }
+    }*/
 
     public static String getShedulerTime(){
         return getPreferences().getString(SHEDULER_TIME, "00:00");

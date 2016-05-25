@@ -46,6 +46,7 @@ import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
+import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.squareup.picasso.Picasso;
 
@@ -209,7 +210,8 @@ public class Dialogs extends DialogFragment{
                                 FavoriteDB.deleteUser(tag);
 
                                 //удаление с сервера
-                                if (Settings.getWriteServerStatus() && Settings.getWriteTeachersStatus()){
+                                if (Settings.getWriteServerStatus() &&
+                                        Settings.getWriteServerItems().contains(App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries)[1])){
                                     new ServerWriter(tag).execute(ServerWriter.PERSON_DELETE_ONE);
                                 }
 
@@ -340,7 +342,8 @@ public class Dialogs extends DialogFragment{
                             RoomDB.writeInRoomsDB(newRoomItem);
 
                             //пишем на сервер
-                            if (Settings.getWriteServerStatus() && Settings.getWriteRoomsServerStatus()){
+                            if (Settings.getWriteServerStatus() &&
+                                    Settings.getWriteServerItems().contains(App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries)[2])){
                                 new ServerWriter(newRoomItem).execute(ServerWriter.ROOMS_UPDATE);
                             }
 

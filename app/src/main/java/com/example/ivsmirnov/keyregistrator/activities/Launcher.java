@@ -77,6 +77,7 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Set;
 
 
@@ -611,15 +612,25 @@ public class Launcher extends AppCompatActivity implements
         super.onResume();
         System.out.println("RESUME");
 
-        //setSheduler();
+        setSheduler();
         //if (mNavigationItems == null) setNavigationItems();
     }
 
     private void setSheduler(){
+        System.out.println("sheduler status " + Settings.getShedulerStatus());
         if (mAlarm == null) mAlarm = new Alarm(App.getAppContext());
         if (Settings.getShedulerStatus()){
+            System.out.println("status true");
+            System.out.println("alarm is set? " + mAlarm.isAlarmSet());
             if (!mAlarm.isAlarmSet()) mAlarm.setAlarm(Alarm.getClosingTime());
+            System.out.println("done");
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mAlarm!=null)  mAlarm.cancelAlarm();
     }
 
     @Override
@@ -627,7 +638,7 @@ public class Launcher extends AppCompatActivity implements
         super.onDestroy();
         System.out.println("DESTROY");
 
-        if (mAlarm!=null)  mAlarm.cancelAlarm();
+
 
         //close databases
         DbShare.closeDB();

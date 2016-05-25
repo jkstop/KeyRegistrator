@@ -9,9 +9,12 @@ import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
+import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.Toasts;
+
+import java.util.ArrayList;
 
 /**
  * Task for close room
@@ -59,8 +62,16 @@ public class CloseRooms extends AsyncTask<Void, Void, Integer> {
         }
 
         if (Settings.getWriteServerStatus()){
-            if (Settings.getWriteJournalServerStatus()) new ServerWriter(new JournalItem().setTimeIn(mRoomTime)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
-            if (Settings.getWriteRoomsServerStatus()) new ServerWriter(mRoomItemUpdated).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
+            ArrayList<String> selectedItemsForWrite = Settings.getWriteServerItems(); //выбранные элементы для синхронизации
+            String[] allItemsForWrite = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries); //все элементы синхронизации
+
+            if (selectedItemsForWrite.contains(allItemsForWrite[0])){ //если выбран журнал
+                new ServerWriter(new JournalItem().setTimeIn(mRoomTime)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
+            }
+
+            if (selectedItemsForWrite.contains(allItemsForWrite[2])){ //если выбраны помещения
+                new ServerWriter(mRoomItemUpdated).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
+            }
         }
     }
 }
