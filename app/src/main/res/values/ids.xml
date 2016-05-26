@@ -46,4 +46,8 @@
     <item name="preference_item_sql_check_connect" type="id"/>
     <item name="preference_item_sql_status" type="id"/>
 
+    <item name="preference_item_grid_size_tabs" type="id"/>
+    <item name="preference_item_grid_size_page_picker" type="id"/>
+    <item name="preference_item_grid_size_toolbar" type="id"/>
+
 </resources>

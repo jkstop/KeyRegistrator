@@ -2,6 +2,17 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
+        android:key="@string/shared_preferences_category_basic"
+        android:title="@string/shared_preferences_category_basic">
+
+        <Preference
+            android:key="@string/shared_preferences_main_grid_size"
+            android:title="@string/shared_preferences_main_grid_size"
+            android:summary="@string/shared_preferences_main_grid_size_summary"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:key="@string/shared_preferences_category_sheduler"
         android:title="@string/shared_preferences_category_sheduler">
 

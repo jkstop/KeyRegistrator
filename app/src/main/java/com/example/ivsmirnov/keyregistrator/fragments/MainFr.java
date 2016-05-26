@@ -74,6 +74,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        initializeAuditroomGrid(); //хз
         //mAdapter.scaleCells(mAdapter.cellFree, newConfig.orientation);
     }
 
@@ -153,36 +154,6 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_main,menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.menu_main_items_size:
-
-                DialogPickers dialogPickers = new DialogPickers();
-                dialogPickers.setTargetFragment(this,0);
-                dialogPickers.show(getFragmentManager(),"dialog_pickers");
-                //Dialogs dialog_resize = new Dialogs();
-                //Bundle bundle_dialog_resize = new Bundle();
-                //bundle_dialog_resize.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_RESIZE_ITEMS);
-                //dialog_resize.setArguments(bundle_dialog_resize);
-                //dialog_resize.setTargetFragment(this,0);
-                //dialog_resize.show(getFragmentManager(),"dialog_resize");
-                return true;
-            //case R.id.menu_main_upload_all_to_server:
-
-              //  return true;
-            //case R.id.menu_main_download_all_from_server:
-
-              //  return true;
-            //case R.id.test:
-                //new insert(mContext).execute();
-              //  return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override

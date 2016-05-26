@@ -1,30 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.LinearLayoutCompat
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".activities.CloseDay"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <include layout="@layout/app_bar_main" />
-
-</android.support.v7.widget.LinearLayoutCompat>
-<!--RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="@dimen/layout_default_margin"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <include
-        layout="@layout/app_bar_main"
-        android:id="@+id/layout_close_day_text_head"/>
-
     <android.support.v7.widget.CardView
         android:id="@+id/layout_close_day_card_stat"
-        android:layout_below="@id/layout_close_day_text_head"
-        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
         android:layout_margin="@dimen/layout_default_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -128,7 +111,7 @@
 
     </android.support.v7.widget.CardView>
 
-    <Button
+    <!--Button
         android:id="@+id/layout_close_day_button_ok"
         android:layout_below="@id/layout_close_day_card_stat"
         android:layout_alignRight="@id/layout_close_day_card_stat"
@@ -137,6 +120,6 @@
         style="@style/ButtonMaterial"
         android:maxLines="1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content" /-->
 
-</RelativeLayout-->
+</RelativeLayout>

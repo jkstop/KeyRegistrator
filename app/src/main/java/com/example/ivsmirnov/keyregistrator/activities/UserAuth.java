@@ -56,8 +56,8 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
        //     Window window = getWindow();
        //     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
        //     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-       //     window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
-        //}
+       //  window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        // }
 
         mViewPager = (ViewPager)findViewById(R.id.user_auth_pager_view);
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());

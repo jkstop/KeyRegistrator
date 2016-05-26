@@ -125,7 +125,7 @@ public class Launcher extends AppCompatActivity implements
     public static Reader.OnStateChangeListener sReaderStateChangeListener;
     public static boolean sCardConnected = false;
 
-    private Alarm mAlarm;
+    //private Alarm mAlarm;
 
     @Override
     protected void onStart() {
@@ -355,6 +355,11 @@ public class Launcher extends AppCompatActivity implements
                 showFragment(getSupportFragmentManager(), EmailFr.newInstance(),R.string.navigation_drawer_item_mail);
                 break;
             case R.id.navigation_item_sql_connect:
+                break;
+            case R.id.navigation_item_stat:
+                startActivity(new Intent(mContext, CloseDay.class)
+                        .putExtra(CloseDay.TITLE, CloseDay.STAT_TITLE)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
             case R.id.navigation_item_download_all_from_server:
                 new ServerReader(mContext, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_ROOMS);
@@ -612,17 +617,25 @@ public class Launcher extends AppCompatActivity implements
         super.onResume();
         System.out.println("RESUME");
 
-        setSheduler();
+        System.out.println("IS ALARM SET " + Alarm.isAlarmSet());
+
+       // if (Settings.isScreenSettingShange()){
+       //     System.out.println("Screen settings has been changed");
+            //showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.navigation_drawer_item_home);
+       //     Settings.setScreenSettingsChange(false);
+        //}
+
+        //setSheduler();
         //if (mNavigationItems == null) setNavigationItems();
     }
 
     private void setSheduler(){
         System.out.println("sheduler status " + Settings.getShedulerStatus());
-        if (mAlarm == null) mAlarm = new Alarm(App.getAppContext());
+        //if (mAlarm == null) mAlarm = new Alarm(App.getAppContext());
         if (Settings.getShedulerStatus()){
-            System.out.println("status true");
-            System.out.println("alarm is set? " + mAlarm.isAlarmSet());
-            if (!mAlarm.isAlarmSet()) mAlarm.setAlarm(Alarm.getClosingTime());
+            System.out.println("alarm is set? " + Alarm.isAlarmSet());
+            //if (!Alarm.isAlarmSet())
+                Alarm.setAlarm(Alarm.getClosingTime(null));
             System.out.println("done");
         }
     }
@@ -630,7 +643,7 @@ public class Launcher extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        if (mAlarm!=null)  mAlarm.cancelAlarm();
+        //if (mAlarm!=null)  mAlarm.cancelAlarm();
     }
 
     @Override
@@ -638,7 +651,7 @@ public class Launcher extends AppCompatActivity implements
         super.onDestroy();
         System.out.println("DESTROY");
 
-
+        Alarm.cancelAlarm();
 
         //close databases
         DbShare.closeDB();

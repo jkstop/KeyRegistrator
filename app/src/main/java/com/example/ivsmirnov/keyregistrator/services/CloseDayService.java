@@ -24,13 +24,11 @@ import java.util.Calendar;
 public class CloseDayService extends Service implements CloseDayInterface {
 
     private Context context;
-    private Alarm mAlarm;
 
 
     @Override
     public void onCreate() {
         context = getApplicationContext();
-        mAlarm = new Alarm(getApplicationContext());
     }
 
     @Override
@@ -74,30 +72,9 @@ public class CloseDayService extends Service implements CloseDayInterface {
                 }
             }
 
-
-           /* if (Settings.getWriteServerStatus()){
-
-                ArrayList<String> selectedItemsForWrite = Settings.getWriteServerItems();
-                String[] allItemsForWrite = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries);
-
-                if (selectedItemsForWrite.contains(allItemsForWrite[0])){
-
-                }
-
-                if (selectedItemsForWrite.contains(allItemsForWrite[1])){
-
-                }
-
-                if (selectedItemsForWrite.contains(allItemsForWrite[2])){
-
-                }
-
-            }*/
-
-
-
             //установка планировщика
-            mAlarm.setAlarm(System.currentTimeMillis() + AlarmManager.INTERVAL_DAY);
+            //mAlarm.setAlarm(System.currentTimeMillis() + AlarmManager.INTERVAL_DAY);
+            Alarm.setAlarm(System.currentTimeMillis() + AlarmManager.INTERVAL_DAY);
 
         } catch (Exception e){
             e.printStackTrace();
@@ -119,7 +96,7 @@ public class CloseDayService extends Service implements CloseDayInterface {
     public void onClosed() {
 
         startActivity(new Intent(getApplicationContext(), CloseDay.class)
-                .putExtra(CloseDay.AUTO_CLOSE_ROOMS, Settings.getAutoClosedRoomsCount())
+                .putExtra(CloseDay.TITLE, CloseDay.CLOSE_TITLE)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
     }
 }

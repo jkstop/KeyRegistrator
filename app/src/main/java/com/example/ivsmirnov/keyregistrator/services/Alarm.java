@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.util.Calendar;
@@ -15,17 +16,27 @@ import java.util.Calendar;
  */
 public class Alarm {
 
-    private AlarmManager mAlarmManager;
-    private PendingIntent mStartAlarmIntent;
-    private Context mContext;
+    private static AlarmManager mAlarmManager;
+    private static PendingIntent mStartAlarmIntent;
+    //private Context mContext;
 
     public Alarm(Context context){
-        this.mContext = context;
+        //this.mContext = context;
     }
 
-    public void setAlarm(long closingTime){
-
+    public static void setAlarm(long closingTime){
+        Context mContext = App.getAppContext();
         mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+
+        mStartAlarmIntent = PendingIntent.getService(mContext,
+                1,
+                new Intent(mContext, CloseDayService.class),
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        mAlarmManager.cancel(mStartAlarmIntent);
+        mStartAlarmIntent.cancel();
+        System.out.println("ALARM OFF");
+
         mStartAlarmIntent = PendingIntent.getService(mContext,
                 1,
                 new Intent(mContext, CloseDayService.class),
@@ -39,25 +50,14 @@ public class Alarm {
         System.out.println("ALARM SET");
     }
 
-    //public long closingTime(){
-    //    Calendar now = Calendar.getInstance();
-    //    Calendar when = (Calendar)now.clone();
-    ///    when.set(Calendar.HOUR_OF_DAY, 22);
-       // when.set(Calendar.MINUTE, 1);
-    //    when.set(Calendar.SECOND, 0);
-     //   when.set(Calendar.MILLISECOND, 0);
-
-//        if (when.compareTo(now)<=0){
-//            when.add(Calendar.DATE, 1);
- //       }
-  //      return when.getTimeInMillis();
-   // }
-
-    public static long getClosingTime(){
+    public static long getClosingTime(String closingTime){
         Calendar mNowCalendar = Calendar.getInstance();
         Calendar mCloseCalendar = (Calendar)mNowCalendar.clone();
 
-        String [] timeSplit = Settings.getShedulerTime().split(":");
+        if (closingTime == null){
+            closingTime = Settings.getShedulerTime();
+        }
+        String [] timeSplit = closingTime.split(":");
         mCloseCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeSplit[0]));
         mCloseCalendar.set(Calendar.MINUTE, Integer.parseInt(timeSplit[1]));
         mCloseCalendar.set(Calendar.SECOND,0);
@@ -67,15 +67,15 @@ public class Alarm {
             mCloseCalendar.add(Calendar.DATE, 1);
         }
 
-        System.out.println(mCloseCalendar.getTime());
+        System.out.println("ALARM TIME " + mCloseCalendar.getTime());
 
         return mCloseCalendar.getTimeInMillis();
     }
 
 
 
-    public void cancelAlarm(){
-
+    public static void cancelAlarm(){
+        Context mContext = App.getAppContext();
         mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         mStartAlarmIntent = PendingIntent.getService(mContext,
                 1,
@@ -87,7 +87,8 @@ public class Alarm {
         System.out.println("ALARM OFF");
     }
 
-    public boolean isAlarmSet(){
+    public static boolean isAlarmSet(){
+        Context mContext = App.getAppContext();
         return (PendingIntent.getService(mContext,
                 1,
                 new Intent(mContext, CloseDayService.class),

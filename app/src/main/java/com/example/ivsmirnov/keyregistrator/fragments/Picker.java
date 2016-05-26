@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +74,7 @@ public class Picker extends Fragment {
     NumberPicker.OnScrollListener scrollListener = new NumberPicker.OnScrollListener() {
         @Override
         public void onScrollStateChange(NumberPicker view, int scrollState) {
+            Settings.setScreenSettingsChange(true);
             switch (pickersType){
                 case PICKER_LANDSCAPE:
                     switch (view.getId()){

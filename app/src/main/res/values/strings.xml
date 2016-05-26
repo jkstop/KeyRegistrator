@@ -25,7 +25,7 @@
     <string name="toolbar_title_auditrooms">Аудитории</string>
     <string name="toolbar_title_shedule">Расписание</string>
     <string name="toolbar_title_email">E-mail рассылка</string>
-    <string name="title_activity_close_day_dialog">Занятия завершены!</string>
+    <string name="title_activity_close_day_dialog">Статистика</string>
     <string name="title_delete_room_dialog">Удаление</string>
     <string name="title_add_new_staff">Добавление нового пользователя</string>
     <string name="title_dialog_log_out">Отсоединение аккаунта</string>
@@ -201,6 +201,10 @@
     <!--Preferences-->
     <string name="shared_preferences_category_sheduler">Планировщик</string>
     <string name="shared_preferences_category_server">Сервер</string>
+    <string name="shared_preferences_category_basic">Общие</string>
+    
+    <string name="shared_preferences_main_grid_size">Размер сетки</string>
+    <string name="shared_preferences_main_grid_size_summary">Количество строк и колонок на главном экране</string>
 
     <string name="shared_preferences_sheduler">Сервис задач</string>
     <string name="shared_preferences_sheduler_disabled">отключен</string>

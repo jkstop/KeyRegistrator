@@ -26,6 +26,10 @@
             android:id="@id/navigation_item_settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/navigation_drawer_item_settings"/>
+        <item
+            android:id="@id/navigation_item_stat"
+            android:icon="@drawable/ic_info_black_24dp"
+            android:title="@string/navigation_drawer_item_stat"/>
     </group>
 
     <item

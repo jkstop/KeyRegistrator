@@ -53,6 +53,7 @@ public class Settings {
     public static final String ROWS_LAND = "ROWS_LAND";
     public static final String COLUMNS_PORT = "COLUMNS_PORT";
     public static final String ROWS_PORT = "ROWS_PORT";
+    public static final String SCREEN_SETTINGS_CHANGE = "SCREEN_SETTINGS_CHANGE";
 
     private static SharedPreferences mPreferences;
     private static SharedPreferences.Editor mPreferencesEditor;
@@ -67,18 +68,26 @@ public class Settings {
         mPreferencesEditor = getPreferencesEditor();
     }
 
-    private static SharedPreferences getPreferences(){
+    public static SharedPreferences getPreferences(){
         if (mPreferences == null){
             mPreferences = PreferenceManager.getDefaultSharedPreferences(App.getAppContext());
         }
         return mPreferences;
     }
 
-    private static SharedPreferences.Editor getPreferencesEditor(){
+    public static SharedPreferences.Editor getPreferencesEditor(){
         if (mPreferencesEditor == null){
             mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(App.getAppContext()).edit();
         }
         return mPreferencesEditor;
+    }
+
+    public static void setScreenSettingsChange(boolean isSettingChanched){
+        getPreferencesEditor().putBoolean(SCREEN_SETTINGS_CHANGE, isSettingChanched).apply();
+    }
+
+    public static boolean isScreenSettingShange(){
+        return getPreferences().getBoolean(SCREEN_SETTINGS_CHANGE, false);
     }
 
     public static ArrayList<String> getWriteServerItems(){
