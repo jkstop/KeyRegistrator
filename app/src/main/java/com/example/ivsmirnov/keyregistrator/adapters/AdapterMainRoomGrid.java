@@ -3,17 +3,20 @@ package com.example.ivsmirnov.keyregistrator.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.fragments.MainFr;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
@@ -28,6 +31,8 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
     private ArrayList<RoomItem> mRoomItems;
     private RecycleItemClickListener mListener;
     private Context mContext;
+    private int mCurrentOrientation;
+    private int mGridHeight;
 
     public View cellFree, cellBusy;
 
@@ -82,7 +87,6 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
             case 1:
                 cellFree = layoutInflater.inflate(R.layout.card_auditroom_free,parent,false);
                 viewHolder = new auditroomFreeViewHolder(cellFree);
-                scaleCells(cellFree, App.getAppContext().getResources().getConfiguration().orientation);
                 final RecyclerView.ViewHolder finalViewHolder = viewHolder;
                 cellFree.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -102,7 +106,6 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
             case 0:
                 cellBusy = layoutInflater.inflate(R.layout.card_auditroom_busy,parent,false);
                 viewHolder = new auditroomBusyViewHolder(cellBusy);
-                scaleCells(cellBusy, App.getAppContext().getResources().getConfiguration().orientation);
                 final RecyclerView.ViewHolder finalViewHolder2 = viewHolder;
                 cellBusy.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -135,19 +138,28 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
             default:
                 break;
         }
-        cell.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                MainFr.mAuditroomGrid.getHeight() / rowsCount));
 
-        System.out.println("SCALE CELL " + cell.toString() + "  orient " + orientation + " ROWS " + rowsCount + " GRID_H " + MainFr.mAuditroomGrid.getHeight() + " CELL_H " + MainFr.mAuditroomGrid.getHeight()/rowsCount);
+        cell.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                mGridHeight / rowsCount));
     }
 
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
+
+        if (mRoomItems.get(position).getGridHeight() == 0){
+            mGridHeight = MainFr.mAuditroomGrid.getHeight();
+        } else {
+            mGridHeight = mRoomItems.get(position).getGridHeight();
+        }
+        mCurrentOrientation = mRoomItems.get(position).getGridOrient();
+
+        scaleCells(holder.itemView, mCurrentOrientation);
+
         switch (holder.getItemViewType()){
             case 1:
                 ((auditroomFreeViewHolder) holder).mFreeTextAuditroom.setText(mRoomItems.get(position).getAuditroom());
-
                 break;
             case 0:
                 ((auditroomBusyViewHolder)holder).mBusyTextAuditroom.setText(mRoomItems.get(position).getAuditroom());

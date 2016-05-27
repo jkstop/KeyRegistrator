@@ -13,6 +13,26 @@ public class RoomItem {
     private String LastVisiter  =Values.EMPTY;
     private String Tag = Values.EMPTY;
     private String Photo = Values.EMPTY;
+    private int GridHeight = 0;
+    private int GridOrient = 0;
+
+    public RoomItem setGridOrient (int gridOrient){
+        this.GridOrient = gridOrient;
+        return this;
+    }
+
+    public int getGridOrient(){
+        return GridOrient;
+    }
+
+    public RoomItem setGridHeight(int gridHeight){
+        this.GridHeight = gridHeight;
+        return this;
+    }
+
+    public int getGridHeight(){
+        return GridHeight;
+    }
 
     public RoomItem setAuditroom(String auditroom){
         this.Auditroom = auditroom;

@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -15,6 +16,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,6 +49,10 @@ import java.util.ArrayList;
 public class MainFr extends Fragment implements UpdateInterface,RecycleItemClickListener {
 
     public static RecyclerView mAuditroomGrid;
+    private int mCurrentOrientation;
+    private int mGridHeight = 0;
+
+    private int roomGridH = 0;
 
     private AdapterMainRoomGrid mAdapter;
     private GridLayoutManager mGridManager;
@@ -73,9 +79,16 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
+
+        mGridManager.setSpanCount(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ? Settings.getColumnsLandscape() : Settings.getColumnsPortrait());
+
+        for (RoomItem roomItem : mRoomItems){
+            roomItem.setGridHeight(mAuditroomGrid.getWidth());
+            roomItem.setGridOrient(newConfig.orientation);
+        }
+        mAdapter.notifyDataSetChanged();
+
         super.onConfigurationChanged(newConfig);
-        initializeAuditroomGrid(); //хз
-        //mAdapter.scaleCells(mAdapter.cellFree, newConfig.orientation);
     }
 
     @Nullable
@@ -86,12 +99,14 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
         mRoomItems = new ArrayList<>();
 
+        mCurrentOrientation = getResources().getConfiguration().orientation;
+
         mCloseRoomInterface = (CloseRoomInterface)getActivity();
 
         mFrameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
 
         mAuditroomGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
-        mAuditroomGrid.setHasFixedSize(true);
+        //mAuditroomGrid.setHasFixedSize(true);
 
         initializeAuditroomGrid();
 
@@ -107,15 +122,6 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         return rootView;
     }
 
-    private void initGridLM(){
-
-    }
-
-    private void setLayoutsWeight(){
-        int weightCard = Settings.getDisclaimerWeight();
-        //((LinearLayout.LayoutParams) mDisclaimerCard.getLayoutParams()).weight = weightCard;
-        ((LinearLayout.LayoutParams) mFrameForGrid.getLayoutParams()).weight = 100 - weightCard;
-    }
 
     private void initializeAuditroomGrid(){
         if (!mRoomItems.isEmpty()) mRoomItems.clear();

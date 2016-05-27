@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -42,7 +43,10 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
     private ArrayList<RoomItem> mRoomItems;
     private Context mContext;
 
-    private RecyclerView mRoomsGrid;
+
+    private AdapterMainRoomGrid mAdapter;
+    private GridLayoutManager mGridManager;
+    private static RecyclerView mRoomsGrid;
 
     public static RoomsFr newInstance(){
         return new RoomsFr();
@@ -93,6 +97,18 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        mGridManager.setSpanCount(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ? Settings.getColumnsLandscape() : Settings.getColumnsPortrait());
+
+        for (RoomItem roomItem : mRoomItems){
+            roomItem.setGridHeight(mRoomsGrid.getWidth());
+            roomItem.setGridOrient(newConfig.orientation);
+        }
+        mAdapter.notifyDataSetChanged();
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_auditrooms, menu);
@@ -113,8 +129,22 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
             mRoomItems.get(i).setStatus(RoomDB.ROOM_IS_FREE);
         }
 
-        AdapterMainRoomGrid mAdapter = new AdapterMainRoomGrid(mContext, mRoomItems, this);
+        mAdapter = new AdapterMainRoomGrid(mContext, mRoomItems,this);
+        mAdapter.hasStableIds();
         mRoomsGrid.setAdapter(mAdapter);
+
+        mGridManager = new GridLayoutManager(mContext,2);
+        switch (getResources().getConfiguration().orientation){
+            case Configuration.ORIENTATION_LANDSCAPE:
+                mGridManager.setSpanCount(Settings.getColumnsLandscape());
+                break;
+            case Configuration.ORIENTATION_PORTRAIT:
+                mGridManager.setSpanCount(Settings.getColumnsPortrait());
+                break;
+            default:
+                break;
+        }
+        mRoomsGrid.setLayoutManager(mGridManager);
 
     }
 
