@@ -352,7 +352,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
                 b.putInt(Dialogs.DIALOG_PERSON_INFORMATION_KEY_POSITION, position);
                 Dialogs dialog = new Dialogs();
                 dialog.setArguments(b);
-                dialog.setTargetFragment(PersonsFr.this, 0);
+                //dialog.setTargetFragment(PersonsFr.this, 0);
                 dialog.show(getChildFragmentManager(), "edit");
                 break;
             default:

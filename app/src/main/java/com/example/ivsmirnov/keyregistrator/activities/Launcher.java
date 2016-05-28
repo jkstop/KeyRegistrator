@@ -45,6 +45,7 @@ import com.example.ivsmirnov.keyregistrator.databases.DbShare;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.fragments.EmailFr;
 import com.example.ivsmirnov.keyregistrator.fragments.JournalFr;
+import com.example.ivsmirnov.keyregistrator.fragments.MailFr;
 import com.example.ivsmirnov.keyregistrator.fragments.MainFr;
 import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
 import com.example.ivsmirnov.keyregistrator.fragments.RoomsFr;
@@ -352,7 +353,7 @@ public class Launcher extends AppCompatActivity implements
                 startActivity(new Intent(mContext, Preferences.class));
                 break;
             case R.id.navigation_item_email:
-                showFragment(getSupportFragmentManager(), EmailFr.newInstance(),R.string.navigation_drawer_item_mail);
+                showFragment(getSupportFragmentManager(), new MailFr(),R.string.navigation_drawer_item_mail);
                 break;
             case R.id.navigation_item_sql_connect:
                 break;

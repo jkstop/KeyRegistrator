@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <fragment
+        android:layout_margin="@dimen/default_content_margin"
+        android:id="@id/account_fr"
+        app:layout_widthPercent="50%"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:name="com.example.ivsmirnov.keyregistrator.fragments.EmailFrAccount"
+        tools:layout="@layout/view_email_account" />
+
+    <fragment
+        android:id="@id/period_fr"
+        android:layout_toEndOf="@id/account_fr"
+        app:layout_widthPercent = "50%"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:name="com.example.ivsmirnov.keyregistrator.fragments.EmailFrPeriod"
+        tools:layout="@layout/view_email_period"
+        android:layout_marginLeft="@dimen/default_content_margin"
+        android:layout_marginRight="@dimen/default_content_margin"
+        android:layout_marginTop="@dimen/default_content_margin"
+        android:layout_alignBottom="@id/account_fr" />
+
+    <fragment
+        android:id="@id/recipients_fr"
+        android:layout_below="@id/account_fr"
+        app:layout_widthPercent = "50%"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:name="com.example.ivsmirnov.keyregistrator.fragments.EmailFrRecipients"
+        tools:layout="@layout/view_email_recipients"
+        android:layout_margin="@dimen/default_content_margin" />
+
+    <fragment
+        android:id="@id/attachments_fr"
+        app:layout_widthPercent = "50%"
+        android:name="com.example.ivsmirnov.keyregistrator.fragments.EmailFrAttachments"
+        tools:layout="@layout/view_email_recipients"
+        android:layout_toEndOf="@id/recipients_fr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/default_content_margin"
+        android:layout_marginRight="@dimen/default_content_margin"
+        android:layout_marginBottom="@dimen/default_content_margin"
+        android:layout_alignTop="@id/recipients_fr" />
+
+</android.support.percent.PercentRelativeLayout>

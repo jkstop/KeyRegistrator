@@ -50,4 +50,26 @@
     <item name="preference_item_grid_size_page_picker" type="id"/>
     <item name="preference_item_grid_size_toolbar" type="id"/>
 
+    <item name="account_fr" type="id"/>
+    <item name="account_fr_head" type="id"/>
+    <item name="account_fr_image" type="id"/>
+    <item name="account_fr_name" type="id"/>
+    <item name="account_fr_email" type="id"/>
+
+    <item name="period_fr" type="id"/>
+    <item name="period_fr_head" type="id"/>
+    <item name="period_fr_days_group" type="id"/>
+    <item name="period_fr_status_task_icon" type="id"/>
+    <item name="period_fr_status_task_text" type="id"/>
+
+    <item name="recipients_fr" type="id"/>
+    <item name="recipients_fr_head" type="id"/>
+    <item name="recipietns_fr_add" type="id"/>
+    <item name="recipients_fr_list" type="id"/>
+
+    <item name="attachments_fr" type="id"/>
+    <item name="attachments_fr_head" type="id"/>
+    <item name="attachments_fr_add" type="id"/>
+    <item name="attachments_fr_list" type="id"/>
+
 </resources>

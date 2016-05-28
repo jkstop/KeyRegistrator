@@ -176,7 +176,7 @@ public class Dialogs extends DialogFragment{
                 final int position = getArguments().getInt(DIALOG_PERSON_INFORMATION_KEY_POSITION);
 
                 //интерфейс
-                final Updatable updateInterface = (Updatable)getTargetFragment();
+                final Updatable updateInterface = (Updatable)getTargetFragment(); //null!!!
 
                 //получаем пользователя и заполняем поля
                 new GetPersons(mContext, null, null).execute(new GetPersonParams()
