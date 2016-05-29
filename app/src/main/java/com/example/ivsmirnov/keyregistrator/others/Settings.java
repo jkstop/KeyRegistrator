@@ -54,6 +54,7 @@ public class Settings {
     public static final String COLUMNS_PORT = "COLUMNS_PORT";
     public static final String ROWS_PORT = "ROWS_PORT";
     public static final String SCREEN_SETTINGS_CHANGE = "SCREEN_SETTINGS_CHANGE";
+    public static final String EMAIL_PERIOD = getStringFromRes(R.string.shared_preferences_email_period);
 
     private static SharedPreferences mPreferences;
     private static SharedPreferences.Editor mPreferencesEditor;
@@ -82,6 +83,7 @@ public class Settings {
         return mPreferencesEditor;
     }
 
+
     public static void setScreenSettingsChange(boolean isSettingChanched){
         getPreferencesEditor().putBoolean(SCREEN_SETTINGS_CHANGE, isSettingChanched).apply();
     }
@@ -96,6 +98,10 @@ public class Settings {
 
     public static ArrayList<String> getShedulerItems(){
         return new ArrayList<>(getPreferences().getStringSet(SHEDULER_ITEMS, null));
+    }
+
+    public static ArrayList<String> getEmailPeriods(){
+        return new ArrayList<>(getPreferences().getStringSet(EMAIL_PERIOD, null));
     }
 
     public static void setServerName (String serverName){

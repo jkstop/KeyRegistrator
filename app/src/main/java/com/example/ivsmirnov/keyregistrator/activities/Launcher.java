@@ -79,6 +79,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Set;
 
 
@@ -146,6 +147,10 @@ public class Launcher extends AppCompatActivity implements
 
         mContext = this;
         mResources = getResources();
+
+        for (String s : Settings.getEmailPeriods()){
+            System.out.println("PERIOD " + s);
+        }
 
         //mNavigationItems = new ArrayList<>();
 

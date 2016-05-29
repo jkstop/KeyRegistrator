@@ -35,36 +35,34 @@
             android:dependency="@string/shared_preferences_sheduler"
             android:summary="@string/shared_preferences_local_tasks_summary" />
 
-        <!--<CheckBoxPreference
-            android:key="@string/shared_preferences_auto_close"
-            android:title="@string/shared_preferences_auto_close"
-            android:dependency="@string/shared_preferences_sheduler"/>
+    </PreferenceCategory>
 
-        <CheckBoxPreference
-            android:key="@string/shared_preferences_email_distribution"
-            android:title="@string/shared_preferences_email_distribution"
-            android:dependency="@string/shared_preferences_sheduler"/>
+    <PreferenceCategory
+        android:key="@string/shared_preferences_category_email"
+        android:title="@string/shared_preferences_category_email">
 
-        <SwitchPreference
-            android:key="@string/shared_preferences_file_writer"
-            android:title="@string/shared_preferences_file_writer"
-            android:dependency="@string/shared_preferences_sheduler"/>
+        <!--SwitchPreference
+            android:key="@string/shared_preferences_email_status"
+            android:title="@string/shared_preferences_email_status"
+            android:summaryOn="@string/shared_preferences_email_status_summary_on"
+            android:summaryOff="@string/shared_preferences_email_status_summary_off"/-->
 
-        <CheckBoxPreference
-            android:key="@string/shared_preferences_write_journal"
-            android:title="@string/shared_preferences_write_journal"
-            android:dependency="@string/shared_preferences_file_writer"/>
+        <MultiSelectListPreference
+            android:key="@string/shared_preferences_email_period"
+            android:title="@string/shared_preferences_email_period"
+            android:summary="@string/shared_preferences_email_period_summary"
+            android:entries="@array/shared_preferences_email_period_entries"
+            android:entryValues="@array/shared_preferences_email_period_entry_values"/>
 
-        <CheckBoxPreference
-            android:key="@string/shared_preferences_write_teachers"
-            android:title="@string/shared_preferences_write_teachers"
-            android:dependency="@string/shared_preferences_file_writer"/>
+        <Preference
+            android:key="@string/shared_preferences_email_recipients"
+            android:title="@string/shared_preferences_email_recipients"
+            android:summary="@string/shared_preferences_email_recipients_summary"/>
 
-        <CheckBoxPreference
-            android:key="@string/shared_preferences_write_rooms"
-            android:title="@string/shared_preferences_write_rooms"
-            android:dependency="@string/shared_preferences_file_writer"/-->
-
+        <Preference
+            android:key="@string/shared_preferences_email_attach"
+            android:title="@string/shared_preferences_email_attach"
+            android:summary="@string/shared_preferences_email_attach_summary"/>
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -11,7 +11,11 @@ import android.text.TextUtils;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Preferences;
+import com.example.ivsmirnov.keyregistrator.others.App;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.services.Alarm;
+
+import java.util.ArrayList;
 
 
 /**
@@ -23,6 +27,9 @@ public class SettingsFr extends PreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
+
+        ArrayList<String> selectedTasks = Settings.getShedulerItems();
+        String[] allTasks = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_local_tasks_entries);
 
         Preference dialogGridPreference = findPreference(getResources().getString(R.string.shared_preferences_main_grid_size));
         dialogGridPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -55,7 +62,6 @@ public class SettingsFr extends PreferenceFragment {
                 return true;
             }
         });
-
     }
 
 

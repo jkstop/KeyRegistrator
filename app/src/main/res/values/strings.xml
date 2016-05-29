@@ -234,6 +234,35 @@
         <item>Рассылка E-mail</item>
     </string-array>
 
+    <string name="shared_preferences_category_email">Рассылка</string>
+    <string name="shared_preferences_email_status">Регулярная рассылка</string>
+    <string name="shared_preferences_email_status_summary_on">включена</string>
+    <string name="shared_preferences_email_status_summary_off">отключена</string>
+    <string name="shared_preferences_email_period">Периодичность</string>
+    <string name="shared_preferences_email_period_summary">Дни недели для рассылки</string>
+    <string-array name="shared_preferences_email_period_entries">
+        <item>Понедельник</item>
+        <item>Вторник</item>
+        <item>Среда</item>
+        <item>Четверг</item>
+        <item>Пятница</item>
+        <item>Суббота</item>
+        <item>Воскресенье</item>
+    </string-array>
+    <string-array name="shared_preferences_email_period_entry_values">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>1</item>
+    </string-array>
+    <string name="shared_preferences_email_recipients">Получатели</string>
+    <string name="shared_preferences_email_recipients_summary">Адреса для рассылки</string>
+    <string name="shared_preferences_email_attach">Вложения</string>
+    <string name="shared_preferences_email_attach_summary">Файлы для рассылки</string>
+
     <string name="view_table_landscape">Альбомный</string>
     <string name="view_table_portrait">Портретный</string>
     <string name="view_table_title">Размер сетки</string>

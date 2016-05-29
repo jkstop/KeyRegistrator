@@ -61,15 +61,17 @@ public class CloseDayService extends Service implements CloseDayInterface {
             }
 
             //рассылка email
-            Calendar calendar = Calendar.getInstance();
-            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-                if (selectedTasks.contains(allTasks[3])){
-                    new Send_Email(context, Send_Email.DIALOG_DISABLED).execute(new MailParams()
-                            .setTheme(Settings.getMessageTheme())
-                            .setBody(Settings.getMessageBody())
-                            .setAttachments(Settings.getAttachments())
-                            .setRecepients(Settings.getRecepients()));
-                }
+            if (selectedTasks.contains(allTasks[3])){
+
+                    if (Settings.getEmailPeriods().contains(
+                            String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)))){
+
+                        new Send_Email(context, Send_Email.DIALOG_DISABLED).execute(new MailParams()
+                                .setTheme(Settings.getMessageTheme())
+                                .setBody(Settings.getMessageBody())
+                                .setAttachments(Settings.getAttachments())
+                                .setRecepients(Settings.getRecepients()));
+                    }
             }
 
             //установка планировщика
