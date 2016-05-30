@@ -227,7 +227,7 @@ public class EmailFr extends Fragment implements GetAccountInterface, EmailInter
 
     @Override
     public void onAddRecepient(View v, int position, int view_id) {
-        if (view_id == R.id.card_email_add_new_recipient_save){
+        if (view_id == R.id.card_email_extra_new_recipient_add){
             mRecepientList.add(v.getTag().toString());
         }
         removeRecipient(position);

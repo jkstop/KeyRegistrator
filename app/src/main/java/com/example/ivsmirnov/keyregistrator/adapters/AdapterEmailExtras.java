@@ -47,9 +47,9 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         switch (viewType){
             case VIEW_RECEPIENTS_SIMPLE:
-                final View rowView = layoutInflater.inflate(R.layout.card_email_extras,parent,false);
-                viewHolder = new viewHolderEmailAttach(rowView);
-                ImageView deleteItem = (ImageView)rowView.findViewById(R.id.card_email_attach_delete);
+                final View rowView = layoutInflater.inflate(R.layout.view_email_extra,parent,false);
+                viewHolder = new viewHolderEmailExtra(rowView);
+                ImageView deleteItem = (ImageView)rowView.findViewById(R.id.card_email_extra_delete);
                 final RecyclerView.ViewHolder finalViewHolder = viewHolder;
                 deleteItem.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -65,9 +65,9 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
             case VIEW_RECEPIENTS_ADD_NEW:
                 View rowViewNEW = layoutInflater.inflate(R.layout.card_email_add_new_recipient,parent,false);
                 viewHolder = new viewHolderAddNew(rowViewNEW);
-                ImageView save = (ImageView)rowViewNEW.findViewById(R.id.card_email_add_new_recipient_save);
-                ImageView delete = (ImageView)rowViewNEW.findViewById(R.id.card_email_add_new_recipient_delete);
-                final TextInputLayout textInputLayout = (TextInputLayout)rowViewNEW.findViewById(R.id.card_email_add_new_recepient_input);
+                ImageView save = (ImageView)rowViewNEW.findViewById(R.id.card_email_extra_new_recipient_add);
+                ImageView delete = (ImageView)rowViewNEW.findViewById(R.id.card_email_extra_new_recipient_delete);
+                final TextInputLayout textInputLayout = (TextInputLayout)rowViewNEW.findViewById(R.id.card_email_extra_new_recipient_input);
                 final RecyclerView.ViewHolder finalViewHolder1 = viewHolder;
                 save.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -100,13 +100,14 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (mType == RECIPIENTS){
             if (!mItems.get(position).equals(EmailRecipientsPreference.ADD_NEW_RECIPIENT)){
-                ((viewHolderEmailAttach)holder).mText.setText(mItems.get(position));
-                ((viewHolderEmailAttach)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_person_black_36dp));
+                ((viewHolderEmailExtra)holder).mTextHead.setText(mItems.get(position));
+                ((viewHolderEmailExtra)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_person_black_36dp));
             }
         }else if (mType == ATTACHMENTS){
             String [] split = mItems.get(position).split("/");
-            ((viewHolderEmailAttach)holder).mText.setText(split[split.length -1]);
-            ((viewHolderEmailAttach)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_insert_drive_file_black_36dp));
+            ((viewHolderEmailExtra)holder).mTextHead.setText(split[split.length -1]);
+            ((viewHolderEmailExtra)holder).mTextSubHead.setText(mItems.get(position));
+            ((viewHolderEmailExtra)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_insert_drive_file_black_36dp));
         }
     }
 
@@ -126,17 +127,18 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
         return mItems.size();
     }
 
-    static class viewHolderEmailAttach extends RecyclerView.ViewHolder{
+    static class viewHolderEmailExtra extends RecyclerView.ViewHolder{
 
         public ImageView mImagePreview;
-        public TextView mText;
+        public TextView mTextHead, mTextSubHead;
         public ImageView mImageDelete;
 
-        public viewHolderEmailAttach(View itemView) {
+        public viewHolderEmailExtra(View itemView) {
             super(itemView);
-            mImagePreview = (ImageView)itemView.findViewById(R.id.card_email_attach_image);
-            mText = (TextView)itemView.findViewById(R.id.card_email_attach_text);
-            mImageDelete = (ImageView)itemView.findViewById(R.id.card_email_attach_delete);
+            mImagePreview = (ImageView)itemView.findViewById(R.id.card_email_extra_icon);
+            mTextHead = (TextView)itemView.findViewById(R.id.card_email_extra_title);
+            mTextSubHead = (TextView)itemView.findViewById(R.id.card_email_extra_subtitle);
+            mImageDelete = (ImageView)itemView.findViewById(R.id.card_email_extra_delete);
         }
     }
 
@@ -147,8 +149,8 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         public viewHolderAddNew(View itemView) {
             super(itemView);
-            mSave = (ImageView)itemView.findViewById(R.id.card_email_add_new_recipient_save);
-            mDelete = (ImageView)itemView.findViewById(R.id.card_email_add_new_recipient_delete);
+            mSave = (ImageView)itemView.findViewById(R.id.card_email_extra_new_recipient_add);
+            mDelete = (ImageView)itemView.findViewById(R.id.card_email_extra_new_recipient_delete);
         }
     }
 }

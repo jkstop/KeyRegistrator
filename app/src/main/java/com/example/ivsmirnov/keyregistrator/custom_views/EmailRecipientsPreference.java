@@ -91,7 +91,7 @@ public class EmailRecipientsPreference extends DialogPreference implements Email
 
     @Override
     public void onAddRecepient(View v, int position, int view_id) {
-        if (view_id == R.id.card_email_add_new_recipient_save){
+        if (view_id == R.id.card_email_extra_new_recipient_add){
             mRecepientList.add(v.getTag().toString());
             mRecepientList.remove(ADD_NEW_RECIPIENT);
             mAdapter.notifyDataSetChanged();

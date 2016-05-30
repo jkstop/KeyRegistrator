@@ -74,4 +74,13 @@
 
     <item name="preference_email_extra_list" type="id"/>
 
+    <item name="card_email_extra_icon" type="id"/>
+    <item name="card_email_extra_title" type="id"/>
+    <item name="card_email_extra_subtitle" type="id"/>
+    <item name="card_email_extra_delete" type="id"/>
+
+    <item name="card_email_extra_new_recipient_input" type="id"/>
+    <item name="card_email_extra_new_recipient_delete" type="id"/>
+    <item name="card_email_extra_new_recipient_add" type="id"/>
+
 </resources>
