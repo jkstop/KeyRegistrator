@@ -262,6 +262,11 @@
     <string name="shared_preferences_email_recipients_summary">Адреса для рассылки</string>
     <string name="shared_preferences_email_attach">Вложения</string>
     <string name="shared_preferences_email_attach_summary">Файлы для рассылки</string>
+    <string name="shared_preferences_email_send">Отправить сейчас</string>
+    <string name="shared_preferences_email_send_summary">Отправить e-mail с текущими параметрами</string>
+    <string name="shared_preferences_email_send_disable">Рассылка недоступна</string>
+    <string name="shared_preferences_email_send_disable_summary_logoff">Войдите в приложение под аккаунтом Google</string>
+    <string name="shared_preferences_email_send_disable_summary_norecipients">Не указано ни одного получателя</string>
 
     <string name="view_table_landscape">Альбомный</string>
     <string name="view_table_portrait">Портретный</string>

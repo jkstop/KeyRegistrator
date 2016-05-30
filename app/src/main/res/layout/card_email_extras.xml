@@ -3,9 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/primary_light"
     app:cardUseCompatPadding="true"
     app:contentPadding="@dimen/card_default_content_padding"
-    app:cardElevation="@dimen/card_default_elevation">
+    app:cardElevation="5dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -28,13 +29,15 @@
             android:layout_toLeftOf="@+id/card_email_attach_delete"
             android:layout_marginStart="@dimen/layout_default_margin"
             android:layout_marginLeft="@dimen/layout_default_margin"
-            android:textSize="@dimen/email_account_extra_attach_text_size"
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:textSize="24sp"
             android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <ImageView
             android:id="@+id/card_email_attach_delete"
+            android:src="@drawable/ic_cancel_black_24dp"
             android:contentDescription="@string/image_description_email_fragment_icon_delete_attachment"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"

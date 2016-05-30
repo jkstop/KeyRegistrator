@@ -1,5 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.activities;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -17,6 +18,7 @@ import android.widget.ListView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 
+import com.example.ivsmirnov.keyregistrator.custom_views.EmailAttachPreference;
 import com.example.ivsmirnov.keyregistrator.fragments.SettingsFr;
 
 /**
@@ -38,6 +40,4 @@ public class Preferences extends AppCompatActivity {
 
         getFragmentManager().beginTransaction().replace(R.id.layout_main_content_frame,new SettingsFr()).commit();
     }
-
-
 }

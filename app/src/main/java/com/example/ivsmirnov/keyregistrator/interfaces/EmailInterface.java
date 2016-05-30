@@ -9,4 +9,5 @@ public interface EmailInterface {
     void onAddRecepient(View v, int position, int view_id);
     void onDeleteRecepient(int position, int view_id);
     void onDeleteAttachment(int position, int view_id);
+    void onAddAttachment();
 }

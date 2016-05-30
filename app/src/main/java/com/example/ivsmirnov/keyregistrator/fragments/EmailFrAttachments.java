@@ -17,7 +17,7 @@ public class EmailFrAttachments extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.view_email_recipients, container, false);
+        View fragmentView = inflater.inflate(R.layout.view_email_extras, container, false);
         return fragmentView;
     }
 }

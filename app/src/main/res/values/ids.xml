@@ -72,4 +72,6 @@
     <item name="attachments_fr_add" type="id"/>
     <item name="attachments_fr_list" type="id"/>
 
+    <item name="preference_email_extra_list" type="id"/>
+
 </resources>

@@ -29,7 +29,7 @@ public class Settings {
     public static final String SQL_PASSWORD = "sql_password";
     public static final String SQL_STATUS = "sql_status";
     public static final String ACTIVE_ACCOUNT_ID = "active_account_id";
-    public static final String MAIL_RECEPIENTS = "mail_recepients";
+    public static final String MAIL_RECEPIENTS = getStringFromRes(R.string.shared_preferences_email_recipients);
     public static final String MAIL_ATTACHMENTS = "mail_attachments";
     public static final String MAIL_THEME = "mail_theme";
     public static final String MAIL_BODY = "mail_body";
@@ -93,15 +93,30 @@ public class Settings {
     }
 
     public static ArrayList<String> getWriteServerItems(){
-        return new ArrayList<>(getPreferences().getStringSet(WRITE_SERVER_ITEMS, null));
+        Set<String> items = getPreferences().getStringSet(WRITE_SERVER_ITEMS, null);
+        if (items!=null){
+            return new ArrayList<>(items);
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public static ArrayList<String> getShedulerItems(){
-        return new ArrayList<>(getPreferences().getStringSet(SHEDULER_ITEMS, null));
+        Set<String> items = getPreferences().getStringSet(SHEDULER_ITEMS, null);
+        if (items!=null){
+            return new ArrayList<>(items);
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public static ArrayList<String> getEmailPeriods(){
-        return new ArrayList<>(getPreferences().getStringSet(EMAIL_PERIOD, null));
+        Set<String> items = getPreferences().getStringSet(EMAIL_PERIOD, null);
+        if (items!=null){
+            return new ArrayList<>(items);
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public static void setServerName (String serverName){

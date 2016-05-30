@@ -3,12 +3,15 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.databases.AccountDB;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.items.MailParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
+import com.example.ivsmirnov.keyregistrator.services.Toasts;
 import com.google.android.gms.auth.GoogleAuthUtil;
 
 import java.io.ByteArrayInputStream;
@@ -17,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 
 import javax.activation.CommandMap;
@@ -35,7 +40,7 @@ import javax.mail.internet.MimeMultipart;
 /**
  * отправка сообщения
  */
-public class Send_Email extends AsyncTask<MailParams, Void, Void> {
+public class Send_Email extends AsyncTask<Void, Void, Exception> {
 
     public static final boolean DIALOG_ENABLED = true;
     public static final boolean DIALOG_DISABLED = false;
@@ -51,7 +56,6 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
 
     @Override
     protected void onPreExecute() {
-        System.out.println("send mail *****************************");
         if (isDialogShow){
             mProgressDialog = new ProgressDialog(mContext);
             mProgressDialog.setMessage("Отправка сообщения");
@@ -60,24 +64,29 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        System.out.println("send mail -------------------------------");
+    protected void onPostExecute(Exception e) {
         if (mProgressDialog!=null && mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }
+
+        if (e == null){
+            Toast.makeText(mContext, "Письмо отправлено", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(mContext, "Ошибка при отправке", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
-    protected Void doInBackground(MailParams... params) {
+    protected Exception doInBackground(Void... params) {
 
         try {
 
             AccountItem mAccountItem = AccountDB.getAccount(Settings.getActiveAccountID());
-
             String token = GoogleAuthUtil.getToken(mContext, mAccountItem.getEmail(),"oauth2:https://mail.google.com/");
-            String mTheme = params[0].getTheme();
-            String mBody = params[0].getBody();
-            ArrayList<String> mAttachments = params[0].getAttachments();
+            String mTheme = "Рассылка";
+            String mBody = String.valueOf(new Date(System.currentTimeMillis()));
+            ArrayList<String> mAttachments = Settings.getAttachments();
 
             Properties mProps = new Properties();
             mProps.put("mail.smtp.ssl.enable", "true");
@@ -92,7 +101,7 @@ public class Send_Email extends AsyncTask<MailParams, Void, Void> {
             mMimeMessage.setSubject(mTheme);
             mMimeMessage.setDataHandler(mHandler);
 
-            for (String recepient : params[0].getRecepients()){
+            for (String recepient : Settings.getRecepients()){
                 mMimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(recepient));
             }
 

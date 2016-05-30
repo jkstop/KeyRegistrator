@@ -1,6 +1,8 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
@@ -11,6 +13,9 @@ import android.text.TextUtils;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Preferences;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
+import com.example.ivsmirnov.keyregistrator.custom_views.EmailAttachPreference;
+import com.example.ivsmirnov.keyregistrator.items.MailParams;
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.services.Alarm;
@@ -28,10 +33,20 @@ public class SettingsFr extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
-        ArrayList<String> selectedTasks = Settings.getShedulerItems();
-        String[] allTasks = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_local_tasks_entries);
-
+        final Preference sendMailPreference = findPreference(getResources().getString(R.string.shared_preferences_email_send));
+        Preference timeSetPreference = findPreference(getResources().getString(R.string.shared_preferences_sheduler_time));
         Preference dialogGridPreference = findPreference(getResources().getString(R.string.shared_preferences_main_grid_size));
+        Preference taskPreference = findPreference(getResources().getString(R.string.shared_preferences_sheduler));
+        Preference recipientsPreference = findPreference(getString(R.string.shared_preferences_email_recipients));
+
+        sendMailPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new Send_Email(getActivity(), Send_Email.DIALOG_ENABLED).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                return true;
+            }
+        });
+
         dialogGridPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -41,7 +56,7 @@ public class SettingsFr extends PreferenceFragment {
             }
         });
 
-        Preference timeSetPreference = findPreference(getResources().getString(R.string.shared_preferences_sheduler_time));
+
         timeSetPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -50,7 +65,7 @@ public class SettingsFr extends PreferenceFragment {
             }
         });
 
-        Preference taskPreference = findPreference(getResources().getString(R.string.shared_preferences_sheduler));
+
         taskPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -62,8 +77,47 @@ public class SettingsFr extends PreferenceFragment {
                 return true;
             }
         });
+
+
+        recipientsPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if (((ArrayList<String>)newValue).size() == 0){
+                    if (isLoggegIn()){
+                        setPreferenceEnabled(false, sendMailPreference,
+                                getString(R.string.shared_preferences_email_send_disable), getString(R.string.shared_preferences_email_send_disable_summary_norecipients));
+                    }
+                } else {
+                    if (isLoggegIn()){
+                        setPreferenceEnabled(true, sendMailPreference, getString(R.string.shared_preferences_email_send), getString(R.string.shared_preferences_email_send_summary));
+                    } else {
+                        setPreferenceEnabled(false, sendMailPreference,
+                                getString(R.string.shared_preferences_email_send_disable), getString(R.string.shared_preferences_email_send_disable_summary_logoff));
+                    }
+                }
+                return true;
+            }
+        });
+
+        if (Settings.getRecepients().size() == 0){
+            setPreferenceEnabled(false, sendMailPreference,
+                    getString(R.string.shared_preferences_email_send_disable), getString(R.string.shared_preferences_email_send_disable_summary_norecipients));
+        }
+
+        if (Settings.getActiveAccountID().equals(getString(R.string.local_account))){
+            setPreferenceEnabled(false, sendMailPreference,
+                    getString(R.string.shared_preferences_email_send_disable), getString(R.string.shared_preferences_email_send_disable_summary_logoff));
+        }
     }
 
+    private void setPreferenceEnabled(boolean enabled, Preference preference, String title, String summary){
+        preference.setEnabled(enabled);
+        preference.setTitle(title);
+        preference.setSummary(summary);
+    }
 
+    private boolean isLoggegIn(){
+        return !Settings.getActiveAccountID().equals(getString(R.string.local_account));
+    }
 
 }

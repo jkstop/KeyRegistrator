@@ -54,15 +54,21 @@
             android:entries="@array/shared_preferences_email_period_entries"
             android:entryValues="@array/shared_preferences_email_period_entry_values"/>
 
-        <Preference
+        <com.example.ivsmirnov.keyregistrator.custom_views.EmailRecipientsPreference
             android:key="@string/shared_preferences_email_recipients"
             android:title="@string/shared_preferences_email_recipients"
-            android:summary="@string/shared_preferences_email_recipients_summary"/>
+            android:summary="@string/shared_preferences_email_recipients_summary"
+            android:persistent="true"/>
 
-        <Preference
+        <com.example.ivsmirnov.keyregistrator.custom_views.EmailAttachPreference
             android:key="@string/shared_preferences_email_attach"
             android:title="@string/shared_preferences_email_attach"
             android:summary="@string/shared_preferences_email_attach_summary"/>
+
+        <Preference
+            android:key="@string/shared_preferences_email_send"
+            android:title="@string/shared_preferences_email_send"
+            android:summary="@string/shared_preferences_email_send_summary"/>
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -92,7 +92,6 @@ public class EmailFr extends Fragment implements GetAccountInterface, EmailInter
             mAccountName.setText(mAccount.getLastname());
             mAccountEmail.setText(mAccount.getEmail());
             Picasso.with(mContext).load(mAccount.getPhoto()).into(mAccountImage);
-            //if (Launcher.isNetworkAvailable()) new LoadImageFromWeb(mAccount.getPhoto(), this).execute();
         }else{
             mAccountName.setText(getResources().getString(R.string.email_fragment_logon));
             mAccountEmail.setText(Values.EMPTY);
@@ -167,11 +166,7 @@ public class EmailFr extends Fragment implements GetAccountInterface, EmailInter
             @Override
             public void onClick(View v) {
                 new Send_Email(mContext, Send_Email.DIALOG_ENABLED)
-                        .execute(new MailParams()
-                        .setTheme(Settings.getMessageTheme())
-                        .setBody(Settings.getMessageBody())
-                        .setAttachments(mAttachmentList)
-                        .setRecepients(mRecepientList));
+                        .execute();
             }
         });
 
@@ -248,5 +243,10 @@ public class EmailFr extends Fragment implements GetAccountInterface, EmailInter
         mAttachmentList.remove(position);
         Settings.setAttachments(mAttachmentList);
         mAdapterAttachments.notifyItemRemoved(position);
+    }
+
+    @Override
+    public void onAddAttachment() {
+
     }
 }
