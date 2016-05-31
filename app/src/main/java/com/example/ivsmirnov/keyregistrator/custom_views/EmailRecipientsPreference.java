@@ -45,7 +45,7 @@ public class EmailRecipientsPreference extends DialogPreference implements Email
 
     @Override
     protected View onCreateDialogView() {
-        View dialogView = View.inflate(mContext, R.layout.view_email_extras, null);
+        View dialogView = View.inflate(mContext, R.layout.view_email_extra_list, null);
         mRecepientList = Settings.getRecepients();
         RecyclerView recipientView = (RecyclerView)dialogView.findViewById(R.id.preference_email_extra_list);
         mAdapter = new AdapterEmailExtras(mContext, this, AdapterEmailExtras.RECIPIENTS, mRecepientList);
@@ -63,8 +63,10 @@ public class EmailRecipientsPreference extends DialogPreference implements Email
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRecepientList.add(ADD_NEW_RECIPIENT);
-                mAdapter.notifyItemInserted(mRecepientList.size());
+                if (!mRecepientList.contains(ADD_NEW_RECIPIENT)){
+                    mRecepientList.add(ADD_NEW_RECIPIENT);
+                    mAdapter.notifyItemInserted(mRecepientList.size());
+                }
             }
         });
     }

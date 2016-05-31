@@ -18,6 +18,7 @@
             android:layout_toEndOf="@id/card_email_extra_icon"
             android:layout_toStartOf="@id/card_email_extra_delete"
             android:layout_marginStart="@dimen/layout_default_margin"
+            android:singleLine="true"
             style="@style/TextAppearance.AppCompat.Headline"
             android:textSize="24sp"
             android:layout_centerVertical="true"

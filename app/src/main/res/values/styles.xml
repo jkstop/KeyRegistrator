@@ -11,6 +11,7 @@
         <!--item name="dialogTheme">@style/AlertDialogCustom</item-->
         <!--item name="preferenceTheme">@style/PreferenceThemeOverlay</item-->
         <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Borderless.Colored</item>
+
     </style>
 
     <style name="AlertDialogCustom" parent="Base.Theme.AppCompat.Light.Dialog">
@@ -72,7 +73,7 @@
         <!-- Need to set this also to style create folder dialog -->
         <item name="alertDialogTheme">@style/FilePickerAlertDialogTheme</item>
 
-        <!-- If you want to set a specific app_bar_main theme, do it here -->
+        <!-- If you want to set a specific main_content theme, do it here -->
         <!-- <item name="nnf_toolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item> -->
     </style>
 

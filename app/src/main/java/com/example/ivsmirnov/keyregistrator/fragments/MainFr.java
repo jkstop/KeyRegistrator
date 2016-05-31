@@ -1,41 +1,26 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
-import android.app.Activity;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.activities.UserAuth;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
-import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
@@ -59,7 +44,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
     private Context mContext;
     private ArrayList<RoomItem> mRoomItems;
-    private FrameLayout mFrameForGrid;
+    //private FrameLayout mFrameForGrid;
     //private CardView mDisclaimerCard;
     private CloseRoomInterface mCloseRoomInterface;
 
@@ -74,7 +59,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
+        //setRetainInstance(true);
     }
 
     @Override
@@ -94,7 +79,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.layout_main_fr,container,false);
+        View rootView = inflater.inflate(R.layout.main_recycler,container,false);
         mContext = rootView.getContext();
 
         mRoomItems = new ArrayList<>();
@@ -103,18 +88,18 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
         mCloseRoomInterface = (CloseRoomInterface)getActivity();
 
-        mFrameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
+        //mFrameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
 
-        mAuditroomGrid = (RecyclerView)rootView.findViewById(R.id.main_fragment_auditroom_grid);
+        mAuditroomGrid = (RecyclerView)rootView.findViewById(R.id.recycler_main);
         //mAuditroomGrid.setHasFixedSize(true);
 
         initializeAuditroomGrid();
 
-        TextView textEmptyAud = (TextView)rootView.findViewById(R.id.text_empty_aud_list);
+        //TextView textEmptyAud = (TextView)rootView.findViewById(R.id.text_empty_aud_list);
 
-        if (mRoomItems.isEmpty()){
-            textEmptyAud.setVisibility(View.VISIBLE);
-        }
+        //if (mRoomItems.isEmpty()){
+        //    textEmptyAud.setVisibility(View.VISIBLE);
+        //}
 
         //mDisclaimerCard = (CardView)rootView.findViewById(R.id.layout_main_fragment_disclaimer_card);
 
@@ -149,11 +134,11 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     public void onResume() {
         super.onResume();
 
-        mRoomItems = RoomDB.readRoomsDB();
+        //mRoomItems = RoomDB.readRoomsDB();
 
         //setLayoutsWeight();
 
-        initializeAuditroomGrid();
+        //initializeAuditroomGrid();
     }
 
     @Override
@@ -168,10 +153,10 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
         ((Launcher)getActivity()).setToolbarTitle(R.string.toolbar_title_main);
 
-        //System.out.println("init mainFr app_bar_main 1");
+        //System.out.println("init mainFr main_content 1");
         //ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
         //if (actionBar != null) {
-            //System.out.println("init mainFr app_bar_main 2");
+            //System.out.println("init mainFr main_content 2");
             //actionBar.setTitle(getResources().getString(R.string.toolbar_title_main));
             //actionBar.setDisplayHomeAsUpEnabled(true);
             //actionBar.setDisplayShowHomeEnabled(true);

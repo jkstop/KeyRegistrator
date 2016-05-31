@@ -43,7 +43,7 @@ public class EmailAttachPreference extends DialogPreference implements EmailInte
 
     @Override
     protected View onCreateDialogView() {
-        View dialogView = View.inflate(mContext, R.layout.view_email_extras, null);
+        View dialogView = View.inflate(mContext, R.layout.view_email_extra_list, null);
         mAttachList = Settings.getAttachments();
         mAdapter = new AdapterEmailExtras(mContext, this, AdapterEmailExtras.ATTACHMENTS, mAttachList);
         RecyclerView attachListView = (RecyclerView)dialogView.findViewById(R.id.preference_email_extra_list);

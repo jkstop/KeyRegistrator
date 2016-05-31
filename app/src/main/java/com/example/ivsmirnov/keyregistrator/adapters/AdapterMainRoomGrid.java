@@ -139,6 +139,8 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
                 break;
         }
 
+        System.out.println("GRID HEIGHT " + mGridHeight);
+
         cell.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 mGridHeight / rowsCount));
     }
@@ -180,16 +182,5 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
         return mRoomItems.size();
     }
 
-    private int getItemScaleHeight(){
-        //int recyclerRows = (int) Math.ceil(12 / App.getAppContext().getResources().getInteger(R.integer.room_grid_count));
-
-        if (App.getAppContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            return MainFr.mAuditroomGrid.getHeight()/ Settings.getRowsLandscape();
-        } else {
-            return MainFr.mAuditroomGrid.getHeight()/ Settings.getRowsPortrait();
-        }
-
-
-    }
 
 }

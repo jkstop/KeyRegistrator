@@ -25,13 +25,15 @@
 
                 </FrameLayout>
 
-                <android.support.v7.widget.RecyclerView
+                <!--android.support.v7.widget.RecyclerView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/recycler_view_for_base_sql"
-                    android:scrollbars="vertical" />
+                    android:scrollbars="vertical" /-->
 
-                <android.support.design.widget.FloatingActionButton
+                <include layout="@layout/main_recycler"/>
+
+                <!--android.support.design.widget.FloatingActionButton
                     android:id="@+id/persons_fragment_fab"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -43,7 +45,7 @@
                     app:layout_anchor="@+id/recycler_view_for_base_sql"
                     app:layout_anchorGravity="bottom|end"
                     app:layout_behavior="com.example.ivsmirnov.keyregistrator.others.FABScrollBehavior"
-                    />
+                    /-->
 
         </android.support.design.widget.CoordinatorLayout>
 

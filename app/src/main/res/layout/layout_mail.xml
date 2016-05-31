@@ -34,14 +34,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:name="com.example.ivsmirnov.keyregistrator.fragments.EmailFrRecipients"
-        tools:layout="@layout/view_email_extras"
+        tools:layout="@layout/view_email_extra_list"
         android:layout_margin="@dimen/default_content_margin" />
 
     <fragment
         android:id="@id/attachments_fr"
         app:layout_widthPercent = "50%"
         android:name="com.example.ivsmirnov.keyregistrator.fragments.EmailFrAttachments"
-        tools:layout="@layout/view_email_extras"
+        tools:layout="@layout/view_email_extra_list"
         android:layout_toEndOf="@id/recipients_fr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

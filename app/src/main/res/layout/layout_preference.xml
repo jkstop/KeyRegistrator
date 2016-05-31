@@ -8,6 +8,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <include layout="@layout/app_bar_main" />
+    <include layout="@layout/main_content" />
 
 </android.support.v7.widget.LinearLayoutCompat>

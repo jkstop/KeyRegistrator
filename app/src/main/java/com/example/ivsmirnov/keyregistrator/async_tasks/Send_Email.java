@@ -6,9 +6,11 @@ import android.os.AsyncTask;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.AccountDB;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.items.MailParams;
+import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.Toasts;
@@ -58,7 +60,8 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
     protected void onPreExecute() {
         if (isDialogShow){
             mProgressDialog = new ProgressDialog(mContext);
-            mProgressDialog.setMessage("Отправка сообщения");
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.setMessage(mContext.getString(R.string.email_sending));
             mProgressDialog.show();
         }
     }
@@ -70,9 +73,9 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
         }
 
         if (e == null){
-            Toast.makeText(mContext, "Письмо отправлено", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, mContext.getString(R.string.email_sending_success), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(mContext, "Ошибка при отправке", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, mContext.getString(R.string.email_sending_error), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -84,8 +87,9 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
 
             AccountItem mAccountItem = AccountDB.getAccount(Settings.getActiveAccountID());
             String token = GoogleAuthUtil.getToken(mContext, mAccountItem.getEmail(),"oauth2:https://mail.google.com/");
-            String mTheme = "Рассылка";
-            String mBody = String.valueOf(new Date(System.currentTimeMillis()));
+            String mTheme = mContext.getString(R.string.email_theme);
+            String mBody = mContext.getString(R.string.email_message) + Settings.showDate();
+            InternetAddress from = new InternetAddress(mAccountItem.getEmail(), App.getAppContext().getResources().getString(R.string.app_name));
             ArrayList<String> mAttachments = Settings.getAttachments();
 
             Properties mProps = new Properties();
@@ -99,6 +103,7 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
             DataHandler mHandler = new DataHandler(new ByteArrayDataSource(mBody.getBytes(), "multipart/mixed"));
 
             mMimeMessage.setSubject(mTheme);
+            mMimeMessage.setFrom(from);
             mMimeMessage.setDataHandler(mHandler);
 
             for (String recepient : Settings.getRecepients()){

@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -97,6 +98,8 @@ public class Launcher extends AppCompatActivity implements
     private Resources mResources;
     private Handler mHandler;
 
+    private FloatingActionButton mFAB;
+
     //NFC reader
     private NFC mNFCReader;
 
@@ -141,6 +144,8 @@ public class Launcher extends AppCompatActivity implements
         System.out.println("CREATE");
         setContentView(R.layout.activity_launcher);
 
+        //getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
+
        // ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
        /// ComponentName componentName = activityManager.getRunningTasks(1).get(0).topActivity;
        // System.out.println("ACTIVITY " + this.getClass().getCanonicalName());
@@ -148,9 +153,6 @@ public class Launcher extends AppCompatActivity implements
         mContext = this;
         mResources = getResources();
 
-        for (String s : Settings.getEmailPeriods()){
-            System.out.println("PERIOD " + s);
-        }
 
         //mNavigationItems = new ArrayList<>();
 
@@ -193,10 +195,12 @@ public class Launcher extends AppCompatActivity implements
 
         initAccount();
 
-        if (savedInstanceState == null){
-            showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.navigation_drawer_item_home);
+        showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
 
-            mNFCReader = new NFC();
+        mNFCReader = new NFC();
+
+        if (savedInstanceState == null){
+
         }
 
     }
@@ -263,6 +267,8 @@ public class Launcher extends AppCompatActivity implements
         mAccountImage.setOnClickListener(logOnClick);
         mAccountExit.setOnClickListener(logOutClick);
 
+        mFAB = (FloatingActionButton) findViewById(R.id.action_button_main);
+
         //getUserActiveAccount();
 
 /*
@@ -317,7 +323,7 @@ public class Launcher extends AppCompatActivity implements
             }
         });
 
-        ActionBarDrawerToggle mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, app_bar_main, R.string.navigation_drawer_opened, R.string.navigation_drawer_closed) {
+        ActionBarDrawerToggle mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, main_content, R.string.navigation_drawer_opened, R.string.navigation_drawer_closed) {
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
@@ -342,11 +348,14 @@ public class Launcher extends AppCompatActivity implements
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.navigation_item_home:
+                mFAB.setVisibility(View.INVISIBLE);
                 showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
                 break;
             case R.id.navigation_item_persons:
                 setToolbarTitle(R.string.toolbar_title_persons);
                 showFragment(getSupportFragmentManager(),PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_EDITOR, 0, null) ,R.string.toolbar_title_persons);
+                mFAB.setVisibility(View.VISIBLE);
+
                 break;
             case R.id.navigation_item_journal:
                 showFragment(getSupportFragmentManager(), JournalFr.newInstance(),R.string.toolbar_title_journal);
@@ -356,11 +365,6 @@ public class Launcher extends AppCompatActivity implements
                 break;
             case R.id.navigation_item_settings:
                 startActivity(new Intent(mContext, Preferences.class));
-                break;
-            case R.id.navigation_item_email:
-                showFragment(getSupportFragmentManager(), new MailFr(),R.string.navigation_drawer_item_mail);
-                break;
-            case R.id.navigation_item_sql_connect:
                 break;
             case R.id.navigation_item_stat:
                 startActivity(new Intent(mContext, CloseDay.class)

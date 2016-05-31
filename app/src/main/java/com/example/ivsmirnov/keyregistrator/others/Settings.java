@@ -7,8 +7,11 @@ import android.preference.PreferenceManager;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -81,6 +84,11 @@ public class Settings {
             mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(App.getAppContext()).edit();
         }
         return mPreferencesEditor;
+    }
+
+    public static String showDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy",new Locale("ru"));
+        return String.valueOf(dateFormat.format(new Date())) + " г.";
     }
 
 

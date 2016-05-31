@@ -31,32 +31,18 @@ public class StatFr extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_statistics,container,false);
 
+        ((TextView) rootView.findViewById(R.id.close_day_date)).setText(Settings.showDate());
 
-        ((TextView) rootView.findViewById(R.id.layout_close_day_card_stat_head)).setText(showDate());
+        ((TextView) rootView.findViewById(R.id.close_day_visit_count)).setText(String.valueOf(JournalDB.getItemCount(JournalDB.COUNT_TODAY)));
 
-        ((TextView) rootView.findViewById(R.id.layout_close_day_card_stat_value_today)).setText(String.valueOf(JournalDB.getItemCount(JournalDB.COUNT_TODAY)));
+        ((TextView) rootView.findViewById(R.id.close_day_closed_count)).setText(String.valueOf(Settings.getAutoClosedRoomsCount()));
 
-        ((TextView) rootView.findViewById(R.id.layout_close_day_card_stat_value_journal_items)).setText(String.valueOf(JournalDB.getItemCount(JournalDB.COUNT_TOTAL)));
+        ((TextView) rootView.findViewById(R.id.close_day_journal_count)).setText(String.valueOf(JournalDB.getItemCount(JournalDB.COUNT_TOTAL)));
 
-        ((TextView) rootView.findViewById(R.id.layout_close_day_card_stat_value_person_items)).setText(String.valueOf(FavoriteDB.getPersonsCount()));
-
-
-        TextView mTextAutoCloseCount = (TextView)rootView.findViewById(R.id.layout_close_day_card_stat_value_autoclose);
-
-        //int titleType = getIntent().getIntExtra(AUTO_CLOSE_ROOMS, -1);
-        //if (titleType == -1){
-        //    mTextTitle.setText(R.string.card_statistic_head_stat);
-        //} else {
-        //    mTextTitle.setText(R.string.card_statistic_head_close);
-        //    mTextTitle.setTextColor(getResources().getColor(R.color.colorAccent));
-            mTextAutoCloseCount.setText(String.valueOf(Settings.getAutoClosedRoomsCount()));
-        //}
+        ((TextView) rootView.findViewById(R.id.close_day_persons_count)).setText(String.valueOf(FavoriteDB.getPersonsCount()));
 
         return rootView;
     }
 
-    private String showDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy",new Locale("ru"));
-        return String.valueOf(dateFormat.format(new Date())) + " г.";
-    }
+
 }

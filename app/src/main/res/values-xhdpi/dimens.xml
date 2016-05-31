@@ -98,4 +98,6 @@
     <dimen name="card_nfc_aud_text">48sp</dimen>
     <dimen name="auth_user_fr_head_text">32sp</dimen>
 
+    <dimen name="aud_card_heght">87dp</dimen>
+
 </resources>

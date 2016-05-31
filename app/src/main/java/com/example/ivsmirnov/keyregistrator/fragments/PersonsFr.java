@@ -146,7 +146,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
 
         mBaseWriterInterface = (BaseWriterInterface)getActivity();
 
-        mAddFAB = (FloatingActionButton) rootView.findViewById(R.id.persons_fragment_fab);
+       /* mAddFAB = (FloatingActionButton) rootView.findViewById(R.id.persons_fragment_fab);
         mAddFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,7 +160,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
 
         if (bundleAccess == FavoriteDB.CLICK_USER_ACCESS){
             mAddFAB.hide();
-        }
+        }*/
 
         mListView = (ListView)rootView.findViewById(R.id.persons_fragment_list_characters);
         mLoadingBar = (ProgressBar)rootView.findViewById(R.id.layout_persons_fragment_loading_progress_bar);
@@ -179,7 +179,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
 
         RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
 
-        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view_for_base_sql);
+        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_main);
         mRecyclerView.setItemAnimator(itemAnimator);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new GridLayoutManager(mContext,3));

@@ -26,6 +26,7 @@
     <string name="toolbar_title_shedule">Расписание</string>
     <string name="toolbar_title_email">E-mail рассылка</string>
     <string name="title_activity_close_day_dialog">Статистика</string>
+    <string name="title_activity_close_day_dialog_end">Занятия завершены!</string>
     <string name="title_delete_room_dialog">Удаление</string>
     <string name="title_add_new_staff">Добавление нового пользователя</string>
     <string name="title_dialog_log_out">Отсоединение аккаунта</string>
@@ -261,7 +262,7 @@
     <string name="shared_preferences_email_recipients">Получатели</string>
     <string name="shared_preferences_email_recipients_summary">Адреса для рассылки</string>
     <string name="shared_preferences_email_attach">Вложения</string>
-    <string name="shared_preferences_email_attach_summary">Файлы для рассылки</string>
+    <string name="shared_preferences_email_attach_summary">Файлы для рассылки (не более 5Мб)</string>
     <string name="shared_preferences_email_send">Отправить сейчас</string>
     <string name="shared_preferences_email_send_summary">Отправить e-mail с текущими параметрами</string>
     <string name="shared_preferences_email_send_disable">Рассылка недоступна</string>
@@ -272,9 +273,14 @@
     <string name="view_table_portrait">Портретный</string>
     <string name="view_table_title">Размер сетки</string>
 
+    <string name="email_theme">Рассылка</string>
+    <string name="email_message">Рассылка от \u0020</string>
+    <string name="email_sending">Отправка сообщения</string>
+    <string name="email_sending_success">Сообщение отправлено</string>
+    <string name="email_sending_error">Ошибка при отправке</string>
+
     <string name="dialog_search_query_hint">Начните вводить фамилию</string>
     <string name="snack_user_add_success">Пользователь добавлен!</string>
     <string name="snack_user_add_error">Ошибка при добавлении пользователя!</string>
-
 
 </resources>

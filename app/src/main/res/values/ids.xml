@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <item name="app_bar_main_layout" type="id"/>
+    <item name="action_button_main" type="id"/>
+
+    <item name="recycler_main" type="id"/>
+
     <item name="user_auth_disclaimer" type="id"/>
     <item name="user_auth_appbar_layout" type="id"/>
     <item name="user_auth_toolbar" type="id"/>
@@ -82,5 +88,17 @@
     <item name="card_email_extra_new_recipient_input" type="id"/>
     <item name="card_email_extra_new_recipient_delete" type="id"/>
     <item name="card_email_extra_new_recipient_add" type="id"/>
+
+    <item name="close_day_logo" type="id"/>
+    <item name="close_day_date" type="id"/>
+    <item name="close_day_info_layout" type="id"/>
+    <item name="close_day_visit_text" type="id"/>
+    <item name="close_day_visit_count" type="id"/>
+    <item name="close_day_closed_text" type="id"/>
+    <item name="close_day_closed_count" type="id"/>
+    <item name="close_day_persons_icon" type="id"/>
+    <item name="close_day_persons_count" type="id"/>
+    <item name="close_day_journal_icon" type="id"/>
+    <item name="close_day_journal_count" type="id"/>
 
 </resources>
