@@ -46,9 +46,3 @@
         app:layout_behavior="com.example.ivsmirnov.keyregistrator.others.FABScrollBehavior"/>
 
 </android.support.design.widget.CoordinatorLayout>
-
-
-
-
-
-

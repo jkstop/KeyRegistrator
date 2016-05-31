@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.custom_views.EmailRecipientsPreference;
-import com.example.ivsmirnov.keyregistrator.fragments.EmailFr;
 import com.example.ivsmirnov.keyregistrator.interfaces.EmailInterface;
 
 import java.util.ArrayList;

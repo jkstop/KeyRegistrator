@@ -139,12 +139,17 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
                 break;
         }
 
-        System.out.println("GRID HEIGHT " + mGridHeight);
-
         cell.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 mGridHeight / rowsCount));
     }
 
+    private int getActionBarHeight(){
+        TypedValue tv = new TypedValue();
+        if (App.getAppContext().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            return TypedValue.complexToDimensionPixelSize(tv.data,App.getAppContext().getResources().getDisplayMetrics());
+        }
+        return 0;
+    }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -155,6 +160,8 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
         } else {
             mGridHeight = mRoomItems.get(position).getGridHeight();
         }
+        mGridHeight -= getActionBarHeight();
+
         mCurrentOrientation = mRoomItems.get(position).getGridOrient();
 
         scaleCells(holder.itemView, mCurrentOrientation);
