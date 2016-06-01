@@ -1,9 +1,7 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,8 +11,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,32 +19,25 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SpinnerAdapter;
-import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterJournalList;
-import com.example.ivsmirnov.keyregistrator.async_tasks.GetJournal;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
+import com.example.ivsmirnov.keyregistrator.async_tasks.FileLoader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.interfaces.Updatable;
 import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
-import com.example.ivsmirnov.keyregistrator.items.GetJournalParams;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -186,7 +175,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i,Loader_intent.REQUEST_CODE_LOAD_JOURNAL);
+                startActivityForResult(i, FileLoader.REQUEST_CODE_LOAD_JOURNAL);
                 return true;
             case R.id.menu_journal_delete:
                 Dialogs dialog = new Dialogs();
@@ -213,11 +202,11 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
        // super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK){
             if (data!=null){
-                if (requestCode == Loader_intent.REQUEST_CODE_LOAD_JOURNAL){
-                    new Loader_intent(mContext,
+                if (requestCode == FileLoader.REQUEST_CODE_LOAD_JOURNAL){
+                    new FileLoader(mContext,
                             data.getData().getPath(),
                             this,
-                            Loader_intent.REQUEST_CODE_LOAD_JOURNAL).execute();
+                            FileLoader.REQUEST_CODE_LOAD_JOURNAL).execute();
                 }else if (requestCode == REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION){
                     Settings.setJournalBackupLocation(data.getData().getPath());
                 }

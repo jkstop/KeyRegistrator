@@ -26,7 +26,7 @@ import java.util.Locale;
 /**
  * Загрузка из файла
  */
-public class Loader_intent extends AsyncTask<Void,Integer,Boolean> {
+public class FileLoader extends AsyncTask<Void,Integer,Boolean> {
 
     public static final int REQUEST_CODE_LOAD_FAVORITE_STAFF = 200;
     public static final int REQUEST_CODE_LOAD_JOURNAL = 201;
@@ -39,7 +39,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Boolean> {
     private int mLoadType;
     private boolean isFileVerify = false;
 
-    public Loader_intent(Context context, String path, UpdateInterface listener, int loadType){
+    public FileLoader(Context context, String path, UpdateInterface listener, int loadType){
         this.mContext = context;
         this.mPath = path;
         this.mListener = listener;
@@ -121,7 +121,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Boolean> {
                 JournalDB.clearJournalDB();
                 try {
                     String verify = bufferedReader.readLine();
-                    if (verify.equals("pass")){
+                    if (verify.equals(JournalDB.JOURNAL_VALIDATE)){
                         isFileVerify = true;
                             while ((line = bufferedReader.readLine())!=null){
                                 if (i<count){
@@ -133,7 +133,8 @@ public class Loader_intent extends AsyncTask<Void,Integer,Boolean> {
                                             .setTimeIn(Long.parseLong(split[2]))
                                             .setTimeOut(Long.parseLong(split[3]))
                                             .setAccessType(Integer.parseInt(split[4]))
-                                            .setPersonInitials(FavoriteDB.getPersonInitials(FavoriteDB.FULL_INITIALS, split[5], split[6], split[7])));
+                                            .setPersonInitials(split[5])
+                                            .setPersonTag(split[6]));
 
                                     publishProgress(i);
                                     i++;

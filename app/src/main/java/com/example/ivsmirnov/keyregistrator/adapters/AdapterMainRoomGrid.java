@@ -160,7 +160,7 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
         } else {
             mGridHeight = mRoomItems.get(position).getGridHeight();
         }
-        mGridHeight -= getActionBarHeight();
+        //mGridHeight -= getActionBarHeight();
 
         mCurrentOrientation = mRoomItems.get(position).getGridOrient();
 

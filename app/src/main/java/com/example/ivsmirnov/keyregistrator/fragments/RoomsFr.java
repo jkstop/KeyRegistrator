@@ -9,9 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,7 +22,7 @@ import android.view.ViewGroup;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGrid;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
+import com.example.ivsmirnov.keyregistrator.async_tasks.FileLoader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
@@ -173,7 +171,7 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i,Loader_intent.REQUEST_CODE_LOAD_ROOMS);
+                startActivityForResult(i, FileLoader.REQUEST_CODE_LOAD_ROOMS);
                 return true;
             case R.id.menu_auditrooms_clear:
                 Dialogs dialog = new Dialogs();
@@ -192,12 +190,12 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
        // super.onActivityResult(requestCode, resultCode, data);
         if (data!=null){
-            if (requestCode == Loader_intent.REQUEST_CODE_LOAD_ROOMS){
+            if (requestCode == FileLoader.REQUEST_CODE_LOAD_ROOMS){
                 if (resultCode == Activity.RESULT_OK){
                     Uri uri = data.getData();
                     String path = uri.getPath();
-                    Loader_intent loader_intent = new Loader_intent(mContext,path,this,Loader_intent.REQUEST_CODE_LOAD_ROOMS);
-                    loader_intent.execute();
+                    FileLoader fileLoader_ = new FileLoader(mContext,path,this, FileLoader.REQUEST_CODE_LOAD_ROOMS);
+                    fileLoader_.execute();
                 }
             }
         }

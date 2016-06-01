@@ -3,9 +3,6 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,12 +12,9 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,14 +23,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsCharacters;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsGrid;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Loader_intent;
+import com.example.ivsmirnov.keyregistrator.async_tasks.FileLoader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
@@ -247,7 +239,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
                 i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i,Loader_intent.REQUEST_CODE_LOAD_FAVORITE_STAFF);
+                startActivityForResult(i, FileLoader.REQUEST_CODE_LOAD_FAVORITE_STAFF);
                 return true;
             case R.id.menu_teachers_delete:
                 Dialogs dialog = new Dialogs();
@@ -279,11 +271,11 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK){
             if (data!=null){
-                if (requestCode==Loader_intent.REQUEST_CODE_LOAD_FAVORITE_STAFF){
-                    new Loader_intent(mContext,
+                if (requestCode== FileLoader.REQUEST_CODE_LOAD_FAVORITE_STAFF){
+                    new FileLoader(mContext,
                             data.getData().getPath(),
                             this,
-                            Loader_intent.REQUEST_CODE_LOAD_FAVORITE_STAFF).execute();
+                            FileLoader.REQUEST_CODE_LOAD_FAVORITE_STAFF).execute();
                 }else if (requestCode == REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION){
                     Settings.setPersonsBackupLocation(data.getData().getPath());
                 }

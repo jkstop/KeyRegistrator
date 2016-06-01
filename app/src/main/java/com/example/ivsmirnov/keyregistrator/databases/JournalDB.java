@@ -34,6 +34,8 @@ public class JournalDB {
     public static final int COUNT_TODAY = 2;
     public static final int COUNT_TOTAL = 3;
 
+    public static final String JOURNAL_VALIDATE = "passw";
+
     public static long writeInDBJournal(JournalItem journalItem){
 
         SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.DB_JOURNAL);
@@ -424,34 +426,56 @@ public class JournalDB {
     }
 
     public static void backupJournalToCSV(){
-        File file = new File(Settings.getBackupLocation(),"/Journal.csv");
-        FileOutputStream fileOutputStream;
-        Cursor cursor;
 
-        cursor = DbShare.getCursor(DbShare.DB_JOURNAL,
-                JournalDBinit.TABLE_JOURNAL,
-                null,null,null,null,null,null);
+        Cursor cursor = null;
         try {
+            File file = new File(Settings.getBackupLocation(),"/Journal.csv");
+            FileOutputStream fileOutputStream;
+
+            cursor = DbShare.getCursor(DbShare.DB_JOURNAL,
+                    JournalDBinit.TABLE_JOURNAL,
+                    null,null,null,null,null,null);
+            cursor.moveToPosition(-1);
+
             if (file != null) {
                 fileOutputStream = new FileOutputStream(file);
-                String row;
-                if (cursor.getCount()!=0){
-                    cursor.moveToPosition(-1);
-                    while (cursor.moveToNext()){
-                        row = cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_USER_ID))+";"
-                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_AUD))+";"
-                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN))+";"
-                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_OUT))+";"
-                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_ACCESS_TYPE))+";"
-                                +cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_INITIALS));
-                        fileOutputStream.write(row.getBytes());
-                        fileOutputStream.write("\n".getBytes());
-                    }
+
+                StringBuilder stringBuilder = new StringBuilder();
+
+                stringBuilder.append(JOURNAL_VALIDATE);
+                fileOutputStream.write(stringBuilder.toString().getBytes());
+                fileOutputStream.write("\n".getBytes());
+                stringBuilder.delete(0, stringBuilder.length());
+
+                String delimeter = ";";
+
+                while (cursor.moveToNext()){
+
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_USER_ID)));
+                    stringBuilder.append(delimeter);
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_AUD)));
+                    stringBuilder.append(delimeter);
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN)));
+                    stringBuilder.append(delimeter);
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_OUT)));
+                    stringBuilder.append(delimeter);
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_ACCESS_TYPE)));
+                    stringBuilder.append(delimeter);
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_INITIALS)));
+                    stringBuilder.append(delimeter);
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_PERSON_TAG)));
+
+                    System.out.println("string: " + stringBuilder.toString());
+
+                    fileOutputStream.write(stringBuilder.toString().getBytes());
+                    fileOutputStream.write("\n".getBytes());
+
+                    stringBuilder.delete(0, stringBuilder.length());
                 }
                 fileOutputStream.close();
             }
-        }
-        catch (IOException e) {
+
+        } catch (Exception e){
             e.printStackTrace();
         } finally {
             closeCursor(cursor);
