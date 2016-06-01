@@ -240,7 +240,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_teachers_save_to_file:
-                FileWriter saveToFile = new FileWriter(mContext,FileWriter.WRITE_TEACHERS, true);
+                FileWriter saveToFile = new FileWriter(mContext, true);
                 saveToFile.execute();
                 return true;
             case R.id.menu_teachers_download_favorite:

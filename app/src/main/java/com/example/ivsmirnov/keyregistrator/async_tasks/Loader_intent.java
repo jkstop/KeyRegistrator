@@ -26,7 +26,7 @@ import java.util.Locale;
 /**
  * Загрузка из файла
  */
-public class Loader_intent extends AsyncTask<Void,Integer,Void> {
+public class Loader_intent extends AsyncTask<Void,Integer,Boolean> {
 
     public static final int REQUEST_CODE_LOAD_FAVORITE_STAFF = 200;
     public static final int REQUEST_CODE_LOAD_JOURNAL = 201;
@@ -37,6 +37,7 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
     private ProgressDialog progressDialog;
     private UpdateInterface mListener;
     private int mLoadType;
+    private boolean isFileVerify = false;
 
     public Loader_intent(Context context, String path, UpdateInterface listener, int loadType){
         this.mContext = context;
@@ -57,17 +58,17 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Boolean doInBackground(Void... params) {
         File file;
         int count = 0;
-        BufferedReader fin = null;
+        BufferedReader bufferedReader = null;
         int i = 0;
         String line;
         ArrayList<String> lines = new ArrayList<>();
         if (mPath!=null){
              file = new File(mPath);
             try {
-                fin = new BufferedReader(new FileReader(file));
+                bufferedReader = new BufferedReader(new FileReader(file));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -83,9 +84,11 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
 
                 FavoriteDB.clear();
                 try {
-                    while ((line = fin.readLine())!=null){
-                        if (i<count){
-                            if (!lines.contains(line)){
+                    String verify = bufferedReader.readLine();
+                    if (verify.equals(FavoriteDB.PERSONS_VALIDATE)){
+                        isFileVerify = true;
+                        while ((line = bufferedReader.readLine())!=null){
+                            if (i<count && !lines.contains(line)){
                                 try {
                                     String [] split = line.split(";");
                                     for (int j=0; j<split.length; j++){
@@ -98,18 +101,18 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                             .setMidname(split[2])
                                             .setDivision(split[3])
                                             .setSex(split[4])
-                                            .setPhoto(split[6])
-                                            .setRadioLabel(split[7]));
+                                            .setRadioLabel(split[5])
+                                            .setPhoto(split[6]));
 
                                     publishProgress(i);
                                     i++;
                                 }catch (Exception e){
                                     e.printStackTrace();
                                 }
-
                             }
                         }
                     }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -117,10 +120,11 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
             case REQUEST_CODE_LOAD_JOURNAL:
                 JournalDB.clearJournalDB();
                 try {
-                    if (fin != null) {
-                        while ((line = fin.readLine())!=null){
-                            if (i<count){
-                                try {
+                    String verify = bufferedReader.readLine();
+                    if (verify.equals("pass")){
+                        isFileVerify = true;
+                            while ((line = bufferedReader.readLine())!=null){
+                                if (i<count){
                                     String [] split = line.split(";");
 
                                     JournalDB.writeInDBJournal(new JournalItem()
@@ -130,14 +134,14 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
                                             .setTimeOut(Long.parseLong(split[3]))
                                             .setAccessType(Integer.parseInt(split[4]))
                                             .setPersonInitials(FavoriteDB.getPersonInitials(FavoriteDB.FULL_INITIALS, split[5], split[6], split[7])));
-                                }catch (Exception e){
-                                    e.printStackTrace();
+
+                                    publishProgress(i);
+                                    i++;
                                 }
-                                publishProgress(i);
-                                i++;
                             }
-                        }
+
                     }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -145,31 +149,37 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
             case REQUEST_CODE_LOAD_ROOMS:
                 RoomDB.clearRoomsDB();
                 try {
-                    while ((line = fin.readLine())!=null){
-                        if (i<count){
-                            if (!lines.contains(line)){
+                    String verify = bufferedReader.readLine();
+                    if (verify.equals(RoomDB.ROOMS_VALIDATE)){
+                        isFileVerify = true;
+                        while ((line = bufferedReader.readLine())!=null){
+                            if (i<count){
                                 String [] split = line.split(";");
-                                if(split.length==6){
-                                    RoomDB.writeInRoomsDB(new RoomItem().setAuditroom(split[0])
-                                            .setStatus(Integer.parseInt(split[1]))
-                                            .setAccessType(Integer.parseInt(split[2]))
-                                            .setLastVisiter(split[3])
-                                            .setTag(split[4]));
-                                    publishProgress(i);
-                                    i++;
-                                }
+
+                                RoomDB.writeInRoomsDB(new RoomItem()
+                                        .setAuditroom(split[0])
+                                        .setStatus(Integer.parseInt(split[1]))
+                                        .setAccessType(Integer.parseInt(split[2]))
+                                        .setLastVisiter(split[3])
+                                        .setTag(split[4]));
+
+                                publishProgress(i);
+                                i++;
                             }
                         }
+
                     }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
                 break;
             default:
                 break;
         }
 
-        return null;
+        return isFileVerify;
     }
 
     @Override
@@ -178,14 +188,20 @@ public class Loader_intent extends AsyncTask<Void,Integer,Void> {
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
+    protected void onPostExecute(Boolean isFileVerify) {
+        super.onPostExecute(isFileVerify);
+        if (isFileVerify){
+            Toast.makeText(mContext, "Готово!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(mContext, "Не правильный файл!", Toast.LENGTH_SHORT).show();
+        }
+
         System.out.println("loader intent -----------------------------");
         if (progressDialog.isShowing()){
             progressDialog.cancel();
         }
         mListener.updateInformation();
-        Toast.makeText(mContext, "Готово!", Toast.LENGTH_SHORT).show();
+
     }
 
     public static int getStringCount(File file)

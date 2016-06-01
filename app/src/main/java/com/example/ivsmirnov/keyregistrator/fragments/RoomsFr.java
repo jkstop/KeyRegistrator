@@ -62,14 +62,14 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.layout_auditrooms_fr,container,false);
+        View rootView = inflater.inflate(R.layout.main_recycler,container,false);
         mContext = rootView.getContext();
 
-        mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.auditroom_fragment_room_grid);
+        mRoomsGrid = (RecyclerView)rootView.findViewById(R.id.recycler_main);
         mRoomsGrid.setHasFixedSize(true);
 
-        FloatingActionButton mAddFAB = (FloatingActionButton) rootView.findViewById(R.id.auditroom_fragment_fab);
-
+        //FloatingActionButton mAddFAB = (FloatingActionButton) rootView.findViewById(R.id.auditroom_fragment_fab);
+/*
         mAddFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,7 +81,7 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
                 dialog.show(getFragmentManager(), "add_room");
             }
         });
-
+*/
         initializeAuditroomsGrid();
         return rootView;
     }
@@ -166,7 +166,7 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
                 dialogs.show(getFragmentManager(),"columns");
                 return true;
             case R.id.menu_auditrooms_save_to_file:
-                FileWriter saveToFile = new FileWriter(mContext, FileWriter.WRITE_ROOMS, true);
+                FileWriter saveToFile = new FileWriter(mContext, true);
                 saveToFile.execute();
                 return true;
             case R.id.menu_auditrooms_load_from_file:

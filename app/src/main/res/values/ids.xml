@@ -6,6 +6,8 @@
 
     <item name="recycler_main" type="id"/>
 
+    <item name="user_auth_appbar" type="id"/>
+    <item name="user_auth_layout" type="id"/>
     <item name="user_auth_disclaimer" type="id"/>
     <item name="user_auth_appbar_layout" type="id"/>
     <item name="user_auth_toolbar" type="id"/>
@@ -13,7 +15,9 @@
     <item name="user_auth_pager_view" type="id"/>
     <item name="user_auth_disclaimer_layout" type="id"/>
     <item name="user_auth_room" type="id"/>
+    <item name="user_auth_fab" type="id"/>
 
+    <item name="user_auth_card_layout" type="id"/>
     <item name="user_auth_card_disclaimer" type="id"/>
     <item name="user_auth_card_arrow_down" type="id"/>
 

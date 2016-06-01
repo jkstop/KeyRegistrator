@@ -27,6 +27,8 @@ public class RoomDB {
     public static final int ROOM_IS_BUSY = 0;
     public static final int ROOM_IS_FREE = 1;
 
+    public static final String ROOMS_VALIDATE = "9LSk8wzZZlY07nC";
+
     public static void writeInRoomsDB (RoomItem roomItem) {
         try {
             ContentValues cv = new ContentValues();
@@ -281,39 +283,47 @@ public class RoomDB {
     public static void backupRoomsToFile(){
         Cursor cursor = null;
         try {
-            ArrayList <String> itemList = new ArrayList<>();
             FileOutputStream fileOutputStream;
-            String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-            File file = new File(mPath + "/Rooms.csv");
+            File file = new File(Settings.getBackupLocation() + "/Rooms.csv");
 
             cursor = DbShare.getCursor(DbShare.DB_ROOM,
                     RoomDBinit.TABLE_ROOMS,
                     null,null,null,null,null,null);
             cursor.moveToPosition(-1);
-            while (cursor.moveToNext()){
-                String room = cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_ROOM));
-                String status = cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_STATUS));
-                String cardOrHand = cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_ACCESS));
-                String lastVisiter = cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_LAST_VISITER));
-                String tag = cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG));
-                String photoPath = cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_PHOTO_PATH));
-                String stroke = room+";"+status+";"+cardOrHand+";"+lastVisiter+";"+tag+";"+photoPath;
-                itemList.add(stroke);
-            }
-            try{
-                if (file!=null){
-                    fileOutputStream = new FileOutputStream(file);
-                    for (int i=0;i<itemList.size();i++){
-                        fileOutputStream.write(itemList.get(i).getBytes());
-                        fileOutputStream.write("\n".getBytes());
-                    }
-                    fileOutputStream.close();
+
+            if (file!=null){
+                fileOutputStream = new FileOutputStream(file);
+                StringBuilder stringBuilder = new StringBuilder();
+
+                stringBuilder.append(ROOMS_VALIDATE);
+                fileOutputStream.write(stringBuilder.toString().getBytes());
+                fileOutputStream.write("\n".getBytes());
+                stringBuilder.delete(0, stringBuilder.length());
+
+                String delimeter = ";";
+                while (cursor.moveToNext()){
+
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_ROOM)));
+                    stringBuilder.append(delimeter);
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_STATUS)));
+                    stringBuilder.append(delimeter);
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_ACCESS)));
+                    stringBuilder.append(delimeter);
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_LAST_VISITER)));
+                    stringBuilder.append(delimeter);
+                    stringBuilder.append(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG)));
+                    //stringBuilder.append(delimeter);
+                    //stringBuilder.append(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_PHOTO_PATH)));
+
+                    System.out.println("string: " + stringBuilder.toString());
+
+                    fileOutputStream.write(stringBuilder.toString().getBytes());
+                    fileOutputStream.write("\n".getBytes());
+
+                    stringBuilder.delete(0, stringBuilder.length());
                 }
+                fileOutputStream.close();
             }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            itemList.clear();
         } catch (Exception e){
             e.printStackTrace();
         } finally {

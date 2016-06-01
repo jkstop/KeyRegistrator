@@ -48,9 +48,7 @@ public class CloseDayService extends Service implements CloseDayInterface {
 
             //запись файлов
             if (selectedTasks.contains(allTasks[1])){
-                new FileWriter(context, FileWriter.WRITE_JOURNAL, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                new FileWriter(context, FileWriter.WRITE_TEACHERS, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                new FileWriter(context, FileWriter.WRITE_ROOMS, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                new FileWriter(null, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, Settings.getBackupItems());
             }
 
             //запись на сервер

@@ -138,7 +138,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
         //setLayoutsWeight();
 
-        //initializeAuditroomGrid();
+        initializeAuditroomGrid();
     }
 
     @Override
@@ -182,7 +182,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
             //new DialogUserAuth().show(getFragmentManager(),);
 
-            startActivity(new Intent(mContext, UserAuth.class));
+            startActivity(new Intent(mContext, UserAuth.class).putExtra(PersonsFr.PERSONS_SELECTED_ROOM, mRoomItems.get(position).getAuditroom()));
 
 
         } else {

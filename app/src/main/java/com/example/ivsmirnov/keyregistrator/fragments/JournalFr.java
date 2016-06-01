@@ -173,7 +173,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_journal_save_to_file:
-                FileWriter saveToFile = new FileWriter(mContext, FileWriter.WRITE_JOURNAL, true);
+                FileWriter saveToFile = new FileWriter(mContext, true);
                 saveToFile.execute();
                 return true;
             case R.id.menu_journal_upload_to_server:

@@ -38,6 +38,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.DbShare;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
+import com.example.ivsmirnov.keyregistrator.fragments.DialogSearch;
 import com.example.ivsmirnov.keyregistrator.fragments.JournalFr;
 import com.example.ivsmirnov.keyregistrator.fragments.MainFr;
 import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
@@ -160,14 +161,10 @@ public class Launcher extends AppCompatActivity implements
 
         initAccount();
 
-        showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
-
-        mNFCReader = new NFC();
-
         if (savedInstanceState == null){
-
+            showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
+            mNFCReader = new NFC();
         }
-
     }
 
     private void initAccount(){
@@ -220,13 +217,34 @@ public class Launcher extends AppCompatActivity implements
                 setToolbarTitle(R.string.toolbar_title_persons);
                 showFragment(getSupportFragmentManager(),PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_EDITOR, 0, null) ,R.string.toolbar_title_persons);
                 mFAB.setVisibility(View.VISIBLE);
-
+                mFAB.setImageResource(R.drawable.ic_add_black_24dp);
+                mFAB.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new DialogSearch().show(getSupportFragmentManager(),"search");
+                    }
+                });
                 break;
             case R.id.navigation_item_journal:
                 showFragment(getSupportFragmentManager(), JournalFr.newInstance(),R.string.toolbar_title_journal);
+                mFAB.setVisibility(View.INVISIBLE);
                 break;
             case R.id.navigation_item_rooms:
-                showFragment(getSupportFragmentManager(), RoomsFr.newInstance(),R.string.toolbar_title_auditrooms);
+                final RoomsFr roomsFr = RoomsFr.newInstance();
+                showFragment(getSupportFragmentManager(), roomsFr,R.string.toolbar_title_auditrooms);
+                mFAB.setVisibility(View.VISIBLE);
+                mFAB.setImageResource(R.drawable.ic_add_black_24dp);
+                mFAB.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Dialogs dialog = new Dialogs();
+                        Bundle b = new Bundle();
+                        b.putInt(Dialogs.DIALOG_TYPE, Dialogs.ADD_ROOM_DIALOG);
+                        dialog.setArguments(b);
+                        dialog.setTargetFragment(roomsFr, 0);
+                        dialog.show(getSupportFragmentManager(), "add_room");
+                    }
+                });
                 break;
             case R.id.navigation_item_settings:
                 startActivity(new Intent(mContext, Preferences.class));

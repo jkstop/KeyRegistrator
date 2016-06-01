@@ -38,14 +38,35 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="@string/shared_preferences_category_backup"
+        android:title="@string/shared_preferences_category_backup">
+
+        <MultiSelectListPreference
+            android:key="@string/shared_preferences_backup_items"
+            android:title="@string/shared_preferences_backup_items"
+            android:summary="@string/shared_preferences_backup_items_summary"
+            android:entries="@array/shared_preferences_backup_items_entries"
+            android:entryValues="@array/shared_preferences_backup_items_entries"/>
+
+        <Preference
+            android:key="@string/shared_preferences_backup_location"
+            android:title="@string/shared_preferences_backup_location" />
+
+        <Preference
+            android:key="@string/shared_preferences_backup_now"
+            android:title="@string/shared_preferences_backup_now"
+            android:summary="@string/shared_preferences_backup_now_summary"/>
+
+        <Preference
+            android:key="@string/shared_preferences_backup_restore"
+            android:title="@string/shared_preferences_backup_restore"
+            android:summary="@string/shared_preferences_backup_restore_summary"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:key="@string/shared_preferences_category_email"
         android:title="@string/shared_preferences_category_email">
-
-        <!--SwitchPreference
-            android:key="@string/shared_preferences_email_status"
-            android:title="@string/shared_preferences_email_status"
-            android:summaryOn="@string/shared_preferences_email_status_summary_on"
-            android:summaryOff="@string/shared_preferences_email_status_summary_off"/-->
 
         <MultiSelectListPreference
             android:key="@string/shared_preferences_email_period"

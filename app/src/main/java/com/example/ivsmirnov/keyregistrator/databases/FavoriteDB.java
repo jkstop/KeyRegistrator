@@ -21,6 +21,7 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -51,6 +52,9 @@ public class FavoriteDB {
 
     public static final int CLICK_USER_ACCESS = 100;
     public static final int CARD_USER_ACCESS = 101;
+
+
+    public static final String PERSONS_VALIDATE = "H4KkNBL1EIzJKoN";
 
 
 
@@ -598,36 +602,65 @@ public class FavoriteDB {
         }
     }
 
-
+    private static String getEncodedPhoto(String personTag){
+        String encoded = null;
+        try {
+            Bitmap bitmap = BitmapFactory.decodeFile(getPersonPhotoPath(personTag).getPath());
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            byte[] bytes = byteArrayOutputStream.toByteArray();
+            encoded = Base64.encodeToString(bytes, Base64.NO_WRAP);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return encoded;
+    }
 
     public static void backupFavoriteStaffToFile(){
         Cursor cursor = null;
-
         try {
+
             FileOutputStream fileOutputStream;
-            String mPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-            File file = new File(mPath + "/Teachers.csv");
+            File file = new File(Settings.getBackupLocation(), "/Persons.csv");
 
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE, FavoriteDBinit.TABLE_PERSONS, null,null,null,null,null,null);
             cursor.moveToPosition(-1);
 
             if (file != null) {
                 fileOutputStream = new FileOutputStream(file);
-                String row;
+                StringBuilder stringBuilder = new StringBuilder();
+
+                stringBuilder.append(PERSONS_VALIDATE);
+                fileOutputStream.write(stringBuilder.toString().getBytes());
+                fileOutputStream.write("\n".getBytes());
+                stringBuilder.delete(0, stringBuilder.length());
+
+                String delimeter = ";";
                 if (cursor.getCount()!=0){
                     while (cursor.moveToNext()){
 
-                        row = cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE))+";"
-                                +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE))+";"
-                                +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE))+";"
-                                +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_DIVISION_FAVORITE))+";"
-                                +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_SEX_FAVORITE))+";"
-                               // +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PREVIEW_FAVORITE))+";"
-                               // +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_ORIGINAL_FAVORITE))+";" сделать Task с бекапом. Фотки брать из хранилища и разбирать на base64
-                                +cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_TAG_FAVORITE));
-                        fileOutputStream.write(row.getBytes());
+                        String tag = cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_TAG_FAVORITE));
+
+                        stringBuilder.append(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE)));
+                        stringBuilder.append(delimeter);
+                        stringBuilder.append(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE)));
+                        stringBuilder.append(delimeter);
+                        stringBuilder.append(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE)));
+                        stringBuilder.append(delimeter);
+                        stringBuilder.append(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_DIVISION_FAVORITE)));
+                        stringBuilder.append(delimeter);
+                        stringBuilder.append(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_SEX_FAVORITE)));
+                        stringBuilder.append(delimeter);
+                        stringBuilder.append(tag);
+                        stringBuilder.append(delimeter);
+                        stringBuilder.append(getEncodedPhoto(tag));
+
+                        System.out.println("string: " + stringBuilder.toString());
+
+                        fileOutputStream.write(stringBuilder.toString().getBytes());
                         fileOutputStream.write("\n".getBytes());
 
+                        stringBuilder.delete(0, stringBuilder.length());
                     }
                 }
                 fileOutputStream.close();

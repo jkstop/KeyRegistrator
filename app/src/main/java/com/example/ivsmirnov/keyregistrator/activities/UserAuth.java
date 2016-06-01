@@ -4,11 +4,15 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -16,6 +20,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.ViewPagerAdapter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.fragments.DialogPassword;
+import com.example.ivsmirnov.keyregistrator.fragments.DialogSearch;
 import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
 import com.example.ivsmirnov.keyregistrator.fragments.UserAuthCard;
 import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
@@ -33,7 +38,7 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
     private TabLayout mTabLayout;
 
     private int previousTab = 0;
-    private boolean correctPass = false;
+    private String selectedRoom;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,15 +46,31 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
         setContentView(R.layout.layout_autorization);
         mContext = this;
         initUI();
+
+        Bundle args = getIntent().getExtras();
+        if (args!=null){
+            selectedRoom = args.getString(PersonsFr.PERSONS_SELECTED_ROOM);
+        }
     }
 
     private void initUI(){
         //set actionbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.user_auth_toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.user_auth_toolbar);
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        final FloatingActionButton mFAB = (FloatingActionButton)findViewById(R.id.user_auth_fab);
+        mFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedRoom!=null){
+                    DialogSearch.newInstance(selectedRoom).show(getSupportFragmentManager(),"search");
+                }
+            }
+        });
+
 
         //цвет статусбара начиная с lollipop
        // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -61,25 +82,29 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
 
         mViewPager = (ViewPager)findViewById(R.id.user_auth_pager_view);
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mViewPagerAdapter.addFragment(UserAuthCard.newInstance("!!SELECTED ROOM!!"), "По карте");
-        mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR, FavoriteDB.CLICK_USER_ACCESS, Settings.getLastClickedAuditroom()), "Без карты");
-        mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR,0,Settings.getLastClickedAuditroom()), "Все пользователи");
+        mViewPagerAdapter.addFragment(UserAuthCard.newInstance("!!SELECTED ROOM!!"), getString(R.string.tab_card));
+        mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR, FavoriteDB.CLICK_USER_ACCESS, Settings.getLastClickedAuditroom()), getString(R.string.tab_free));
+        mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR,0,Settings.getLastClickedAuditroom()), getString(R.string.tab_all));
 
         mViewPager.setAdapter(mViewPagerAdapter);
 
         mTabLayout = (TabLayout)findViewById(R.id.user_auth_tabs);
         mTabLayout.setupWithViewPager(mViewPager);
-        mTabLayout.getTabAt(0).setIcon(R.drawable.ic_credit_card_black_24dp);
-        mTabLayout.getTabAt(1).setIcon(R.drawable.ic_touch_app_black_24dp);
-        mTabLayout.getTabAt(2).setIcon(R.drawable.ic_supervisor_account_black_24dp);
+        mTabLayout.getTabAt(0).setIcon(R.drawable.ic_credit_card_black_24dp).setTag(getString(R.string.tab_card));
+        mTabLayout.getTabAt(1).setIcon(R.drawable.ic_touch_app_black_24dp).setTag(getString(R.string.tab_free));
+        mTabLayout.getTabAt(2).setIcon(R.drawable.ic_supervisor_account_black_24dp).setTag(getString(R.string.tab_all));
 
         mTabLayout.setOnTabSelectedListener(
                 new TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
                     @Override
                     public void onTabSelected(TabLayout.Tab tab) {
                         super.onTabSelected(tab);
-                        if (tab.getText().equals("Все пользователи")){
+
+                        if (tab.getTag().equals(getString(R.string.tab_all))){
                             new DialogPassword().show(getSupportFragmentManager(), DialogPassword.PERSONS_ACCESS);
+                            mFAB.setVisibility(View.VISIBLE);
+                        } else {
+                            mFAB.setVisibility(View.INVISIBLE);
                         }
                     }
 

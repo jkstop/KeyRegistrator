@@ -18,6 +18,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -359,10 +360,8 @@ public class JournalDB {
     }
 
     public static  void backupJournalToXLS(){
-        String fileNameXLS = "Journal"+".xls";
-        File sdCard = Environment.getExternalStorageDirectory();
-        File directory = new File(sdCard.getAbsolutePath());
-        File file = new File(directory,fileNameXLS);
+
+        File file = new File(Settings.getBackupLocation(),"/Journal.xls");
         Cursor cursor = null;
 
         WorkbookSettings workbookSettings = new WorkbookSettings();
@@ -425,11 +424,7 @@ public class JournalDB {
     }
 
     public static void backupJournalToCSV(){
-
-        String fileName = "Journal.csv";
-        File sdCard = Environment.getExternalStorageDirectory();
-        File directory = new File(sdCard.getAbsolutePath());
-        File file = new File(directory,fileName);
+        File file = new File(Settings.getBackupLocation(),"/Journal.csv");
         FileOutputStream fileOutputStream;
         Cursor cursor;
 

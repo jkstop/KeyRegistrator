@@ -243,7 +243,7 @@ public class Dialogs extends DialogFragment{
                                     .setDivision(inputDivision.getEditText().getText().toString())
                                     .setAccessType(access));
 
-                           updateInterface.onItemChanged(tag, position);
+//                           updateInterface.onItemChanged(tag, position);
                             //updateInformation();
                         }
                     });

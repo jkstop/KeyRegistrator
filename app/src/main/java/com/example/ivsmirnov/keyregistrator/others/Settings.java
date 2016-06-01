@@ -58,6 +58,8 @@ public class Settings {
     public static final String ROWS_PORT = "ROWS_PORT";
     public static final String SCREEN_SETTINGS_CHANGE = "SCREEN_SETTINGS_CHANGE";
     public static final String EMAIL_PERIOD = getStringFromRes(R.string.shared_preferences_email_period);
+    public static final String BACKUP_ITEMS = getStringFromRes(R.string.shared_preferences_backup_items);
+    public static final String BACKUP_LOCATION = getStringFromRes(R.string.shared_preferences_backup_location);
 
     private static SharedPreferences mPreferences;
     private static SharedPreferences.Editor mPreferencesEditor;
@@ -89,6 +91,23 @@ public class Settings {
     public static String showDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy",new Locale("ru"));
         return String.valueOf(dateFormat.format(new Date())) + " г.";
+    }
+
+    public static void setBackupLocation (String path){
+        getPreferencesEditor().putString(BACKUP_LOCATION, path).apply();
+    }
+
+    public static String getBackupLocation(){
+        return getPreferences().getString(BACKUP_LOCATION, Environment.getExternalStorageDirectory().getPath());
+    }
+
+    public static ArrayList<String> getBackupItems(){
+        Set<String> items = getPreferences().getStringSet(BACKUP_ITEMS, null);
+        if (items!=null){
+            return new ArrayList<>(items);
+        }else{
+            return new ArrayList<>();
+        }
     }
 
 

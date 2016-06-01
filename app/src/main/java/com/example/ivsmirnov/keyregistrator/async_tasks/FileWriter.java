@@ -5,9 +5,11 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
+import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.io.File;
@@ -17,11 +19,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 /**
  * Запись файлов
  */
-public class FileWriter extends AsyncTask <Void,Integer,Void> {
+public class FileWriter extends AsyncTask <ArrayList<String>,Integer,Exception> {
 
     public static final int WRITE_JOURNAL = 100;
     public static final int WRITE_TEACHERS = 101;
@@ -33,20 +36,19 @@ public class FileWriter extends AsyncTask <Void,Integer,Void> {
     private boolean isShowDialog;
 
 
-    private static final String JOURNAL = "/Journal.xls";
-    private static final String TEACHERS = "/Teachers.csv";
+    //private static final String JOURNAL = "/Journal.xls";
+    //private static final String TEACHERS = "/Teachers.csv";
 
-    public FileWriter(Context context, int loadType, boolean isShowDialog){
-        this.mType = loadType;
-        this.isShowDialog = isShowDialog;
-        mPathExternal = Environment.getExternalStorageDirectory().getPath();
-        mProgressDialog = new ProgressDialog(context);
+    public FileWriter(Context context,  boolean isShowDialog){
+        if (isShowDialog){
+            mProgressDialog = new ProgressDialog(context);
+        }
     }
 
     @Override
     protected void onPreExecute() {
         System.out.println("file writer ***********************************");
-        if (isShowDialog){
+        if (mProgressDialog!=null){
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             mProgressDialog.setCancelable(false);
             mProgressDialog.setMessage("Запись...");
@@ -55,41 +57,84 @@ public class FileWriter extends AsyncTask <Void,Integer,Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
-        switch (mType){
-            case WRITE_JOURNAL:
+    protected Exception doInBackground(ArrayList<String>... params) {
+        String [] allWriteItems = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_backup_items_entries);
 
+        try {
+            if (params[0].contains(allWriteItems[0])){
+                //journal
+                publishProgress(WRITE_JOURNAL);
                 JournalDB.backupJournalToXLS();
                 JournalDB.backupJournalToCSV();
 
-                String srFileJournal = mPathExternal + JOURNAL;
-                String dtFileJournal = Settings.getJournalBackupLocation() + JOURNAL;
-                copyFile(srFileJournal, dtFileJournal);
-                break;
-            case WRITE_TEACHERS:
+                System.out.println("journal backuped");
 
+                // String srFileJournal = mPathExternal + JOURNAL;
+                // String dtFileJournal = Settings.getJournalBackupLocation() + JOURNAL;
+                // copyFile(srFileJournal, dtFileJournal);
+            }
+
+            if (params[0].contains(allWriteItems[1])){
+                //persons
+                publishProgress(WRITE_TEACHERS);
                 FavoriteDB.backupFavoriteStaffToFile();
 
-                String srFileTeachers = mPathExternal + TEACHERS;
-                String dtFileTeachers = Settings.getPersonsBackupLocation() + TEACHERS;
-                copyFile(srFileTeachers, dtFileTeachers);
-                break;
-            case WRITE_ROOMS:
+                System.out.println("persons backuped");
+
+                //String srFileTeachers = mPathExternal + TEACHERS;
+                //String dtFileTeachers = Settings.getPersonsBackupLocation() + TEACHERS;
+                //copyFile(srFileTeachers, dtFileTeachers);
+            }
+
+            if (params[0].contains(allWriteItems[2])){
+                //rooms
+                publishProgress(WRITE_ROOMS);
                 RoomDB.backupRoomsToFile();
-                break;
+
+                System.out.println("rooms backuped");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            return e;
         }
         return null;
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+        if (mProgressDialog!=null){
+            switch (values[0]){
+                case WRITE_JOURNAL:
+                    mProgressDialog.setMessage("Запись журнала...");
+                    break;
+                case WRITE_TEACHERS:
+                    mProgressDialog.setMessage("Запись списка пользователей...");
+                    break;
+                case WRITE_ROOMS:
+                    mProgressDialog.setMessage("Запись списка помещений...");
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    @Override
+    protected void onPostExecute(Exception e) {
         System.out.println("file writer ------------------------------------------");
-        if (mProgressDialog.isShowing()){
+        if (e == null){
+            System.out.println("success");
+        } else {
+            System.out.println("error");
+        }
+
+        if (mProgressDialog!=null && mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }
     }
 
-    public static void copyFile(String srFile, String dtFile){
+    /*public static void copyFile(String srFile, String dtFile){
         try{
             File f1 = new File(srFile);
             File f2 = new File(dtFile);
@@ -109,5 +154,5 @@ public class FileWriter extends AsyncTask <Void,Integer,Void> {
         catch(IOException e){
             System.out.println(e.getMessage());
         }
-    }
+    }*/
 }

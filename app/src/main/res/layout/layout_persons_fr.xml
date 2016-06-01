@@ -1,60 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
-    android:layout_height="fill_parent"
-    android:layout_width="fill_parent"
-    android:baselineAligned="false">
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <android.support.design.widget.CoordinatorLayout
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent">
+    <ListView
+        android:layout_alignParentEnd="true"
+        android:id="@+id/persons_fragment_list_characters"
+        app:layout_widthPercent="4%"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:divider="#00ffffff"
+        android:dividerHeight="5dp" />
 
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+    <include layout="@layout/main_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toStartOf="@id/persons_fragment_list_characters"/>
 
-                        <ProgressBar
-                            android:id="@+id/layout_persons_fragment_loading_progress_bar"
-                            android:layout_gravity="center"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:visibility="invisible"/>
+    <ProgressBar
+        android:id="@+id/layout_persons_fragment_loading_progress_bar"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"/>
 
-                </FrameLayout>
 
-                <!--android.support.v7.widget.RecyclerView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/recycler_view_for_base_sql"
-                    android:scrollbars="vertical" /-->
-
-                <include layout="@layout/main_recycler"/>
-
-                <!--android.support.design.widget.FloatingActionButton
-                    android:id="@+id/persons_fragment_fab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:backgroundTint="@color/colorAccent"
-                    app:elevation="@dimen/persons_fragment_fab_elevation"
-                    android:layout_margin="16dp"
-                    android:src="@drawable/fab_ic_add"
-                    android:layout_gravity="end|bottom"
-                    app:layout_anchor="@+id/recycler_view_for_base_sql"
-                    app:layout_anchorGravity="bottom|end"
-                    app:layout_behavior="com.example.ivsmirnov.keyregistrator.others.FABScrollBehavior"
-                    /-->
-
-        </android.support.design.widget.CoordinatorLayout>
-
-        <ListView
-            android:id="@+id/persons_fragment_list_characters"
-            android:layout_width="0dp"
-            android:layout_weight="0.03"
-            android:layout_height="match_parent"
-            android:divider="#00ffffff"
-            android:dividerHeight="5dp" />
-
-</LinearLayout>
+</android.support.percent.PercentRelativeLayout>

@@ -198,11 +198,16 @@
     <string name="menu_main_upload_all_to_server">Загрузить все на сервер</string>
     <string name="menu_main_download_all_from_server">Загрузить все с сервера</string>
     <string name="menu_nfc_all_persons">Все пользователи</string>
+    
+    <string name="tab_card">По карте</string>
+    <string name="tab_free">Без карты</string>
+    <string name="tab_all">Все пользователи</string>
 
     <!--Preferences-->
     <string name="shared_preferences_category_sheduler">Планировщик</string>
     <string name="shared_preferences_category_server">Сервер</string>
     <string name="shared_preferences_category_basic">Общие</string>
+    <string name="shared_preferences_category_backup">Резервное копирование</string>
     
     <string name="shared_preferences_main_grid_size">Размер сетки</string>
     <string name="shared_preferences_main_grid_size_summary">Количество строк и колонок на главном экране</string>
@@ -268,6 +273,21 @@
     <string name="shared_preferences_email_send_disable">Рассылка недоступна</string>
     <string name="shared_preferences_email_send_disable_summary_logoff">Войдите в приложение под аккаунтом Google</string>
     <string name="shared_preferences_email_send_disable_summary_norecipients">Не указано ни одного получателя</string>
+
+    <string name="shared_preferences_backup_items">Объекты</string>
+    <string name="shared_preferences_backup_items_summary">Выберите какие резервные копии создавать</string>
+    <string name="shared_preferences_backup_location">Расположение резервных копий</string>
+    <string name="shared_preferences_backup_now">Сохранить сейчас</string>
+    <string name="shared_preferences_backup_now_summary">Создать резервные копии с текущими параметрами</string>
+    <string name="shared_preferences_backup_now_disable">Сохранить сейчас невозможно</string>
+    <string name="shared_preferences_backup_now_disable_summary">Не выбрано ни одного объекта для бэкапа</string>
+    <string name="shared_preferences_backup_restore">Восстановить</string>
+    <string name="shared_preferences_backup_restore_summary">Восстановление данных из резервной копии</string>
+    <string-array name="shared_preferences_backup_items_entries">
+        <item>Журнал</item>
+        <item>Пользователи</item>
+        <item>Помещения</item>
+    </string-array>
 
     <string name="view_table_landscape">Альбомный</string>
     <string name="view_table_portrait">Портретный</string>
