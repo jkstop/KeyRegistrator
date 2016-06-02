@@ -32,6 +32,12 @@
     <item name="dialog_search_recycler" type="id"/>
     <item name="dialog_search_progress" type="id"/>
 
+    <item name="dialog_erase_journal_check" type="id"/>
+    <item name="dialog_erase_persons_check" type="id"/>
+    <item name="dialog_erase_rooms_check" type="id"/>
+    <item name="dialog_erase_disclaimer" type="id"/>
+    <item name="dialog_erase_server_check" type="id"/>
+
     <item name="layout_main_content_frame" type="id"/>
     <item name="layout_main_drawer" type="id"/>
     <item name="layout_main_navigation_view" type="id"/>

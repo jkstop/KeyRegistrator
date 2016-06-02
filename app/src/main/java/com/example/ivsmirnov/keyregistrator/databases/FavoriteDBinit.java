@@ -23,7 +23,7 @@ public class FavoriteDBinit extends SQLiteOpenHelper implements BaseColumns {
     public static final String COLUMN_TAG_FAVORITE = "Радиометка";
     public static final String COLUMN_SEX_FAVORITE = "Пол";
     public static final String COLUMN_PHOTO_PATH_FAVORITE = "Ссылка";
-    public static final String COLUMN_ACCESS_TYPE = "Доступ";
+    public static final String COLUMN_ACCESS_TYPE_FAVORITE = "Доступ";
     public static final String SQL_CREATE_TEACHERS_BASE = "create table " + TABLE_PERSONS + " (" + BaseColumns._ID + " integer primary key autoincrement, "
             + COLUMN_USER_ID_FAVORITE + " text, "
             + COLUMN_LASTNAME_FAVORITE + " text, "
@@ -32,13 +32,13 @@ public class FavoriteDBinit extends SQLiteOpenHelper implements BaseColumns {
             + COLUMN_DIVISION_FAVORITE + " text, "
             + COLUMN_TAG_FAVORITE + " text, "
             + COLUMN_SEX_FAVORITE + " text, "
-            + COLUMN_ACCESS_TYPE + " integer, "
+            + COLUMN_ACCESS_TYPE_FAVORITE + " integer, "
             + COLUMN_PHOTO_PATH_FAVORITE + " text);";
 
     public static final String SQL_DELETE_TEACHERS_BASE = "DROP TABLE IF EXISTS "
             + TABLE_PERSONS;
 
-    public static  final String SQL_UPGRADE_TEACHERS_BASE = "ALTER TABLE " + TABLE_PERSONS + " ADD COLUMN " + COLUMN_ACCESS_TYPE + " INTEGER";
+    public static  final String SQL_UPGRADE_TEACHERS_BASE = "ALTER TABLE " + TABLE_PERSONS + " ADD COLUMN " + COLUMN_ACCESS_TYPE_FAVORITE + " INTEGER";
 
     public FavoriteDBinit(Context context) {
         super(context, name, null, version);

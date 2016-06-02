@@ -4,8 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
-import android.support.v4.content.res.TypedArrayUtils;
 import android.util.Base64;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -21,14 +19,11 @@ import com.example.ivsmirnov.keyregistrator.others.Values;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -81,7 +76,7 @@ public class FavoriteDB {
                             .setMidname(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE)))
                             .setDivision(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_DIVISION_FAVORITE)))
                             .setSex(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_SEX_FAVORITE)))
-                            .setAccessType(cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE)))
+                            .setAccessType(cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE)))
                             .setRadioLabel(tag)
                             .setPhotoPath(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE)));
                     if (withBase64Photo){
@@ -195,7 +190,7 @@ public class FavoriteDB {
                 cv.put(FavoriteDBinit.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
                 cv.put(FavoriteDBinit.COLUMN_TAG_FAVORITE, personItem.getRadioLabel());
                 cv.put(FavoriteDBinit.COLUMN_SEX_FAVORITE, personItem.getSex());
-                cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE, acccessType);
+                cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE, acccessType);
 
                 if (photoPath!=null) cv.put(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE, photoPath);
 
@@ -336,7 +331,7 @@ public class FavoriteDB {
                     cv.put(FavoriteDBinit.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
                 }
                 if (personItem.getAccessType() != 0 ){
-                    cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE, personItem.getAccessType());
+                    cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE, personItem.getAccessType());
                 }
                 if (cv.size()!=0){
                     DbShare.getDataBase(DbShare.DB_FAVORITE).update(FavoriteDBinit.TABLE_PERSONS,
@@ -396,7 +391,7 @@ public class FavoriteDB {
             String selection = null;
             String[] selectionArgs = null;
             if (accessType != 0){
-                selection = FavoriteDBinit.COLUMN_ACCESS_TYPE + " =?";
+                selection = FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE + " =?";
                 selectionArgs = new String[]{String.valueOf(accessType)};
             }
 
@@ -473,7 +468,7 @@ public class FavoriteDB {
 
             //если есть инфа о доступе
             if (accessType != 0){
-                selectionType = FavoriteDBinit.COLUMN_ACCESS_TYPE + " =?";
+                selectionType = FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE + " =?";
                 selectionArgsType = new String[]{String.valueOf(accessType)};
             }
 
@@ -505,7 +500,7 @@ public class FavoriteDB {
                             FavoriteDBinit.COLUMN_DIVISION_FAVORITE,
                             FavoriteDBinit.COLUMN_TAG_FAVORITE,
                             FavoriteDBinit.COLUMN_SEX_FAVORITE,
-                            FavoriteDBinit.COLUMN_ACCESS_TYPE},
+                            FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE},
                     selection,
                     selectionArgs,
                     null,
@@ -521,7 +516,7 @@ public class FavoriteDB {
                             .setDivision(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_DIVISION_FAVORITE)))
                             .setSex(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_SEX_FAVORITE)))
                             .setRadioLabel(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_TAG_FAVORITE)))
-                            .setAccessType(cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE))));
+                            .setAccessType(cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE))));
                 }
             }
         } catch (Exception e){
@@ -537,7 +532,7 @@ public class FavoriteDB {
         try {
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
                     FavoriteDBinit.TABLE_PERSONS,
-                    new String[]{FavoriteDBinit._ID, FavoriteDBinit.COLUMN_ACCESS_TYPE},
+                    new String[]{FavoriteDBinit._ID, FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE},
                     FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
                     new String[]{tag},
                     null,
@@ -546,7 +541,7 @@ public class FavoriteDB {
             if (cursor.getCount()>0){
                 cursor.moveToFirst();
                 ContentValues cv = new ContentValues();
-                cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE, accessType);
+                cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE, accessType);
                 DbShare.getDataBase(DbShare.DB_FAVORITE)
                         .update(FavoriteDBinit.TABLE_PERSONS, cv, FavoriteDBinit._ID + " = " + cursor.getInt(cursor.getColumnIndex(FavoriteDBinit._ID)), null);
             }
@@ -562,7 +557,7 @@ public class FavoriteDB {
         try {
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
                     FavoriteDBinit.TABLE_PERSONS,
-                    new String[]{FavoriteDBinit.COLUMN_ACCESS_TYPE},
+                    new String[]{FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE},
                     FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
                     new String[]{tag},
                     null,
@@ -570,7 +565,7 @@ public class FavoriteDB {
                     "1");
             if (cursor.getCount()>0){
                 cursor.moveToFirst();
-                return cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE));
+                return cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE));
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -652,6 +647,8 @@ public class FavoriteDB {
                         stringBuilder.append(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_SEX_FAVORITE)));
                         stringBuilder.append(delimeter);
                         stringBuilder.append(tag);
+                        stringBuilder.append(delimeter);
+                        stringBuilder.append(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE)));
                         stringBuilder.append(delimeter);
                         stringBuilder.append(getEncodedPhoto(tag));
 

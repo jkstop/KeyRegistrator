@@ -104,7 +104,7 @@ public class SQLPreference extends DialogPreference implements SQL_Connection.Ca
     }
 
     @Override
-    public void onServerConnected() {
+    public void onServerConnected(Connection connection) {
         mCheckServerConnect.clearAnimation();
         mInputServerName.setErrorEnabled(false);
         mServerStatus.setImageResource(R.drawable.ic_cloud_done_black_48dp);

@@ -5,15 +5,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.MultiSelectListPreference;
-import android.preference.Preference;
 
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
+
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.text.TextUtils;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Preferences;
+import com.example.ivsmirnov.keyregistrator.async_tasks.FileLoader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.custom_views.EmailAttachPreference;
@@ -33,6 +36,7 @@ import java.util.HashSet;
 public class SettingsFr extends PreferenceFragment {
 
     private static final int REQUEST_CODE_SELECT_BACKUP_LOCATION = 203;
+    private static final int REQUEST_CODE_RESTORE = 204;
 
     private Preference backupLocationPreference;
 
@@ -48,6 +52,8 @@ public class SettingsFr extends PreferenceFragment {
         Preference recipientsPreference = findPreference(getString(R.string.shared_preferences_email_recipients));
         Preference backupItemsPreference = findPreference(getString(R.string.shared_preferences_backup_items));
         final Preference backupNowPreference = findPreference(getString(R.string.shared_preferences_backup_now));
+        Preference backupRestorePreference = findPreference(getString(R.string.shared_preferences_backup_restore));
+        Preference erasePreference = findPreference(getString(R.string.shared_preferences_backup_erase_base));
 
         backupLocationPreference = findPreference(getString(R.string.shared_preferences_backup_location));
         backupLocationPreference.setSummary(Settings.getBackupLocation());
@@ -91,6 +97,17 @@ public class SettingsFr extends PreferenceFragment {
             }
         });
 
+        backupRestorePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+                i.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getBackupLocation());
+                startActivityForResult(i, REQUEST_CODE_RESTORE);
+                return true;
+            }
+        });
+
         taskPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -112,6 +129,14 @@ public class SettingsFr extends PreferenceFragment {
                     setPreferenceEnabled(true, backupNowPreference, getString(R.string.shared_preferences_backup_now), getString(R.string.shared_preferences_backup_now_summary));
                 }
                 return true;
+            }
+        });
+
+        erasePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new DialogErase().show(((Preferences)getActivity()).getSupportFragmentManager(),"erase");
+                return false;
             }
         });
 
@@ -159,14 +184,24 @@ public class SettingsFr extends PreferenceFragment {
         }
     }
 
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK
-                && requestCode == REQUEST_CODE_SELECT_BACKUP_LOCATION
-                && data!=null){
+
+        if (resultCode == Activity.RESULT_OK && data!=null){
             String path = data.getData().getPath();
-            Settings.setBackupLocation(path);
-            backupLocationPreference.setSummary(path);
+            switch (requestCode){
+                case REQUEST_CODE_SELECT_BACKUP_LOCATION:
+                    Settings.setBackupLocation(path);
+                    backupLocationPreference.setSummary(path);
+                    break;
+                case REQUEST_CODE_RESTORE:
+                    new FileLoader(getActivity(),path).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

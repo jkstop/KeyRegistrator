@@ -59,6 +59,8 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
     private static final int HANDLER_HIDE_PROGRESS = 101;
     private static final int HANDLER_DATA_CHANGED = 102;
 
+    public static boolean contentNeedsForUpdate = false;
+
     private Context mContext;
     private static RecyclerView mRecyclerView;
     private ListView mListView;
@@ -231,31 +233,31 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.menu_teachers_save_to_file:
-                FileWriter saveToFile = new FileWriter(mContext, true);
-                saveToFile.execute();
-                return true;
-            case R.id.menu_teachers_download_favorite:
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
-                i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i, FileLoader.REQUEST_CODE_LOAD_FAVORITE_STAFF);
-                return true;
-            case R.id.menu_teachers_delete:
-                Dialogs dialog = new Dialogs();
-                Bundle bundle = new Bundle();
-                bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_CLEAR_TEACHERS);
-                dialog.setArguments(bundle);
-                dialog.setTargetFragment(PersonsFr.this,0);
-                dialog.show(getFragmentManager(),"clearTeachers");
-                return true;
-            case R.id.menu_teachers_select_location_for_copy:
-                Intent iLC = new Intent(Intent.ACTION_GET_CONTENT);
-                iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
-                iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-                iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getPersonsBackupLocation());
-                startActivityForResult(iLC,REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
-                return true;
+            //case R.id.menu_teachers_save_to_file:
+            //    FileWriter saveToFile = new FileWriter(mContext, true);
+            //    saveToFile.execute();
+            //    return true;
+            //case R.id.menu_teachers_download_favorite:
+            //    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+            //    i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+            //    i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+            //    startActivityForResult(i, FileLoader.REQUEST_CODE_LOAD_FAVORITE_STAFF);
+            //    return true;
+            //case R.id.menu_teachers_delete:
+            //    Dialogs dialog = new Dialogs();
+            //    Bundle bundle = new Bundle();
+           //     bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_CLEAR_TEACHERS);
+           //     dialog.setArguments(bundle);
+            //    dialog.setTargetFragment(PersonsFr.this,0);
+             //   dialog.show(getFragmentManager(),"clearTeachers");
+             //   return true;
+            //case R.id.menu_teachers_select_location_for_copy:
+            //    Intent iLC = new Intent(Intent.ACTION_GET_CONTENT);
+            //    iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
+            //    iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
+            //    iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getPersonsBackupLocation());
+            //    startActivityForResult(iLC,REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
+            //    return true;
             case R.id.menu_teachers_upload_to_server:
                 new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
                 return true;
@@ -273,13 +275,20 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
             if (data!=null){
                 if (requestCode== FileLoader.REQUEST_CODE_LOAD_FAVORITE_STAFF){
                     new FileLoader(mContext,
-                            data.getData().getPath(),
-                            this,
-                            FileLoader.REQUEST_CODE_LOAD_FAVORITE_STAFF).execute();
+                            data.getData().getPath()).execute();
                 }else if (requestCode == REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION){
                     Settings.setPersonsBackupLocation(data.getData().getPath());
                 }
             }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (contentNeedsForUpdate){
+            initPersons("#", true).start();
+            contentNeedsForUpdate = false;
         }
     }
 

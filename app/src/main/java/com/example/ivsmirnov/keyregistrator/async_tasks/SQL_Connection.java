@@ -1,18 +1,13 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 
-import com.example.ivsmirnov.keyregistrator.fragments.DialogPassword;
-import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
+import java.sql.SQLException;
 
 /**
  * Соединение с сервером
@@ -61,35 +56,76 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
     public static final String COLUMN_ALL_STAFF_TAG = "RADIO_LABEL";
 
     private static Connection SQLconnect;
+    private static Thread connectThread;
 
-    private String mServerName;
+    private static String mServerName;
     private Callback mCallback;
     private static SQL_Connection mConnectTask;
 
-    String classs = "net.sourceforge.jtds.jdbc.Driver";
-    String db = "KeyRegistratorBase";
+
+    private static final String NET_SOURCEFORGE_JTDS_JDBC_DRIVER = "net.sourceforge.jtds.jdbc.Driver";
+    private static final String DB = "KeyRegistratorBase";
 
     public SQL_Connection (String serverName, Callback callback){
-        this.mServerName = serverName;
-        this.mCallback = callback;
+        mServerName = serverName;
+        mCallback = callback;
     }
 
     public static Connection getConnection(String serverName, Callback callback){
         System.out.println("SQL CONNECT " + SQLconnect);
-        if (serverName !=null && mConnectTask == null){
-            mConnectTask = new SQL_Connection(serverName, callback);
-            mConnectTask.execute();
+        if (serverName !=null){
+            //mConnectTask = new SQL_Connection(serverName, callback);
+            //mConnectTask.execute();
+            connect(serverName, callback);
         } else {
             if (SQLconnect!=null){
                 return SQLconnect;
             } else {
-                if (mConnectTask == null){
-                    mConnectTask = new SQL_Connection(Settings.getServerName(), callback);
-                    mConnectTask.execute();
-                }
+                //if (mConnectTask == null){
+                //    mConnectTask = new SQL_Connection(Settings.getServerName(), callback);
+                //    mConnectTask.execute();
+               // }
+                connect(Settings.getServerName(), callback);
             }
         }
         return null;
+    }
+
+    private static void connect(String serverName, Callback callback){
+        try {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+
+            Class.forName(NET_SOURCEFORGE_JTDS_JDBC_DRIVER);
+            final String ConnURL = "jdbc:jtds:sqlserver://" + serverName + ";"
+                    + "database=" + DB +";user=shsupport;password=podderzhka;";
+            System.out.println("************connect thread*************" + connectThread);
+            if (connectThread == null){
+                getConnectionFromUrl(ConnURL, callback).start();
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private static Thread getConnectionFromUrl(final String url, final Callback callback){
+        connectThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println("start get connection from URL");
+                    SQLconnect = DriverManager.getConnection(url);
+                    connectThread = null;
+                    if (callback!=null) callback.onServerConnected(SQLconnect);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    if (callback!=null) callback.onServerConnectException(e);
+                }
+            }
+        });
+        return connectThread;
     }
 
     @Override
@@ -106,10 +142,11 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
         StrictMode.setThreadPolicy(policy);
 
         try {
-            Class.forName(classs);
+            Class.forName(NET_SOURCEFORGE_JTDS_JDBC_DRIVER);
             String ConnURL = "jdbc:jtds:sqlserver://" + mServerName + ";"
-                    + "database=" + db +";user=shsupport;password=podderzhka;";
+                    + "database=" + DB +";user=shsupport;password=podderzhka;";
             SQLconnect = DriverManager.getConnection(ConnURL);
+
             return null;
         }catch (Exception e) {
             e.printStackTrace();
@@ -131,14 +168,14 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
             //if (mConnectionInterface!=null) mConnectionInterface.onServerDisconnected();
         } else {
             Settings.setServerStatus(true);
-            if (mCallback!=null) mCallback.onServerConnected();
+            if (mCallback!=null) mCallback.onServerConnected(SQLconnect);
             //if (mConnectionInterface!=null) mConnectionInterface.onServerConnected();
             System.out.println("SERVER CONNECTED");
         }
     }
 
     public interface Callback{
-        void onServerConnected();
+        void onServerConnected(Connection connection);
         void onServerConnectException(Exception e);
     }
 }

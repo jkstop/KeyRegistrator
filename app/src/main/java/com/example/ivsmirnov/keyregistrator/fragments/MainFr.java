@@ -209,7 +209,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
                 //bundle.putInt(Dialogs.DIALOG_TYPE,Dialogs.DIALOG_ENTER_PASSWORD);
                 //dialogs.setArguments(bundle);
                 //dialogs.show(getFragmentManager(),"enter_pin");
-                DialogPassword.newInstance(mRoomItems.get(position).getTag())
+                DialogPassword.newInstance(mRoomItems.get(position).getTag(), null)
                         .show(getFragmentManager(), DialogPassword.ROOMS_ACCESS);
             }
         }

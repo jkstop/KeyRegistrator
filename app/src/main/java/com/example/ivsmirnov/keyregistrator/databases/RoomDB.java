@@ -356,7 +356,7 @@ public class RoomDB {
         return closedRooms;
     }
 
-    public static void clearRoomsDB(){
+    public static void clear(){
         try {
             DbShare.getDataBase(DbShare.DB_ROOM).delete(RoomDBinit.TABLE_ROOMS,null,null);
         } catch (Exception e){

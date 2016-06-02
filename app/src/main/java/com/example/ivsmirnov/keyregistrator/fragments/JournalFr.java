@@ -63,6 +63,8 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
 
     private ProgressBar mLoadingBar;
 
+    public static boolean contentNeedsForUpdate = false;
+
     public static JournalFr newInstance() {
         return new JournalFr();
     }
@@ -129,6 +131,11 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
     public void onResume() {
         super.onResume();
         showDateSpinner();
+
+        if (contentNeedsForUpdate){
+            updateInformation();
+            contentNeedsForUpdate = false;
+        }
     }
 
     @Nullable
@@ -161,37 +168,37 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.menu_journal_save_to_file:
-                FileWriter saveToFile = new FileWriter(mContext, true);
-                saveToFile.execute();
-                return true;
+            //case R.id.menu_journal_save_to_file:
+            //    FileWriter saveToFile = new FileWriter(mContext, true);
+            //    saveToFile.execute();
+             //   return true;
             case R.id.menu_journal_upload_to_server:
                 new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
                 return true;
             case R.id.menu_journal_download_from_server:
                 new ServerReader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_JOURNAL);
                 return true;
-            case R.id.menu_journal_download_from_file:
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
-                i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i, FileLoader.REQUEST_CODE_LOAD_JOURNAL);
-                return true;
-            case R.id.menu_journal_delete:
-                Dialogs dialog = new Dialogs();
-                Bundle bundle = new Bundle();
-                bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_CLEAR_JOURNAL);
-                dialog.setTargetFragment(this, 0);
-                dialog.setArguments(bundle);
-                dialog.show(getFragmentManager(),"clearJournal");
-                return true;
-            case R.id.menu_journal_select_location_for_copy:
-                Intent iLC = new Intent(Intent.ACTION_GET_CONTENT);
-                iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
-                iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-                iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getJournalBackupLocation());
-                startActivityForResult(iLC,REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION);
-                return true;
+            //case R.id.menu_journal_download_from_file:
+            //    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+             //   i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+            //    i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+            //    startActivityForResult(i, FileLoader.REQUEST_CODE_LOAD_JOURNAL);
+            //    return true;
+            //case R.id.menu_journal_delete:
+            //    Dialogs dialog = new Dialogs();
+            //    Bundle bundle = new Bundle();
+             //   bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_CLEAR_JOURNAL);
+             //   dialog.setTargetFragment(this, 0);
+             //   dialog.setArguments(bundle);
+             //   dialog.show(getFragmentManager(),"clearJournal");
+              //  return true;
+            //case R.id.menu_journal_select_location_for_copy:
+            //    Intent iLC = new Intent(Intent.ACTION_GET_CONTENT);
+            //    iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
+            //    iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
+            //    iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getJournalBackupLocation());
+             //   startActivityForResult(iLC,REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION);
+             //   return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -204,9 +211,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
             if (data!=null){
                 if (requestCode == FileLoader.REQUEST_CODE_LOAD_JOURNAL){
                     new FileLoader(mContext,
-                            data.getData().getPath(),
-                            this,
-                            FileLoader.REQUEST_CODE_LOAD_JOURNAL).execute();
+                            data.getData().getPath()).execute();
                 }else if (requestCode == REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION){
                     Settings.setJournalBackupLocation(data.getData().getPath());
                 }

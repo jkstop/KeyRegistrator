@@ -51,6 +51,7 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
 import java.util.ArrayList;
 
 public class Dialogs extends DialogFragment{
@@ -120,7 +121,7 @@ public class Dialogs extends DialogFragment{
                             public void onClick(DialogInterface dialog, int which) {
 
                                 if (checkClearJournalLocal.isChecked()){
-                                    JournalDB.clearJournalDB();
+                                    JournalDB.clear();
                                     updateInformation();
                                 }
 
@@ -309,7 +310,7 @@ public class Dialogs extends DialogFragment{
                             public void onClick(DialogInterface dialog, int which) {
 
                                 if (eraseLocalRoomsCheck.isChecked()){
-                                    RoomDB.clearRoomsDB();
+                                    RoomDB.clear();
                                     updateInformation();
                                 }
 
@@ -432,7 +433,7 @@ public class Dialogs extends DialogFragment{
                         try {
                             SQL_Connection.getConnection(null, new SQL_Connection.Callback() {
                                 @Override
-                                public void onServerConnected() {
+                                public void onServerConnected(Connection connection) {
                                     serverCheckConnection.clearAnimation();
                                     serverStatusImage.setImageResource(R.drawable.ic_cloud_done_black_48dp);
                                     serverStatusText.setText(R.string.dialog_sql_server_connected);

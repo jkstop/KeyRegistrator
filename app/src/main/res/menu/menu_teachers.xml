@@ -2,25 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/menu_teachers_save_to_file"
-        android:title="@string/menu_teachers_save_to_file"
-        android:icon="@drawable/ic_save_black_24dp"
-        app:showAsAction="never"/>
-
-    <item android:id="@+id/menu_teachers_download_favorite"
-        android:title="@string/menu_teachers_download_favorite"
-        android:icon="@drawable/ic_add_black_24dp"
-        app:showAsAction="never"/>
-
-    <item android:id="@+id/menu_teachers_delete"
-        android:title="@string/menu_teachers_delete"
-        android:icon="@drawable/ic_delete_black_24dp"
-        app:showAsAction="never"/>
-
-    <item android:id="@+id/menu_teachers_select_location_for_copy"
-        android:title="@string/menu_teachers_select_location_for_copy"
-        app:showAsAction="never"/>
-
     <item android:id="@+id/menu_teachers_upload_to_server"
         android:title="@string/menu_teachers_upload_to_server"
         app:showAsAction="never"/>

@@ -115,6 +115,7 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
     @Override
     public void onResume() {
         super.onResume();
+
         initializeAuditroomsGrid();
     }
 
@@ -155,32 +156,32 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
             case R.id.menu_auditrooms_download_from_server:
                 new ServerReader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_ROOMS);
                 return true;
-            case R.id.menu_auditrooms_set_columns_number:
-                Dialogs dialogs = new Dialogs();
-                Bundle bundle = new Bundle();
-                bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.SELECT_COLUMNS_DIALOG);
-                dialogs.setArguments(bundle);
-                dialogs.setTargetFragment(RoomsFr.this, 0);
-                dialogs.show(getFragmentManager(),"columns");
-                return true;
-            case R.id.menu_auditrooms_save_to_file:
-                FileWriter saveToFile = new FileWriter(mContext, true);
-                saveToFile.execute();
-                return true;
-            case R.id.menu_auditrooms_load_from_file:
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
-                i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-                startActivityForResult(i, FileLoader.REQUEST_CODE_LOAD_ROOMS);
-                return true;
-            case R.id.menu_auditrooms_clear:
-                Dialogs dialog = new Dialogs();
-                Bundle bundleRooms = new Bundle();
-                bundleRooms.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_CLEAR_ROOMS);
-                dialog.setArguments(bundleRooms);
-                dialog.setTargetFragment(RoomsFr.this,0);
-                dialog.show(getFragmentManager(),"clearRooms");
-                return true;
+            //case R.id.menu_auditrooms_set_columns_number:
+             //   Dialogs dialogs = new Dialogs();
+            ///    Bundle bundle = new Bundle();
+             //   bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.SELECT_COLUMNS_DIALOG);
+             //   dialogs.setArguments(bundle);
+             //   dialogs.setTargetFragment(RoomsFr.this, 0);
+             //   dialogs.show(getFragmentManager(),"columns");
+             //   return true;
+            //case R.id.menu_auditrooms_save_to_file:
+            //    FileWriter saveToFile = new FileWriter(mContext, true);
+             //   saveToFile.execute();
+             //   return true;
+            //case R.id.menu_auditrooms_load_from_file:
+            //    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+             //   i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+              //  i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+              //  startActivityForResult(i, FileLoader.REQUEST_CODE_LOAD_ROOMS);
+              //  return true;
+            ///case R.id.menu_auditrooms_clear:
+              //  Dialogs dialog = new Dialogs();
+              //  Bundle bundleRooms = new Bundle();
+             //   bundleRooms.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_CLEAR_ROOMS);
+              //  dialog.setArguments(bundleRooms);
+              //  dialog.setTargetFragment(RoomsFr.this,0);
+              //  dialog.show(getFragmentManager(),"clearRooms");
+              //  return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -194,7 +195,7 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
                 if (resultCode == Activity.RESULT_OK){
                     Uri uri = data.getData();
                     String path = uri.getPath();
-                    FileLoader fileLoader_ = new FileLoader(mContext,path,this, FileLoader.REQUEST_CODE_LOAD_ROOMS);
+                    FileLoader fileLoader_ = new FileLoader(mContext,path);
                     fileLoader_.execute();
                 }
             }

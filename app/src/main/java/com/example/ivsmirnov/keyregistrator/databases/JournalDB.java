@@ -5,9 +5,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
+import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.io.File;
@@ -34,7 +36,7 @@ public class JournalDB {
     public static final int COUNT_TODAY = 2;
     public static final int COUNT_TOTAL = 3;
 
-    public static final String JOURNAL_VALIDATE = "passw";
+    public static final String JOURNAL_VALIDATE = "hJU3Y5WSPQCLtvv";
 
     public static long writeInDBJournal(JournalItem journalItem){
 
@@ -487,7 +489,7 @@ public class JournalDB {
 
     }
 
-    public static void clearJournalDB(){
+    public static void clear(){
         SQLiteDatabase mDataBase = DbShare.getDataBase(DbShare.DB_JOURNAL);
         try {
             mDataBase.delete(JournalDBinit.TABLE_JOURNAL, null, null);

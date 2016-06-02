@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    android:key="@string/shared_preferences_screen"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
         android:key="@string/shared_preferences_category_basic"
@@ -62,6 +64,11 @@
             android:title="@string/shared_preferences_backup_restore"
             android:summary="@string/shared_preferences_backup_restore_summary"/>
 
+        <Preference
+            android:key="@string/shared_preferences_backup_erase_base"
+            android:title="@string/shared_preferences_backup_erase_base"
+            android:summary="@string/shared_preferences_backup_erase_base_summary"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -115,21 +122,6 @@
             android:dependency="@string/shared_preferences_write_server"
             android:summary="Выберите, что синхронизировать с сервером"
             />
-
-       <!-- <CheckBoxPreference
-            android:key="@string/shared_preferences_write_journal_server"
-            android:title="@string/shared_preferences_write_journal_server"
-            android:dependency="@string/shared_preferences_write_server"/>
-
-        <CheckBoxPreference
-            android:key="@string/shared_preferences_write_teachers_server"
-            android:title="@string/shared_preferences_write_teachers_server"
-            android:dependency="@string/shared_preferences_write_server"/>
-
-         <CheckBoxPreference
-             android:key="@string/shared_preferences_write_rooms_server"
-             android:title="@string/shared_preferences_write_rooms_server"
-             android:dependency="@string/shared_preferences_write_server"/>-->
 
     </PreferenceCategory>
 

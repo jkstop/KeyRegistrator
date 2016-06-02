@@ -14,6 +14,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -33,7 +34,6 @@ import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterNavigationDrawerList;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
-import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.DbShare;
@@ -48,13 +48,11 @@ import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.fragments.Dialogs;
-import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.services.Alarm;
 import com.example.ivsmirnov.keyregistrator.services.NFC;
-import com.example.ivsmirnov.keyregistrator.services.Toasts;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -67,11 +65,14 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
+import java.sql.Connection;
 
 
 public class Launcher extends AppCompatActivity implements
         BaseWriterInterface,
         CloseRoomInterface,
+ServerWriter.Callback,
+SQL_Connection.Callback,
         GoogleApiClient.OnConnectionFailedListener,
         NavigationView.OnNavigationItemSelectedListener{
 
@@ -165,6 +166,7 @@ public class Launcher extends AppCompatActivity implements
             showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
             mNFCReader = new NFC();
         }
+
     }
 
     private void initAccount(){
@@ -260,9 +262,10 @@ public class Launcher extends AppCompatActivity implements
                 new ServerReader(mContext, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_JOURNAL);
                 break;
             case R.id.navigation_item_upload_all_to_server:
-                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
-                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
-                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
+                new ServerWriter(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.UPDATE_ALL);
+                //new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
+                //new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
+                //new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
                 break;
             default:
                 break;
@@ -477,4 +480,23 @@ public class Launcher extends AppCompatActivity implements
         return getSupportFragmentManager().findFragmentByTag(getResources().getString(resID));
     }
 
+    @Override
+    public void onServerConnected(Connection connection) {
+        System.out.println("CONNECTED : " + connection);
+    }
+
+    @Override
+    public void onServerConnectException(Exception e) {
+        System.out.println("CONNECT EXCEPTION : " + e.getLocalizedMessage());
+    }
+
+    @Override
+    public void onSuccessServerWrite() {
+        Snackbar.make(getCurrentFocus(),"Запись прошла успешно",Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onErrorServerWrite() {
+        Snackbar.make(getCurrentFocus(),"Ошибка при записи",Snackbar.LENGTH_SHORT).show();
+    }
 }

@@ -39,7 +39,10 @@
     Брать и сдавать ключи необходимо лично Вам!\n
     Не оставляйте компьютерный класс открытым!</string>
 
-
+    <string name="erase_disclaimer">Внимание!\n
+    При очистке данных с устройства будет удалена вся информация, накопленная приложением.\n
+    Убедитесь в наличии резервной копии.</string>
+    <string name="erase_server_also">Удалить также информацию на сервере</string>
     <!-- Navigation Drawer -->
 
     <string name="navigation_drawer_opened">The navigation drawer is opened</string>
@@ -204,6 +207,9 @@
     <string name="tab_all">Все пользователи</string>
 
     <!--Preferences-->
+
+    <string name="shared_preferences_screen">PrefereceScreen</string>
+
     <string name="shared_preferences_category_sheduler">Планировщик</string>
     <string name="shared_preferences_category_server">Сервер</string>
     <string name="shared_preferences_category_basic">Общие</string>
@@ -288,6 +294,8 @@
         <item>Пользователи</item>
         <item>Помещения</item>
     </string-array>
+    <string name="shared_preferences_backup_erase_base">Очистка базы данных</string>
+    <string name="shared_preferences_backup_erase_base_summary">Удаление накопленной в приложении информации</string>
 
     <string name="view_table_landscape">Альбомный</string>
     <string name="view_table_portrait">Портретный</string>

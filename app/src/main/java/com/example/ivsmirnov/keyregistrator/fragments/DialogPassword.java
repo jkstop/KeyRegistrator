@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -13,7 +14,13 @@ import android.view.View;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
+import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
+import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
+
+import java.util.ArrayList;
 
 /**
  * Диалог ввода пароля
@@ -22,16 +29,20 @@ public class DialogPassword extends DialogFragment {
 
     public static final String PERSONS_ACCESS = "persons_access";
     public static final String ROOMS_ACCESS = "rooms_access";
+    public static final String ERASE_ACCESS = "erase_access";
 
     private static final String BUNDLE_RADIO_LABEL = "bundle_radio_label";
+    private static final String BUNDLE_ERASE_LIST = "bundle_erase_list";
 
     private Context mContext;
     private Callback mCallback;
     private String mDialogTag, mPersonTag;
+    private ArrayList<String> mEraseItems;
 
-    public static DialogPassword newInstance (String personRadioLabel){
+    public static DialogPassword newInstance (String personRadioLabel, ArrayList<String> eraseItems){
         DialogPassword dialogPassword = new DialogPassword();
         Bundle bundle = new Bundle();
+        bundle.putStringArrayList(BUNDLE_ERASE_LIST, eraseItems);
         bundle.putString(BUNDLE_RADIO_LABEL, personRadioLabel);
         dialogPassword.setArguments(bundle);
         return dialogPassword;
@@ -43,7 +54,10 @@ public class DialogPassword extends DialogFragment {
         mContext = getContext();
         mDialogTag = getTag();
         Bundle extras = getArguments();
-        if (extras!=null) mPersonTag = extras.getString(BUNDLE_RADIO_LABEL);
+        if (extras!=null) {
+            mPersonTag = extras.getString(BUNDLE_RADIO_LABEL);
+            mEraseItems = extras.getStringArrayList(BUNDLE_ERASE_LIST);
+        }
         if (mDialogTag.equals(PERSONS_ACCESS)) mCallback = (Callback)getActivity();
     }
 
@@ -71,9 +85,37 @@ public class DialogPassword extends DialogFragment {
                     @Override
                     public void onClick(View v) {
                         if (textInputLayout.getEditText().getText().toString().equals("1212")){
-                            if (mDialogTag.equals(ROOMS_ACCESS) && mPersonTag!=null){
-                                new CloseRooms(mContext, mPersonTag, (CloseRoomInterface)getActivity()).execute();
+                            switch (mDialogTag){
+                                case ROOMS_ACCESS:
+                                    if (mPersonTag!=null){
+                                        new CloseRooms(mContext, mPersonTag, (CloseRoomInterface)getActivity()).execute();
+                                    }
+                                    break;
+                                case ERASE_ACCESS:
+                                    if (mEraseItems.contains(getString(R.string.toolbar_title_journal))){
+                                        JournalDB.clear();
+                                        if (mEraseItems.contains(getString(R.string.erase_server_also))){
+                                            new ServerWriter().execute(ServerWriter.JOURNAL_DELETE_ALL);
+                                        }
+                                    }
+                                    if (mEraseItems.contains(getString(R.string.toolbar_title_persons))){
+                                        FavoriteDB.clear();
+                                        if (mEraseItems.contains(getString(R.string.erase_server_also))){
+                                            new ServerWriter().execute(ServerWriter.PERSON_DELETE_ALL);
+                                        }
+                                    }
+                                    if (mEraseItems.contains(getString(R.string.toolbar_title_auditrooms))){
+                                        RoomDB.clear();
+                                        if (mEraseItems.contains(getString(R.string.erase_server_also))){
+                                            new ServerWriter().execute(ServerWriter.ROOMS_DELETE_ALL);
+                                        }
+                                    }
+                                    Snackbar.make(getActivity().getWindow().getCurrentFocus(),"Удалено",Snackbar.LENGTH_SHORT).show();
+                                    break;
+                                default:
+                                    break;
                             }
+
                             dialog.dismiss();
                         } else {
                             textInputLayout.setError(getString(R.string.view_enter_password_entered_incorrect));
