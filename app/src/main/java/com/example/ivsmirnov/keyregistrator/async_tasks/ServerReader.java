@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 /**
  * Загрузка с сервера
  */
-public class ServerReader extends AsyncTask<Integer,Integer,Void> {
+public class ServerReader extends AsyncTask<Integer,Integer,Void> implements SQL_Connection.Callback {
 
     public static final int LOAD_JOURNAL = 100;
     public static final int LOAD_TEACHERS = 200;
@@ -271,5 +272,15 @@ public class ServerReader extends AsyncTask<Integer,Integer,Void> {
             mProgressDialog.cancel();
         }
         if (mListener!=null) mListener.updateInformation();
+    }
+
+    @Override
+    public void onServerConnected(Connection connection) {
+
+    }
+
+    @Override
+    public void onServerConnectException(Exception e) {
+
     }
 }

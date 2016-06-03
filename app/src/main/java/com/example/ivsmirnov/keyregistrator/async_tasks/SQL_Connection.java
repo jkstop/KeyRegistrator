@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Соединение с сервером
  */
-public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
+public class SQL_Connection {
 
     //таблицы
     public static final String JOURNAL_TABLE = "JOURNAL_V2";
@@ -63,7 +63,7 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
 
     private static String mServerName;
     private static Callback mCallback;
-    private static SQL_Connection mConnectTask;
+    //private static SQL_Connection mConnectTask;
 
 
     private static final String NET_SOURCEFORGE_JTDS_JDBC_DRIVER = "net.sourceforge.jtds.jdbc.Driver";
@@ -82,35 +82,21 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
         System.out.println("THREAD " + connectThread);
 
         if (connectThread == null){
-            connectThread = new Thread(null,getConnect,"BackGroundConnect");
-            System.out.println("THREAD CREATED " + connectThread);
-            connectThread.start();
-        } else {
+            connectThread = new Thread(null,getConnect,"MSSQLServerConnect");
 
-            connectThread.interrupt();
-
-            System.out.println("THREAT INTERRUPT ");
-        }
-        System.out.println("THREAD STATE " + connectThread.getState());
-
-        if (serverName !=null){
-            //connectThread.start();
-            //mConnectTask = new SQL_Connection(serverName, callback);
-            //mConnectTask.execute();
-            //connect(serverName, callback);
-        } else {
-            if (SQLconnect!=null){
-                return SQLconnect;
+            if (serverName !=null){
+                connectThread.start();
             } else {
-                mServerName = Settings.getServerName();
-               // connectThread.start();
-                //if (mConnectTask == null){
-                //    mConnectTask = new SQL_Connection(Settings.getServerName(), callback);
-                //    mConnectTask.execute();
-               // }
-                //connect(Settings.getServerName(), callback);
+                if (SQLconnect!=null){
+                    return SQLconnect;
+                } else {
+                    mServerName = Settings.getServerName();
+                    connectThread.start();
+                }
             }
+
         }
+
         return null;
     }
 
@@ -121,66 +107,10 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
         }
     };
 
-   /* private static void connect(String serverName, Callback callback){
-        try {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-
-            Class.forName(NET_SOURCEFORGE_JTDS_JDBC_DRIVER);
-            final String ConnURL = "jdbc:jtds:sqlserver://" + serverName + ";"
-                    + "database=" + DB +";user=shsupport;password=podderzhka;";
-
-            getConnectionFromUrl(ConnURL, callback).start();
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }*/
 
     private static void getConnectionFromUrl(final String serverName, final Callback callback){
 
         System.out.println("START GET CONNECT SN " + serverName + " CB " + callback);
-
-
-        for (int i=0;i<100;i++){
-            while (!connectThread.isInterrupted()){
-                System.out.println(i);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-        /*StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        try {
-            Class.forName(NET_SOURCEFORGE_JTDS_JDBC_DRIVER);
-            final String ConnURL = "jdbc:jtds:sqlserver://" + serverName + ";"
-                    + "database=" + DB +";user=shsupport;password=podderzhka;";
-            System.out.println("start get connection from URL");
-            SQLconnect = DriverManager.getConnection(ConnURL);
-            //connectThread = null;
-            if (callback!=null) callback.onServerConnected(SQLconnect);
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (callback!=null) callback.onServerConnectException(e);
-        }*/
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        System.out.println("********** SQL connection START **********");
-    }
-
-    @Override
-    protected Exception doInBackground(Void... params) {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
@@ -188,34 +118,14 @@ public class SQL_Connection extends AsyncTask<Void,Void,Exception> {
 
         try {
             Class.forName(NET_SOURCEFORGE_JTDS_JDBC_DRIVER);
-            String ConnURL = "jdbc:jtds:sqlserver://" + mServerName + ";"
-                    + "database=" + DB +";user=shsupport;password=podderzhka;";
+            final String ConnURL = "jdbc:jtds:sqlserver://" + serverName + ";"
+                    + "database=" + DB +";user=shsupport;password=podderzhka;loginTimeout=5";
+            connectThread = null;
             SQLconnect = DriverManager.getConnection(ConnURL);
-
-            return null;
-        }catch (Exception e) {
+            if (callback!=null) callback.onServerConnected(SQLconnect);
+        } catch (Exception e) {
             e.printStackTrace();
-            SQLconnect = null;
-            //if (mCallback!=null) mCallback.onServerConnectException(e);
-            return e;
-        }
-    }
-
-    @Override
-    protected void onPostExecute(Exception e) {
-        System.out.println("********** SQL connection END **********");
-        mConnectTask = null;
-        if (e != null){
-            Settings.setServerStatus(false);
-            System.out.println("SERVER DISCONNECTED");
-            if (mCallback!=null) mCallback.onServerConnectException(e);
-            //if (mConnectionInterface!=null) mConnectionInterface.onServerConnectException(e);
-            //if (mConnectionInterface!=null) mConnectionInterface.onServerDisconnected();
-        } else {
-            Settings.setServerStatus(true);
-            if (mCallback!=null) mCallback.onServerConnected(SQLconnect);
-            //if (mConnectionInterface!=null) mConnectionInterface.onServerConnected();
-            System.out.println("SERVER CONNECTED");
+            if (callback!=null) callback.onServerConnectException(e);
         }
     }
 

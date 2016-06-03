@@ -147,7 +147,6 @@ SQL_Connection.Callback,
 
         //connect to server
         SQL_Connection.getConnection(null, null);
-       // Dummy.getConnection();
 
         //init DataBases
         new DbShare();

@@ -25,6 +25,10 @@ import java.util.ArrayList;
  */
 public class ServerWriter extends AsyncTask<Integer,Void,Exception> {
 
+    public static final int ERROR_NO_CONNECT = 1000;
+    public static final int ERROR_OTHER = 1001;
+
+
    // public static final int JOURNAL_NEW = 100; //для добавления новой записи
    // public static final int JOURNAL_ALL = 101; //для добавления всех не синхронизированных записей
     public static final int JOURNAL_UPDATE = 104; //обновление журнала
@@ -453,6 +457,7 @@ public class ServerWriter extends AsyncTask<Integer,Void,Exception> {
         if (e == null){
             if (mCallback !=null) mCallback.onSuccessServerWrite();
         } else {
+
             if (mCallback != null) mCallback.onErrorServerWrite();
         }
 
