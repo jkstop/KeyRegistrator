@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterNavigationDrawerList;
+import com.example.ivsmirnov.keyregistrator.async_tasks.Dummy;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
@@ -146,6 +147,7 @@ SQL_Connection.Callback,
 
         //connect to server
         SQL_Connection.getConnection(null, null);
+       // Dummy.getConnection();
 
         //init DataBases
         new DbShare();
@@ -262,6 +264,7 @@ SQL_Connection.Callback,
                 new ServerReader(mContext, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_JOURNAL);
                 break;
             case R.id.navigation_item_upload_all_to_server:
+                //Dummy.getConnection();
                 new ServerWriter(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.UPDATE_ALL);
                 //new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
                 //new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
