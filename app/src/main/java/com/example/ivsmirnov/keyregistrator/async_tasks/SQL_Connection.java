@@ -2,6 +2,8 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.os.AsyncTask;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
@@ -60,6 +62,7 @@ public class SQL_Connection {
 
     private static Connection SQLconnect;
     private static Thread connectThread;
+    private static int mCallingTask;
 
     private static String mServerName;
     private static Callback mCallback;
@@ -74,30 +77,26 @@ public class SQL_Connection {
         mCallback = callback;
     }
 
-    public static Connection getConnection(String serverName, Callback callback){
+
+    public static void getConnection(String serverName, int callingTask, @Nullable Callback callback){
         mServerName = serverName;
         mCallback = callback;
+        mCallingTask = callingTask;
 
         System.out.println("SQL CONNECT " + SQLconnect);
         System.out.println("THREAD " + connectThread);
 
-        if (connectThread == null){
-            connectThread = new Thread(null,getConnect,"MSSQLServerConnect");
+        if (SQLconnect!=null){
+            callback.onServerConnected(SQLconnect, mCallingTask);
+        } else {
+            if (connectThread == null){
+                connectThread = new Thread(null, getConnect, "MSSQLServerConnect");
 
-            if (serverName !=null){
+                if (serverName == null) mServerName = Settings.getServerName();
+
                 connectThread.start();
-            } else {
-                if (SQLconnect!=null){
-                    return SQLconnect;
-                } else {
-                    mServerName = Settings.getServerName();
-                    connectThread.start();
-                }
             }
-
         }
-
-        return null;
     }
 
     private static Runnable getConnect = new Runnable() {
@@ -122,15 +121,15 @@ public class SQL_Connection {
                     + "database=" + DB +";user=shsupport;password=podderzhka;loginTimeout=5";
             connectThread = null;
             SQLconnect = DriverManager.getConnection(ConnURL);
-            if (callback!=null) callback.onServerConnected(SQLconnect);
+            callback.onServerConnected(SQLconnect, mCallingTask);
         } catch (Exception e) {
             e.printStackTrace();
-            if (callback!=null) callback.onServerConnectException(e);
+            callback.onServerConnectException(e);
         }
     }
 
     public interface Callback{
-        void onServerConnected(Connection connection);
+        void onServerConnected(Connection connection, int callingTask);
         void onServerConnectException(Exception e);
     }
 }

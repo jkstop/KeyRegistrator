@@ -126,7 +126,7 @@ public class Dialogs extends DialogFragment{
                                 }
 
                                 if (checkClearJournalServer.isChecked()){
-                                    new ServerWriter().execute(ServerWriter.JOURNAL_DELETE_ALL);
+                                   // new ServerWriter().execute(ServerWriter.JOURNAL_DELETE_ALL);
                                 }
 
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
@@ -156,7 +156,7 @@ public class Dialogs extends DialogFragment{
                                 }
 
                                 if (checkClearTeachersServer.isChecked()){
-                                    new ServerWriter().execute(ServerWriter.PERSON_DELETE_ALL);
+                                   // new ServerWriter().execute(ServerWriter.PERSON_DELETE_ALL);
                                 }
 
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
@@ -213,7 +213,7 @@ public class Dialogs extends DialogFragment{
                                 //удаление с сервера
                                 if (Settings.getWriteServerStatus() &&
                                         Settings.getWriteServerItems().contains(App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries)[1])){
-                                    new ServerWriter(tag).execute(ServerWriter.PERSON_DELETE_ONE);
+                                   // new ServerWriter(tag).execute(ServerWriter.PERSON_DELETE_ONE);
                                 }
 
                                 //updateInformation();
@@ -278,7 +278,7 @@ public class Dialogs extends DialogFragment{
                                 }
 
                                 if (deleteRoomServerCheck.isChecked()){
-                                    new ServerWriter(aud).execute(ServerWriter.ROOMS_DELETE_ONE);
+                                    //new ServerWriter(aud).execute(ServerWriter.ROOMS_DELETE_ONE);
                                 }
 
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
@@ -315,7 +315,7 @@ public class Dialogs extends DialogFragment{
                                 }
 
                                 if (eraseServerRoomsCheck.isChecked()){
-                                    new ServerWriter().execute(ServerWriter.ROOMS_DELETE_ALL);
+                                   // new ServerWriter().execute(ServerWriter.ROOMS_DELETE_ALL);
                                 }
 
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
@@ -345,7 +345,7 @@ public class Dialogs extends DialogFragment{
                             //пишем на сервер
                             if (Settings.getWriteServerStatus() &&
                                     Settings.getWriteServerItems().contains(App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries)[2])){
-                                new ServerWriter(newRoomItem).execute(ServerWriter.ROOMS_UPDATE);
+                                //new ServerWriter(newRoomItem).execute(ServerWriter.ROOMS_UPDATE);
                             }
 
                             enterAuditroomText.getText().clear();
@@ -539,7 +539,7 @@ public class Dialogs extends DialogFragment{
                                 }
 
                                 if (deleteFromServerCheck.isChecked()){ //удаление с сервера
-                                    new ServerWriter(timeInTag).execute(ServerWriter.JOURNAL_DELETE_ONE);
+                                    //new ServerWriter(timeInTag).execute(ServerWriter.JOURNAL_DELETE_ONE);
                                 }
                             }
                         })

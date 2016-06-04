@@ -14,12 +14,13 @@ import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.others.Values;
 import com.example.ivsmirnov.keyregistrator.services.Toasts;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 
 /**
  * Task for close room
  */
-public class CloseRooms extends AsyncTask<Void, Void, Integer> {
+public class CloseRooms extends AsyncTask<Void, Void, Integer> implements SQL_Connection.Callback {
 
     private Context mContext;
     private String mTag;
@@ -62,16 +63,29 @@ public class CloseRooms extends AsyncTask<Void, Void, Integer> {
         }
 
         if (Settings.getWriteServerStatus()){
-            ArrayList<String> selectedItemsForWrite = Settings.getWriteServerItems(); //выбранные элементы для синхронизации
-            String[] allItemsForWrite = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries); //все элементы синхронизации
 
-            if (selectedItemsForWrite.contains(allItemsForWrite[0])){ //если выбран журнал
-                new ServerWriter(new JournalItem().setTimeIn(mRoomTime)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
-            }
+            SQL_Connection.getConnection(null, this);
+            //ArrayList<String> selectedItemsForWrite = Settings.getWriteServerItems(); //выбранные элементы для синхронизации
+            //String[] allItemsForWrite = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries); //все элементы синхронизации
 
-            if (selectedItemsForWrite.contains(allItemsForWrite[2])){ //если выбраны помещения
-                new ServerWriter(mRoomItemUpdated).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
-            }
+//            if (selectedItemsForWrite.contains(allItemsForWrite[0])){ //если выбран журнал
+  //              new ServerWriter(new JournalItem().setTimeIn(mRoomTime)).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
+    //        }
+
+      //      if (selectedItemsForWrite.contains(allItemsForWrite[2])){ //если выбраны помещения
+        //        new ServerWriter(mRoomItemUpdated).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
+          //  }
         }
+    }
+
+    @Override
+    public void onServerConnected(Connection connection) {
+        new ServerWriter(ServerWriter.JOURNAL_UPDATE, new JournalItem().setTimeIn(mRoomTime), null, false, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+        new ServerWriter(ServerWriter.ROOMS_UPDATE, mRoomItemUpdated, null, false, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+    }
+
+    @Override
+    public void onServerConnectException(Exception e) {
+        System.out.println("SERVER IS DISCONNECT!!!");
     }
 }

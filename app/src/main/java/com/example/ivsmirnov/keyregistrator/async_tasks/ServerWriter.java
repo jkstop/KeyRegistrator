@@ -23,11 +23,7 @@ import java.util.ArrayList;
 /**
  * Запись на сервер
  */
-public class ServerWriter extends AsyncTask<Integer,Void,Exception> {
-
-    public static final int ERROR_NO_CONNECT = 1000;
-    public static final int ERROR_OTHER = 1001;
-
+public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
 
    // public static final int JOURNAL_NEW = 100; //для добавления новой записи
    // public static final int JOURNAL_ALL = 101; //для добавления всех не синхронизированных записей
@@ -49,13 +45,15 @@ public class ServerWriter extends AsyncTask<Integer,Void,Exception> {
 
     private ProgressDialog mProgressDialog;
 
-    private Long mJournalItemTag;
-    private String mTag;
+   // private Long mJournalItemTag;
+   // private String mTag;
     private JournalItem mJournalItem;
     private PersonItem mPersonItem;
     private RoomItem mRoomItem;
     private Callback mCallback;
 
+    private int mWriteParams;
+/*
     public ServerWriter (JournalItem journalItem){
         mJournalItem = journalItem;
     }
@@ -85,6 +83,30 @@ public class ServerWriter extends AsyncTask<Integer,Void,Exception> {
 
     public ServerWriter (Context context, boolean isShowProgress){
         if (isShowProgress) mProgressDialog = new ProgressDialog(context);
+    }*/
+
+    public ServerWriter (int writeParams, JournalItem journalItem, Callback callback){
+        mWriteParams = writeParams;
+        mJournalItem = journalItem;
+        mCallback = callback;
+    }
+
+    public ServerWriter (int writeParams, PersonItem personItem, Callback callback){
+        mWriteParams = writeParams;
+        mPersonItem = personItem;
+        mCallback = callback;
+    }
+
+    public ServerWriter (int writeParams, RoomItem roomItem, Callback callback){
+        mWriteParams = writeParams;
+        mRoomItem = roomItem;
+        mCallback = callback;
+    }
+
+    public ServerWriter (int writeParams, Context context, boolean progressDialog, Callback callback){
+        mWriteParams = writeParams;
+        if (progressDialog) mProgressDialog = new ProgressDialog(context);
+        mCallback = callback;
     }
 
     @Override
@@ -99,12 +121,12 @@ public class ServerWriter extends AsyncTask<Integer,Void,Exception> {
     }
 
     @Override
-    protected Exception doInBackground(Integer... params) {
+    protected Exception doInBackground(Connection... params) {
         try {
-            Connection mConnection = SQL_Connection.getConnection(null, null);
+            Connection mConnection = params[0];
             Statement mStatement = mConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             ResultSet mResult;
-                switch (params[0]){
+                switch (mWriteParams){
                     case UPDATE_ALL: //обновляем все записи на сервере
                         //журнал
                         //загружаем все теги с сервера. если в журнале есть, а на сервере нет, то пишем
@@ -233,8 +255,8 @@ public class ServerWriter extends AsyncTask<Integer,Void,Exception> {
                         }*/
                         break;
                     case JOURNAL_DELETE_ONE:
-                        if (mJournalItemTag!=null){
-                            mStatement.execute("DELETE FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " = " + mJournalItemTag);
+                        if (mJournalItem!=null && mJournalItem.getTimeIn()!=null){
+                            mStatement.execute("DELETE FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " = " + mJournalItem.getTimeIn());
                         }
                         break;
                     case JOURNAL_DELETE_ALL:
@@ -268,8 +290,8 @@ public class ServerWriter extends AsyncTask<Integer,Void,Exception> {
                         }*/
                         break;
                     case PERSON_DELETE_ONE:
-                        if (mTag!=null){
-                            mStatement.execute("DELETE FROM " + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " ='" + mTag + "'");
+                        if (mPersonItem!=null && mPersonItem.getRadioLabel()!=null){
+                            mStatement.execute("DELETE FROM " + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " ='" + mPersonItem.getRadioLabel() + "'");
                         }
                         break;
                     case PERSON_DELETE_ALL:
@@ -325,8 +347,8 @@ public class ServerWriter extends AsyncTask<Integer,Void,Exception> {
                         }*/
                         break;
                     case ROOMS_DELETE_ONE:
-                        if (mTag!=null){
-                            mStatement.execute("DELETE FROM " + SQL_Connection.ROOMS_TABLE + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " = " + mTag);
+                        if (mRoomItem!=null && mRoomItem.getAuditroom()!=null){
+                            mStatement.execute("DELETE FROM " + SQL_Connection.ROOMS_TABLE + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " = " + mRoomItem.getAuditroom());
                         }
                         break;
                     case ROOMS_DELETE_ALL:

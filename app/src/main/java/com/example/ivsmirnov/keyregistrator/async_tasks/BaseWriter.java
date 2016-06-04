@@ -17,12 +17,13 @@ import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.services.Toasts;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 
 /**
  * Получение пользователя из базы; создание journalItem, запись в журнал посещений; запись в БД помещений
  */
-public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
+public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> implements SQL_Connection.Callback{
 
     private Context mContext;
     private BaseWriterInterface mBaseWriterInterface;
@@ -81,16 +82,29 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Void> {
 
         if (Settings.getWriteServerStatus()){
 
-            ArrayList<String> selectedItemsForWrite = Settings.getWriteServerItems();
-            String[] allItemsForWrite = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries);
+            //ArrayList<String> selectedItemsForWrite = Settings.getWriteServerItems();
+            //String[] allItemsForWrite = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries);
 
-            if (selectedItemsForWrite.contains(allItemsForWrite[0])){ //если выбран журнал
-                new ServerWriter(mJournalItem).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
-            }
+            //if (selectedItemsForWrite.contains(allItemsForWrite[0])){ //если выбран журнал
+                //new ServerWriter(mJournalItem).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
+            //}
 
-            if (selectedItemsForWrite.contains(allItemsForWrite[2])){ //если выбраны помещения
-                new ServerWriter(mRoomItem).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
-            }
+            SQL_Connection.getConnection(null, 0, this);
+
+            //if (selectedItemsForWrite.contains(allItemsForWrite[2])){ //если выбраны помещения
+             //   new ServerWriter(mRoomItem).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
+            //}
         }
+    }
+
+    @Override
+    public void onServerConnected(Connection connection, int callingTask) {
+        new ServerWriter(ServerWriter.JOURNAL_UPDATE, mJournalItem, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+        new ServerWriter(ServerWriter.ROOMS_UPDATE, mRoomItem, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+    }
+
+    @Override
+    public void onServerConnectException(Exception e) {
+        System.out.println("SERVER IS DISCONNECT!!!");
     }
 }

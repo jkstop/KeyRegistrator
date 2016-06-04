@@ -103,6 +103,9 @@ SQL_Connection.Callback,
     private BaseWriterInterface mBaseWriterInterface;
     private CloseRoomInterface mCloseRoomInterface;
 
+    private ServerWriter.Callback mServerWriteCallback;
+    private SQL_Connection.Callback mSQLConnectCallback;
+
     private GoogleApiClient mGoogleApiClient;
 
     private static long back_pressed;
@@ -131,6 +134,9 @@ SQL_Connection.Callback,
         mBaseWriterInterface = this;
         mCloseRoomInterface = this;
 
+        mServerWriteCallback = this;
+        mSQLConnectCallback = this;
+
         mHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
@@ -146,7 +152,7 @@ SQL_Connection.Callback,
         };
 
         //connect to server
-        SQL_Connection.getConnection(null, null);
+        SQL_Connection.getConnection(null, 0, this);
 
         //init DataBases
         new DbShare();
@@ -264,7 +270,8 @@ SQL_Connection.Callback,
                 break;
             case R.id.navigation_item_upload_all_to_server:
                 //Dummy.getConnection();
-                new ServerWriter(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.UPDATE_ALL);
+                SQL_Connection.getConnection(null, ServerWriter.UPDATE_ALL, mSQLConnectCallback);
+               // new ServerWriter(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.UPDATE_ALL);
                 //new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
                 //new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
                 //new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
@@ -483,8 +490,15 @@ SQL_Connection.Callback,
     }
 
     @Override
-    public void onServerConnected(Connection connection) {
+    public void onServerConnected(Connection connection, int callingTask) {
         System.out.println("CONNECTED : " + connection);
+        switch (callingTask){
+            case ServerWriter.UPDATE_ALL:
+                new ServerWriter(ServerWriter.UPDATE_ALL, null, false, mServerWriteCallback).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
