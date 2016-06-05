@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
@@ -38,10 +39,9 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
     public static final int ROOMS_DELETE_ONE = 302; //удаление 1 записи
     public static final int ROOMS_DELETE_ALL = 303; //удаление всех записей
     public static final int ROOMS_UPDATE = 304; //обновление помещений
-    public static final int UPDATE_ALL = 305; //выгрузка всех на сервер
 
-    private static final int NO_CONNECT = 1;
-    private static final int SUCCESS_WRITE = 2;
+    public static final int UPDATE_ALL = 305; //выгрузка всех на сервер
+    public static final int DELETE = 306; //удаление
 
     private ProgressDialog mProgressDialog;
 
@@ -50,6 +50,7 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
     private JournalItem mJournalItem;
     private PersonItem mPersonItem;
     private RoomItem mRoomItem;
+    private ArrayList<String> mArguments;
     private Callback mCallback;
 
     private int mWriteParams;
@@ -107,6 +108,11 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
         mWriteParams = writeParams;
         if (progressDialog) mProgressDialog = new ProgressDialog(context);
         mCallback = callback;
+    }
+
+    public ServerWriter (int writeParams, ArrayList<String> args){
+        mWriteParams = writeParams;
+        mArguments = args;
     }
 
     @Override
@@ -261,6 +267,19 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
                         break;
                     case JOURNAL_DELETE_ALL:
                         mStatement.execute("TRUNCATE TABLE " + SQL_Connection.JOURNAL_TABLE);
+                        break;
+                    case DELETE:
+                        if (mArguments!=null){
+                            if (mArguments.contains(App.getAppContext().getString(R.string.toolbar_title_journal))){
+                                mStatement.execute("TRUNCATE TABLE " + SQL_Connection.JOURNAL_TABLE);
+                            }
+                            if (mArguments.contains(App.getAppContext().getString(R.string.toolbar_title_persons))){
+                                mStatement.execute("TRUNCATE TABLE " + SQL_Connection.PERSONS_TABLE);
+                            }
+                            if (mArguments.contains(App.getAppContext().getString(R.string.toolbar_title_auditrooms))){
+                                mStatement.execute("TRUNCATE TABLE " + SQL_Connection.ROOMS_TABLE);
+                            }
+                        }
                         break;
                     case PERSON_UPDATE:
                         //Если передан PersonItem, то перезаписываем его. Если нет - пишем всех.

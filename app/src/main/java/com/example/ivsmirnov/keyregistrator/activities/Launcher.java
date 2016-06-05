@@ -73,6 +73,7 @@ public class Launcher extends AppCompatActivity implements
         BaseWriterInterface,
         CloseRoomInterface,
 ServerWriter.Callback,
+ServerReader.Callback,
 SQL_Connection.Callback,
         GoogleApiClient.OnConnectionFailedListener,
         NavigationView.OnNavigationItemSelectedListener{
@@ -105,6 +106,7 @@ SQL_Connection.Callback,
 
     private ServerWriter.Callback mServerWriteCallback;
     private SQL_Connection.Callback mSQLConnectCallback;
+    private ServerReader.Callback mServerReaderCallback;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -135,6 +137,7 @@ SQL_Connection.Callback,
         mCloseRoomInterface = this;
 
         mServerWriteCallback = this;
+        mServerReaderCallback = this;
         mSQLConnectCallback = this;
 
         mHandler = new Handler(){
@@ -264,17 +267,10 @@ SQL_Connection.Callback,
                         .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
             case R.id.navigation_item_download_all_from_server:
-                new ServerReader(mContext, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_ROOMS);
-                new ServerReader(mContext, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_TEACHERS);
-                new ServerReader(mContext, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_JOURNAL);
+                SQL_Connection.getConnection(null, ServerReader.READ_ALL, mSQLConnectCallback);
                 break;
             case R.id.navigation_item_upload_all_to_server:
-                //Dummy.getConnection();
                 SQL_Connection.getConnection(null, ServerWriter.UPDATE_ALL, mSQLConnectCallback);
-               // new ServerWriter(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.UPDATE_ALL);
-                //new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
-                //new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
-                //new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
                 break;
             default:
                 break;
@@ -349,7 +345,8 @@ SQL_Connection.Callback,
                             .setDivision(account.getEmail())
                             .setRadioLabel(account.getId())
                             .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
-                            .setPhoto(encoded));
+                            .setPhoto(encoded),
+                            Settings.getWriteServerStatus());
 
                     Settings.setActiveAccountID(account.getId());
 
@@ -496,6 +493,9 @@ SQL_Connection.Callback,
             case ServerWriter.UPDATE_ALL:
                 new ServerWriter(ServerWriter.UPDATE_ALL, null, false, mServerWriteCallback).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
                 break;
+            case ServerReader.READ_ALL:
+                new ServerReader(ServerReader.READ_ALL, mContext, mServerReaderCallback).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+                break;
             default:
                 break;
         }
@@ -514,5 +514,15 @@ SQL_Connection.Callback,
     @Override
     public void onErrorServerWrite() {
         Snackbar.make(getCurrentFocus(),"Ошибка при записи",Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSuccessServerRead(Object result) {
+        Snackbar.make(getCurrentFocus(),"Чтение успешно",Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onErrorServerRead(Exception e) {
+        Snackbar.make(getCurrentFocus(),"Ошибка при чтении",Snackbar.LENGTH_SHORT).show();
     }
 }

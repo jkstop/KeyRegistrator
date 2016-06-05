@@ -150,12 +150,12 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.menu_auditrooms_upload_to_server:
-                new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
-                return true;
-            case R.id.menu_auditrooms_download_from_server:
-                new ServerReader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_ROOMS);
-                return true;
+            //case R.id.menu_auditrooms_upload_to_server:
+            //    new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
+            //    return true;
+            //case R.id.menu_auditrooms_download_from_server:
+             //   new ServerReader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_ROOMS);
+             //   return true;
             //case R.id.menu_auditrooms_set_columns_number:
              //   Dialogs dialogs = new Dialogs();
             ///    Bundle bundle = new Bundle();

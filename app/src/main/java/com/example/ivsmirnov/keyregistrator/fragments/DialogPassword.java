@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,18 +15,20 @@ import android.view.View;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 
 /**
  * Диалог ввода пароля
  */
-public class DialogPassword extends DialogFragment {
+public class DialogPassword extends DialogFragment implements SQL_Connection.Callback{
 
     public static final String PERSONS_ACCESS = "persons_access";
     public static final String ROOMS_ACCESS = "rooms_access";
@@ -38,6 +41,8 @@ public class DialogPassword extends DialogFragment {
     private Callback mCallback;
     private String mDialogTag, mPersonTag;
     private ArrayList<String> mEraseItems;
+
+    private SQL_Connection.Callback mSQLCallback;
 
     public static DialogPassword newInstance (String personRadioLabel, ArrayList<String> eraseItems){
         DialogPassword dialogPassword = new DialogPassword();
@@ -53,6 +58,7 @@ public class DialogPassword extends DialogFragment {
         super.onCreate(savedInstanceState);
         mContext = getContext();
         mDialogTag = getTag();
+        mSQLCallback = this;
         Bundle extras = getArguments();
         if (extras!=null) {
             mPersonTag = extras.getString(BUNDLE_RADIO_LABEL);
@@ -94,21 +100,16 @@ public class DialogPassword extends DialogFragment {
                                 case ERASE_ACCESS:
                                     if (mEraseItems.contains(getString(R.string.toolbar_title_journal))){
                                         JournalDB.clear();
-                                        if (mEraseItems.contains(getString(R.string.erase_server_also))){
-                                            new ServerWriter().execute(ServerWriter.JOURNAL_DELETE_ALL);
-                                        }
                                     }
                                     if (mEraseItems.contains(getString(R.string.toolbar_title_persons))){
                                         FavoriteDB.clear();
-                                        if (mEraseItems.contains(getString(R.string.erase_server_also))){
-                                            new ServerWriter().execute(ServerWriter.PERSON_DELETE_ALL);
-                                        }
                                     }
                                     if (mEraseItems.contains(getString(R.string.toolbar_title_auditrooms))){
                                         RoomDB.clear();
-                                        if (mEraseItems.contains(getString(R.string.erase_server_also))){
-                                            new ServerWriter().execute(ServerWriter.ROOMS_DELETE_ALL);
-                                        }
+                                    }
+
+                                    if (mEraseItems.contains(getString(R.string.erase_server_also))){
+                                        SQL_Connection.getConnection(null, ServerWriter.DELETE, mSQLCallback);
                                     }
                                     Snackbar.make(getActivity().getWindow().getCurrentFocus(),"Удалено",Snackbar.LENGTH_SHORT).show();
                                     break;
@@ -126,6 +127,16 @@ public class DialogPassword extends DialogFragment {
         });
         setCancelable(false);
         return dialogPass;
+    }
+
+    @Override
+    public void onServerConnected(Connection connection, int callingTask) {
+        new ServerWriter(ServerWriter.DELETE, mEraseItems).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+    }
+
+    @Override
+    public void onServerConnectException(Exception e) {
+//нет подключения к серверу
     }
 
     public interface Callback{

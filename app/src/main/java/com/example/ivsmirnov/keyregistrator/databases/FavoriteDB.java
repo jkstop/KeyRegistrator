@@ -51,8 +51,6 @@ public class FavoriteDB {
 
     public static final String PERSONS_VALIDATE = "H4KkNBL1EIzJKoN";
 
-
-
     public static PersonItem getPersonItem(String tag, int userLocation, boolean withBase64Photo){
 
         Cursor cursor = null;
@@ -92,7 +90,10 @@ public class FavoriteDB {
                 } else {
                     return null;
                 }
-            }else if (userLocation == SERVER_USER){
+            }/*else if (userLocation == SERVER_USER){
+
+
+               // SQL_Connection.getConnection(null, SERVER_USER, this);
 
                 Connection connection = SQL_Connection.getConnection(null,null);
                 if (connection!=null){
@@ -136,7 +137,7 @@ public class FavoriteDB {
                                     break;
                                 default:
                                     break;
-                            }*/
+                            }
                     } catch (SQLException e) {
                         e.printStackTrace();
                         return null;
@@ -146,7 +147,7 @@ public class FavoriteDB {
                     //Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
                     return null;
                 }
-            }
+            }*/
             return null;
         }catch (Exception e){
             e.printStackTrace();
@@ -156,7 +157,8 @@ public class FavoriteDB {
         }
     }
 
-    public static boolean addNewUser(PersonItem personItem) {
+
+    public static boolean addNewUser(final PersonItem personItem, boolean writeToServerAlso) {
         String photoPath;
         int acccessType;
         try {
@@ -198,10 +200,20 @@ public class FavoriteDB {
                 DbShare.getDataBase(DbShare.DB_FAVORITE).insert(FavoriteDBinit.TABLE_PERSONS, null, cv);
 
                 //добавляем на сервер
-                if (Settings.getWriteServerStatus() &&
+                if (writeToServerAlso &&
                         Settings.getWriteServerItems().contains(App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries)[1])){
 
-                    new ServerWriter(personItem).execute(ServerWriter.PERSON_UPDATE);
+                    SQL_Connection.getConnection(null, 0, new SQL_Connection.Callback() {
+                        @Override
+                        public void onServerConnected(Connection connection, int callingTask) {
+                            new ServerWriter(ServerWriter.PERSON_UPDATE, personItem, null);
+                        }
+
+                        @Override
+                        public void onServerConnectException(Exception e) {
+
+                        }
+                    });
                 }
 
                 return true;
@@ -232,7 +244,7 @@ public class FavoriteDB {
                         return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE));
                     }
                     return null;
-                case SERVER_PHOTO:
+                /*case SERVER_PHOTO:
                     Connection mConnection = SQL_Connection.getConnection(null, null);
                     if (mConnection!=null){
                         try {
@@ -263,7 +275,7 @@ public class FavoriteDB {
                             e.printStackTrace();
                         }
                     }
-                    return null;
+                    return null;*/
                 default:
                     return null;
             }
@@ -831,4 +843,5 @@ public class FavoriteDB {
     private static void closeCursor(Cursor cursor){
         if (cursor!=null) cursor.close();
     }
+
 }

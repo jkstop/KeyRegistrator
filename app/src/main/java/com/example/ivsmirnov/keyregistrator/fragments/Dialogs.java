@@ -385,7 +385,7 @@ public class Dialogs extends DialogFragment{
                         .setView(pickerView)
                         .create();
 
-            case DIALOG_SQL_CONNECT:
+            /*case DIALOG_SQL_CONNECT:
                 View dialogLayout = View.inflate(mContext, R.layout.layout_dialog_sql_connect, null);
                 final AppCompatEditText inputServer = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_server)).getEditText();
                 final AppCompatEditText inputLogin = (AppCompatEditText) ((TextInputLayout)dialogLayout.findViewById(R.id.layout_dialog_sql_new_input_login)).getEditText();
@@ -482,7 +482,7 @@ public class Dialogs extends DialogFragment{
                                 dialog.cancel();
                             }
                         })
-                        .create();
+                        .create();*/
             case DIALOG_LOG_OUT:
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(getString(R.string.title_dialog_log_out))

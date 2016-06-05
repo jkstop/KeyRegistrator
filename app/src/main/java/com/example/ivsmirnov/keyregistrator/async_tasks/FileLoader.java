@@ -14,6 +14,7 @@ import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
+import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -88,7 +89,8 @@ public class FileLoader extends AsyncTask<Void,Integer,Boolean> {
                                         .setSex(split[4])
                                         .setRadioLabel(split[5])
                                         .setAccessType(Integer.parseInt(split[6]))
-                                        .setPhoto(split[7]));
+                                        .setPhoto(split[7]),
+                                        Settings.getWriteServerStatus());
 
                                 publishProgress(i);
                                 i++;

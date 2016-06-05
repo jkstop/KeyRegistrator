@@ -64,7 +64,7 @@ public class CloseRooms extends AsyncTask<Void, Void, Integer> implements SQL_Co
 
         if (Settings.getWriteServerStatus()){
 
-            SQL_Connection.getConnection(null, this);
+            SQL_Connection.getConnection(null, 0, this);
             //ArrayList<String> selectedItemsForWrite = Settings.getWriteServerItems(); //выбранные элементы для синхронизации
             //String[] allItemsForWrite = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries); //все элементы синхронизации
 
@@ -79,9 +79,9 @@ public class CloseRooms extends AsyncTask<Void, Void, Integer> implements SQL_Co
     }
 
     @Override
-    public void onServerConnected(Connection connection) {
-        new ServerWriter(ServerWriter.JOURNAL_UPDATE, new JournalItem().setTimeIn(mRoomTime), null, false, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
-        new ServerWriter(ServerWriter.ROOMS_UPDATE, mRoomItemUpdated, null, false, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+    public void onServerConnected(Connection connection, int callingTask) {
+        new ServerWriter(ServerWriter.JOURNAL_UPDATE, new JournalItem().setTimeIn(mRoomTime), null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+        new ServerWriter(ServerWriter.ROOMS_UPDATE, mRoomItemUpdated, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
     }
 
     @Override

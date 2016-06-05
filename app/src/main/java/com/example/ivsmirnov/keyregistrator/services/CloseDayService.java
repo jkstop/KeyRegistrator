@@ -9,6 +9,7 @@ import android.os.IBinder;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
+import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
@@ -18,10 +19,11 @@ import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.activities.CloseDay;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class CloseDayService extends Service implements CloseDayInterface {
+public class CloseDayService extends Service implements CloseDayInterface, SQL_Connection.Callback {
 
     private Context context;
 
@@ -53,9 +55,10 @@ public class CloseDayService extends Service implements CloseDayInterface {
 
             //запись на сервер
             if (selectedTasks.contains(allTasks[2])){
-                new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
-                new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
-                new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
+                SQL_Connection.getConnection(null, 0, this);
+                //new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
+                //new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
+                //new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
             }
 
             //рассылка email
@@ -94,5 +97,15 @@ public class CloseDayService extends Service implements CloseDayInterface {
         startActivity(new Intent(getApplicationContext(), CloseDay.class)
                 .putExtra(CloseDay.TITLE, CloseDay.CLOSE_TITLE)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
+    }
+
+    @Override
+    public void onServerConnected(Connection connection, int callingTask) {
+        new ServerWriter(ServerWriter.UPDATE_ALL, null, false, null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+    }
+
+    @Override
+    public void onServerConnectException(Exception e) {
+
     }
 }

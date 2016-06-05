@@ -118,7 +118,7 @@ public class SQL_Connection {
         try {
             Class.forName(NET_SOURCEFORGE_JTDS_JDBC_DRIVER);
             final String ConnURL = "jdbc:jtds:sqlserver://" + serverName + ";"
-                    + "database=" + DB +";user=shsupport;password=podderzhka;loginTimeout=5";
+                    + "database=" + DB +";user=shsupport;password=podderzhka;loginTimeout=3";
             connectThread = null;
             SQLconnect = DriverManager.getConnection(ConnURL);
             callback.onServerConnected(SQLconnect, mCallingTask);

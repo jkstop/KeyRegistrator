@@ -26,6 +26,7 @@ import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ImageSaver;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
@@ -44,11 +45,14 @@ import java.util.Random;
 /**
  * Диалог поиска новых пользователей
  */
-public class DialogSearch extends DialogFragment implements RecycleItemClickListener{
+public class DialogSearch extends DialogFragment implements
+        RecycleItemClickListener,
+        SQL_Connection.Callback,
+        ServerReader.Callback{
 
     private static final String BUNDLE_ROOM = "bundle_room";
 
-    private Connection mConnection;
+   // private Connection mConnection;
     private SearchTask mSearchTask;
     private ProgressBar mProgressBar;
     private RecyclerView mPersonsRecycler;
@@ -56,7 +60,12 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
     private ArrayList<PersonItem> mPersonList;
     private String mSelectedRoom;
 
+    private String textSearch;
+
     private Context mContext;
+
+    private SQL_Connection.Callback mSQLCallback;
+    private ServerReader.Callback mServerReaderCallback;
 
     private int queryLength = 0;
 
@@ -90,6 +99,8 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
         View dialogView = inflater.inflate(R.layout.view_dialog_search, container, false);
         mContext = getContext();
         mPersonList = new ArrayList<>();
+        mSQLCallback = this;
+        mServerReaderCallback = this;
         Bundle extras = getArguments();
         if (extras!=null){
             mSelectedRoom = extras.getString(BUNDLE_ROOM);
@@ -106,7 +117,7 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
             }
         });
 
-        mConnection = SQL_Connection.getConnection(null, null);
+        //mConnection = SQL_Connection.getConnection(null, null);
 
         mPersonsAdapter = new AdapterPersonsGrid(mContext, mPersonList, AdapterPersonsGrid.SHOW_ALL_PERSONS, this);
         mPersonsRecycler = (RecyclerView)dialogView.findViewById(R.id.dialog_search_recycler);
@@ -125,8 +136,10 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
             public boolean onQueryTextChange(String newText) {
                 queryLength = newText.length();
                 if (queryLength>=3 && queryLength<=6){
-                    cancelSearchTask();
-                    startSearchTask(newText);
+
+                    textSearch = newText;
+                    SQL_Connection.getConnection(null, 0, mSQLCallback);
+
                 }
 
                 return false;
@@ -180,14 +193,16 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
         }
     }
 
-    private void startSearchTask(String searchingText){
+    private void startSearchTask(){
         mSearchTask = new SearchTask();
-        mSearchTask.execute(searchingText);
+        mSearchTask.execute();
     }
 
     @Override
     public void onItemClick(View v, int position, int viewID) {
-        new TransportPersonTask().execute(mPersonList.get(position).getRadioLabel());
+        cancelSearchTask();
+        new ServerReader(ServerReader.READ_PERSON_ITEM, mPersonList.get(position).getRadioLabel(),mServerReaderCallback);
+       // new TransportPersonTask().execute(mPersonList.get(position).getRadioLabel());
     }
 
     @Override
@@ -195,7 +210,39 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
 
     }
 
-    private class SearchTask extends AsyncTask<String,PersonItem,Void>{
+    @Override
+    public void onServerConnected(Connection connection, int callingTask) {
+        cancelSearchTask();
+        startSearchTask();
+    }
+
+    @Override
+    public void onServerConnectException(Exception e) {
+
+    }
+
+    @Override
+    public void onSuccessServerRead(Object result) {
+        if (result!=null){
+            PersonItem personItem = (PersonItem)result;
+
+            addNewUser(personItem);
+
+            if (mSelectedRoom!=null){
+                new BaseWriter(mContext, (BaseWriterInterface)getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
+                        .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
+                        .setAuditroom(mSelectedRoom)
+                        .setPersonTag(personItem.getRadioLabel()));
+            }
+        }
+    }
+
+    @Override
+    public void onErrorServerRead(Exception e) {
+
+    }
+
+    private class SearchTask extends AsyncTask<Connection,PersonItem,Void>{
 
         @Override
         protected void onPreExecute() {
@@ -205,10 +252,9 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            if (mConnection!=null){
+        protected Void doInBackground(Connection... params) {
                 try {
-                    ResultSet resultSet = mConnection.prepareStatement("SELECT "
+                    ResultSet resultSet = params[0].prepareStatement("SELECT "
                             + SQL_Connection.COLUMN_ALL_STAFF_DIVISION + ","
                             + SQL_Connection.COLUMN_ALL_STAFF_LASTNAME + ","
                             + SQL_Connection.COLUMN_ALL_STAFF_FIRSTNAME + ","
@@ -217,12 +263,12 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
                             + SQL_Connection.COLUMN_ALL_STAFF_TAG
                             + " FROM " + SQL_Connection.ALL_STAFF_TABLE
                             + " WHERE " + SQL_Connection.COLUMN_ALL_STAFF_LASTNAME
-                            + " LIKE '" + params[0] + "%'").executeQuery();
+                            + " LIKE '" + textSearch + "%'").executeQuery();
                     while (resultSet.next()){
                         if (isCancelled()) break;
                         PersonItem personItem = new PersonItem();
                         if (resultSet.getString(SQL_Connection.COLUMN_ALL_STAFF_TAG)!=null){
-                            ResultSet resultPhoto = mConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY)
+                            ResultSet resultPhoto = params[0].createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY)
                                     .executeQuery("SELECT " + SQL_Connection.COLUMN_ALL_STAFF_PHOTO
                             + " FROM " + SQL_Connection.ALL_STAFF_TABLE
                             + " WHERE " + SQL_Connection.COLUMN_ALL_STAFF_TAG
@@ -248,7 +294,7 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-            }
+
             return null;
         }
 
@@ -271,7 +317,7 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
             mProgressBar.setVisibility(View.INVISIBLE);
         }
     }
-
+/*
     private class TransportPersonTask extends AsyncTask <String,Void,PersonItem>{
 
         @Override
@@ -292,11 +338,11 @@ public class DialogSearch extends DialogFragment implements RecycleItemClickList
                         .setPersonTag(personItem.getRadioLabel()));
             }
         }
-    }
+    }*/
 
     private void addNewUser (PersonItem personItem){
         String snackText;
-        if (FavoriteDB.addNewUser(personItem)){
+        if (FavoriteDB.addNewUser(personItem, Settings.getWriteServerStatus())){
             snackText = getResources().getString(R.string.snack_user_add_success);
         } else {
             snackText = getResources().getString(R.string.snack_user_add_error);

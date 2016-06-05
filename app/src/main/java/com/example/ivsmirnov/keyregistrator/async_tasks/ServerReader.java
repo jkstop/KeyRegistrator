@@ -22,22 +22,33 @@ import java.util.ArrayList;
 /**
  * Загрузка с сервера
  */
-public class ServerReader extends AsyncTask<Connection,Integer,Void> implements SQL_Connection.Callback {
+public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
 
-    public static final int LOAD_JOURNAL = 100;
-    public static final int LOAD_TEACHERS = 200;
-    public static final int LOAD_ROOMS = 300;
+    public static final int READ_ALL = 10;
+    public static final int READ_PERSON_ITEM = 20;
 
     private ProgressDialog mProgressDialog;
+    private Callback mCallback;
 
-    public ServerReader(Context context){
+    private String mPersonItemTag;
+    private PersonItem mServerPersonItem;
+    private int mReadParam;
+
+    public ServerReader(int readParam, Context context, Callback callback){
+        mReadParam = readParam;
         mProgressDialog = new ProgressDialog(context);
+        mCallback = callback;
+    }
+
+    public ServerReader(int readParam, String personTag, Callback callback){
+        mReadParam =readParam;
+        mPersonItemTag = personTag;
+        mCallback = callback;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        System.out.println("server reader *******************************");
         if (mProgressDialog!=null){
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             mProgressDialog.setCancelable(false);
@@ -48,184 +59,215 @@ public class ServerReader extends AsyncTask<Connection,Integer,Void> implements 
     }
 
     @Override
-    protected Void doInBackground(Connection... params) {
-        try {
-            Connection connection = params[0];
-            Statement mStatement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet mResult;
-            ResultSet journalItemResult;
+    protected Exception doInBackground(Connection... params) {
+        switch (mReadParam){
+            case READ_ALL:
+                try {
+                    Connection connection = params[0];
+                    Statement mStatement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    ResultSet mResult;
+                    ResultSet journalItemResult;
 
-            //сначала обновляем журнал
+                    //сначала обновляем журнал
 
-            //получаем список тэгов всех записей журнала на устройстве
-            ArrayList<Long> mJournalTags = JournalDB.getJournalItemTags(null);
-            //получаем счетчик всех отсутствующих записей и ставим значение как максимум
-            ResultSet getJournalTagsResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_JOURNAL_TIME_IN
-                                + " FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN
-                                + " NOT IN (" + getInClause(mJournalTags) + ")"
-                        , ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-                        .executeQuery();
-            getJournalTagsResult.last();
+                    //получаем список тэгов всех записей журнала на устройстве
+                    ArrayList<Long> mJournalTags = JournalDB.getJournalItemTags(null);
+                    //получаем счетчик всех отсутствующих записей и ставим значение как максимум
+                    ResultSet getJournalTagsResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_JOURNAL_TIME_IN
+                                    + " FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN
+                                    + " NOT IN (" + getInClause(mJournalTags) + ")"
+                            , ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+                            .executeQuery();
+                    getJournalTagsResult.last();
 
-            mProgressDialog.setMessage("Обновление журнала");
-            mProgressDialog.setMax(getJournalTagsResult.getRow());
+                    mProgressDialog.setMessage("Обновление журнала");
+                    mProgressDialog.setMax(getJournalTagsResult.getRow());
 
-            //двигаем в начало
-            getJournalTagsResult.beforeFirst();
-
-
-            while (getJournalTagsResult.next()){
-                //для каждого тэга получаем journalItem и пишем в устройство. Можно бы получить все сразу, но тогда зависает, данных много.
-                journalItemResult = mStatement.executeQuery("SELECT * FROM " +SQL_Connection.JOURNAL_TABLE
-                        + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " = " + getJournalTagsResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN));
-
-                journalItemResult.first();
-                if (journalItemResult.getRow() != 0){
-                    //пишем в журнал
-                    JournalDB.writeInDBJournal(new JournalItem()
-                            .setAccountID(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_ACCOUNT_ID))
-                            .setAuditroom(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_ROOM))
-                            .setTimeIn(journalItemResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN))
-                            .setTimeOut(journalItemResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT))
-                            .setAccessType(journalItemResult.getInt(SQL_Connection.COLUMN_JOURNAL_ACCESS))
-                            .setPersonInitials(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_PERSON_INITIALS))
-                            .setPersonTag(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_PERSON_TAG)));
-                }
-
-                publishProgress(getJournalTagsResult.getRow());
-            }
-
-            mProgressDialog.setMax(0);
-            mProgressDialog.setProgress(0);
-
-            //проверяем открытые помещения. Если на сервере они закрыты, то обновляем локальный журнал.
-            //сначала получаем тэги открытых помещений  в журнале (они же время входа)
-            ArrayList<Long> mOpenTags = JournalDB.getOpenRoomsTags();
-
-            //для каждого открытого помещения проверяем, закрылось ли на сервере
-            mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + ","
-                    + SQL_Connection.COLUMN_JOURNAL_TIME_OUT + " FROM " + SQL_Connection.JOURNAL_TABLE
-                    + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " IN (" + getInClause(mOpenTags) + ")");
-            long timeOut;
-            long timeIn;
-            while (mResult.next()){
-                timeOut = mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT);
-                timeIn = mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN);
-                if (timeOut!=0) JournalDB.updateDB(timeIn, timeOut);
-            }
+                    //двигаем в начало
+                    getJournalTagsResult.beforeFirst();
 
 
-            //теперь проверяем пользователей
+                    while (getJournalTagsResult.next()){
+                        //для каждого тэга получаем journalItem и пишем в устройство. Можно бы получить все сразу, но тогда зависает, данных много.
+                        journalItemResult = mStatement.executeQuery("SELECT * FROM " +SQL_Connection.JOURNAL_TABLE
+                                + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " = " + getJournalTagsResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN));
 
-            //список тэгов всех пользователей
-            ArrayList<String> mPersonsTags = FavoriteDB.getPersonsTags();
-            ResultSet personItemResult;
+                        journalItemResult.first();
+                        if (journalItemResult.getRow() != 0){
+                            //пишем в журнал
+                            JournalDB.writeInDBJournal(new JournalItem()
+                                    .setAccountID(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_ACCOUNT_ID))
+                                    .setAuditroom(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_ROOM))
+                                    .setTimeIn(journalItemResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN))
+                                    .setTimeOut(journalItemResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT))
+                                    .setAccessType(journalItemResult.getInt(SQL_Connection.COLUMN_JOURNAL_ACCESS))
+                                    .setPersonInitials(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_PERSON_INITIALS))
+                                    .setPersonTag(journalItemResult.getString(SQL_Connection.COLUMN_JOURNAL_PERSON_TAG)));
+                        }
 
-            //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
-            ResultSet getPesonsTagsResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_PERSONS_TAG + " FROM " + SQL_Connection.PERSONS_TABLE
-                                + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " NOT IN (" + getInClause(mPersonsTags) + ")"
-                        ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
-
-            getJournalTagsResult.last();
-            mProgressDialog.setMessage("Обновление пользователей");
-            mProgressDialog.setMax(getPesonsTagsResult.getRow());
-
-            //в начало
-            getPesonsTagsResult.beforeFirst();
-
-            while (getPesonsTagsResult.next()){
-                personItemResult = mStatement.executeQuery("SELECT * FROM " +SQL_Connection.PERSONS_TABLE
-                        + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG
-                        + " = '" + getPesonsTagsResult.getString(SQL_Connection.COLUMN_PERSONS_TAG) + "'");
-                personItemResult.first();
-                if (personItemResult.getRow() != 0){
-                    FavoriteDB.addNewUser(new PersonItem()
-                            .setLastname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_LASTNAME))
-                            .setFirstname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_FIRSTNAME))
-                            .setMidname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_MIDNAME))
-                            .setDivision(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_DIVISION))
-                            .setRadioLabel(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_TAG))
-                            .setSex(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_SEX))
-                            .setPhoto(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_BASE64)));
-                }
-
-                publishProgress(getPesonsTagsResult.getRow());
-            }
-
-            mProgressDialog.setMax(0);
-            mProgressDialog.setProgress(0);
-
-            //помещения
-
-            //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
-            ArrayList<String> mRooms = RoomDB.getRoomList();
-
-            ResultSet getRoomsItemsResult = connection.prepareStatement("SELECT * FROM " + SQL_Connection.ROOMS_TABLE
-                    + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " NOT IN (" + getInClause(mRooms) + ")"
-                    ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
-
-            getRoomsItemsResult.last();
-            mProgressDialog.setMessage("Обновление помещений");
-            mProgressDialog.setMax(getRoomsItemsResult.getRow());
-
-            while (getRoomsItemsResult.next()){
-                RoomDB.writeInRoomsDB(new RoomItem()
-                        .setAuditroom(mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM))
-                        .setStatus(mResult.getInt(SQL_Connection.COLUMN_ROOMS_STATUS))
-                        .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
-                        .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME))
-                        .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
-                        .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL)));
-            }
-
-            //для всех записей проверяем статус. Если на устройстве не совпадает с сервером, пишем в устройство новый статус
-            //сначала получаем с сервера список всех помещений и их статусы
-            mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.ROOMS_TABLE);
-            //для каждого значения сравниваем статус с локальным
-            String aud;
-            int status;
-            long timeServer;
-            long timeLocal;
-            while (mResult.next()){
-                aud = mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM);
-                status = mResult.getInt(SQL_Connection.COLUMN_ROOMS_STATUS);
-                //статус не совпал, пишем в устройство новый статус
-                if (status != RoomDB.getRoomStatus(aud)){
-                    switch (status){
-                        case RoomDB.ROOM_IS_FREE: //освобождаем помещение
-                            RoomDB.updateRoom(new RoomItem()
-                                    .setAuditroom(aud)
-                                    .setStatus(status));
-                            break;
-                        case RoomDB.ROOM_IS_BUSY: //занимаем помещение
-                            RoomDB.updateRoom(new RoomItem()
-                                    .setAuditroom(aud)
-                                    .setStatus(status)
-                                    .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL))
-                                    .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
-                                    .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
-                                    .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME)));
-                            break;
-                        default:
-                            break;
+                        publishProgress(getJournalTagsResult.getRow());
                     }
-                } else { //статус совпал, проверяем время входа
-                    timeServer = mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME);
-                    timeLocal = RoomDB.getRoomTimeIn(aud);
-                    if (timeServer != timeLocal){ //время отличается, обновляем на устройстве
-                        RoomDB.updateRoom(new RoomItem()
-                                .setAuditroom(aud)
-                                .setStatus(status)
-                                .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL))
+
+                    mProgressDialog.setMax(0);
+                    mProgressDialog.setProgress(0);
+
+                    //проверяем открытые помещения. Если на сервере они закрыты, то обновляем локальный журнал.
+                    //сначала получаем тэги открытых помещений  в журнале (они же время входа)
+                    ArrayList<Long> mOpenTags = JournalDB.getOpenRoomsTags();
+
+                    //для каждого открытого помещения проверяем, закрылось ли на сервере
+                    mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + ","
+                            + SQL_Connection.COLUMN_JOURNAL_TIME_OUT + " FROM " + SQL_Connection.JOURNAL_TABLE
+                            + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " IN (" + getInClause(mOpenTags) + ")");
+                    long timeOut;
+                    long timeIn;
+                    while (mResult.next()){
+                        timeOut = mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_OUT);
+                        timeIn = mResult.getLong(SQL_Connection.COLUMN_JOURNAL_TIME_IN);
+                        if (timeOut!=0) JournalDB.updateDB(timeIn, timeOut);
+                    }
+
+
+                    //теперь проверяем пользователей
+
+                    //список тэгов всех пользователей
+                    ArrayList<String> mPersonsTags = FavoriteDB.getPersonsTags();
+                    ResultSet personItemResult;
+
+                    //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
+                    ResultSet getPesonsTagsResult = connection.prepareStatement("SELECT " + SQL_Connection.COLUMN_PERSONS_TAG + " FROM " + SQL_Connection.PERSONS_TABLE
+                                    + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " NOT IN (" + getInClause(mPersonsTags) + ")"
+                            ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
+
+                    getJournalTagsResult.last();
+                    mProgressDialog.setMessage("Обновление пользователей");
+                    mProgressDialog.setMax(getPesonsTagsResult.getRow());
+
+                    //в начало
+                    getPesonsTagsResult.beforeFirst();
+
+                    while (getPesonsTagsResult.next()){
+                        personItemResult = mStatement.executeQuery("SELECT * FROM " +SQL_Connection.PERSONS_TABLE
+                                + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG
+                                + " = '" + getPesonsTagsResult.getString(SQL_Connection.COLUMN_PERSONS_TAG) + "'");
+                        personItemResult.first();
+                        if (personItemResult.getRow() != 0){
+                            FavoriteDB.addNewUser(new PersonItem()
+                                    .setLastname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_LASTNAME))
+                                    .setFirstname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_FIRSTNAME))
+                                    .setMidname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_MIDNAME))
+                                    .setDivision(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_DIVISION))
+                                    .setRadioLabel(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_TAG))
+                                    .setSex(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_SEX))
+                                    .setPhoto(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_BASE64)),
+                                    false);
+                        }
+
+                        publishProgress(getPesonsTagsResult.getRow());
+                    }
+
+                    mProgressDialog.setMax(0);
+                    mProgressDialog.setProgress(0);
+
+                    //помещения
+
+                    //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
+                    ArrayList<String> mRooms = RoomDB.getRoomList();
+
+                    ResultSet getRoomsItemsResult = connection.prepareStatement("SELECT * FROM " + SQL_Connection.ROOMS_TABLE
+                                    + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " NOT IN (" + getInClause(mRooms) + ")"
+                            ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
+
+                    getRoomsItemsResult.last();
+                    mProgressDialog.setMessage("Обновление помещений");
+                    mProgressDialog.setMax(getRoomsItemsResult.getRow());
+
+                    while (getRoomsItemsResult.next()){
+                        RoomDB.writeInRoomsDB(new RoomItem()
+                                .setAuditroom(mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM))
+                                .setStatus(mResult.getInt(SQL_Connection.COLUMN_ROOMS_STATUS))
                                 .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
+                                .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME))
                                 .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
-                                .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME)));
+                                .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL)));
                     }
+
+                    //для всех записей проверяем статус. Если на устройстве не совпадает с сервером, пишем в устройство новый статус
+                    //сначала получаем с сервера список всех помещений и их статусы
+                    mResult = mStatement.executeQuery("SELECT * FROM " + SQL_Connection.ROOMS_TABLE);
+                    //для каждого значения сравниваем статус с локальным
+                    String aud;
+                    int status;
+                    long timeServer;
+                    long timeLocal;
+                    while (mResult.next()){
+                        aud = mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM);
+                        status = mResult.getInt(SQL_Connection.COLUMN_ROOMS_STATUS);
+                        //статус не совпал, пишем в устройство новый статус
+                        if (status != RoomDB.getRoomStatus(aud)){
+                            switch (status){
+                                case RoomDB.ROOM_IS_FREE: //освобождаем помещение
+                                    RoomDB.updateRoom(new RoomItem()
+                                            .setAuditroom(aud)
+                                            .setStatus(status));
+                                    break;
+                                case RoomDB.ROOM_IS_BUSY: //занимаем помещение
+                                    RoomDB.updateRoom(new RoomItem()
+                                            .setAuditroom(aud)
+                                            .setStatus(status)
+                                            .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL))
+                                            .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
+                                            .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
+                                            .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME)));
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } else { //статус совпал, проверяем время входа
+                            timeServer = mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME);
+                            timeLocal = RoomDB.getRoomTimeIn(aud);
+                            if (timeServer != timeLocal){ //время отличается, обновляем на устройстве
+                                RoomDB.updateRoom(new RoomItem()
+                                        .setAuditroom(aud)
+                                        .setStatus(status)
+                                        .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL))
+                                        .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
+                                        .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
+                                        .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME)));
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return e;
                 }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+                break;
+            case READ_PERSON_ITEM:
+                try {
+                    Connection connection = params[0];
+                    //получаем всю инфу с сервера о пользователе
+                    Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                    ResultSet resultSet = statement.executeQuery("SELECT * FROM " + SQL_Connection.ALL_STAFF_TABLE
+                            + " WHERE " + SQL_Connection.COLUMN_ALL_STAFF_TAG + " = '" + mPersonItemTag + "'");
+                    resultSet.first();
+                    if (resultSet.getRow() !=0){
+                        mServerPersonItem = new PersonItem().setLastname(resultSet.getString("LASTNAME"))
+                                .setFirstname(resultSet.getString("FIRSTNAME"))
+                                .setMidname(resultSet.getString("MIDNAME"))
+                                .setDivision(resultSet.getString("NAME_DIVISION"))
+                                .setSex(resultSet.getString("SEX"))
+                                .setPhoto(resultSet.getString("PHOTO"))
+                                .setRadioLabel(resultSet.getString("RADIO_LABEL"));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return e;
+                }
+                break;
+            default:
+                break;
         }
+
         return null;
     }
 
@@ -260,22 +302,28 @@ public class ServerReader extends AsyncTask<Connection,Integer,Void> implements 
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        System.out.println("server reader -----------------------------");
+    protected void onPostExecute(Exception e) {
+        super.onPostExecute(e);
+
+        if (mCallback!=null){
+            if (e == null){
+                if (mServerPersonItem!=null){
+                    mCallback.onSuccessServerRead(mServerPersonItem);
+                } else {
+                    mCallback.onSuccessServerRead(null);
+                }
+            }else{
+                mCallback.onErrorServerRead(e);
+            }
+        }
         if (mProgressDialog!=null && mProgressDialog.isShowing()){
             mProgressDialog.cancel();
         }
-        //if (mListener!=null) mListener.updateInformation();
     }
 
-    @Override
-    public void onServerConnected(Connection connection, int callingTask) {
-
+    public interface Callback{
+        void onSuccessServerRead(Object result);
+        void onErrorServerRead(Exception e);
     }
 
-    @Override
-    public void onServerConnectException(Exception e) {
-
-    }
 }
