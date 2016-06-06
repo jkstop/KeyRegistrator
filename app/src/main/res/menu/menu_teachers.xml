@@ -2,12 +2,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/menu_teachers_upload_to_server"
-        android:title="@string/menu_teachers_upload_to_server"
-        app:showAsAction="never"/>
-
-    <item android:id="@+id/menu_teachers_download_from_server"
-        android:title="@string/menu_teachers_download_from_server"
-        app:showAsAction="never"/>
-
 </menu>

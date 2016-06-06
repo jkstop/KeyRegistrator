@@ -109,7 +109,7 @@ public class DialogPassword extends DialogFragment implements SQL_Connection.Cal
                                     }
 
                                     if (mEraseItems.contains(getString(R.string.erase_server_also))){
-                                        SQL_Connection.getConnection(null, ServerWriter.DELETE, mSQLCallback);
+                                        SQL_Connection.getConnection(null, ServerWriter.DELETE_ALL, mSQLCallback);
                                     }
                                     Snackbar.make(getActivity().getWindow().getCurrentFocus(),"Удалено",Snackbar.LENGTH_SHORT).show();
                                     break;
@@ -131,7 +131,7 @@ public class DialogPassword extends DialogFragment implements SQL_Connection.Cal
 
     @Override
     public void onServerConnected(Connection connection, int callingTask) {
-        new ServerWriter(ServerWriter.DELETE, mEraseItems).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+        new ServerWriter(ServerWriter.DELETE_ALL, mEraseItems).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
     }
 
     @Override

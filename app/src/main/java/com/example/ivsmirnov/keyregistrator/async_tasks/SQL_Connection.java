@@ -41,6 +41,7 @@ public class SQL_Connection {
     public static final String COLUMN_PERSONS_DIVISION = "DIVISION";
     public static final String COLUMN_PERSONS_TAG = "TAG";
     public static final String COLUMN_PERSONS_SEX = "SEX";
+    public static final String COLUMN_PERSONS_ACCESS = "ACCESS";
     public static final String COLUMN_PERSONS_PHOTO_BASE64 = "PHOTO_BASE64";
 
     public static final String COLUMN_ROOMS_ROOM = "ROOM";
@@ -86,7 +87,7 @@ public class SQL_Connection {
         System.out.println("SQL CONNECT " + SQLconnect);
         System.out.println("THREAD " + connectThread);
 
-        if (SQLconnect!=null){
+        if (SQLconnect!=null && callback!=null){
             callback.onServerConnected(SQLconnect, mCallingTask);
         } else {
             if (connectThread == null){
@@ -121,10 +122,10 @@ public class SQL_Connection {
                     + "database=" + DB +";user=shsupport;password=podderzhka;loginTimeout=3";
             connectThread = null;
             SQLconnect = DriverManager.getConnection(ConnURL);
-            callback.onServerConnected(SQLconnect, mCallingTask);
+            if (callback!=null) callback.onServerConnected(SQLconnect, mCallingTask);
         } catch (Exception e) {
             e.printStackTrace();
-            callback.onServerConnectException(e);
+            if (callback!=null) callback.onServerConnectException(e);
         }
     }
 

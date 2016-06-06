@@ -11,6 +11,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -46,7 +47,7 @@ import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
 
-public class PersonsFr extends Fragment implements UpdateInterface, Updatable, RecycleItemClickListener {
+public class PersonsFr extends Fragment implements UpdateInterface, Updatable, RecycleItemClickListener, DialogPersonInfo.Callback {
 
     public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
     public static final String PERSONS_FRAGMENT_TYPE = "persons_fragment_type";
@@ -58,6 +59,8 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
     private static final int HANDLER_SHOW_PROGRESS = 100;
     private static final int HANDLER_HIDE_PROGRESS = 101;
     private static final int HANDLER_DATA_CHANGED = 102;
+
+
 
     public static boolean contentNeedsForUpdate = false;
 
@@ -171,10 +174,8 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
             }
         });
 
-        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
-
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_main);
-        mRecyclerView.setItemAnimator(itemAnimator);
+        mRecyclerView.setItemAnimator(null);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new GridLayoutManager(mContext,3));
 
@@ -222,51 +223,6 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
     private void getPersonsCharacters(){
         if (mListCharacters.size()!=0) mListCharacters.clear();
         mListCharacters.addAll(FavoriteDB.getPersonsCharacters(bundleAccess));
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_teachers, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            //case R.id.menu_teachers_save_to_file:
-            //    FileWriter saveToFile = new FileWriter(mContext, true);
-            //    saveToFile.execute();
-            //    return true;
-            //case R.id.menu_teachers_download_favorite:
-            //    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-            //    i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
-            //    i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-            //    startActivityForResult(i, FileLoader.REQUEST_CODE_LOAD_FAVORITE_STAFF);
-            //    return true;
-            //case R.id.menu_teachers_delete:
-            //    Dialogs dialog = new Dialogs();
-            //    Bundle bundle = new Bundle();
-           //     bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_CLEAR_TEACHERS);
-           //     dialog.setArguments(bundle);
-            //    dialog.setTargetFragment(PersonsFr.this,0);
-             //   dialog.show(getFragmentManager(),"clearTeachers");
-             //   return true;
-            //case R.id.menu_teachers_select_location_for_copy:
-            //    Intent iLC = new Intent(Intent.ACTION_GET_CONTENT);
-            //    iLC.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
-            //    iLC.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-            //    iLC.putExtra(FilePickerActivity.EXTRA_START_PATH, Settings.getPersonsBackupLocation());
-            //    startActivityForResult(iLC,REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION);
-            //    return true;
-            //case R.id.menu_teachers_upload_to_server:
-            //    new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
-            //    return true;
-            //case R.id.menu_teachers_download_from_server:
-            //    new ServerReader(mContext,this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_TEACHERS);
-            //    return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
@@ -347,14 +303,35 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
 
                 break;
             case PERSONS_FRAGMENT_EDITOR:
-                Bundle b = new Bundle();
-                b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_EDIT);
-                b.putString(Dialogs.BUNDLE_TAG, mPersonsList.get(position).getRadioLabel());
-                b.putInt(Dialogs.DIALOG_PERSON_INFORMATION_KEY_POSITION, position);
-                Dialogs dialog = new Dialogs();
-                dialog.setArguments(b);
+                //Bundle b = new Bundle();
+                //b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_EDIT);
+                //b.putString(Dialogs.BUNDLE_TAG, mPersonsList.get(position).getRadioLabel());
+                //b.putInt(Dialogs.DIALOG_PERSON_INFORMATION_KEY_POSITION, position);
+                //Dialogs dialog = new Dialogs();
+                //dialog.setArguments(b);
                 //dialog.setTargetFragment(PersonsFr.this, 0);
-                dialog.show(getChildFragmentManager(), "edit");
+                //dialog.show(getChildFragmentManager(), "edit");
+
+                //ArrayList<String> item = new ArrayList<>();
+                //item.add(DialogPersonInfo.PERSON_LASTNAME, mPersonsList.get(position).getLastname());
+                //item.add(DialogPersonInfo.PERSON_FIRSTNAME, mPersonsList.get(position).getFirstname());
+                //item.add(DialogPersonInfo.PERSON_MIDNAME, mPersonsList.get(position).getMidname());
+                //item.add(DialogPersonInfo.PERSON_DIVISION, mPersonsList.get(position).getDivision());
+                //item.add(DialogPersonInfo.PERSON_ACCESS, String.valueOf(mPersonsList.get(position).getAccessType()));
+                //item.add(DialogPersonInfo.PERSON_TAG, mPersonsList.get(position).getRadioLabel());
+
+                String [] itemM = new String[6];
+                itemM[DialogPersonInfo.PERSON_LASTNAME] = mPersonsList.get(position).getLastname();
+                itemM[DialogPersonInfo.PERSON_FIRSTNAME] = mPersonsList.get(position).getFirstname();
+                itemM[DialogPersonInfo.PERSON_MIDNAME] = mPersonsList.get(position).getMidname();
+                itemM[DialogPersonInfo.PERSON_DIVISION] = mPersonsList.get(position).getDivision();
+                itemM[DialogPersonInfo.PERSON_ACCESS] = String.valueOf(mPersonsList.get(position).getAccessType());
+                itemM[DialogPersonInfo.PERSON_TAG] = mPersonsList.get(position).getRadioLabel();
+
+                DialogPersonInfo dialogPersonInfo = DialogPersonInfo.newInstanse(itemM,position);
+                dialogPersonInfo.setTargetFragment(this, 0);
+                dialogPersonInfo.show(getChildFragmentManager(), "edit");
+
                 break;
             default:
                 break;
@@ -379,4 +356,24 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         }
     }
 
+    @Override
+    public void onUserDeleted(int position) {
+        mPersonsList.remove(position);
+        mAdapter.notifyItemRemoved(position);
+
+        Snackbar.make(getView(),"Удалено",Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onUserChanged(int position, PersonItem newPerson) {
+        mPersonsList.get(position)
+                .setLastname(newPerson.getLastname())
+                .setFirstname(newPerson.getFirstname())
+                .setMidname(newPerson.getMidname())
+                .setDivision(newPerson.getDivision())
+                .setAccessType(newPerson.getAccessType());
+        mAdapter.notifyItemChanged(position);
+
+        Snackbar.make(getView(),"Изменено",Snackbar.LENGTH_SHORT).show();
+    }
 }

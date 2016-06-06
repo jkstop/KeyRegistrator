@@ -200,8 +200,7 @@ public class FavoriteDB {
                 DbShare.getDataBase(DbShare.DB_FAVORITE).insert(FavoriteDBinit.TABLE_PERSONS, null, cv);
 
                 //добавляем на сервер
-                if (writeToServerAlso &&
-                        Settings.getWriteServerItems().contains(App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries)[1])){
+                if (writeToServerAlso){
 
                     SQL_Connection.getConnection(null, 0, new SQL_Connection.Callback() {
                         @Override

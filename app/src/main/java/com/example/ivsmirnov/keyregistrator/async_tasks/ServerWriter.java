@@ -3,7 +3,6 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
@@ -29,19 +28,20 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
    // public static final int JOURNAL_NEW = 100; //для добавления новой записи
    // public static final int JOURNAL_ALL = 101; //для добавления всех не синхронизированных записей
     public static final int JOURNAL_UPDATE = 104; //обновление журнала
-    public static final int JOURNAL_DELETE_ONE = 102; //для удаления 1 записи
-    public static final int JOURNAL_DELETE_ALL = 103; //для очистки все журнала
+   // public static final int JOURNAL_DELETE_ONE = 102; //для удаления 1 записи
+   // public static final int JOURNAL_DELETE_ALL = 103; //для очистки все журнала
    // public static final int PERSON_NEW = 200; //добавление 1 нового пользователя
    // public static final int PERSON_ALL = 201; //добавление всех не синхронизированных пользователей
     public static final int PERSON_UPDATE = 204; //обновление пользователей
-    public static final int PERSON_DELETE_ONE = 202; //удаление 1 пользователя
-    public static final int PERSON_DELETE_ALL = 203; //удаление всех пользователей на сервере
-    public static final int ROOMS_DELETE_ONE = 302; //удаление 1 записи
-    public static final int ROOMS_DELETE_ALL = 303; //удаление всех записей
+   // public static final int PERSON_DELETE_ONE = 202; //удаление 1 пользователя
+   // public static final int PERSON_DELETE_ALL = 203; //удаление всех пользователей на сервере
+   // public static final int ROOMS_DELETE_ONE = 302; //удаление 1 записи
+   // public static final int ROOMS_DELETE_ALL = 303; //удаление всех записей
     public static final int ROOMS_UPDATE = 304; //обновление помещений
 
     public static final int UPDATE_ALL = 305; //выгрузка всех на сервер
-    public static final int DELETE = 306; //удаление
+    public static final int DELETE_ALL = 306; //удаление всех
+    public static final int DELETE_ONE = 307; //удаление 1
 
     private ProgressDialog mProgressDialog;
 
@@ -260,15 +260,15 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
                             }
                         }*/
                         break;
-                    case JOURNAL_DELETE_ONE:
-                        if (mJournalItem!=null && mJournalItem.getTimeIn()!=null){
-                            mStatement.execute("DELETE FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " = " + mJournalItem.getTimeIn());
-                        }
-                        break;
-                    case JOURNAL_DELETE_ALL:
-                        mStatement.execute("TRUNCATE TABLE " + SQL_Connection.JOURNAL_TABLE);
-                        break;
-                    case DELETE:
+                    //case JOURNAL_DELETE_ONE:
+                    ///    if (mJournalItem!=null && mJournalItem.getTimeIn()!=null){
+                     //       mStatement.execute("DELETE FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " = " + mJournalItem.getTimeIn());
+                     //   }
+                     //   break;
+                    //case JOURNAL_DELETE_ALL:
+                    //    mStatement.execute("TRUNCATE TABLE " + SQL_Connection.JOURNAL_TABLE);
+                    //    break;
+                    case DELETE_ALL:
                         if (mArguments!=null){
                             if (mArguments.contains(App.getAppContext().getString(R.string.toolbar_title_journal))){
                                 mStatement.execute("TRUNCATE TABLE " + SQL_Connection.JOURNAL_TABLE);
@@ -281,19 +281,35 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
                             }
                         }
                         break;
+                    case DELETE_ONE:
+                        if (mJournalItem!=null && mJournalItem.getTimeIn()!=null){
+                            mStatement.execute("DELETE FROM " + SQL_Connection.JOURNAL_TABLE + " WHERE " + SQL_Connection.COLUMN_JOURNAL_TIME_IN + " = " + mJournalItem.getTimeIn());
+                        } else if (mPersonItem!=null && mPersonItem.getRadioLabel()!=null){
+                            mStatement.execute("DELETE FROM " + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " ='" + mPersonItem.getRadioLabel() + "'");
+                        } else if (mRoomItem!=null && mRoomItem.getAuditroom()!=null){
+                            mStatement.execute("DELETE FROM " + SQL_Connection.ROOMS_TABLE + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " = " + mRoomItem.getAuditroom());
+                        }
+                        break;
                     case PERSON_UPDATE:
                         //Если передан PersonItem, то перезаписываем его. Если нет - пишем всех.
                         if (mPersonItem != null){
-                            mResult = mStatement.executeQuery("SELECT " + SQL_Connection.COLUMN_PERSONS_LASTNAME + " FROM "
-                                    + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " = '" + mPersonItem.getRadioLabel() + "'"
-                            + " AND " + SQL_Connection.COLUMN_PERSONS_ACCOUNT_ID + " = '" + Settings.getActiveAccountID() + "'");
-                            mResult.first();
-                            if (mResult.getRow() == 1){ //если такой уже есть, то удаляем
-                                mStatement.executeUpdate("DELETE FROM "
-                                        + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " = '" + mPersonItem.getRadioLabel() + "'");
+                            ResultSet getPersonItemResult = mConnection.prepareStatement("SELECT " + SQL_Connection.COLUMN_PERSONS_LASTNAME + ","
+                                    + SQL_Connection.COLUMN_PERSONS_FIRSTNAME + ","
+                                    + SQL_Connection.COLUMN_PERSONS_MIDNAME + ","
+                                    + SQL_Connection.COLUMN_PERSONS_DIVISION + ","
+                                    + SQL_Connection.COLUMN_PERSONS_ACCESS
+                                    + " FROM " + SQL_Connection.PERSONS_TABLE
+                                    + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " = '" + mPersonItem.getRadioLabel() + "'"
+                                    + " AND " + SQL_Connection.COLUMN_PERSONS_ACCOUNT_ID + " = '" + Settings.getActiveAccountID() + "'"
+                                    ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
+                            getPersonItemResult.first();
+                            if (getPersonItemResult.getRow() == 1){ //если такой уже есть, то обновляем
+                                updatePersonItemToServer(getPersonItemResult, mPersonItem);
+                            }else {
+                                //если нет, пишем нового
+                                writePersonItemToServer(mStatement, mPersonItem);
                             }
-                            //пишем нового пользователя на сервер
-                            writePersonItemToServer(mStatement, mPersonItem);
+
                         } /*else {
                             //Получаем список тегов локальных пользователей и на сервере
                             ArrayList<String> localTags = FavoriteDB.getPersonsTags();
@@ -308,14 +324,14 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
                             }
                         }*/
                         break;
-                    case PERSON_DELETE_ONE:
-                        if (mPersonItem!=null && mPersonItem.getRadioLabel()!=null){
-                            mStatement.execute("DELETE FROM " + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " ='" + mPersonItem.getRadioLabel() + "'");
-                        }
-                        break;
-                    case PERSON_DELETE_ALL:
-                        mStatement.execute("TRUNCATE TABLE " + SQL_Connection.PERSONS_TABLE);
-                        break;
+                    //case PERSON_DELETE_ONE:
+                    //    if (mPersonItem!=null && mPersonItem.getRadioLabel()!=null){
+                    //        mStatement.execute("DELETE FROM " + SQL_Connection.PERSONS_TABLE + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " ='" + mPersonItem.getRadioLabel() + "'");
+                    //    }
+                    //    break;
+                    //case PERSON_DELETE_ALL:
+                    //    mStatement.execute("TRUNCATE TABLE " + SQL_Connection.PERSONS_TABLE);
+                    //    break;
                     case ROOMS_UPDATE:
                         //если передан RoomItem, то обновляем на сервере одно помещение. Если RoomItem == null, то обновляем все помещения
                         if (mRoomItem != null){
@@ -365,14 +381,14 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
                             }
                         }*/
                         break;
-                    case ROOMS_DELETE_ONE:
-                        if (mRoomItem!=null && mRoomItem.getAuditroom()!=null){
-                            mStatement.execute("DELETE FROM " + SQL_Connection.ROOMS_TABLE + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " = " + mRoomItem.getAuditroom());
-                        }
-                        break;
-                    case ROOMS_DELETE_ALL:
-                        mStatement.execute("TRUNCATE TABLE " + SQL_Connection.ROOMS_TABLE);
-                        break;
+                    //case ROOMS_DELETE_ONE:
+                    //    if (mRoomItem!=null && mRoomItem.getAuditroom()!=null){
+                    //        mStatement.execute("DELETE FROM " + SQL_Connection.ROOMS_TABLE + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " = " + mRoomItem.getAuditroom());
+                    //    }
+                    //    break;
+                    //case ROOMS_DELETE_ALL:
+                    //    mStatement.execute("TRUNCATE TABLE " + SQL_Connection.ROOMS_TABLE);
+                    //    break;
                     default:
                         break;
                 }
@@ -489,8 +505,21 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
         } catch (Exception e){
             e.printStackTrace();
         }
-
     }
+
+    private void updatePersonItemToServer (ResultSet resultSet, PersonItem personItem){
+        try {
+            resultSet.updateString(SQL_Connection.COLUMN_PERSONS_LASTNAME, personItem.getLastname());
+            resultSet.updateString(SQL_Connection.COLUMN_PERSONS_FIRSTNAME, personItem.getFirstname());
+            resultSet.updateString(SQL_Connection.COLUMN_PERSONS_MIDNAME, personItem.getMidname());
+            resultSet.updateString(SQL_Connection.COLUMN_PERSONS_DIVISION, personItem.getDivision());
+            resultSet.updateInt(SQL_Connection.COLUMN_PERSONS_ACCESS, personItem.getAccessType());
+            resultSet.updateRow();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     protected void onPostExecute(Exception e) {

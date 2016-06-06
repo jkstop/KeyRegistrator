@@ -114,14 +114,14 @@
             android:summaryOn="@string/shared_preferences_server_enabled"
             android:summaryOff="@string/shared_preferences_server_disabled"/>
 
-        <MultiSelectListPreference
+        <!--MultiSelectListPreference
             android:key="@string/shared_preferences_write_server_items_key"
             android:title="@string/shared_preferences_write_server_items_key"
             android:entries="@array/shared_preferences_write_server_items_entries"
             android:entryValues="@array/shared_preferences_write_server_items_entries"
             android:dependency="@string/shared_preferences_write_server"
             android:summary="Выберите, что синхронизировать с сервером"
-            />
+            /-->
 
     </PreferenceCategory>
 

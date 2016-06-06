@@ -102,7 +102,7 @@ public class Dialogs extends DialogFragment{
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         switch (mDialogId){
-            case DIALOG_CLEAR_JOURNAL:
+            /*case DIALOG_CLEAR_JOURNAL:
                 View dialogClearJournalView = View.inflate(mContext, R.layout.view_dialog_clear,null);
                 final CheckBox checkClearJournalLocal = (CheckBox)dialogClearJournalView.findViewById(R.id.view_dialog_clear_delete_local);
                 final CheckBox checkClearJournalServer = (CheckBox)dialogClearJournalView.findViewById(R.id.view_dialog_clear_delete_server);
@@ -162,7 +162,7 @@ public class Dialogs extends DialogFragment{
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }
                         })
-                        .create();
+                        .create();*/
             case DIALOG_EDIT:
 
                 final View dialogView = View.inflate(mContext, R.layout.layout_person_information, null);
@@ -211,8 +211,7 @@ public class Dialogs extends DialogFragment{
                                 FavoriteDB.deleteUser(tag);
 
                                 //удаление с сервера
-                                if (Settings.getWriteServerStatus() &&
-                                        Settings.getWriteServerItems().contains(App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries)[1])){
+                                if (Settings.getWriteServerStatus()){
                                    // new ServerWriter(tag).execute(ServerWriter.PERSON_DELETE_ONE);
                                 }
 
@@ -292,7 +291,7 @@ public class Dialogs extends DialogFragment{
                             }
                         })
                         .create();
-            case DIALOG_CLEAR_ROOMS:
+            /*case DIALOG_CLEAR_ROOMS:
                 View dialogEraseRoomsView = View.inflate(mContext, R.layout.view_dialog_clear, null);
                 final CheckBox eraseLocalRoomsCheck = (CheckBox)dialogEraseRoomsView.findViewById(R.id.view_dialog_clear_delete_local);
                 final CheckBox eraseServerRoomsCheck = (CheckBox)dialogEraseRoomsView.findViewById(R.id.view_dialog_clear_delete_server);
@@ -321,7 +320,7 @@ public class Dialogs extends DialogFragment{
                                 Snackbar.make(getActivity().getWindow().getDecorView().getRootView(),R.string.done,Snackbar.LENGTH_SHORT).show();
                             }
                         })
-                        .create();
+                        .create();*/
             case ADD_ROOM_DIALOG:
                 //добавление нового помещения
                 final TextInputLayout enterAuditroomLayout = (TextInputLayout) View.inflate(mContext, R.layout.view_enter_auditroom, null);
@@ -343,8 +342,7 @@ public class Dialogs extends DialogFragment{
                             RoomDB.writeInRoomsDB(newRoomItem);
 
                             //пишем на сервер
-                            if (Settings.getWriteServerStatus() &&
-                                    Settings.getWriteServerItems().contains(App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries)[2])){
+                            if (Settings.getWriteServerStatus()){
                                 //new ServerWriter(newRoomItem).execute(ServerWriter.ROOMS_UPDATE);
                             }
 

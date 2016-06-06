@@ -3,6 +3,8 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
@@ -27,12 +29,19 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
     public static final int READ_ALL = 10;
     public static final int READ_PERSON_ITEM = 20;
 
+    private Handler mHandler;
+    private static final int HANDLER_UPDATE_JOURNAL = 100;
+    private static final int HANDLER_UPDATE_PERSONS = 101;
+    private static final int HANDLER_UPDATE_ROOMS = 102;
+
     private ProgressDialog mProgressDialog;
     private Callback mCallback;
 
     private String mPersonItemTag;
     private PersonItem mServerPersonItem;
     private int mReadParam;
+
+    private int dialogMaxCount = 0;
 
     public ServerReader(int readParam, Context context, Callback callback){
         mReadParam = readParam;
@@ -49,13 +58,39 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        System.out.println("start server reader");
+
+        mHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                if (mProgressDialog!=null){
+                    switch (msg.what){
+                        case HANDLER_UPDATE_JOURNAL:
+                            mProgressDialog.setMessage("Загрузка журнала");
+                            break;
+                        case HANDLER_UPDATE_PERSONS:
+                            mProgressDialog.setMessage("Загрузка пользователей");
+                            break;
+                        case HANDLER_UPDATE_ROOMS:
+                            mProgressDialog.setMessage("Загрузка помещений");
+                            break;
+                        default:
+                            break;
+                    }
+                    mProgressDialog.setMax(dialogMaxCount);
+                }
+            }
+        };
+
         if (mProgressDialog!=null){
             mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            mProgressDialog.setMessage("Загрузка...");
             mProgressDialog.setCancelable(false);
             mProgressDialog.setMax(0);
-            mProgressDialog.setMessage("Синхронизация...");
             mProgressDialog.show();
         }
+
     }
 
     @Override
@@ -80,8 +115,9 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
                             .executeQuery();
                     getJournalTagsResult.last();
 
-                    mProgressDialog.setMessage("Обновление журнала");
-                    mProgressDialog.setMax(getJournalTagsResult.getRow());
+                    dialogMaxCount = getJournalTagsResult.getRow();
+                    mHandler.sendEmptyMessage(HANDLER_UPDATE_JOURNAL);
+
 
                     //двигаем в начало
                     getJournalTagsResult.beforeFirst();
@@ -108,8 +144,6 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
                         publishProgress(getJournalTagsResult.getRow());
                     }
 
-                    mProgressDialog.setMax(0);
-                    mProgressDialog.setProgress(0);
 
                     //проверяем открытые помещения. Если на сервере они закрыты, то обновляем локальный журнал.
                     //сначала получаем тэги открытых помещений  в журнале (они же время входа)
@@ -127,7 +161,6 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
                         if (timeOut!=0) JournalDB.updateDB(timeIn, timeOut);
                     }
 
-
                     //теперь проверяем пользователей
 
                     //список тэгов всех пользователей
@@ -139,9 +172,10 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
                                     + " WHERE " + SQL_Connection.COLUMN_PERSONS_TAG + " NOT IN (" + getInClause(mPersonsTags) + ")"
                             ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
 
-                    getJournalTagsResult.last();
-                    mProgressDialog.setMessage("Обновление пользователей");
-                    mProgressDialog.setMax(getPesonsTagsResult.getRow());
+                    getPesonsTagsResult.last();
+
+                    dialogMaxCount = getPesonsTagsResult.getRow();
+                    mHandler.sendEmptyMessage(HANDLER_UPDATE_PERSONS);
 
                     //в начало
                     getPesonsTagsResult.beforeFirst();
@@ -166,9 +200,6 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
                         publishProgress(getPesonsTagsResult.getRow());
                     }
 
-                    mProgressDialog.setMax(0);
-                    mProgressDialog.setProgress(0);
-
                     //помещения
 
                     //выбираем записи, которые есть на сервере, но нет в устройстве. пишем в устройство отсутствующие
@@ -179,17 +210,22 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
                             ,ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE).executeQuery();
 
                     getRoomsItemsResult.last();
-                    mProgressDialog.setMessage("Обновление помещений");
-                    mProgressDialog.setMax(getRoomsItemsResult.getRow());
+
+                    dialogMaxCount = getRoomsItemsResult.getRow();
+                    mHandler.sendEmptyMessage(HANDLER_UPDATE_ROOMS);
+
+                    //в начало
+                    getRoomsItemsResult.beforeFirst();
 
                     while (getRoomsItemsResult.next()){
+
                         RoomDB.writeInRoomsDB(new RoomItem()
-                                .setAuditroom(mResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM))
-                                .setStatus(mResult.getInt(SQL_Connection.COLUMN_ROOMS_STATUS))
-                                .setAccessType(mResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
-                                .setTime(mResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME))
-                                .setLastVisiter(mResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
-                                .setTag(mResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL)));
+                                .setAuditroom(getRoomsItemsResult.getString(SQL_Connection.COLUMN_ROOMS_ROOM))
+                                .setStatus(getRoomsItemsResult.getInt(SQL_Connection.COLUMN_ROOMS_STATUS))
+                                .setAccessType(getRoomsItemsResult.getInt(SQL_Connection.COLUMN_ROOMS_ACCESS))
+                                .setTime(getRoomsItemsResult.getLong(SQL_Connection.COLUMN_ROOMS_TIME))
+                                .setLastVisiter(getRoomsItemsResult.getString(SQL_Connection.COLUMN_ROOMS_LAST_VISITER))
+                                .setTag(getRoomsItemsResult.getString(SQL_Connection.COLUMN_ROOMS_RADIO_LABEL)));
                     }
 
                     //для всех записей проверяем статус. Если на устройстве не совпадает с сервером, пишем в устройство новый статус
@@ -275,7 +311,9 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
 
-        if (mProgressDialog!=null) mProgressDialog.setProgress(values[0]);
+        if (mProgressDialog!=null){
+            mProgressDialog.setProgress(values[0]);
+        }
     }
 
     private String getInClause(ArrayList items){

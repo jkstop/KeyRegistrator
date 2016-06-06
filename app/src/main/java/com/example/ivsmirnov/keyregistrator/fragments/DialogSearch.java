@@ -51,6 +51,9 @@ public class DialogSearch extends DialogFragment implements
         ServerReader.Callback{
 
     private static final String BUNDLE_ROOM = "bundle_room";
+    private static final int READ_USER = 100;
+    private static final int GET_USER = 101;
+
 
    // private Connection mConnection;
     private SearchTask mSearchTask;
@@ -61,6 +64,7 @@ public class DialogSearch extends DialogFragment implements
     private String mSelectedRoom;
 
     private String textSearch;
+    private String selectedPersonTag;
 
     private Context mContext;
 
@@ -138,7 +142,7 @@ public class DialogSearch extends DialogFragment implements
                 if (queryLength>=3 && queryLength<=6){
 
                     textSearch = newText;
-                    SQL_Connection.getConnection(null, 0, mSQLCallback);
+                    SQL_Connection.getConnection(null, READ_USER, mSQLCallback);
 
                 }
 
@@ -193,15 +197,16 @@ public class DialogSearch extends DialogFragment implements
         }
     }
 
-    private void startSearchTask(){
+    private void startSearchTask(Connection connection){
         mSearchTask = new SearchTask();
-        mSearchTask.execute();
+        mSearchTask.execute(connection);
     }
 
     @Override
     public void onItemClick(View v, int position, int viewID) {
         cancelSearchTask();
-        new ServerReader(ServerReader.READ_PERSON_ITEM, mPersonList.get(position).getRadioLabel(),mServerReaderCallback);
+        selectedPersonTag = mPersonList.get(position).getRadioLabel();
+        SQL_Connection.getConnection(null, GET_USER, mSQLCallback);
        // new TransportPersonTask().execute(mPersonList.get(position).getRadioLabel());
     }
 
@@ -212,8 +217,17 @@ public class DialogSearch extends DialogFragment implements
 
     @Override
     public void onServerConnected(Connection connection, int callingTask) {
-        cancelSearchTask();
-        startSearchTask();
+        switch (callingTask){
+            case READ_USER:
+                cancelSearchTask();
+                startSearchTask(connection);
+                break;
+            case GET_USER:
+                new ServerReader(ServerReader.READ_PERSON_ITEM, selectedPersonTag, mServerReaderCallback).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR,connection);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -253,6 +267,7 @@ public class DialogSearch extends DialogFragment implements
 
         @Override
         protected Void doInBackground(Connection... params) {
+            System.out.println("SEARCH FOR " + textSearch);
                 try {
                     ResultSet resultSet = params[0].prepareStatement("SELECT "
                             + SQL_Connection.COLUMN_ALL_STAFF_DIVISION + ","

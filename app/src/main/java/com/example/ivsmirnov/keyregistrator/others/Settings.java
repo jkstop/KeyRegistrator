@@ -49,7 +49,7 @@ public class Settings {
    // public static final String SERVER_WRITE_TEACHERS = getStringFromRes(R.string.shared_preferences_write_teachers_server);
    // public static final String SERVER_WRITE_ROOMS = getStringFromRes(R.string.shared_preferences_write_rooms_server);
     public static final String SERVER_NAME = getStringFromRes(R.string.shared_preferences_sql_settings);
-    public static final String WRITE_SERVER_ITEMS = getStringFromRes(R.string.shared_preferences_write_server_items_key);
+    //public static final String WRITE_SERVER_ITEMS = getStringFromRes(R.string.shared_preferences_write_server_items_key);
     public static final String SHEDULER_ITEMS = getStringFromRes(R.string.shared_preferences_local_tasks_key);
     public static final String last_room_time_in = "timein";
     public static final String COLUMNS_LAND = "COLUMNS_LAND";
@@ -119,14 +119,14 @@ public class Settings {
         return getPreferences().getBoolean(SCREEN_SETTINGS_CHANGE, false);
     }
 
-    public static ArrayList<String> getWriteServerItems(){
-        Set<String> items = getPreferences().getStringSet(WRITE_SERVER_ITEMS, null);
-        if (items!=null){
-            return new ArrayList<>(items);
-        } else {
-            return new ArrayList<>();
-        }
-    }
+   // public static ArrayList<String> getWriteServerItems(){
+   //     Set<String> items = getPreferences().getStringSet(WRITE_SERVER_ITEMS, null);
+   //     if (items!=null){
+    ///        return new ArrayList<>(items);
+    //    } else {
+   //         return new ArrayList<>();
+   //     }
+   // }
 
     public static ArrayList<String> getShedulerItems(){
         Set<String> items = getPreferences().getStringSet(SHEDULER_ITEMS, null);

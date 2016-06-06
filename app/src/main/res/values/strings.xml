@@ -139,7 +139,7 @@
     <string name="person_information_text_lastname">Фамилия</string>
     <string name="person_information_text_firstname">Имя</string>
     <string name="person_information_text_midname">Отчество</string>
-    <string name="person_information_text_division">Структурное подразделение</string>
+    <string name="person_information_text_division">Подразделение</string>
     <string name="person_information_access_type">Доступ без карты</string>
 
     <string name="snack_user_added">Пользователь добавлен!</string>
@@ -229,13 +229,6 @@
     <string name="shared_preferences_server_enabled">активна</string>
 
     <string name="shared_preferences_sql_settings">Подключение</string>
-
-    <string name="shared_preferences_write_server_items_key">Параметры синхронизации</string>
-    <string-array name="shared_preferences_write_server_items_entries">
-        <item>Журнал</item>
-        <item>Пользователи</item>
-        <item>Помещения</item>
-    </string-array>
 
     <string name="shared_preferences_local_tasks_key">Задачи</string>
     <string name="shared_preferences_local_tasks_summary">Действия, выполняемые сервисом</string>

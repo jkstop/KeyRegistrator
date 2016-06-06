@@ -33,7 +33,6 @@ import android.widget.Toast;
 import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterNavigationDrawerList;
-import com.example.ivsmirnov.keyregistrator.async_tasks.Dummy;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
@@ -155,7 +154,7 @@ SQL_Connection.Callback,
         };
 
         //connect to server
-        SQL_Connection.getConnection(null, 0, this);
+        SQL_Connection.getConnection(null, 0, mSQLConnectCallback);
 
         //init DataBases
         new DbShare();
@@ -503,6 +502,7 @@ SQL_Connection.Callback,
 
     @Override
     public void onServerConnectException(Exception e) {
+        Snackbar.make(getCurrentFocus(),"Нет соединения с сервером",Snackbar.LENGTH_SHORT).show();
         System.out.println("CONNECT EXCEPTION : " + e.getLocalizedMessage());
     }
 
