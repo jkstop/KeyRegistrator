@@ -107,12 +107,6 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_auditrooms, menu);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
@@ -147,45 +141,6 @@ public class RoomsFr extends Fragment implements UpdateInterface, RecycleItemCli
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            //case R.id.menu_auditrooms_upload_to_server:
-            //    new ServerWriter(mContext, true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
-            //    return true;
-            //case R.id.menu_auditrooms_download_from_server:
-             //   new ServerReader(mContext, this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerReader.LOAD_ROOMS);
-             //   return true;
-            //case R.id.menu_auditrooms_set_columns_number:
-             //   Dialogs dialogs = new Dialogs();
-            ///    Bundle bundle = new Bundle();
-             //   bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.SELECT_COLUMNS_DIALOG);
-             //   dialogs.setArguments(bundle);
-             //   dialogs.setTargetFragment(RoomsFr.this, 0);
-             //   dialogs.show(getFragmentManager(),"columns");
-             //   return true;
-            //case R.id.menu_auditrooms_save_to_file:
-            //    FileWriter saveToFile = new FileWriter(mContext, true);
-             //   saveToFile.execute();
-             //   return true;
-            //case R.id.menu_auditrooms_load_from_file:
-            //    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-             //   i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
-              //  i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-              //  startActivityForResult(i, FileLoader.REQUEST_CODE_LOAD_ROOMS);
-              //  return true;
-            ///case R.id.menu_auditrooms_clear:
-              //  Dialogs dialog = new Dialogs();
-              //  Bundle bundleRooms = new Bundle();
-             //   bundleRooms.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_CLEAR_ROOMS);
-              //  dialog.setArguments(bundleRooms);
-              //  dialog.setTargetFragment(RoomsFr.this,0);
-              //  dialog.show(getFragmentManager(),"clearRooms");
-              //  return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -218,6 +218,9 @@
     <string name="shared_preferences_main_grid_size">Размер сетки</string>
     <string name="shared_preferences_main_grid_size_summary">Количество строк и колонок на главном экране</string>
 
+    <string name="shared_preferences_rooms">Помещения</string>
+    <string name="shared_preferences_rooms_summary">Список отображаемых помещений</string>
+
     <string name="shared_preferences_sheduler">Сервис задач</string>
     <string name="shared_preferences_sheduler_disabled">отключен</string>
     <string name="shared_preferences_sheduler_enabled">активен</string>

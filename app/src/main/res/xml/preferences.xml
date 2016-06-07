@@ -12,6 +12,11 @@
             android:title="@string/shared_preferences_main_grid_size"
             android:summary="@string/shared_preferences_main_grid_size_summary"/>
 
+        <com.example.ivsmirnov.keyregistrator.custom_views.RoomsPreference
+            android:key="@string/shared_preferences_rooms"
+            android:title="@string/shared_preferences_rooms"
+            android:summary="@string/shared_preferences_rooms_summary"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory
