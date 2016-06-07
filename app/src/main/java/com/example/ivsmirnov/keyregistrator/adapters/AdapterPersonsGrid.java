@@ -14,14 +14,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersonPhoto;
-import com.example.ivsmirnov.keyregistrator.async_tasks.GetPersons;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ImageSaver;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
-import com.example.ivsmirnov.keyregistrator.items.GetPersonParams;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -56,18 +51,16 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
         public TextView textMidname;
         public TextView textDivision;
         public CardView personCard;
-        public ProgressBar progressBar;
 
         public ViewHolder(View itemView) {
             super(itemView);
             imageView = (ImageView)itemView.findViewById(R.id.person_card_image_user);
-            accessImageView = (ImageView) itemView.findViewById(R.id.person_card_icon_access);
-            textLastname = (TextView) itemView.findViewById(R.id.person_card_text_lastname);
-            textFirstname = (TextView)itemView.findViewById(R.id.person_card_text_firstname);
-            textMidname = (TextView)itemView.findViewById(R.id.person_card_text_midname);
-            textDivision = (TextView)itemView.findViewById(R.id.person_card_text_division);
+            accessImageView = (ImageView) itemView.findViewById(R.id.person_card_user_access_icon);
+            textLastname = (TextView) itemView.findViewById(R.id.person_card_user_lastname);
+            textFirstname = (TextView)itemView.findViewById(R.id.person_card_user_firstname);
+            textMidname = (TextView)itemView.findViewById(R.id.person_card_user_midname);
+            textDivision = (TextView)itemView.findViewById(R.id.person_card_user_division_text);
             personCard = (CardView)itemView.findViewById(R.id.person_card);
-            progressBar = (ProgressBar)itemView.findViewById(R.id.person_card_image_load_progress);
         }
     }
 
@@ -101,7 +94,6 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
-        Animation fadeInanimation = AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in);
 
         holder.textLastname.setText(mPersonList.get(position).getLastname());
         holder.textFirstname.setText(mPersonList.get(position).getFirstname());

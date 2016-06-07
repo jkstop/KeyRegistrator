@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="room_grid_count">2</integer>
+    <integer name="persons_grid_columns"> 1 </integer>
 
 </resources>

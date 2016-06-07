@@ -20,7 +20,7 @@
 
     <!-- Titles -->
     <string name="toolbar_title_main">Загруженность аудиторий</string>
-    <string name="toolbar_title_persons">Преподаватели</string>
+    <string name="toolbar_title_persons">Пользователи</string>
     <string name="toolbar_title_journal">Журнал</string>
     <string name="toolbar_title_auditrooms">Аудитории</string>
     <string name="toolbar_title_shedule">Расписание</string>
@@ -204,7 +204,7 @@
     
     <string name="tab_card">По карте</string>
     <string name="tab_free">Без карты</string>
-    <string name="tab_all">Все пользователи</string>
+    <string name="tab_all">По паролю</string>
 
     <!--Preferences-->
 

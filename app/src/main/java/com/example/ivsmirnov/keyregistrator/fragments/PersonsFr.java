@@ -27,6 +27,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsCharacters;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileLoader;
@@ -136,28 +137,10 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         final View rootView = inflater.inflate(R.layout.layout_persons_fr, container, false);
         mContext = rootView.getContext();
 
-        //showPopup(rootView.findFocus());
-
         mListCharacters = new ArrayList<>();
         mPersonsList = new ArrayList<>();
 
         mBaseWriterInterface = (BaseWriterInterface)getActivity();
-
-       /* mAddFAB = (FloatingActionButton) rootView.findViewById(R.id.persons_fragment_fab);
-        mAddFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (bundleType == PERSONS_FRAGMENT_SELECTOR && bundleRoom!=null){
-                    DialogSearch.newInstance(bundleRoom).show(getFragmentManager(),"search");
-                } else {
-                    new DialogSearch().show(getFragmentManager(), "search");
-                }
-            }
-        });
-
-        if (bundleAccess == FavoriteDB.CLICK_USER_ACCESS){
-            mAddFAB.hide();
-        }*/
 
         mListView = (ListView)rootView.findViewById(R.id.persons_fragment_list_characters);
         mLoadingBar = (ProgressBar)rootView.findViewById(R.id.layout_persons_fragment_loading_progress_bar);
@@ -176,8 +159,8 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
 
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_main);
         mRecyclerView.setItemAnimator(null);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(mContext,3));
+        //mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(mContext,getResources().getInteger(R.integer.persons_grid_columns)));
 
         initListCharactersAdapter();
         initRecyclerAdapter();
@@ -190,6 +173,10 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        if (bundleRoom == null){
+            ((Launcher)getActivity()).getSupportActionBar().setTitle(getString(R.string.toolbar_title_persons));
+        }
+
         //if (actionBar!=null){
         //    actionBar.setTitle(getResources().getString(R.string.toolbar_title_persons));
             //actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
@@ -198,11 +185,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         //if (actionBar != null) {
         //    actionBar.setTitle(getResources().getString(R.string.toolbar_title_persons));
         //}
-        if (bundleType == PERSONS_FRAGMENT_SELECTOR){
-            setHasOptionsMenu(false);
-        }else{
-            setHasOptionsMenu(true);
-        }
+
     }
 
     private void initRecyclerAdapter(){
@@ -328,9 +311,7 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
                 itemM[DialogPersonInfo.PERSON_ACCESS] = String.valueOf(mPersonsList.get(position).getAccessType());
                 itemM[DialogPersonInfo.PERSON_TAG] = mPersonsList.get(position).getRadioLabel();
 
-                DialogPersonInfo dialogPersonInfo = DialogPersonInfo.newInstanse(itemM,position);
-                dialogPersonInfo.setTargetFragment(this, 0);
-                dialogPersonInfo.show(getChildFragmentManager(), "edit");
+                DialogPersonInfo.newInstanse(itemM, position).show(getChildFragmentManager(), "person_info");
 
                 break;
             default:

@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -36,6 +37,7 @@ import com.example.ivsmirnov.keyregistrator.adapters.AdapterNavigationDrawerList
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
+import com.example.ivsmirnov.keyregistrator.custom_views.SQLPreference;
 import com.example.ivsmirnov.keyregistrator.databases.DbShare;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.fragments.DialogSearch;
@@ -43,6 +45,7 @@ import com.example.ivsmirnov.keyregistrator.fragments.JournalFr;
 import com.example.ivsmirnov.keyregistrator.fragments.MainFr;
 import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
 import com.example.ivsmirnov.keyregistrator.fragments.RoomsFr;
+import com.example.ivsmirnov.keyregistrator.fragments.SettingsFr;
 import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
@@ -115,6 +118,8 @@ SQL_Connection.Callback,
     public static Reader.OnStateChangeListener sReaderStateChangeListener;
     public static boolean sCardConnected = false;
 
+    private static CoordinatorLayout mContentFrame;
+
 
     @Override
     protected void onStart() {
@@ -153,25 +158,26 @@ SQL_Connection.Callback,
             }
         };
 
-        //connect to server
-        SQL_Connection.getConnection(null, 0, mSQLConnectCallback);
-
-        //init DataBases
-        new DbShare();
-
-        //init SharedPreferences
-        new Settings();
-
         //init and set auto close alarm
         setSheduler();
 
-        initGoogleAPI();
-
         initUI();
+
+        initGoogleAPI();
 
         initAccount();
 
         if (savedInstanceState == null){
+            //connect to server
+            SQL_Connection.getConnection(null, 0, mSQLConnectCallback);
+
+            //init DataBases
+            //new DbShare();
+
+            //init SharedPreferences
+            //new Settings();
+
+
             showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
             mNFCReader = new NFC();
         }
@@ -190,6 +196,9 @@ SQL_Connection.Callback,
     }
 
     private void initUI (){
+        //главный контейнер для фрагментов
+        mContentFrame = (CoordinatorLayout)findViewById(R.id.layout_main_content_frame);
+
         //тулбар
         Toolbar toolbar = (Toolbar)findViewById(R.id.layout_main_app_bar);
         setSupportActionBar(toolbar);
@@ -225,7 +234,7 @@ SQL_Connection.Callback,
                 showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
                 break;
             case R.id.navigation_item_persons:
-                setToolbarTitle(R.string.toolbar_title_persons);
+                //setToolbarTitle(R.string.toolbar_title_persons);
                 showFragment(getSupportFragmentManager(),PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_EDITOR, 0, null) ,R.string.toolbar_title_persons);
                 mFAB.setVisibility(View.VISIBLE);
                 mFAB.setImageResource(R.drawable.ic_add_black_24dp);
@@ -502,27 +511,33 @@ SQL_Connection.Callback,
 
     @Override
     public void onServerConnectException(Exception e) {
-        Snackbar.make(getCurrentFocus(),"Нет соединения с сервером",Snackbar.LENGTH_SHORT).show();
-        System.out.println("CONNECT EXCEPTION : " + e.getLocalizedMessage());
+        Snackbar.make(mContentFrame,"Нет соединения с сервером",Snackbar.LENGTH_SHORT)
+                .setAction("Настройки", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v){
+                        startActivity(new Intent(mContext, Preferences.class));
+                    }
+                })
+                .show();
     }
 
     @Override
     public void onSuccessServerWrite() {
-        Snackbar.make(getCurrentFocus(),"Запись прошла успешно",Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mContentFrame,"Запись прошла успешно",Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void onErrorServerWrite() {
-        Snackbar.make(getCurrentFocus(),"Ошибка при записи",Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mContentFrame,"Ошибка при записи",Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSuccessServerRead(Object result) {
-        Snackbar.make(getCurrentFocus(),"Чтение успешно",Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mContentFrame,"Чтение успешно",Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void onErrorServerRead(Exception e) {
-        Snackbar.make(getCurrentFocus(),"Ошибка при чтении",Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mContentFrame,"Ошибка при чтении",Snackbar.LENGTH_SHORT).show();
     }
 }

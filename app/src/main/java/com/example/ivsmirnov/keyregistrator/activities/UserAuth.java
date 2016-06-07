@@ -92,7 +92,7 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.getTabAt(0).setIcon(R.drawable.ic_credit_card_black_24dp).setTag(getString(R.string.tab_card));
         mTabLayout.getTabAt(1).setIcon(R.drawable.ic_touch_app_black_24dp).setTag(getString(R.string.tab_free));
-        mTabLayout.getTabAt(2).setIcon(R.drawable.ic_supervisor_account_black_24dp).setTag(getString(R.string.tab_all));
+        mTabLayout.getTabAt(2).setIcon(R.drawable.ic_lock_black_24dp).setTag(getString(R.string.tab_all));
 
         mTabLayout.setOnTabSelectedListener(
                 new TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {

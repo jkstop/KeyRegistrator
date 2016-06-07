@@ -112,12 +112,23 @@
     <item name="close_day_journal_count" type="id"/>
 
     <item name="person_info_toolbar" type="id"/>
+    <item name="person_info_spaces_layout" type="id"/>
     <item name="person_info_photo" type="id"/>
     <item name="person_info_firstname" type="id"/>
     <item name="person_info_midname" type="id"/>
     <item name="person_info_lastname" type="id"/>
     <item name="person_info_division" type="id"/>
     <item name="person_info_access" type="id"/>
+    
+    <item name="person_card" type="id"/>
+    <item name="person_card_info_layout" type="id"/>
+    <item name="person_card_user_photo" type="id"/>
+    <item name="person_card_user_lastname" type="id"/>
+    <item name="person_card_user_firstname" type="id"/>
+    <item name="person_card_user_midname" type="id"/>
+    <item name="person_card_user_division_text" type="id"/>
+    <item name="person_card_user_division_icon" type="id"/>
+    <item name="person_card_user_access_icon" type="id"/>
 
     <item name="menu_person_info_save" type="id"/>
     <item name="menu_person_info_delete" type="id"/>

@@ -69,7 +69,7 @@ public class DialogPersonInfo extends DialogFragment implements SQL_Connection.C
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCallback = (Callback)getTargetFragment();
+        mCallback = (Callback)getParentFragment();
         mConnectCallback = this;
         Bundle extras = getArguments();
         if (extras!=null){

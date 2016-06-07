@@ -1,103 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/person_card_width"
-    android:layout_height="@dimen/person_card_height"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:foreground="?android:attr/selectableItemBackground"
     app:cardUseCompatPadding="true"
-    app:cardElevation="@dimen/person_card_elevation"
+    app:cardElevation="5dp"
+    app:contentPadding="3dp"
     app:cardBackgroundColor="@color/primary_light"
-    app:contentPadding="@dimen/person_card_content_padding"
-    android:id="@+id/person_card">
+    android:id="@id/person_card">
 
-    <RelativeLayout
+    <android.support.percent.PercentRelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/person_card_height">
+        android:layout_height="wrap_content">
 
-        <FrameLayout
-            android:id="@+id/person_card_image_frame"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_width="@dimen/person_card_image_width"
-            android:layout_height="@dimen/person_card_image_height">
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/person_card_image_user"
+            app:srcCompat="@drawable/ic_user_not_found"
+            android:layout_toStartOf="@id/person_card_info_layout"
+            android:layout_alignTop="@id/person_card_info_layout"
+            android:layout_alignBottom="@id/person_card_info_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-            <ProgressBar
-                android:id="@+id/person_card_image_load_progress"
-                android:layout_gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="invisible"/>
-
-            <ImageView
-                android:id="@+id/person_card_image_user"
-                android:contentDescription="@string/descryption_person_card_image_user"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"/>
-
-        </FrameLayout>
 
         <RelativeLayout
-            android:layout_toRightOf="@+id/person_card_image_frame"
-            android:layout_toEndOf="@+id/person_card_image_frame"
+            android:id="@id/person_card_info_layout"
+            app:layout_widthPercent = "75%"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/default_content_margin"
-            android:layout_marginStart="@dimen/default_content_margin">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:layout_alignParentTop="true"
-                android:id="@+id/person_card_text_lastname"
-                android:textSize="@dimen/person_card_text_lastname"
-                style="@style/CardPersonText"/>
+                android:layout_alignParentStart="true"
+                android:id="@id/person_card_user_lastname"
+                android:text="Lastname"
+                android:maxLines="1"
+                style="@style/TextAppearance.AppCompat.Headline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
             <TextView
-                android:layout_below="@+id/person_card_text_lastname"
-                android:id="@+id/person_card_text_firstname"
-                android:textSize="@dimen/person_card_text_firstname"
-                style="@style/CardPersonText"/>
+                android:layout_below="@id/person_card_user_lastname"
+                android:id="@id/person_card_user_firstname"
+                android:maxLines="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Firstname"
+                style="@style/TextAppearance.AppCompat.Subhead"/>
 
             <TextView
-                android:layout_below="@+id/person_card_text_firstname"
-                android:id="@+id/person_card_text_midname"
-                android:textSize="@dimen/person_card_text_midname"
-                style="@style/CardPersonText"/>
+                android:layout_below="@id/person_card_user_firstname"
+                android:id="@id/person_card_user_midname"
+                android:maxLines="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Midname"
+                style="@style/TextAppearance.AppCompat.Subhead"/>
 
-            <ImageView
-                android:layout_alignParentBottom="true"
-                android:id="@+id/person_card_icon_division"
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@id/person_card_user_division_icon"
+                android:layout_below="@id/person_card_user_midname"
+                android:layout_marginTop="32dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/person_card_icon_division_margin"
-                android:layout_marginEnd="@dimen/person_card_icon_division_margin"
-                android:layout_marginTop="@dimen/person_card_icon_division_margin"
-                android:contentDescription="@string/person_card_icon_division_descryption"
-                android:src="@drawable/ic_work_black_18dp" />
+                android:src="@drawable/ic_work_black_24dp" />
 
             <TextView
-                android:layout_alignParentBottom="true"
-                android:layout_toRightOf="@+id/person_card_icon_division"
-                android:layout_toEndOf="@+id/person_card_icon_division"
-                android:layout_toLeftOf="@+id/person_card_icon_access"
-                android:layout_toStartOf="@+id/person_card_icon_access"
-                android:id="@+id/person_card_text_division"
-                android:textSize="@dimen/person_card_text_division"
-                style="@style/CardPersonText.Division" />
+                android:id="@id/person_card_user_division_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Division"
+                android:layout_toEndOf="@id/person_card_user_division_icon"
+                android:layout_toStartOf="@id/person_card_user_access_icon"
+                android:layout_alignBottom="@id/person_card_user_division_icon"
+                android:maxLines="2"
+                style="@style/TextAppearance.AppCompat.Small"/>
 
-            <ImageView
-                android:layout_alignParentRight="true"
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@id/person_card_user_access_icon"
+                android:layout_alignBottom="@id/person_card_user_division_icon"
                 android:layout_alignParentEnd="true"
-                android:layout_alignBottom="@id/person_card_text_division"
-                android:id="@id/person_card_icon_access"
-                android:clickable="true"
-                android:contentDescription="@string/descryption_person_card_icon_access"
+                android:src="@drawable/ic_credit_card_black_24dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-
-
         </RelativeLayout>
 
-    </RelativeLayout>
+    </android.support.percent.PercentRelativeLayout>
 
 
 

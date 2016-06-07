@@ -11,6 +11,7 @@ import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
+import android.preference.PreferenceScreen;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.text.TextUtils;
 
@@ -37,6 +38,7 @@ public class SettingsFr extends PreferenceFragment {
 
     private static final int REQUEST_CODE_SELECT_BACKUP_LOCATION = 203;
     private static final int REQUEST_CODE_RESTORE = 204;
+
 
     private Preference backupLocationPreference;
 
