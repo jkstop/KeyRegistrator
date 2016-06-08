@@ -27,6 +27,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -88,8 +89,6 @@ SQL_Connection.Callback,
     private Resources mResources;
     private Handler mHandler;
 
-    private FloatingActionButton mFAB;
-
     //NFC reader
     private NFC mNFCReader;
 
@@ -118,7 +117,7 @@ SQL_Connection.Callback,
     public static Reader.OnStateChangeListener sReaderStateChangeListener;
     public static boolean sCardConnected = false;
 
-    private static CoordinatorLayout mContentFrame;
+    private static FrameLayout mContentFrame;
 
 
     @Override
@@ -197,7 +196,7 @@ SQL_Connection.Callback,
 
     private void initUI (){
         //главный контейнер для фрагментов
-        mContentFrame = (CoordinatorLayout)findViewById(R.id.layout_main_content_frame);
+        mContentFrame = (FrameLayout) findViewById(R.id.layout_main_content_frame);
 
         //тулбар
         Toolbar toolbar = (Toolbar)findViewById(R.id.layout_main_app_bar);
@@ -222,34 +221,22 @@ SQL_Connection.Callback,
 
         mAccountImage.setOnClickListener(logOnClick);
         mAccountExit.setOnClickListener(logOutClick);
-
-        mFAB = (FloatingActionButton) findViewById(R.id.action_button_main);
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.navigation_item_home:
-                mFAB.setVisibility(View.INVISIBLE);
                 showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
                 break;
             case R.id.navigation_item_persons:
                 //setToolbarTitle(R.string.toolbar_title_persons);
                 showFragment(getSupportFragmentManager(),PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_EDITOR, 0, null) ,R.string.toolbar_title_persons);
-                mFAB.setVisibility(View.VISIBLE);
-                mFAB.setImageResource(R.drawable.ic_add_black_24dp);
-                mFAB.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        new DialogSearch().show(getSupportFragmentManager(),"search");
-                    }
-                });
                 break;
             case R.id.navigation_item_journal:
                 showFragment(getSupportFragmentManager(), JournalFr.newInstance(),R.string.toolbar_title_journal);
-                mFAB.setVisibility(View.INVISIBLE);
                 break;
-            case R.id.navigation_item_rooms:
+            /*case R.id.navigation_item_rooms:
                 final RoomsFr roomsFr = RoomsFr.newInstance();
                 showFragment(getSupportFragmentManager(), roomsFr,R.string.toolbar_title_auditrooms);
                 mFAB.setVisibility(View.VISIBLE);
@@ -265,7 +252,7 @@ SQL_Connection.Callback,
                         dialog.show(getSupportFragmentManager(), "add_room");
                     }
                 });
-                break;
+                break;*/
             case R.id.navigation_item_settings:
                 startActivity(new Intent(mContext, Preferences.class));
                 break;

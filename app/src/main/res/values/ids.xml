@@ -130,6 +130,16 @@
     <item name="person_card_user_division_icon" type="id"/>
     <item name="person_card_user_access_icon" type="id"/>
 
+    <item name="journal_card_room" type="id"/>
+    <item name="journal_card_photo_container" type="id"/>
+    <item name="journal_card_photo" type="id"/>
+    <item name="journal_card_user" type="id"/>
+    <item name="journal_card_time_in" type="id"/>
+    <item name="journal_card_time_out" type="id"/>
+    <item name="journal_card_time_icon" type="id"/>
+    <item name="journal_card_access_icon" type="id"/>
+
+    <item name="menu_person_add" type="id"/>
     <item name="menu_person_info_save" type="id"/>
     <item name="menu_person_info_delete" type="id"/>
 

@@ -14,25 +14,33 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.AppCompatImageView
-            android:id="@+id/person_card_image_user"
-            app:srcCompat="@drawable/ic_user_not_found"
+        <RelativeLayout
             android:layout_toStartOf="@id/person_card_info_layout"
             android:layout_alignTop="@id/person_card_info_layout"
             android:layout_alignBottom="@id/person_card_info_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
 
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/person_card_image_user"
+                android:layout_alignParentStart="true"
+                app:srcCompat="@drawable/ic_user_not_found"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@id/person_card_info_layout"
-            app:layout_widthPercent = "75%"
+            app:layout_widthPercent = "70%"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginStart="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
+                android:gravity="center_horizontal"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
                 android:id="@id/person_card_user_lastname"
@@ -43,6 +51,7 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
+                android:gravity="center_horizontal"
                 android:layout_below="@id/person_card_user_lastname"
                 android:id="@id/person_card_user_firstname"
                 android:maxLines="1"
@@ -52,6 +61,7 @@
                 style="@style/TextAppearance.AppCompat.Subhead"/>
 
             <TextView
+                android:gravity="center_horizontal"
                 android:layout_below="@id/person_card_user_firstname"
                 android:id="@id/person_card_user_midname"
                 android:maxLines="1"
@@ -60,28 +70,21 @@
                 android:text="Midname"
                 style="@style/TextAppearance.AppCompat.Subhead"/>
 
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@id/person_card_user_division_icon"
-                android:layout_below="@id/person_card_user_midname"
-                android:layout_marginTop="32dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_work_black_24dp" />
-
             <TextView
+                android:gravity="center_horizontal"
                 android:id="@id/person_card_user_division_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Division"
-                android:layout_toEndOf="@id/person_card_user_division_icon"
                 android:layout_toStartOf="@id/person_card_user_access_icon"
-                android:layout_alignBottom="@id/person_card_user_division_icon"
+                android:layout_alignBottom="@id/person_card_user_access_icon"
                 android:maxLines="2"
                 style="@style/TextAppearance.AppCompat.Small"/>
 
             <android.support.v7.widget.AppCompatImageView
                 android:id="@id/person_card_user_access_icon"
-                android:layout_alignBottom="@id/person_card_user_division_icon"
+                android:layout_below="@id/person_card_user_midname"
+                android:layout_marginTop="32dp"
                 android:layout_alignParentEnd="true"
                 android:src="@drawable/ic_credit_card_black_24dp"
                 android:layout_width="wrap_content"

@@ -162,7 +162,7 @@ public class Dialogs extends DialogFragment{
                                 Toast.makeText(mContext,mResources.getString(R.string.done),Toast.LENGTH_SHORT).show();
                             }
                         })
-                        .create();*/
+                        .create();
             case DIALOG_EDIT:
 
                 final View dialogView = View.inflate(mContext, R.layout.layout_person_information, null);
@@ -290,7 +290,7 @@ public class Dialogs extends DialogFragment{
                                 dialog.cancel();
                             }
                         })
-                        .create();
+                        .create();*/
             /*case DIALOG_CLEAR_ROOMS:
                 View dialogEraseRoomsView = View.inflate(mContext, R.layout.view_dialog_clear, null);
                 final CheckBox eraseLocalRoomsCheck = (CheckBox)dialogEraseRoomsView.findViewById(R.id.view_dialog_clear_delete_local);
@@ -321,7 +321,7 @@ public class Dialogs extends DialogFragment{
                             }
                         })
                         .create();*/
-            case ADD_ROOM_DIALOG:
+            /*case ADD_ROOM_DIALOG:
                 //добавление нового помещения
                 final TextInputLayout enterAuditroomLayout = (TextInputLayout) View.inflate(mContext, R.layout.view_enter_auditroom, null);
                 final AppCompatEditText enterAuditroomText = (AppCompatEditText)enterAuditroomLayout.findViewById(R.id.view_auditroom_enter_room);
@@ -381,7 +381,7 @@ public class Dialogs extends DialogFragment{
                             }
                         })
                         .setView(pickerView)
-                        .create();
+                        .create();*/
 
             /*case DIALOG_SQL_CONNECT:
                 View dialogLayout = View.inflate(mContext, R.layout.layout_dialog_sql_connect, null);
@@ -508,16 +508,16 @@ public class Dialogs extends DialogFragment{
                 final CheckBox deleteFromJournalCheck = (CheckBox)deleteJournalItemView.findViewById(R.id.view_dialog_delete_journal_item_delete_from_journal_check);
                 final CheckBox deleteFromServerCheck = (CheckBox)deleteJournalItemView.findViewById(R.id.view_dialog_delete_journal_item_delete_from_server_check);
                 final Updatable updatable = (Updatable)getTargetFragment();
-                new GetJournal(new GetJournalParams()
-                        .setCard(selectedCard)
-                        .setTextAuditroom((TextView)selectedCard.findViewById(R.id.card_journal_item_text_auditroom))
-                        .setImagePerson((ImageView)selectedCard.findViewById(R.id.card_journal_item_person_image))
-                        .setTextInitials((TextView)selectedCard.findViewById(R.id.card_journal_item_person_initials))
-                        .setTextTimeIn((TextView)selectedCard.findViewById(R.id.card_journal_item_time_in))
-                        .setTextTimeOut((TextView)selectedCard.findViewById(R.id.card_journal_item_time_out))
-                        .setTimeIn(timeInTag),
-                        AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in))
-                        .execute();
+               // new GetJournal(new GetJournalParams()
+               //         .setCard(selectedCard)
+               //         .setTextAuditroom((TextView)selectedCard.findViewById(R.id.card_journal_item_text_auditroom))
+               //         .setImagePerson((ImageView)selectedCard.findViewById(R.id.card_journal_item_person_image))
+               // /        .setTextInitials((TextView)selectedCard.findViewById(R.id.card_journal_item_person_initials))
+                //        .setTextTimeIn((TextView)selectedCard.findViewById(R.id.card_journal_item_time_in))
+               //         .setTextTimeOut((TextView)selectedCard.findViewById(R.id.card_journal_item_time_out))
+               //         .setTimeIn(timeInTag),
+               //         AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in))
+               //         .execute();
 
                 return new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.title_dialog_delete_journal_item)

@@ -3,123 +3,103 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_journal_item"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/journal_item_card_height"
+    android:layout_height="wrap_content"
     app:cardBackgroundColor="@color/primary_light"
     app:cardUseCompatPadding="true"
     app:contentPadding="@dimen/journal_item_card_content_padding"
     app:elevation="@dimen/journal_item_card_elevation">
     
-    <RelativeLayout
+    <android.support.percent.PercentRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:id="@id/journal_card_photo_container"
             android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/card_journal_item_text_auditroom"
-            android:layout_toStartOf="@+id/card_journal_item_text_auditroom">
+            android:layout_width="64dp"
+            android:layout_height="64dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/card_journal_item_person_image"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_width="@dimen/journal_item_card_image_width"
-                android:layout_height="@dimen/journal_item_card_image_height"
-                android:src="@drawable/person_male_colored"
-                app:civ_border_width="1dp"
-                app:civ_border_color="@color/black"/>
-
-            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
-                android:id="@+id/card_journal_item_person_initials"
-                android:layout_toRightOf="@id/card_journal_item_person_image"
-                android:layout_toEndOf="@id/card_journal_item_person_image"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="@dimen/default_content_margin"
-                android:layout_marginLeft="@dimen/default_content_margin"
-                android:layout_marginEnd="@dimen/default_content_margin"
-                android:layout_marginRight="@dimen/default_content_margin"
-                android:maxLines="3"
-                android:textSize="@dimen/journal_item_max_text_person_initials"
+                android:id="@id/journal_card_photo"
+                android:src="@drawable/ic_user_not_found"
+                android:layout_centerInParent="true"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@id/journal_card_access_icon"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                app:srcCompat="@drawable/ic_credit_card_white_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
         </RelativeLayout>
 
-        <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
-            android:id="@+id/card_journal_item_text_auditroom"
-            android:layout_centerInParent="true"
-            android:maxLines="1"
-            android:textColor="@color/black"
-            android:gravity="center"
-            android:textSize="100sp"
-            android:text="@string/empty_text_journal_item_room"
-            android:layout_marginStart="@dimen/default_content_margin"
-            android:layout_marginLeft="@dimen/default_content_margin"
-            android:layout_marginEnd="@dimen/default_content_margin"
-            android:layout_marginRight="@dimen/default_content_margin"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@id/journal_card_user"
+            android:layout_toStartOf="@id/journal_card_room"
+            android:layout_toEndOf="@id/journal_card_photo_container"
+            android:layout_alignBottom="@id/journal_card_photo_container"
+            android:layout_alignTop="@id/journal_card_photo_container"
+            android:gravity="center|start"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:maxLines="2"
+            android:text="Lastname Firstname Midname"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <TextView
+            android:id="@id/journal_card_room"
+            android:text="456"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            style="@style/TextAppearance.AppCompat.Display2"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
         <RelativeLayout
-            android:layout_toEndOf="@id/card_journal_item_text_auditroom"
-            android:layout_toRightOf="@id/card_journal_item_text_auditroom"
-            android:layout_toStartOf="@+id/card_journal_item_access_image"
-            android:layout_toLeftOf="@+id/card_journal_item_access_image"
+            android:layout_toEndOf="@id/journal_card_room"
+
+            android:layout_alignTop="@id/journal_card_photo_container"
+            android:layout_alignBottom="@id/journal_card_photo_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
-                android:id="@+id/card_journal_item_time_in"
-                android:layout_toStartOf="@+id/card_journal_item_time_icon"
-                android:layout_toLeftOf="@+id/card_journal_item_time_icon"
-                android:layout_alignBottom="@+id/card_journal_item_time_icon"
-                android:layout_alignTop="@+id/card_journal_item_time_icon"
-                android:maxLines="1"
-                android:gravity="end|center_vertical"
-                android:textSize="@dimen/journal_item_max_text_time"
-                android:text="@string/empty_text_journal_item_time"
+            <TextView
+                android:id="@id/journal_card_time_in"
+                android:text="12:00:00"
+                android:layout_toStartOf="@id/journal_card_time_icon"
+                android:gravity="center_vertical|end"
+                style="@style/TextAppearance.AppCompat.Title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <ImageView
-                android:id="@+id/card_journal_item_time_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/default_content_margin"
-                android:layout_marginRight="@dimen/default_content_margin"
-                android:src="@drawable/ic_access_alarm_black_36dp"
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@id/journal_card_time_icon"
                 android:layout_centerInParent="true"
-                android:contentDescription="@string/image_description_sql_journal_item_access" />
+                app:srcCompat="@drawable/ic_access_alarm_black_36dp"
+                android:layout_margin="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
-                android:id="@+id/card_journal_item_time_out"
-                android:layout_toEndOf="@+id/card_journal_item_time_icon"
-                android:layout_toRightOf="@+id/card_journal_item_time_icon"
-                android:layout_alignBottom="@+id/card_journal_item_time_icon"
-                android:layout_alignTop="@+id/card_journal_item_time_icon"
-                android:maxLines="1"
-                android:gravity="start|center_vertical"
-                android:textSize="@dimen/journal_item_max_text_time"
-                android:text="@string/empty_text_journal_item_time"
+            <TextView
+                android:id="@id/journal_card_time_out"
+                android:text="12:59:59"
+                android:layout_toEndOf="@id/journal_card_time_icon"
+                android:gravity="center_vertical|start"
+                style="@style/TextAppearance.AppCompat.Title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
 
         </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/card_journal_item_access_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:contentDescription="@string/image_description_sql_journal_item_timer" />
-
-    </RelativeLayout>
+    </android.support.percent.PercentRelativeLayout>
 
     
 

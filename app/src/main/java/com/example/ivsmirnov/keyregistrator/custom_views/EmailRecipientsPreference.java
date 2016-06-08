@@ -21,9 +21,7 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 30.05.2016.
  */
-public class EmailRecipientsPreference extends DialogPreference implements EmailInterface {
-
-    public static final String ADD_NEW_RECIPIENT = "add_new_recipient";
+public class EmailRecipientsPreference extends DialogPreference implements AdapterEmailExtras.Callback {
 
     private Context mContext;
     private AdapterEmailExtras mAdapter;
@@ -48,7 +46,7 @@ public class EmailRecipientsPreference extends DialogPreference implements Email
         View dialogView = View.inflate(mContext, R.layout.view_email_extra_list, null);
         mRecepientList = Settings.getRecepients();
         RecyclerView recipientView = (RecyclerView)dialogView.findViewById(R.id.preference_email_extra_list);
-        mAdapter = new AdapterEmailExtras(mContext, this, AdapterEmailExtras.RECIPIENTS, mRecepientList);
+        mAdapter = new AdapterEmailExtras(mContext, AdapterEmailExtras.RECIPIENTS, mRecepientList, this);
         mAdapter.setHasStableIds(true);
         recipientView.setAdapter(mAdapter);
         recipientView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -63,8 +61,8 @@ public class EmailRecipientsPreference extends DialogPreference implements Email
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mRecepientList.contains(ADD_NEW_RECIPIENT)){
-                    mRecepientList.add(ADD_NEW_RECIPIENT);
+                if (!mRecepientList.contains(AdapterEmailExtras.ADD_NEW_ITEM)){
+                    mRecepientList.add(AdapterEmailExtras.ADD_NEW_ITEM);
                     mAdapter.notifyItemInserted(mRecepientList.size());
                 }
             }
@@ -81,8 +79,8 @@ public class EmailRecipientsPreference extends DialogPreference implements Email
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
         if (pressedButton == AlertDialog.BUTTON_POSITIVE){
-            if (mRecepientList.contains(ADD_NEW_RECIPIENT)){
-                mRecepientList.remove(ADD_NEW_RECIPIENT);
+            if (mRecepientList.contains(AdapterEmailExtras.ADD_NEW_ITEM)){
+                mRecepientList.remove(AdapterEmailExtras.ADD_NEW_ITEM);
             }
             Settings.setRecepients(mRecepientList);
             callChangeListener(mRecepientList);
@@ -92,27 +90,16 @@ public class EmailRecipientsPreference extends DialogPreference implements Email
     }
 
     @Override
-    public void onAddRecepient(View v, int position, int view_id) {
-        if (view_id == R.id.card_email_extra_new_recipient_add){
-            mRecepientList.add(v.getTag().toString());
-            mRecepientList.remove(ADD_NEW_RECIPIENT);
-            mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
-    public void onDeleteRecepient(int position, int view_id) {
+    public void onDeleteItem(int position) {
         mRecepientList.remove(position);
         mAdapter.notifyItemRemoved(position);
     }
 
     @Override
-    public void onDeleteAttachment(int position, int view_id) {
-
-    }
-
-    @Override
-    public void onAddAttachment() {
+    public void onAddItem(String item) {
+        mRecepientList.add(item);
+        mRecepientList.remove(AdapterEmailExtras.ADD_NEW_ITEM);
+        mAdapter.notifyDataSetChanged();
 
     }
 }

@@ -70,14 +70,14 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
         }
 
         if (mBindedItem.getAccessType() == FavoriteDB.CLICK_USER_ACCESS){
-            holder.mImageAccess.setImageResource(R.drawable.ic_touch_app_black_24dp);
+            holder.mImageAccess.setImageResource(R.drawable.ic_touch_app_white_24dp);
         } else {
-            holder.mImageAccess.setImageResource(R.drawable.ic_credit_card_black_24dp);
+            holder.mImageAccess.setImageResource(R.drawable.ic_credit_card_white_24dp);
         }
 
         Picasso.with(context)
                 .load(FavoriteDB.getPersonPhotoPath(mBindedItem.getPersonTag()))
-                .resizeDimen(R.dimen.journal_item_card_image_width, R.dimen.journal_item_card_height)
+                .fit()
                 .centerCrop()
                 .placeholder(R.drawable.ic_user_not_found)
                 .into(holder.mImagePerson);
@@ -122,15 +122,15 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
 
         public ViewHolderJournalItem(View itemView) {
             super(itemView);
-            mTextAuditroom = (TextView)itemView.findViewById(R.id.card_journal_item_text_auditroom);
-            mTextTimeIn = (TextView)itemView.findViewById(R.id.card_journal_item_time_in);
-            mTextTimeOut = (TextView)itemView.findViewById(R.id.card_journal_item_time_out);
-            mImagePerson = (ImageView)itemView.findViewById(R.id.card_journal_item_person_image);
-            mTextPesonInitials = (TextView)itemView.findViewById(R.id.card_journal_item_person_initials);
+            mTextAuditroom = (TextView)itemView.findViewById(R.id.journal_card_room);
+            mTextTimeIn = (TextView)itemView.findViewById(R.id.journal_card_time_in);
+            mTextTimeOut = (TextView)itemView.findViewById(R.id.journal_card_time_out);
+            mImagePerson = (ImageView)itemView.findViewById(R.id.journal_card_photo);
+            mTextPesonInitials = (TextView)itemView.findViewById(R.id.journal_card_user);
             //mTextLastname = (TextView)itemView.findViewById(R.id.journal_card_text_lastname);
             //mTextFirstname = (TextView)itemView.findViewById(R.id.journal_card_text_firstname);
             //mTextMidname = (TextView)itemView.findViewById(R.id.journal_card_text_midname);
-            mImageAccess = (ImageView)itemView.findViewById(R.id.card_journal_item_access_image);
+            mImageAccess = (ImageView)itemView.findViewById(R.id.journal_card_access_icon);
             mCard = (CardView)itemView.findViewById(R.id.card_journal_item);
         }
     }

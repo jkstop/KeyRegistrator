@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.others.App;
 
@@ -34,7 +35,7 @@ public class AdapterPersonsCharacters extends ArrayAdapter<CharacterItem> {
         TextView text = (TextView)rootView.findViewById(R.id.text_for_row_character_list);
         text.setText(mCharacters.get(position).getCharacter());
         if (mCharacters.get(position).getSelection()){
-            rootView.setBackgroundColor(App.getAppContext().getResources().getColor(R.color.colorPrimary));
+            rootView.setBackgroundResource(R.drawable.character_background);
         }
 
         return rootView;

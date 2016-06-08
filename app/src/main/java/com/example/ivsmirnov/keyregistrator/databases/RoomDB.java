@@ -138,7 +138,9 @@ public class RoomDB {
             ArrayList<RoomItem> roomItems = new ArrayList<>();
             cursor = DbShare.getCursor(DbShare.DB_ROOM,
                     RoomDBinit.TABLE_ROOMS,
-                    null,null,null,null,null,null);
+                    null,null,null,null,
+                    RoomDBinit.COLUMN_ROOM + " ASC",
+                    null);
             cursor.moveToPosition(-1);
             while (cursor.moveToNext()){
                 roomItems.add(new RoomItem().setAuditroom(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_ROOM)))
@@ -266,7 +268,7 @@ public class RoomDB {
                     null,
                     null,
                     null,
-                    null,
+                    RoomDBinit.COLUMN_ROOM + " ASC",
                     null);
             cursor.moveToPosition(-1);
             while (cursor.moveToNext()){

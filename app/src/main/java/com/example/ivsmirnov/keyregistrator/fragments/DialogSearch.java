@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -51,8 +52,11 @@ public class DialogSearch extends DialogFragment implements
         ServerReader.Callback{
 
     private static final String BUNDLE_ROOM = "bundle_room";
+    private static final String BUNDLE_TYPE = "bundle_type";
     private static final int READ_USER = 100;
     private static final int GET_USER = 101;
+
+    public static final int LIKE_FRAGMENT = 10;
 
 
    // private Connection mConnection;
@@ -62,6 +66,7 @@ public class DialogSearch extends DialogFragment implements
     private AdapterPersonsGrid mPersonsAdapter;
     private ArrayList<PersonItem> mPersonList;
     private String mSelectedRoom;
+    private int mType;
 
     private String textSearch;
     private String selectedPersonTag;
@@ -70,13 +75,16 @@ public class DialogSearch extends DialogFragment implements
 
     private SQL_Connection.Callback mSQLCallback;
     private ServerReader.Callback mServerReaderCallback;
+    private static Callback mCallback;
 
     private int queryLength = 0;
 
-    public static DialogSearch newInstance (String selectedRoom){
+    public static DialogSearch newInstance (String selectedRoom, int type, Callback callback){
+        mCallback = callback;
         DialogSearch dialogSearch = new DialogSearch();
         Bundle bundle = new Bundle();
         bundle.putString(BUNDLE_ROOM, selectedRoom);
+        bundle.putInt(BUNDLE_TYPE, type);
         dialogSearch.setArguments(bundle);
         return dialogSearch;
     }
@@ -108,20 +116,27 @@ public class DialogSearch extends DialogFragment implements
         Bundle extras = getArguments();
         if (extras!=null){
             mSelectedRoom = extras.getString(BUNDLE_ROOM);
+            mType = extras.getInt(BUNDLE_TYPE);
         }
+
+        System.out.println("selected room " + mSelectedRoom);
+        System.out.println("type " + mType);
 
         mProgressBar = (ProgressBar)dialogView.findViewById(R.id.dialog_search_progress);
 
         Toolbar toolbar = (Toolbar)dialogView.findViewById(R.id.dialog_search_toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getDialog().cancel();
-            }
-        });
+        if (mType != LIKE_FRAGMENT){
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getDialog().cancel();
+                }
+            });
+        } else {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.white));
+        }
 
-        //mConnection = SQL_Connection.getConnection(null, null);
 
         mPersonsAdapter = new AdapterPersonsGrid(mContext, mPersonList, AdapterPersonsGrid.SHOW_ALL_PERSONS, this);
         mPersonsRecycler = (RecyclerView)dialogView.findViewById(R.id.dialog_search_recycler);
@@ -168,12 +183,22 @@ public class DialogSearch extends DialogFragment implements
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    addNewUser(new PersonItem().setLastname(lastname)
+
+                    PersonItem personItem = new PersonItem().setLastname(lastname)
                             .setFirstname(firstname)
                             .setMidname(midname)
                             .setPhoto(photo)
                             .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
-                            .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1));
+                            .setRadioLabel(String.valueOf(new Random().nextLong() % (100000 - 1)) + 1);
+
+                    addNewUser(personItem);
+
+                    if (mSelectedRoom!=null){
+                        new BaseWriter(mContext, (BaseWriterInterface)getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
+                                .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
+                                .setAuditroom(mSelectedRoom)
+                                .setPersonTag(personItem.getRadioLabel()));
+                    }
                 }
             }
         });
@@ -207,13 +232,10 @@ public class DialogSearch extends DialogFragment implements
         cancelSearchTask();
         selectedPersonTag = mPersonList.get(position).getRadioLabel();
         SQL_Connection.getConnection(null, GET_USER, mSQLCallback);
-       // new TransportPersonTask().execute(mPersonList.get(position).getRadioLabel());
     }
 
     @Override
-    public void onItemLongClick(View v, int position, long timeIn) {
-
-    }
+    public void onItemLongClick(View v, int position, long timeIn) {}
 
     @Override
     public void onServerConnected(Connection connection, int callingTask) {
@@ -332,28 +354,6 @@ public class DialogSearch extends DialogFragment implements
             mProgressBar.setVisibility(View.INVISIBLE);
         }
     }
-/*
-    private class TransportPersonTask extends AsyncTask <String,Void,PersonItem>{
-
-        @Override
-        protected PersonItem doInBackground(String... params) {
-            return FavoriteDB.getPersonItem(params[0], FavoriteDB.SERVER_USER, true);
-        }
-
-        @Override
-        protected void onPostExecute(PersonItem personItem) {
-            super.onPostExecute(personItem);
-            if (personItem!=null){
-                addNewUser(personItem);
-            }
-            if (mSelectedRoom!=null){
-                new BaseWriter(mContext, (BaseWriterInterface)getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
-                        .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
-                        .setAuditroom(mSelectedRoom)
-                        .setPersonTag(personItem.getRadioLabel()));
-            }
-        }
-    }*/
 
     private void addNewUser (PersonItem personItem){
         String snackText;
@@ -362,6 +362,13 @@ public class DialogSearch extends DialogFragment implements
         } else {
             snackText = getResources().getString(R.string.snack_user_add_error);
         }
+
+        if (mCallback!=null) mCallback.onUserAdded(personItem);
+
         Snackbar.make(getView(), snackText, Snackbar.LENGTH_SHORT).show();
+    }
+
+    public interface Callback{
+        void onUserAdded(PersonItem personItem);
     }
 }

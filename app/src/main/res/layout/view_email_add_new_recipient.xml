@@ -12,11 +12,9 @@
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@id/card_email_extra_new_recipient_add"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:errorEnabled="true">
+            android:layout_height="wrap_content">
 
             <android.support.v7.widget.AppCompatEditText
-                android:hint="Новый получатель"
                 android:inputType="textEmailAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

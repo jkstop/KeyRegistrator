@@ -21,7 +21,7 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 30.05.2016.
  */
-public class EmailAttachPreference extends DialogPreference implements EmailInterface{
+public class EmailAttachPreference extends DialogPreference implements AdapterEmailExtras.Callback{
 
     public static final int REQUEST_CODE_SELECT_EMAIL_ATTACHMENT = 206;
 
@@ -45,7 +45,7 @@ public class EmailAttachPreference extends DialogPreference implements EmailInte
     protected View onCreateDialogView() {
         View dialogView = View.inflate(mContext, R.layout.view_email_extra_list, null);
         mAttachList = Settings.getAttachments();
-        mAdapter = new AdapterEmailExtras(mContext, this, AdapterEmailExtras.ATTACHMENTS, mAttachList);
+        mAdapter = new AdapterEmailExtras(mContext, AdapterEmailExtras.ATTACHMENTS, mAttachList, this);
         RecyclerView attachListView = (RecyclerView)dialogView.findViewById(R.id.preference_email_extra_list);
         attachListView.setAdapter(mAdapter);
         attachListView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -78,24 +78,15 @@ public class EmailAttachPreference extends DialogPreference implements EmailInte
         });
     }
 
-    @Override
-    public void onAddRecepient(View v, int position, int view_id) {
-
-    }
 
     @Override
-    public void onDeleteRecepient(int position, int view_id) {
-
-    }
-
-    @Override
-    public void onDeleteAttachment(int position, int view_id) {
+    public void onDeleteItem(int position) {
         mAttachList.remove(position);
         mAdapter.notifyItemRemoved(position);
     }
 
     @Override
-    public void onAddAttachment() {
+    public void onAddItem(String item) {
 
     }
 }

@@ -20,22 +20,25 @@ import java.util.ArrayList;
  */
 public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
+    public static final String ADD_NEW_ITEM = "add_new_item";
+
     public static final int RECIPIENTS = 1;
     public static final int ATTACHMENTS = 2;
+    public static final int ROOMS = 3;
 
-    public static final int VIEW_RECEPIENTS_SIMPLE = 3;
-    public static final int VIEW_RECEPIENTS_ADD_NEW = 4;
+    public static final int VIEW_RECEPIENTS_SIMPLE = 10;
+    public static final int VIEW_RECEPIENTS_ADD_NEW = 20;
 
     private Context mContext;
     private int mType;
     private ArrayList<String> mItems;
-    private EmailInterface mEmailInterface;
+    private Callback mCallback;
 
-    public AdapterEmailExtras(Context context, EmailInterface emailInterface, int type, ArrayList<String> items){
+    public AdapterEmailExtras(Context context, int type, ArrayList<String> items, Callback callback){
         this.mContext = context;
         this.mType = type;
         this.mItems = items;
-        this.mEmailInterface = emailInterface;
+        mCallback = callback;
     }
 
     @Override
@@ -53,11 +56,9 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
                 deleteItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (mType == RECIPIENTS){
-                            mEmailInterface.onDeleteRecepient(finalViewHolder.getLayoutPosition(), v.getId());
-                        }else if (mType == ATTACHMENTS){
-                            mEmailInterface.onDeleteAttachment(finalViewHolder.getLayoutPosition(), v.getId());
-                        }
+                        mCallback.onDeleteItem(finalViewHolder.getLayoutPosition());
+                            //mEmailInterface.onDeleteRecepient(finalViewHolder.getLayoutPosition(), v.getId());
+                            //mEmailInterface.onDeleteAttachment(finalViewHolder.getLayoutPosition(), v.getId());
                     }
                 });
                 break;
@@ -67,18 +68,40 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
                 ImageView save = (ImageView)rowViewNEW.findViewById(R.id.card_email_extra_new_recipient_add);
                 ImageView delete = (ImageView)rowViewNEW.findViewById(R.id.card_email_extra_new_recipient_delete);
                 final TextInputLayout textInputLayout = (TextInputLayout)rowViewNEW.findViewById(R.id.card_email_extra_new_recipient_input);
-
+                switch (mType){
+                    case RECIPIENTS:
+                        textInputLayout.setHint("Новый пользователь");
+                        break;
+                    case ROOMS:
+                        textInputLayout.setHint("Новое помещение");
+                        break;
+                    default:
+                        break;
+                }
                 final RecyclerView.ViewHolder finalViewHolder1 = viewHolder;
                 save.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         String inputText = textInputLayout.getEditText().getText().toString();
-                        if (inputText.contains("@") && inputText.contains(".")){
-                            v.setTag(textInputLayout.getEditText().getText().toString());
-                            mEmailInterface.onAddRecepient(v, finalViewHolder1.getLayoutPosition(), v.getId());
-                            textInputLayout.getEditText().setText(null);
+
+                        if (inputText.length() == 0){
+                            textInputLayout.setError(mContext.getResources().getString(R.string.input_empty_error));
                         }else{
-                            textInputLayout.setError(mContext.getResources().getString(R.string.email_fragment_error_not_email_entered));
+                            switch (mType){
+                                case RECIPIENTS:
+                                    if (inputText.contains("@") && inputText.contains(".")){
+                                        mCallback.onAddItem(inputText);
+                                    } else {
+                                        textInputLayout.setError(mContext.getResources().getString(R.string.email_fragment_error_not_email_entered));
+                                    }
+                                    break;
+                                case ROOMS:
+                                    mCallback.onAddItem(inputText);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            textInputLayout.getEditText().setText(null);
                         }
 
                     }
@@ -86,7 +109,8 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
                 delete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mEmailInterface.onDeleteRecepient(finalViewHolder1.getLayoutPosition(), v.getId());
+                        mCallback.onDeleteItem(finalViewHolder1.getLayoutPosition());
+                        //mEmailInterface.onDeleteRecepient(finalViewHolder1.getLayoutPosition(), v.getId());
                     }
                 });
 
@@ -98,24 +122,37 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (mType == RECIPIENTS){
-            if (!mItems.get(position).equals(EmailRecipientsPreference.ADD_NEW_RECIPIENT)){
-                ((viewHolderEmailExtra)holder).mTextHead.setText(mItems.get(position));
-                ((viewHolderEmailExtra)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_person_black_36dp));
-            } else {
-                ((viewHolderAddNew)holder).mInput.requestFocus();
-            }
-        }else if (mType == ATTACHMENTS){
-            String [] split = mItems.get(position).split("/");
-            ((viewHolderEmailExtra)holder).mTextHead.setText(split[split.length -1]);
-            ((viewHolderEmailExtra)holder).mTextSubHead.setText(mItems.get(position));
-            ((viewHolderEmailExtra)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_insert_drive_file_black_36dp));
+        switch (mType){
+            case RECIPIENTS:
+                if (!mItems.get(position).equals(ADD_NEW_ITEM)){
+                    ((viewHolderEmailExtra)holder).mTextHead.setText(mItems.get(position));
+                    ((viewHolderEmailExtra)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_person_black_36dp));
+                } else {
+                    ((viewHolderAddNew)holder).mInput.requestFocus();
+                }
+                break;
+            case ATTACHMENTS:
+                String [] split = mItems.get(position).split("/");
+                ((viewHolderEmailExtra)holder).mTextHead.setText(split[split.length -1]);
+                ((viewHolderEmailExtra)holder).mTextSubHead.setText(mItems.get(position));
+                ((viewHolderEmailExtra)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_insert_drive_file_black_36dp));
+                break;
+            case ROOMS:
+                if (!mItems.get(position).equals(ADD_NEW_ITEM)){
+                    ((viewHolderEmailExtra)holder).mTextHead.setText(mItems.get(position));
+                    ((viewHolderEmailExtra)holder).mImagePreview.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_room_black_36dp));
+                }else {
+                    ((viewHolderAddNew)holder).mInput.requestFocus();
+                }
+                break;
+            default:
+                break;
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (mItems.get(position).equals(EmailRecipientsPreference.ADD_NEW_RECIPIENT)){
+        if (mItems.get(position).equals(ADD_NEW_ITEM)){
             return VIEW_RECEPIENTS_ADD_NEW;
         }else{
             return VIEW_RECEPIENTS_SIMPLE;
@@ -157,4 +194,10 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
             mInput = (TextInputLayout)itemView.findViewById(R.id.card_email_extra_new_recipient_input);
         }
     }
+
+   public interface Callback{
+       void onDeleteItem(int position);
+       void onAddItem(String item);
+   }
+
 }

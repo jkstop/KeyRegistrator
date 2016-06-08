@@ -38,7 +38,6 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
     private TabLayout mTabLayout;
 
     private int previousTab = 0;
-    private String selectedRoom;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,11 +45,6 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
         setContentView(R.layout.layout_autorization);
         mContext = this;
         initUI();
-
-        Bundle args = getIntent().getExtras();
-        if (args!=null){
-            selectedRoom = args.getString(PersonsFr.PERSONS_SELECTED_ROOM);
-        }
     }
 
     private void initUI(){
@@ -61,30 +55,12 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        final FloatingActionButton mFAB = (FloatingActionButton)findViewById(R.id.user_auth_fab);
-        mFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (selectedRoom!=null){
-                    DialogSearch.newInstance(selectedRoom).show(getSupportFragmentManager(),"search");
-                }
-            }
-        });
-
-
-        //цвет статусбара начиная с lollipop
-       // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-       //     Window window = getWindow();
-       //     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-       //     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-       //  window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
-        // }
-
         mViewPager = (ViewPager)findViewById(R.id.user_auth_pager_view);
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         mViewPagerAdapter.addFragment(UserAuthCard.newInstance("!!SELECTED ROOM!!"), getString(R.string.tab_card));
         mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR, FavoriteDB.CLICK_USER_ACCESS, Settings.getLastClickedAuditroom()), getString(R.string.tab_free));
         mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR,0,Settings.getLastClickedAuditroom()), getString(R.string.tab_all));
+        mViewPagerAdapter.addFragment(DialogSearch.newInstance(getIntent().getExtras().getString(PersonsFr.PERSONS_SELECTED_ROOM), DialogSearch.LIKE_FRAGMENT, null), getString(R.string.tab_new));
 
         mViewPager.setAdapter(mViewPagerAdapter);
 
@@ -93,6 +69,7 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
         mTabLayout.getTabAt(0).setIcon(R.drawable.ic_credit_card_black_24dp).setTag(getString(R.string.tab_card));
         mTabLayout.getTabAt(1).setIcon(R.drawable.ic_touch_app_black_24dp).setTag(getString(R.string.tab_free));
         mTabLayout.getTabAt(2).setIcon(R.drawable.ic_lock_black_24dp).setTag(getString(R.string.tab_all));
+        mTabLayout.getTabAt(3).setIcon(R.drawable.ic_person_add_black_24dp).setTag(getString(R.string.tab_new));
 
         mTabLayout.setOnTabSelectedListener(
                 new TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
@@ -102,9 +79,7 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
 
                         if (tab.getTag().equals(getString(R.string.tab_all))){
                             new DialogPassword().show(getSupportFragmentManager(), DialogPassword.PERSONS_ACCESS);
-                            mFAB.setVisibility(View.VISIBLE);
-                        } else {
-                            mFAB.setVisibility(View.INVISIBLE);
+
                         }
                     }
 

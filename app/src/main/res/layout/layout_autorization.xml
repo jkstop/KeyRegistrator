@@ -17,7 +17,8 @@
             android:id="@id/user_auth_toolbar"
             android:background="@color/colorPrimary"
             android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize" />
+            android:layout_height="?android:attr/actionBarSize"/>
+
 
         <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
             android:id="@id/user_auth_disclaimer"
@@ -48,15 +49,5 @@
         android:layout_below="@id/user_auth_appbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@id/user_auth_fab"
-        android:src="@drawable/ic_add_black_24dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
-        android:visibility="invisible"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
 </android.support.percent.PercentRelativeLayout>

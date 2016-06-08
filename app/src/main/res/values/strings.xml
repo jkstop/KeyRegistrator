@@ -205,6 +205,7 @@
     <string name="tab_card">По карте</string>
     <string name="tab_free">Без карты</string>
     <string name="tab_all">По паролю</string>
+    <string name="tab_new">Новый</string>
 
     <!--Preferences-->
 

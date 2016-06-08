@@ -154,7 +154,7 @@ public class SettingsFr extends PreferenceFragment {
         recipientsPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                if (((HashSet)newValue).size() == 0){
+                if (((ArrayList)newValue).size() == 0){
                     if (isLoggegIn()){
                         setPreferenceEnabled(false, sendMailPreference,
                                 getString(R.string.shared_preferences_email_send_disable), getString(R.string.shared_preferences_email_send_disable_summary_norecipients));

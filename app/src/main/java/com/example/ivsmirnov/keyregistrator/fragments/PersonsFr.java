@@ -48,7 +48,9 @@ import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
 
-public class PersonsFr extends Fragment implements UpdateInterface, Updatable, RecycleItemClickListener, DialogPersonInfo.Callback {
+public class PersonsFr extends Fragment implements UpdateInterface, Updatable, RecycleItemClickListener,
+        DialogPersonInfo.Callback,
+DialogSearch.Callback{
 
     public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
     public static final String PERSONS_FRAGMENT_TYPE = "persons_fragment_type";
@@ -61,12 +63,10 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
     private static final int HANDLER_HIDE_PROGRESS = 101;
     private static final int HANDLER_DATA_CHANGED = 102;
 
-
-
     public static boolean contentNeedsForUpdate = false;
 
     private Context mContext;
-    private static RecyclerView mRecyclerView;
+    public static RecyclerView mRecyclerView;
     private ListView mListView;
 
     private Handler mHandler;
@@ -175,6 +175,9 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
 
         if (bundleRoom == null){
             ((Launcher)getActivity()).getSupportActionBar().setTitle(getString(R.string.toolbar_title_persons));
+            setHasOptionsMenu(true);
+        } else {
+            setHasOptionsMenu(false);
         }
 
         //if (actionBar!=null){
@@ -186,6 +189,23 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         //    actionBar.setTitle(getResources().getString(R.string.toolbar_title_persons));
         //}
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_users, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_person_add:
+                DialogSearch.newInstance(null, 0, this).show(getChildFragmentManager(),"search");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void initRecyclerAdapter(){
@@ -225,11 +245,19 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
     @Override
     public void onResume() {
         super.onResume();
+        System.out.println("resume");
         if (contentNeedsForUpdate){
             initPersons("#", true).start();
             contentNeedsForUpdate = false;
         }
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        System.out.println("pause");
+    }
+
 
     @Override
     public void updateInformation() {
@@ -356,5 +384,11 @@ public class PersonsFr extends Fragment implements UpdateInterface, Updatable, R
         mAdapter.notifyItemChanged(position);
 
         Snackbar.make(getView(),"Изменено",Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onUserAdded(PersonItem personItem) {
+        mPersonsList.add(0, personItem);
+        mAdapter.notifyDataSetChanged();
     }
 }
