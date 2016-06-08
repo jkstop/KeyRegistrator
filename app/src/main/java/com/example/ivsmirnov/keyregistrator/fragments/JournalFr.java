@@ -45,7 +45,7 @@ import java.util.Date;
 import java.util.Locale;
 
 
-public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnNavigationListener, RecycleItemClickListener, Updatable {
+public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnNavigationListener, RecycleItemClickListener, Updatable, ServerWriter.Callback {
 
     public static final int REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION = 203;
 
@@ -151,14 +151,13 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
         mDates.addAll(getDates());
 
         mAdapterjournallist = new AdapterJournalList(mContext, this, mJournalItems);
-        mAdapterjournallist.setHasStableIds(true);
+       // mAdapterjournallist.setHasStableIds(true);
         mJournalRecycler.setLayoutManager(new LinearLayoutManager(mContext));
         mJournalRecycler.setAdapter(mAdapterjournallist);
         mJournalRecycler.scrollToPosition(mJournalItems.size()-1);
         return rootView;
 
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -205,6 +204,18 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
     @Override
     public void onItemClick(View v, int position, int viewID) {
 
+
+        System.out.println(position);
+        System.out.println("item " + mJournalItems.get(position).getPersonInitials());
+        //удаление из базы - wrong position?
+        JournalDB.deleteFromDB(mJournalItems.get(position).getTimeIn());
+
+        if (Settings.getWriteServerStatus()){
+            new ServerWriter(ServerWriter.DELETE_ONE, mJournalItems.get(position), this);
+        }
+
+        mJournalItems.remove(position);
+        mAdapterjournallist.notifyItemRemoved(position);
     }
 
     @Override
@@ -226,6 +237,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
                 mHandler.sendEmptyMessage(HANDLER_SHOW_PROGRESS);
                 if (!mJournalItems.isEmpty()) mJournalItems.clear();
                 mJournalItems.addAll(JournalDB.getJournalItemsForCurrentDate(date));
+                System.out.println("items size " +mJournalItems.size() );
                 mHandler.sendEmptyMessage(HANDLER_HIDE_PROGRESS);
                 mHandler.sendEmptyMessage(HANDLER_DATA_CHANGED);
             }
@@ -240,5 +252,15 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
 
     @Override
     public void onItemChanged(String tag, int position) {
+    }
+
+    @Override
+    public void onSuccessServerWrite() {
+
+    }
+
+    @Override
+    public void onErrorServerWrite() {
+
     }
 }

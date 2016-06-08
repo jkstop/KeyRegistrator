@@ -138,6 +138,7 @@
     <item name="journal_card_time_out" type="id"/>
     <item name="journal_card_time_icon" type="id"/>
     <item name="journal_card_access_icon" type="id"/>
+    <item name="journal_card_delete" type="id"/>
 
     <item name="menu_person_add" type="id"/>
     <item name="menu_person_info_save" type="id"/>

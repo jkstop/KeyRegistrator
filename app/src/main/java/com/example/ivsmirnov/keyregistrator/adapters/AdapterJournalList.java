@@ -40,11 +40,10 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
     public ViewHolderJournalItem onCreateViewHolder(ViewGroup parent, int viewType) {
         View rowView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_journal_item,parent,false);
         final ViewHolderJournalItem viewHolderJournalItem = new ViewHolderJournalItem(rowView);
-        rowView.setOnLongClickListener(new View.OnLongClickListener() {
+        rowView.findViewById(R.id.journal_card_delete).setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                mListener.onItemLongClick(v,viewHolderJournalItem.getLayoutPosition(), mJournalItems.get(viewHolderJournalItem.getLayoutPosition()).getTimeIn());
-                return true;
+            public void onClick(View v) {
+                mListener.onItemClick(v, viewHolderJournalItem.getLayoutPosition(), v.getId());
             }
         });
         return viewHolderJournalItem;
@@ -81,20 +80,6 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
                 .centerCrop()
                 .placeholder(R.drawable.ic_user_not_found)
                 .into(holder.mImagePerson);
-
-        /*new GetJournal(new GetJournalParams()
-                .setTimeIn(mJournalItemTags.get(position))
-                .setCard(holder.mCard)
-                .setImagePerson(holder.mImagePerson)
-                .setImageAccess(holder.mImageAccess)
-                .setTextAuditroom(holder.mTextAuditroom)
-                .setTextInitials(holder.mTextPesonInitials)
-                //.setTextLastname(holder.mTextLastname)
-                //.setTextFirstname(holder.mTextFirstname)
-                //.setTextMidname(holder.mTextMidname)
-                .setTextTimeIn(holder.mTextTimeIn)
-                .setTextTimeOut(holder.mTextTimeOut),
-                AnimationUtils.loadAnimation(context, android.R.anim.fade_in)).execute();*/
     }
 
     @Override
@@ -114,10 +99,8 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
         public TextView mTextTimeOut;
         public ImageView mImagePerson;
         public TextView mTextPesonInitials;
-        //public TextView mTextLastname;
-        //public TextView mTextFirstname;
-        //public TextView mTextMidname;
         public ImageView mImageAccess;
+        public ImageView mDelete;
         public CardView mCard;
 
         public ViewHolderJournalItem(View itemView) {
@@ -127,11 +110,9 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
             mTextTimeOut = (TextView)itemView.findViewById(R.id.journal_card_time_out);
             mImagePerson = (ImageView)itemView.findViewById(R.id.journal_card_photo);
             mTextPesonInitials = (TextView)itemView.findViewById(R.id.journal_card_user);
-            //mTextLastname = (TextView)itemView.findViewById(R.id.journal_card_text_lastname);
-            //mTextFirstname = (TextView)itemView.findViewById(R.id.journal_card_text_firstname);
-            //mTextMidname = (TextView)itemView.findViewById(R.id.journal_card_text_midname);
             mImageAccess = (ImageView)itemView.findViewById(R.id.journal_card_access_icon);
             mCard = (CardView)itemView.findViewById(R.id.card_journal_item);
+            mDelete = (ImageView)itemView.findViewById(R.id.journal_card_delete);
         }
     }
 }

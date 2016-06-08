@@ -64,7 +64,7 @@
 
         <RelativeLayout
             android:layout_toEndOf="@id/journal_card_room"
-
+            android:layout_toStartOf="@id/journal_card_delete"
             android:layout_alignTop="@id/journal_card_photo_container"
             android:layout_alignBottom="@id/journal_card_photo_container"
             android:layout_width="match_parent"
@@ -73,6 +73,7 @@
             <TextView
                 android:id="@id/journal_card_time_in"
                 android:text="12:00:00"
+                android:maxLines="1"
                 android:layout_toStartOf="@id/journal_card_time_icon"
                 android:gravity="center_vertical|end"
                 style="@style/TextAppearance.AppCompat.Title"
@@ -90,17 +91,23 @@
             <TextView
                 android:id="@id/journal_card_time_out"
                 android:text="12:59:59"
+                android:maxLines="1"
                 android:layout_toEndOf="@id/journal_card_time_icon"
                 android:gravity="center_vertical|start"
                 style="@style/TextAppearance.AppCompat.Title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-
-
         </RelativeLayout>
 
-    </android.support.percent.PercentRelativeLayout>
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@id/journal_card_delete"
+            android:src="@drawable/ic_cancel_black_24dp"
+            android:layout_alignTop="@id/journal_card_photo_container"
+            android:layout_alignParentEnd="true"
+            android:clickable="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    
+    </android.support.percent.PercentRelativeLayout>
 
 </android.support.v7.widget.CardView>
