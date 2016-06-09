@@ -344,9 +344,9 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
         if (mCallback!=null){
             if (e == null){
                 if (mServerPersonItem!=null){
-                    mCallback.onSuccessServerRead(mServerPersonItem);
+                    mCallback.onSuccessServerRead(mReadParam, mServerPersonItem);
                 } else {
-                    mCallback.onSuccessServerRead(null);
+                    mCallback.onSuccessServerRead(mReadParam, null);
                 }
             }else{
                 mCallback.onErrorServerRead(e);
@@ -358,7 +358,7 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
     }
 
     public interface Callback{
-        void onSuccessServerRead(Object result);
+        void onSuccessServerRead(int task, Object result);
         void onErrorServerRead(Exception e);
     }
 

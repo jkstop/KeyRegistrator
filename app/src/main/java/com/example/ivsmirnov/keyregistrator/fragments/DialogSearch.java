@@ -248,11 +248,10 @@ public class DialogSearch extends DialogFragment implements
 
     @Override
     public void onServerConnectException(Exception e) {
-
     }
 
     @Override
-    public void onSuccessServerRead(Object result) {
+    public void onSuccessServerRead(int task, Object result) {
         if (result!=null){
             PersonItem personItem = (PersonItem)result;
 
