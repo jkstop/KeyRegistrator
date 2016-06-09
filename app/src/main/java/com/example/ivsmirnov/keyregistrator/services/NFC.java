@@ -1,37 +1,59 @@
 package com.example.ivsmirnov.keyregistrator.services;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
-import android.os.AsyncTask;
-import android.util.Log;
+import android.view.KeyEvent;
 
 import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.activities.CloseDay;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.activities.Preferences;
 import com.example.ivsmirnov.keyregistrator.activities.UserAuth;
+import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
+import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
+import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
+import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
+import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
+import java.sql.Connection;
+
 /**
  * NFC считыватель
- */
-public class NFC {
+
+public class NFC implements
+        SQL_Connection.Callback,
+        ServerReader.Callback,
+BaseWriter.Callback{
 
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
     private static final int RECEIVER_REQUEST_CODE = 100;
     private Reader mReader;
     private Context mContext;
+    private String mCurrentRadioLabel;
 
-    public NFC() {
+    private SQL_Connection.Callback mConnectionCallback;
+    private ServerReader.Callback mServerReaderCallback;
+    private BaseWriter.Callback mBaseWriterCallback;
+    private Callback mCallback;
+
+    public NFC(Callback callback) {
         mContext = App.getAppContext();
+
+        mConnectionCallback = this;
+        mServerReaderCallback = this;
+        mBaseWriterCallback = this;
+        mCallback = callback;
+
         UsbManager manager = (UsbManager)mContext.getSystemService(Context.USB_SERVICE);
         mReader = new Reader(manager);
         mReader.setOnStateChangeListener(readerStateChangeListener);
@@ -55,10 +77,12 @@ public class NFC {
             if (currentState < Reader.CARD_UNKNOWN || currentState > Reader.CARD_SPECIFIC) currentState = Reader.CARD_UNKNOWN;
 
             if (currentState == Reader.CARD_PRESENT){
-                System.out.println("CARD CONNECTED " + getRadioLabelValue());
+                mCurrentRadioLabel = getRadioLabelValue();
+                System.out.println("CARD CONNECTED " + mCurrentRadioLabel);
+
                 ActivityManager activityManager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
                 String runnungActivityName = activityManager.getRunningTasks(1).get(0).topActivity.getClassName();
-                System.out.println(runnungActivityName);
+
                 if (runnungActivityName.equals(Launcher.class.getCanonicalName())){
                     System.out.println("activity_launcher");
                 } else if (runnungActivityName.equals(Preferences.class.getCanonicalName())){
@@ -67,17 +91,18 @@ public class NFC {
                     System.out.println("close day");
                 } else if (runnungActivityName.equals(UserAuth.class.getCanonicalName())){
                     System.out.println("user auth");
+                    if (!FavoriteDB.isUserInBase(mCurrentRadioLabel)){
+                        System.out.println("user not in base");
+                        SQL_Connection.getConnection(null, 0, mConnectionCallback);
+                    } else {
+                        System.out.println("user in base");
+                        write(new PersonItem()
+                                .setRadioLabel(mCurrentRadioLabel)
+                                .setAccessType(FavoriteDB.CARD_USER_ACCESS));
+                    }
                 } else{
                     System.out.println("hm. WTF?");
                 }
-                //switch (componentName.getClassName()){
-                //    case Launcher.class.getCanonicalName():
-                //        System.out.println("activity_launcher");
-                //        break;
-                //    default:
-                //        break;
-
-                //}
             }
 
             if (currentState == Reader.CARD_ABSENT){
@@ -160,8 +185,56 @@ public class NFC {
         return bufferString + "00 00";
     }
 
+    @Override
+    public void onServerConnected(Connection connection, int callingTask) {
+        System.out.println("server connected");
+        new ServerReader(ServerReader.READ_PERSON_ITEM, mCurrentRadioLabel, mServerReaderCallback).execute(connection);
+    }
+
+    @Override
+    public void onServerConnectException(Exception e) {
+
+    }
+
+    private void write(PersonItem personItem){
+        new BaseWriter(BaseWriter.WRITE_NEW, mContext, mBaseWriterCallback)
+                .execute(new BaseWriterParams()
+                        .setPersonTag(personItem.getRadioLabel())
+                        .setAccessType(personItem.getAccessType())
+                        .setAuditroom(UserAuth.mSelectedRoom));
+    }
+
+    @Override
+    public void onSuccessServerRead(Object result) {
+        System.out.println("success server read");
+        if (result!=null){
+            PersonItem personItem = (PersonItem)result;
+            if (FavoriteDB.addNewUser(personItem, Settings.getWriteServerStatus())){
+                write(personItem);
+            }
+        }
+    }
+
+    @Override
+    public void onErrorServerRead(Exception e) {
+        Toasts.handler.sendEmptyMessage(Toasts.TOAST_WRONG_CARD);
+    }
+
+    @Override
+    public void onSuccessBaseWrite() {
+        System.out.println("success base write");
+        mCallback.onSuccessBaseWrite();
+    }
+
+    @Override
+    public void onErrorBaseWrite() {
+        mCallback.onErrorBaseWrite();
+    }
+
     public interface Callback{
-        void onGetRadioLabelFromReader(String radioLabel);
+        void onSuccessBaseWrite();
+        void onErrorBaseWrite();
     }
 
 }
+ */

@@ -14,7 +14,7 @@
         android:layout_marginEnd="@dimen/default_content_margin"
         android:layout_height="match_parent"
         android:layout_width="wrap_content"
-        android:divider="#00ffffff"
+        android:divider="@color/transparent"
         android:dividerHeight="1dp"/>
 
     <include layout="@layout/main_recycler"

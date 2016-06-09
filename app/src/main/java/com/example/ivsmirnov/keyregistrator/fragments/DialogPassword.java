@@ -14,13 +14,13 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
-import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
+import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class DialogPassword extends DialogFragment implements SQL_Connection.Cal
             mPersonTag = extras.getString(BUNDLE_RADIO_LABEL);
             mEraseItems = extras.getStringArrayList(BUNDLE_ERASE_LIST);
         }
-        if (mDialogTag.equals(PERSONS_ACCESS)) mCallback = (Callback)getActivity();
+        if (mDialogTag.equals(PERSONS_ACCESS)) mCallback = (Callback)getParentFragment();
     }
 
     @NonNull
@@ -94,7 +94,9 @@ public class DialogPassword extends DialogFragment implements SQL_Connection.Cal
                             switch (mDialogTag){
                                 case ROOMS_ACCESS:
                                     if (mPersonTag!=null){
-                                        new CloseRooms(mContext, mPersonTag, (CloseRoomInterface)getActivity()).execute();
+                                        new BaseWriter(BaseWriter.UPDATE_CURRENT, mContext, (BaseWriter.Callback)getActivity())
+                                                .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams().setPersonTag(mPersonTag));
+                                        //new CloseRooms(mContext, mPersonTag, (CloseRoomInterface)getActivity()).execute();
                                     }
                                     break;
                                 case ERASE_ACCESS:

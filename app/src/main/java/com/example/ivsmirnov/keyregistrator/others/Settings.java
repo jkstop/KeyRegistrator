@@ -5,7 +5,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.items.ServerConnectionItem;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -279,14 +278,6 @@ public class Settings {
         return items;
     }
 
-    public static void setLastClickedAuditroom(String auditroom){
-       getPreferencesEditor().putString(AUDITROOM, auditroom).apply();
-    }
-
-    public static String getLastClickedAuditroom(){
-
-        return getPreferences().getString(AUDITROOM, Values.EMPTY);
-    }
 
     public static void setTotalJournalCount(int count){
         getPreferencesEditor().putInt(TOTAL_JOURNAL_COUNT,count).apply();
@@ -321,22 +312,6 @@ public class Settings {
     public static int getAuditroomColumnsCount(){
 
         return getPreferences().getInt(COLUMNS_AUD_COUNT, 3);
-    }
-
-    public static ServerConnectionItem getServerConnectionParams(){
-
-        return new ServerConnectionItem()
-                .setServerName(getPreferences().getString(SQL_SERVER,""))
-                .setUserName(getPreferences().getString(SQL_USER, ""))
-                .setUserPassword(getPreferences().getString(SQL_PASSWORD, ""));
-    }
-
-    public static void setServerConnectionParams(ServerConnectionItem serverConnectionItem){
-
-        getPreferencesEditor().putString(SQL_SERVER, serverConnectionItem.getServerName());
-        getPreferencesEditor().putString(SQL_USER, serverConnectionItem.getUserName());
-        getPreferencesEditor().putString(SQL_PASSWORD, serverConnectionItem.getUserPassword());
-        getPreferencesEditor().apply();
     }
 
     public static boolean getServerStatus(){

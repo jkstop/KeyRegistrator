@@ -10,15 +10,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.custom_views.EmailRecipientsPreference;
-import com.example.ivsmirnov.keyregistrator.interfaces.EmailInterface;
 
 import java.util.ArrayList;
 
 /**
  * адаптер для списка вложений и списка получателей email рассылки
  */
-public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class AdapterPreferenceExtra extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     public static final String ADD_NEW_ITEM = "add_new_item";
 
@@ -26,15 +24,15 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
     public static final int ATTACHMENTS = 2;
     public static final int ROOMS = 3;
 
-    public static final int VIEW_RECEPIENTS_SIMPLE = 10;
-    public static final int VIEW_RECEPIENTS_ADD_NEW = 20;
+    public static final int VIEW_SIMPLE = 10;
+    public static final int VIEW_ADD_NEW = 20;
 
     private Context mContext;
     private int mType;
     private ArrayList<String> mItems;
     private Callback mCallback;
 
-    public AdapterEmailExtras(Context context, int type, ArrayList<String> items, Callback callback){
+    public AdapterPreferenceExtra(Context context, int type, ArrayList<String> items, Callback callback){
         this.mContext = context;
         this.mType = type;
         this.mItems = items;
@@ -48,7 +46,7 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
 
         switch (viewType){
-            case VIEW_RECEPIENTS_SIMPLE:
+            case VIEW_SIMPLE:
                 final View rowView = layoutInflater.inflate(R.layout.view_email_extra_item,parent,false);
                 viewHolder = new viewHolderEmailExtra(rowView);
                 ImageView deleteItem = (ImageView)rowView.findViewById(R.id.card_email_extra_delete);
@@ -62,7 +60,7 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                 });
                 break;
-            case VIEW_RECEPIENTS_ADD_NEW:
+            case VIEW_ADD_NEW:
                 View rowViewNEW = layoutInflater.inflate(R.layout.view_email_add_new_recipient,parent,false);
                 viewHolder = new viewHolderAddNew(rowViewNEW);
                 ImageView save = (ImageView)rowViewNEW.findViewById(R.id.card_email_extra_new_recipient_add);
@@ -153,9 +151,9 @@ public class AdapterEmailExtras extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemViewType(int position) {
         if (mItems.get(position).equals(ADD_NEW_ITEM)){
-            return VIEW_RECEPIENTS_ADD_NEW;
+            return VIEW_ADD_NEW;
         }else{
-            return VIEW_RECEPIENTS_SIMPLE;
+            return VIEW_SIMPLE;
         }
     }
 

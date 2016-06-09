@@ -198,8 +198,8 @@
     <string name="menu_teachers_upload_to_server">Загрузить на сервер</string>
     <string name="menu_teachers_download_from_server">Загрузить с сервера</string>
     <string name="menu_main_items_size">Размер элементов</string>
-    <string name="menu_main_upload_all_to_server">Загрузить все на сервер</string>
-    <string name="menu_main_download_all_from_server">Загрузить все с сервера</string>
+    <string name="menu_main_upload_all_to_server">Загрузка на сервер</string>
+    <string name="menu_main_download_all_from_server">Загрузка с сервера</string>
     <string name="menu_nfc_all_persons">Все пользователи</string>
     
     <string name="tab_card">По карте</string>

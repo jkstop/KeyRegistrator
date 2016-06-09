@@ -2,34 +2,30 @@ package com.example.ivsmirnov.keyregistrator.activities;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.ViewPagerAdapter;
+import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.fragments.DialogPassword;
 import com.example.ivsmirnov.keyregistrator.fragments.DialogSearch;
 import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
 import com.example.ivsmirnov.keyregistrator.fragments.UserAuthCard;
-import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 /**
  * Экран авторизации пользователя
  */
-public class UserAuth extends AppCompatActivity implements BaseWriterInterface, DialogPassword.Callback {
+public class UserAuth extends AppCompatActivity implements BaseWriter.Callback, DialogPassword.Callback {
 
     private Context mContext;
 
@@ -39,11 +35,14 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
 
     private int previousTab = 0;
 
+    public static String mSelectedRoom;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_autorization);
         mContext = this;
+        mSelectedRoom = getIntent().getExtras().getString(PersonsFr.PERSONS_SELECTED_ROOM);
         initUI();
     }
 
@@ -57,10 +56,10 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
 
         mViewPager = (ViewPager)findViewById(R.id.user_auth_pager_view);
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mViewPagerAdapter.addFragment(UserAuthCard.newInstance("!!SELECTED ROOM!!"), getString(R.string.tab_card));
-        mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR, FavoriteDB.CLICK_USER_ACCESS, Settings.getLastClickedAuditroom()), getString(R.string.tab_free));
-        mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR,0,Settings.getLastClickedAuditroom()), getString(R.string.tab_all));
-        mViewPagerAdapter.addFragment(DialogSearch.newInstance(getIntent().getExtras().getString(PersonsFr.PERSONS_SELECTED_ROOM), DialogSearch.LIKE_FRAGMENT, null), getString(R.string.tab_new));
+        mViewPagerAdapter.addFragment(UserAuthCard.newInstance(mSelectedRoom), getString(R.string.tab_card));
+        mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR, FavoriteDB.CLICK_USER_ACCESS, mSelectedRoom), getString(R.string.tab_free));
+        mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR, 0, mSelectedRoom), getString(R.string.tab_all));
+        mViewPagerAdapter.addFragment(DialogSearch.newInstance(mSelectedRoom, DialogSearch.LIKE_FRAGMENT), getString(R.string.tab_new));
 
         mViewPager.setAdapter(mViewPagerAdapter);
 
@@ -79,7 +78,6 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
 
                         if (tab.getTag().equals(getString(R.string.tab_all))){
                             new DialogPassword().show(getSupportFragmentManager(), DialogPassword.PERSONS_ACCESS);
-
                         }
                     }
 
@@ -96,84 +94,14 @@ public class UserAuth extends AppCompatActivity implements BaseWriterInterface, 
         super.onConfigurationChanged(newConfig);
     }
 
-    /*private void showEnterPassPopup(){
-        View dialogView = View.inflate(mContext, R.layout.view_enter_password,null);
-        final PopupWindow popup = new PopupWindow(mContext);
-        final TextInputLayout mPassInputLayout = (TextInputLayout)dialogView.findViewById(R.id.enter_pass_input_layout);
-        dialogView.findViewById(R.id.enter_pass_ok_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mPassInputLayout.getEditText().getText().toString().equals("1212")){
-                    correctPass = true;
-                    popup.dismiss();
-                } else {
-                    mPassInputLayout.setError("Пароль акбар");
-                }
-            }
-        });
-        popup.setContentView(dialogView);
-        popup.setHeight(getResources().getDimensionPixelOffset(R.dimen.layout_default_margin)*5);
-        popup.setFocusable(true);
-        popup.setOutsideTouchable(true);
-        popup.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
-        popup.setWindowLayoutMode(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        popup.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                if (correctPass){
-                    popup.dismiss();
-                } else {
-                    mTabLayout.getTabAt(previousTab).select();
-                }
-                correctPass = false;
-            }
-        });
-
-        mTabLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                popup.showAsDropDown(mTabLayout, 0, 0);
-            }
-        });
-    }
-
-    private void showEnterPassDialog(){
-        View dialogView = View.inflate(mContext, R.layout.view_enter_password, null);
-        final TextInputLayout textInputLayout = (TextInputLayout)dialogView.findViewById(R.id.enter_pass_input_layout);
-        final AlertDialog dialogPass = new AlertDialog.Builder(mContext)
-                .setView(dialogView)
-                .setTitle(getString(R.string.view_enter_password_title))
-                .setCancelable(false)
-                .setPositiveButton(android.R.string.ok, null)
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mTabLayout.getTabAt(previousTab).select();
-                        dialog.dismiss();
-                    }
-                })
-                .create();
-        dialogPass.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(final DialogInterface dialog) {
-                dialogPass.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (textInputLayout.getEditText().getText().toString().equals("1212")){
-                            dialog.dismiss();
-                        } else {
-                            textInputLayout.setError(getString(R.string.view_enter_password_entered_incorrect));
-                        }
-                    }
-                });
-            }
-        });
-        dialogPass.show();
-    }*/
-
     @Override
     public void onSuccessBaseWrite() {
         finish();
+    }
+
+    @Override
+    public void onErrorBaseWrite() {
+
     }
 
     @Override

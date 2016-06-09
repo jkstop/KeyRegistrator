@@ -1,19 +1,14 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
-import com.example.ivsmirnov.keyregistrator.others.Values;
-
 /**
  * элемент журнала
  */
 public class JournalItem {
     private String AccountID;
-    private String Auditroom = Values.EMPTY;
+    private String Auditroom = "";
     private long TimeIn;
     private long TimeOut;
     private int AccessType;
-    private String PersonLastname = Values.EMPTY;
-    private String PersonFirstname = Values.EMPTY;
-    private String PersonMidname = Values.EMPTY;
     private String PersonPhoto;
     private String PersonPhotoPath;
     private String PersonInitials;
@@ -114,33 +109,6 @@ public class JournalItem {
 
     public int getAccessType(){
         return AccessType;
-    }
-
-    public JournalItem setPersonLastname (String personLastname){
-        this.PersonLastname = personLastname;
-        return this;
-    }
-
-    public String getPersonLastname(){
-        return PersonLastname;
-    }
-
-    public JournalItem setPersonFirstname (String personFirstname){
-        this.PersonFirstname = personFirstname;
-        return this;
-    }
-
-    public String getPersonFirstname(){
-        return PersonFirstname;
-    }
-
-    public JournalItem setPersonMidname (String personMidname){
-        this.PersonMidname = personMidname;
-        return this;
-    }
-
-    public String getPersonMidname(){
-        return PersonMidname;
     }
 
     public JournalItem setPersonPhoto (String personPhoto){

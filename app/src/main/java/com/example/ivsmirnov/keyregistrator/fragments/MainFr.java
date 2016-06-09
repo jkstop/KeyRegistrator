@@ -3,6 +3,7 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -19,19 +20,18 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.activities.UserAuth;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterMainRoomGrid;
-import com.example.ivsmirnov.keyregistrator.async_tasks.CloseRooms;
+import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
-import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
+import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.services.Toasts;
 
 import java.util.ArrayList;
 
-public class MainFr extends Fragment implements UpdateInterface,RecycleItemClickListener {
+public class MainFr extends Fragment implements RecycleItemClickListener {
 
     public static RecyclerView mAuditroomGrid;
     private int mCurrentOrientation;
@@ -39,14 +39,13 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
     private int roomGridH = 0;
 
-    private AdapterMainRoomGrid mAdapter;
+    public static AdapterMainRoomGrid mAdapter;
     private GridLayoutManager mGridManager;
 
     private Context mContext;
-    private ArrayList<RoomItem> mRoomItems;
+    public static ArrayList<RoomItem> mRoomItems;
     //private FrameLayout mFrameForGrid;
     //private CardView mDisclaimerCard;
-    private CloseRoomInterface mCloseRoomInterface;
 
     private static long lastClickTime = 0;
 
@@ -86,7 +85,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
 
         mCurrentOrientation = getResources().getConfiguration().orientation;
 
-        mCloseRoomInterface = (CloseRoomInterface)getActivity();
+        //mCloseRoomInterface = (CloseRoomInterface)getActivity();
 
         //mFrameForGrid = (FrameLayout) rootView.findViewById(R.id.frame_for_grid_aud);
 
@@ -113,7 +112,6 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         mRoomItems.addAll(RoomDB.readRoomsDB());
 
         mAdapter = new AdapterMainRoomGrid(mContext, mRoomItems,this);
-        mAdapter.hasStableIds();
         mAuditroomGrid.setAdapter(mAdapter);
         mGridManager = new GridLayoutManager(mContext,2);
         switch (getResources().getConfiguration().orientation){
@@ -129,15 +127,17 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
         mAuditroomGrid.setLayoutManager(mGridManager);
     }
 
+    public static void updateGrid(){
+        if (!mRoomItems.isEmpty()) mRoomItems.clear();
+        mRoomItems.addAll(RoomDB.readRoomsDB());
+
+        mAdapter.notifyDataSetChanged();
+    }
+
 
     @Override
     public void onResume() {
         super.onResume();
-
-        //mRoomItems = RoomDB.readRoomsDB();
-
-        //setLayoutsWeight();
-
         initializeAuditroomGrid();
     }
 
@@ -150,18 +150,7 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         ((Launcher)getActivity()).setToolbarTitle(R.string.toolbar_title_main);
-
-        //System.out.println("init mainFr main_content 1");
-        //ActionBar actionBar = ((Launcher) getActivity()).getSupportActionBar();
-        //if (actionBar != null) {
-            //System.out.println("init mainFr main_content 2");
-            //actionBar.setTitle(getResources().getString(R.string.toolbar_title_main));
-            //actionBar.setDisplayHomeAsUpEnabled(true);
-            //actionBar.setDisplayShowHomeEnabled(true);
-            //actionBar.setHomeButtonEnabled(true);
-        //}
     }
 
     @Override
@@ -170,26 +159,15 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
             return;
         }
         if (mRoomItems.get(position).getStatus() == RoomDB.ROOM_IS_FREE) {
-            Settings.setLastClickedAuditroom(mRoomItems.get(position).getAuditroom());
-            //Bundle bundle = new Bundle();
-            //bundle.putInt(PersonsFr.PERSONS_FRAGMENT_TYPE, PersonsFr.PERSONS_FRAGMENT_SELECTOR);
-            //UserAuthFr nfc_fr = UserAuthFr.newInstance();
-            //nfc_fr.setArguments(bundle);
-
-            //Launcher.showFragment(getActivity().getSupportFragmentManager(), nfc_fr, R.string.fragment_tag_nfc);
-
-            //if (Launcher.sCardConnected && Launcher.sReaderStateChangeListener!=null) Launcher.sReaderStateChangeListener.onStateChange(0, 1, 2);
-
-            //new DialogUserAuth().show(getFragmentManager(),);
-
-            startActivity(new Intent(mContext, UserAuth.class).putExtra(PersonsFr.PERSONS_SELECTED_ROOM, mRoomItems.get(position).getAuditroom()));
-
-
+            //startActivity(new Intent(mContext, UserAuth.class).putExtra(PersonsFr.PERSONS_SELECTED_ROOM, mRoomItems.get(position).getAuditroom()));
+            DialogUserAuth.newInstance(mRoomItems.get(position).getAuditroom()).show(getActivity().getSupportFragmentManager(),getString(R.string.title_activity_user_auth));
         } else {
             if (mRoomItems.get(position).getAccessType() == FavoriteDB.CLICK_USER_ACCESS) {
-                new CloseRooms(mContext, mRoomItems.get(position).getTag(), mCloseRoomInterface).execute();
+
+                new BaseWriter(BaseWriter.UPDATE_CURRENT, mContext, (BaseWriter.Callback)getActivity())
+                        .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams().setPersonTag(mRoomItems.get(position).getTag()));
             }else{
-                Toasts.showFullscreenToast(mContext,getResources().getString(R.string.text_toast_put_card),Toasts.TOAST_NEGATIVE);
+                Toasts.handler.sendEmptyMessage(Toasts.TOAST_PUT_CARD_FIRST);
             }
         }
         lastClickTime = SystemClock.elapsedRealtime();
@@ -199,26 +177,9 @@ public class MainFr extends Fragment implements UpdateInterface,RecycleItemClick
     public void onItemLongClick(View v, int position, long timeIn) {
         if (mRoomItems.get(position).getStatus() == RoomDB.ROOM_IS_BUSY){
             if (mRoomItems.get(position).getAccessType()== FavoriteDB.CARD_USER_ACCESS){
-                //Dialogs dialogs = new Dialogs();
-                //Bundle bundle = new Bundle();
-                //bundle.putLong(Values.POSITION_IN_BASE_FOR_ROOM,mRoomItems.get(position).getTime());
-                //bundle.putString("aud",mRoomItems.get(position).getAuditroom());
-                //bundle.putString("tag",mRoomItems.get(position).getTag());
-                //bundle.putLong("positionInBase",mRoomItems.get(position).getTime());
-                //bundle.putInt(Dialogs.DIALOG_ENTER_PASSWORD_TYPE, Dialogs.DIALOG_ENTER_PASSWORD_TYPE_CLOSE_ROOM);
-                //bundle.putInt(Dialogs.DIALOG_TYPE,Dialogs.DIALOG_ENTER_PASSWORD);
-                //dialogs.setArguments(bundle);
-                //dialogs.show(getFragmentManager(),"enter_pin");
                 DialogPassword.newInstance(mRoomItems.get(position).getTag(), null)
                         .show(getFragmentManager(), DialogPassword.ROOMS_ACCESS);
             }
         }
     }
-
-    @Override
-    public void updateInformation() {
-        //setLayoutsWeight();
-        initializeAuditroomGrid();
-    }
-
 }

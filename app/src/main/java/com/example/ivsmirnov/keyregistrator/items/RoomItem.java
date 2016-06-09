@@ -1,18 +1,15 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
-import com.example.ivsmirnov.keyregistrator.others.Values;
-
 /**
  * элемент карточки помещения
  */
 public class RoomItem {
-    private String Auditroom = Values.EMPTY;
+    private String Auditroom = "";
     private int Status;
     private int Access;
     private long Time = 0;
-    private String LastVisiter  =Values.EMPTY;
-    private String Tag = Values.EMPTY;
-    private String Photo = Values.EMPTY;
+    private String LastVisiter = "";
+    private String Tag = "";
     private int GridHeight = 0;
     private int GridOrient = 0;
 

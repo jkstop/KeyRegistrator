@@ -179,7 +179,7 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
                         }
                         //получаем список тэгов, которых нет на сервере. Для каждого пишем пользователя
                         for (String tag : compareStringLists(localTags, serverTags)){
-                            writePersonItemToServer(mStatement, FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER, true));
+                            writePersonItemToServer(mStatement, FavoriteDB.getPersonItem(tag, true));
                         }
 
                         //помещения
@@ -336,7 +336,7 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
                         //если передан RoomItem, то обновляем на сервере одно помещение. Если RoomItem == null, то обновляем все помещения
                         if (mRoomItem != null){
                             mResult = mStatement.executeQuery("SELECT * FROM " +SQL_Connection.ROOMS_TABLE
-                                    + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " = " + mRoomItem.getAuditroom());
+                                    + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " = '" + mRoomItem.getAuditroom() + "'");
                             mResult.first();
 
                             //если помещение отсутствует на сервере,пишем его

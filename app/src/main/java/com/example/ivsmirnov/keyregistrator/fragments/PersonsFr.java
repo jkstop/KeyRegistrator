@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -13,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,26 +29,20 @@ import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsCharacters;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPersonsGrid;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileLoader;
-import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
-import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
-import com.example.ivsmirnov.keyregistrator.interfaces.Updatable;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.util.ArrayList;
 
-public class PersonsFr extends Fragment implements UpdateInterface, Updatable, RecycleItemClickListener,
+public class PersonsFr extends Fragment implements
+        RecycleItemClickListener,
         DialogPersonInfo.Callback,
-DialogSearch.Callback{
+        DialogSearch.Callback{
 
     public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
     public static final String PERSONS_FRAGMENT_TYPE = "persons_fragment_type";
@@ -76,8 +68,6 @@ DialogSearch.Callback{
     private AdapterPersonsCharacters mListCharAdapter;
 
     private FloatingActionButton mAddFAB;
-
-    private BaseWriterInterface mBaseWriterInterface;
 
     private ArrayList<CharacterItem> mListCharacters;
 
@@ -140,8 +130,6 @@ DialogSearch.Callback{
         mListCharacters = new ArrayList<>();
         mPersonsList = new ArrayList<>();
 
-        mBaseWriterInterface = (BaseWriterInterface)getActivity();
-
         mListView = (ListView)rootView.findViewById(R.id.persons_fragment_list_characters);
         mLoadingBar = (ProgressBar)rootView.findViewById(R.id.layout_persons_fragment_loading_progress_bar);
 
@@ -201,7 +189,7 @@ DialogSearch.Callback{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_person_add:
-                DialogSearch.newInstance(null, 0, this).show(getChildFragmentManager(),"search");
+                DialogSearch.newInstance(null, 0).show(getChildFragmentManager(),"search");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -258,12 +246,6 @@ DialogSearch.Callback{
         System.out.println("pause");
     }
 
-
-    @Override
-    public void updateInformation() {
-        initPersons("#", true).start();
-    }
-
     private Thread initPersons (final String character, final boolean isInitAllCharacters){
         return new Thread(new Runnable() {
             @Override
@@ -281,56 +263,12 @@ DialogSearch.Callback{
     }
 
     @Override
-    public void onItemDeleted(int position) {
-        mPersonsList.remove(position);
-        mAdapter.notifyItemRemoved(position);
-    }
-
-    @Override
-    public void onItemChanged(String tag, int position) {
-        PersonItem updatedPerson = FavoriteDB.getPersonItem(tag, FavoriteDB.LOCAL_USER, false);
-
-        mPersonsList.get(position)
-                .setLastname(updatedPerson.getLastname())
-                .setFirstname(updatedPerson.getFirstname())
-                .setMidname(updatedPerson.getMidname())
-                .setDivision(updatedPerson.getDivision())
-                .setAccessType(updatedPerson.getAccessType());
-        mAdapter.notifyItemChanged(position);
-    }
-
-    @Override
     public void onItemClick(View v, int position, int viewID) {
         switch (bundleType){
             case PERSONS_FRAGMENT_SELECTOR:
-                if (SystemClock.elapsedRealtime() - lastClickTime < 1000) return;
-                if (bundleRoom!=null){
-                    new BaseWriter(mContext, mBaseWriterInterface).execute(new BaseWriterParams()
-                            .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
-                            .setAuditroom(bundleRoom)
-                            .setPersonTag(mPersonsList.get(position).getRadioLabel()));
-                }
-                lastClickTime = SystemClock.elapsedRealtime();
-
+                writeInBase(position, FavoriteDB.CLICK_USER_ACCESS);
                 break;
             case PERSONS_FRAGMENT_EDITOR:
-                //Bundle b = new Bundle();
-                //b.putInt(Dialogs.DIALOG_TYPE, Dialogs.DIALOG_EDIT);
-                //b.putString(Dialogs.BUNDLE_TAG, mPersonsList.get(position).getRadioLabel());
-                //b.putInt(Dialogs.DIALOG_PERSON_INFORMATION_KEY_POSITION, position);
-                //Dialogs dialog = new Dialogs();
-                //dialog.setArguments(b);
-                //dialog.setTargetFragment(PersonsFr.this, 0);
-                //dialog.show(getChildFragmentManager(), "edit");
-
-                //ArrayList<String> item = new ArrayList<>();
-                //item.add(DialogPersonInfo.PERSON_LASTNAME, mPersonsList.get(position).getLastname());
-                //item.add(DialogPersonInfo.PERSON_FIRSTNAME, mPersonsList.get(position).getFirstname());
-                //item.add(DialogPersonInfo.PERSON_MIDNAME, mPersonsList.get(position).getMidname());
-                //item.add(DialogPersonInfo.PERSON_DIVISION, mPersonsList.get(position).getDivision());
-                //item.add(DialogPersonInfo.PERSON_ACCESS, String.valueOf(mPersonsList.get(position).getAccessType()));
-                //item.add(DialogPersonInfo.PERSON_TAG, mPersonsList.get(position).getRadioLabel());
-
                 String [] itemM = new String[6];
                 itemM[DialogPersonInfo.PERSON_LASTNAME] = mPersonsList.get(position).getLastname();
                 itemM[DialogPersonInfo.PERSON_FIRSTNAME] = mPersonsList.get(position).getFirstname();
@@ -340,25 +278,30 @@ DialogSearch.Callback{
                 itemM[DialogPersonInfo.PERSON_TAG] = mPersonsList.get(position).getRadioLabel();
 
                 DialogPersonInfo.newInstanse(itemM, position).show(getChildFragmentManager(), "person_info");
-
                 break;
             default:
                 break;
         }
     }
 
+    private void writeInBase(int clickedPosition, int accessType){
+        if (SystemClock.elapsedRealtime() - lastClickTime < 1000) return;
+        if (bundleRoom!=null){
+            new BaseWriter(BaseWriter.WRITE_NEW, mContext, (BaseWriter.Callback)getParentFragment())
+                    .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
+                            .setAccessType(accessType)
+                            .setAuditroom(bundleRoom)
+                            .setPersonTag(mPersonsList.get(clickedPosition).getRadioLabel()));
+        }
+        lastClickTime = SystemClock.elapsedRealtime();
+    }
+
+
     @Override
     public void onItemLongClick(View v, int position, long timeIn) {
         switch (bundleType){
             case PERSONS_FRAGMENT_SELECTOR:
-                if (SystemClock.elapsedRealtime() - lastClickTime < 1000) return;
-                if (bundleRoom!=null){
-                    new BaseWriter(mContext, mBaseWriterInterface).execute(new BaseWriterParams()
-                            .setAccessType(FavoriteDB.CARD_USER_ACCESS)
-                            .setAuditroom(bundleRoom)
-                            .setPersonTag(mPersonsList.get(position).getRadioLabel()));
-                }
-                lastClickTime = SystemClock.elapsedRealtime();
+                writeInBase(position, FavoriteDB.CARD_USER_ACCESS);
                 break;
             default:
                 break;

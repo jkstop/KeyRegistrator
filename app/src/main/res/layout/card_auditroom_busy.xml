@@ -36,19 +36,11 @@
                 android:id="@+id/card_auditroom_busy_image_key"
                 android:contentDescription="@string/auditroom_grid_busy_image_key_description"
                 android:layout_alignEnd="@id/card_auditroom_busy_image_person"
-                android:layout_alignRight="@id/card_auditroom_busy_image_person"
                 android:src="@drawable/ic_key_color"
                 android:layout_alignParentBottom="true"
                 android:scaleType="fitEnd"
                 app:layout_widthPercent="35%"
                 app:layout_heightPercent = "35%"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <ProgressBar
-                android:id="@+id/card_auditroom_busy_image_progress"
-                android:layout_centerInParent="true"
-                android:visibility="invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 

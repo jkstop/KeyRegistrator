@@ -3,9 +3,7 @@ package com.example.ivsmirnov.keyregistrator.fragments;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -17,8 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
@@ -29,11 +25,9 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.ImageSaver;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
-import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.io.File;
@@ -75,12 +69,11 @@ public class DialogSearch extends DialogFragment implements
 
     private SQL_Connection.Callback mSQLCallback;
     private ServerReader.Callback mServerReaderCallback;
-    private static Callback mCallback;
+    private Callback mCallback;
 
     private int queryLength = 0;
 
-    public static DialogSearch newInstance (String selectedRoom, int type, Callback callback){
-        mCallback = callback;
+    public static DialogSearch newInstance (String selectedRoom, int type){
         DialogSearch dialogSearch = new DialogSearch();
         Bundle bundle = new Bundle();
         bundle.putString(BUNDLE_ROOM, selectedRoom);
@@ -110,6 +103,7 @@ public class DialogSearch extends DialogFragment implements
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View dialogView = inflater.inflate(R.layout.view_dialog_search, container, false);
         mContext = getContext();
+        mCallback = (Callback)getParentFragment();
         mPersonList = new ArrayList<>();
         mSQLCallback = this;
         mServerReaderCallback = this;
@@ -194,7 +188,7 @@ public class DialogSearch extends DialogFragment implements
                     addNewUser(personItem);
 
                     if (mSelectedRoom!=null){
-                        new BaseWriter(mContext, (BaseWriterInterface)getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
+                        new BaseWriter(BaseWriter.WRITE_NEW, mContext, (BaseWriter.Callback)getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
                                 .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
                                 .setAuditroom(mSelectedRoom)
                                 .setPersonTag(personItem.getRadioLabel()));
@@ -265,7 +259,7 @@ public class DialogSearch extends DialogFragment implements
             addNewUser(personItem);
 
             if (mSelectedRoom!=null){
-                new BaseWriter(mContext, (BaseWriterInterface)getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
+                new BaseWriter(BaseWriter.WRITE_NEW, mContext, (BaseWriter.Callback)getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
                         .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
                         .setAuditroom(mSelectedRoom)
                         .setPersonTag(personItem.getRadioLabel()));

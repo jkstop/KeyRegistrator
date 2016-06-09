@@ -60,7 +60,6 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
         public TextView mBusyTextAuditroom;
         public TextView mBusyTextPerson;
         public CardView mBusyCard;
-        public ProgressBar mProgress;
 
         public auditroomBusyViewHolder(View itemView) {
             super(itemView);
@@ -68,7 +67,6 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
             mBusyTextAuditroom = (TextView)itemView.findViewById(R.id.card_auditroom_busy_text_auditroom);
             mBusyTextPerson = (TextView)itemView.findViewById(R.id.card_auditroom_busy_text_person);
             mBusyCard = (CardView)itemView.findViewById(R.id.card_auditroom_busy);
-            mProgress = (ProgressBar)itemView.findViewById(R.id.card_auditroom_busy_image_progress);
         }
     }
 

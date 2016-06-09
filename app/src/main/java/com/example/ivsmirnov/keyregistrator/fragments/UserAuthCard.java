@@ -23,14 +23,23 @@ import com.example.ivsmirnov.keyregistrator.R;
  */
 public class UserAuthCard extends Fragment {
 
-    public static final String SELECTED_ROOM = "SELECTED_ROOM";
+    private String mSelectedRoom;
 
     public static UserAuthCard newInstance (String selectedRoom){
         UserAuthCard userAuthCard = new UserAuthCard();
         Bundle bundle = new Bundle();
-        bundle.putString(SELECTED_ROOM, selectedRoom);
+        bundle.putString(PersonsFr.PERSONS_SELECTED_ROOM, selectedRoom);
         userAuthCard.setArguments(bundle);
         return userAuthCard;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle extras = getArguments();
+        if (extras!=null){
+            mSelectedRoom = extras.getString(PersonsFr.PERSONS_SELECTED_ROOM, null);
+        }
     }
 
     @Nullable

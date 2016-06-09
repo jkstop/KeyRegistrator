@@ -45,7 +45,7 @@
         <activity
             android:name=".activities.UserAuth"
             android:parentActivityName=".activities.Launcher"
-            android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize"
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboardHidden"
             android:label="@string/title_activity_user_auth"/>
 
         <activity

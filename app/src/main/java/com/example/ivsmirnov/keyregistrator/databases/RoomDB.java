@@ -2,22 +2,14 @@ package com.example.ivsmirnov.keyregistrator.databases;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.os.AsyncTask;
-import android.os.Environment;
 
-import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
-import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Set;
 
 /**
  * ДБ помещений
@@ -49,9 +41,9 @@ public class RoomDB {
         int updatedRooms = 0;
         try {
             String roomPosition;
-            if (!roomItem.getAuditroom().equals(Values.EMPTY)){
+            if (!roomItem.getAuditroom().equals("")){
                 roomPosition = DbShare.getDataBase(DbShare.DB_ROOM).compileStatement("SELECT * FROM " + RoomDBinit.TABLE_ROOMS +
-                        " WHERE " + RoomDBinit.COLUMN_ROOM + " = " + roomItem.getAuditroom()).simpleQueryForString();
+                        " WHERE " + RoomDBinit.COLUMN_ROOM + " = '" + roomItem.getAuditroom() + "'").simpleQueryForString();
             }else{
                 roomPosition = DbShare.getDataBase(DbShare.DB_ROOM).compileStatement("SELECT * FROM " + RoomDBinit.TABLE_ROOMS +
                         " WHERE " + RoomDBinit.COLUMN_TAG + " = " + roomItem.getTag()).simpleQueryForString();
@@ -314,8 +306,6 @@ public class RoomDB {
                     stringBuilder.append(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_LAST_VISITER)));
                     stringBuilder.append(delimeter);
                     stringBuilder.append(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG)));
-                    //stringBuilder.append(delimeter);
-                    //stringBuilder.append(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_PHOTO_PATH)));
 
                     System.out.println("string: " + stringBuilder.toString());
 
@@ -341,15 +331,10 @@ public class RoomDB {
         for (RoomItem roomItem : rooms){
             if (roomItem.getStatus() == ROOM_IS_BUSY){
                 roomItem.setStatus(ROOM_IS_FREE);
-                roomItem.setTag(Values.EMPTY);
+                roomItem.setTag("");
 
                 RoomDB.updateRoom(roomItem);
                 JournalDB.updateDB(roomItem.getTime(), System.currentTimeMillis());
-
-                //if (Settings.getWriteServerStatus() &&
-                //        Settings.getWriteServerItems().contains(App.getAppContext().getResources().getStringArray(R.array.shared_preferences_write_server_items_entries)[0])){
-                //    new ServerWriter(new JournalItem().setTimeIn(roomItem.getTime())).execute(ServerWriter.JOURNAL_UPDATE);
-                //}
 
                 closedRooms++;
             }

@@ -12,13 +12,11 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.adapters.AdapterEmailExtras;
+import com.example.ivsmirnov.keyregistrator.adapters.AdapterPreferenceExtra;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,12 +24,12 @@ import java.util.Comparator;
 /**
  * Created by Илья on 07.06.2016.
  */
-public class RoomsPreference extends DialogPreference implements AdapterEmailExtras.Callback{
+public class RoomsPreference extends DialogPreference implements AdapterPreferenceExtra.Callback{
 
     private Context mContext;
     private ArrayList<String> mRoomList;
     private ArrayList<String> mPreviousRoomList;
-    private AdapterEmailExtras mAdapter;
+    private AdapterPreferenceExtra mAdapter;
     private int pressedButton = 0;
 
     public RoomsPreference(Context context, AttributeSet attrs) {
@@ -52,7 +50,7 @@ public class RoomsPreference extends DialogPreference implements AdapterEmailExt
         mRoomList.addAll(RoomDB.getRoomList());
         mPreviousRoomList = new ArrayList<>(mRoomList);
         RecyclerView roomListRecycler = (RecyclerView)dialogView.findViewById(R.id.preference_email_extra_list);
-        mAdapter = new AdapterEmailExtras(mContext, AdapterEmailExtras.ROOMS, mRoomList, this);
+        mAdapter = new AdapterPreferenceExtra(mContext, AdapterPreferenceExtra.ROOMS, mRoomList, this);
         roomListRecycler.setLayoutManager(new LinearLayoutManager(mContext));
         roomListRecycler.setAdapter(mAdapter);
         return dialogView;
@@ -66,8 +64,8 @@ public class RoomsPreference extends DialogPreference implements AdapterEmailExt
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mRoomList.contains(AdapterEmailExtras.ADD_NEW_ITEM)){
-                    mRoomList.add(AdapterEmailExtras.ADD_NEW_ITEM);
+                if (!mRoomList.contains(AdapterPreferenceExtra.ADD_NEW_ITEM)){
+                    mRoomList.add(AdapterPreferenceExtra.ADD_NEW_ITEM);
                     mAdapter.notifyItemInserted(mRoomList.size());
                 }
             }
@@ -84,8 +82,8 @@ public class RoomsPreference extends DialogPreference implements AdapterEmailExt
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
         if (pressedButton == AlertDialog.BUTTON_POSITIVE){
-            if (mRoomList.contains(AdapterEmailExtras.ADD_NEW_ITEM)){
-                mRoomList.remove(AdapterEmailExtras.ADD_NEW_ITEM);
+            if (mRoomList.contains(AdapterPreferenceExtra.ADD_NEW_ITEM)){
+                mRoomList.remove(AdapterPreferenceExtra.ADD_NEW_ITEM);
             }
 
             for (String s : mRoomList){
@@ -117,7 +115,7 @@ public class RoomsPreference extends DialogPreference implements AdapterEmailExt
     @Override
     public void onAddItem(String item) {
         mRoomList.add(item);
-        mRoomList.remove(AdapterEmailExtras.ADD_NEW_ITEM);
+        mRoomList.remove(AdapterPreferenceExtra.ADD_NEW_ITEM);
 
         Collections.sort(mRoomList, new Comparator<String>() {
             @Override

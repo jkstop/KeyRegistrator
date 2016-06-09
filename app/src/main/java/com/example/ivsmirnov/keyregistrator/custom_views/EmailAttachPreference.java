@@ -11,8 +11,7 @@ import android.view.View;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Preferences;
-import com.example.ivsmirnov.keyregistrator.adapters.AdapterEmailExtras;
-import com.example.ivsmirnov.keyregistrator.interfaces.EmailInterface;
+import com.example.ivsmirnov.keyregistrator.adapters.AdapterPreferenceExtra;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.io.File;
@@ -21,12 +20,12 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 30.05.2016.
  */
-public class EmailAttachPreference extends DialogPreference implements AdapterEmailExtras.Callback{
+public class EmailAttachPreference extends DialogPreference implements AdapterPreferenceExtra.Callback{
 
     public static final int REQUEST_CODE_SELECT_EMAIL_ATTACHMENT = 206;
 
     private Context mContext;
-    private AdapterEmailExtras mAdapter;
+    private AdapterPreferenceExtra mAdapter;
     private ArrayList<String> mAttachList;
 
 
@@ -45,7 +44,7 @@ public class EmailAttachPreference extends DialogPreference implements AdapterEm
     protected View onCreateDialogView() {
         View dialogView = View.inflate(mContext, R.layout.view_email_extra_list, null);
         mAttachList = Settings.getAttachments();
-        mAdapter = new AdapterEmailExtras(mContext, AdapterEmailExtras.ATTACHMENTS, mAttachList, this);
+        mAdapter = new AdapterPreferenceExtra(mContext, AdapterPreferenceExtra.ATTACHMENTS, mAttachList, this);
         RecyclerView attachListView = (RecyclerView)dialogView.findViewById(R.id.preference_email_extra_list);
         attachListView.setAdapter(mAdapter);
         attachListView.setLayoutManager(new LinearLayoutManager(mContext));

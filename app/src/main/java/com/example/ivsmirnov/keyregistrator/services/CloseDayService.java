@@ -13,8 +13,6 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
-import com.example.ivsmirnov.keyregistrator.interfaces.CloseDayInterface;
-import com.example.ivsmirnov.keyregistrator.items.MailParams;
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.activities.CloseDay;
@@ -23,7 +21,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class CloseDayService extends Service implements CloseDayInterface, SQL_Connection.Callback {
+public class CloseDayService extends Service implements SQL_Connection.Callback {
 
     private Context context;
 
@@ -72,13 +70,14 @@ public class CloseDayService extends Service implements CloseDayInterface, SQL_C
             }
 
             //установка планировщика
-            //mAlarm.setAlarm(System.currentTimeMillis() + AlarmManager.INTERVAL_DAY);
             Alarm.setAlarm(System.currentTimeMillis() + AlarmManager.INTERVAL_DAY);
 
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            onClosed();
+            startActivity(new Intent(getApplicationContext(), CloseDay.class)
+                    .putExtra(CloseDay.TITLE, CloseDay.CLOSE_TITLE)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
         }
         return START_NOT_STICKY;
     }
@@ -91,13 +90,6 @@ public class CloseDayService extends Service implements CloseDayInterface, SQL_C
         return null;
     }
 
-    @Override
-    public void onClosed() {
-
-        startActivity(new Intent(getApplicationContext(), CloseDay.class)
-                .putExtra(CloseDay.TITLE, CloseDay.CLOSE_TITLE)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP));
-    }
 
     @Override
     public void onServerConnected(Connection connection, int callingTask) {

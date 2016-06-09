@@ -1,28 +1,18 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.preference.MultiSelectListPreference;
 
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-
-import android.preference.PreferenceScreen;
-import android.support.v7.preference.PreferenceFragmentCompat;
-import android.text.TextUtils;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Preferences;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileLoader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
-import com.example.ivsmirnov.keyregistrator.custom_views.EmailAttachPreference;
-import com.example.ivsmirnov.keyregistrator.items.MailParams;
-import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.services.Alarm;
 import com.nononsenseapps.filepicker.FilePickerActivity;

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -14,9 +13,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -26,18 +22,15 @@ import android.widget.SpinnerAdapter;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterJournalList;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
+import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.FileLoader;
-import com.example.ivsmirnov.keyregistrator.async_tasks.FileWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.interfaces.Updatable;
-import com.example.ivsmirnov.keyregistrator.interfaces.UpdateInterface;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.nononsenseapps.filepicker.FilePickerActivity;
 
+import java.sql.Connection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,7 +38,11 @@ import java.util.Date;
 import java.util.Locale;
 
 
-public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnNavigationListener, RecycleItemClickListener, Updatable, ServerWriter.Callback {
+public class JournalFr extends Fragment implements
+        ActionBar.OnNavigationListener,
+        RecycleItemClickListener,
+        ServerWriter.Callback,
+        SQL_Connection.Callback {
 
     public static final int REQUEST_CODE_SELECT_BACKUP_JOURNAL_LOCATION = 203;
 
@@ -64,6 +61,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
     private ProgressBar mLoadingBar;
 
     public static boolean contentNeedsForUpdate = false;
+    private int selectedPosition = 0;
 
     public static JournalFr newInstance() {
         return new JournalFr();
@@ -133,7 +131,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
         showDateSpinner();
 
         if (contentNeedsForUpdate){
-            updateInformation();
+            updateList();
             contentNeedsForUpdate = false;
         }
     }
@@ -174,8 +172,7 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
         }
     }
 
-    @Override
-    public void updateInformation() {
+    private void updateList(){
         if (!mDates.isEmpty()) mDates.clear();
         mDates.addAll(getDates());
 
@@ -203,15 +200,13 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
 
     @Override
     public void onItemClick(View v, int position, int viewID) {
+        selectedPosition = position;
 
-
-        System.out.println(position);
-        System.out.println("item " + mJournalItems.get(position).getPersonInitials());
-        //удаление из базы - wrong position?
+        //удаление из базы
         JournalDB.deleteFromDB(mJournalItems.get(position).getTimeIn());
 
         if (Settings.getWriteServerStatus()){
-            new ServerWriter(ServerWriter.DELETE_ONE, mJournalItems.get(position), this);
+            SQL_Connection.getConnection(null, 0, this);
         }
 
         mJournalItems.remove(position);
@@ -220,14 +215,6 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
 
     @Override
     public void onItemLongClick(View v, int position, long timeIn) {
-        Dialogs dialogs = new Dialogs();
-        Bundle bundle = new Bundle();
-        bundle.putInt(Dialogs.DIALOG_TYPE, Dialogs.DELETE_JOURNAL_ITEM);
-        bundle.putLong(Dialogs.BUNDLE_TAG, timeIn);
-        bundle.putInt(Dialogs.BUNDLE_POSITION, position);
-        dialogs.setArguments(bundle);
-        dialogs.setTargetFragment(this,0);
-        dialogs.show(getFragmentManager(), getResources().getString(R.string.title_dialog_delete_journal_item));
     }
 
     private Thread getJournal (final Date date){
@@ -245,22 +232,22 @@ public class JournalFr extends Fragment implements UpdateInterface,ActionBar.OnN
     }
 
     @Override
-    public void onItemDeleted(int position) {
-        mJournalItems.remove(position);
-        mAdapterjournallist.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onItemChanged(String tag, int position) {
-    }
-
-    @Override
     public void onSuccessServerWrite() {
 
     }
 
     @Override
     public void onErrorServerWrite() {
+
+    }
+
+    @Override
+    public void onServerConnected(Connection connection, int callingTask) {
+        new ServerWriter(ServerWriter.DELETE_ONE, mJournalItems.get(selectedPosition), this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+    }
+
+    @Override
+    public void onServerConnectException(Exception e) {
 
     }
 }

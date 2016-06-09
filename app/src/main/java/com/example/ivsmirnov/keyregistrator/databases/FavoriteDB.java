@@ -14,15 +14,11 @@ import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,13 +47,13 @@ public class FavoriteDB {
 
     public static final String PERSONS_VALIDATE = "H4KkNBL1EIzJKoN";
 
-    public static PersonItem getPersonItem(String tag, int userLocation, boolean withBase64Photo){
+    public static PersonItem getPersonItem(String tag, boolean withBase64Photo){
 
         Cursor cursor = null;
         try {
             PersonItem personItem;
-            if (userLocation == LOCAL_USER){
-                cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
+
+            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
                         FavoriteDBinit.TABLE_PERSONS,
                             null,
                             FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
@@ -66,7 +62,7 @@ public class FavoriteDB {
                             null,
                         "1");
 
-                if (cursor!=null && cursor.getCount()>0){
+            if (cursor!=null && cursor.getCount()>0){ //пользователь найден, возвращаем его
                     cursor.moveToFirst();
                     personItem = new PersonItem()
                             .setLastname(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE)))
@@ -77,7 +73,7 @@ public class FavoriteDB {
                             .setAccessType(cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE)))
                             .setRadioLabel(tag)
                             .setPhotoPath(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE)));
-                    if (withBase64Photo){
+                if (withBase64Photo){
                         if (personItem.getPhotoPath()!=null){
                             Bitmap personImageBitmap = BitmapFactory.decodeFile(personItem.getPhotoPath());
                             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -86,69 +82,11 @@ public class FavoriteDB {
                             personItem.setPhoto(Base64.encodeToString(imageByte, Base64.NO_WRAP));
                         }
                     }
-                    return personItem;
-                } else {
-                    return null;
-                }
-            }/*else if (userLocation == SERVER_USER){
+                return personItem;
 
-
-               // SQL_Connection.getConnection(null, SERVER_USER, this);
-
-                Connection connection = SQL_Connection.getConnection(null,null);
-                if (connection!=null){
-                    try {
-                        //получаем всю инфу с сервера о пользователе
-                        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                        ResultSet resultSet = statement.executeQuery("SELECT * FROM " + SQL_Connection.ALL_STAFF_TABLE
-                                + " WHERE " + SQL_Connection.COLUMN_ALL_STAFF_TAG + " = '" + tag + "'");
-                        resultSet.first();
-                        if (resultSet.getRow() !=0){
-                            PersonItem serverPersonItem = new PersonItem().setLastname(resultSet.getString("LASTNAME"))
-                                    .setFirstname(resultSet.getString("FIRSTNAME"))
-                                    .setMidname(resultSet.getString("MIDNAME"))
-                                    .setDivision(resultSet.getString("NAME_DIVISION"))
-                                    .setSex(resultSet.getString("SEX"))
-                                    .setRadioLabel(resultSet.getString("RADIO_LABEL"));
-                            if (withBase64Photo){
-                                serverPersonItem.setPhoto(resultSet.getString("PHOTO"));
-                            }
-                            System.out.println("serverPersonItemPhoto " + serverPersonItem.getPhoto());
-                            return serverPersonItem;
-                        }
-
-                        /*    String photo = resultSet.getString("PHOTO");
-
-                            if (photo == null)
-                                photo = getBase64DefaultPhotoFromResources();
-
-                            switch (photoType) {
-                                case FULLSIZE_PHOTO:
-                                    personItem.setPhotoOriginal(photo);
-                                    break;
-                                case PREVIEW_PHOTO:
-                                    personItem.setPhotoPreview(getPhotoPreview(photo));
-                                    break;
-                                case ALL_PHOTO:
-                                    personItem.setPhotoOriginal(photo);
-                                    personItem.setPhotoPreview(getPhotoPreview(photo));
-                                    break;
-                                case NO_PHOTO:
-                                    break;
-                                default:
-                                    break;
-                            }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }else{
-                    //ПОПРОБОВАТЬ СДЕЛАТЬ SNACKBAR
-                    //Toast.makeText(mContext,"Нет подключения к серверу!",Toast.LENGTH_SHORT).show();
-                    return null;
-                }
-            }*/
-            return null;
+            } else { //пользователя нет
+                return null;
+            }
         }catch (Exception e){
             e.printStackTrace();
             return null;
@@ -329,16 +267,16 @@ public class FavoriteDB {
             if (cursor.getCount()>0){
                 cursor.moveToFirst();
                 ContentValues cv = new ContentValues();
-                if (!personItem.getLastname().equals(Values.EMPTY)){
+                if (!personItem.getLastname().equals("")){
                     cv.put(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE,personItem.getLastname());
                 }
-                if (!personItem.getFirstname().equals(Values.EMPTY)){
+                if (!personItem.getFirstname().equals("")){
                     cv.put(FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
                 }
-                if (!personItem.getMidname().equals(Values.EMPTY)){
+                if (!personItem.getMidname().equals("")){
                     cv.put(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE,personItem.getMidname());
                 }
-                if (!personItem.getDivision().equals(Values.EMPTY)){
+                if (!personItem.getDivision().equals("")){
                     cv.put(FavoriteDBinit.COLUMN_DIVISION_FAVORITE, personItem.getDivision());
                 }
                 if (personItem.getAccessType() != 0 ){
@@ -804,7 +742,7 @@ public class FavoriteDB {
     }
 
     public static String getPersonInitials (int initialsType, String lastname, String firstname, String midname){
-        String initials = Values.EMPTY;
+        String initials = "";
         switch (initialsType){
             case SHORT_INITIALS:
                 if (lastname != null && firstname != null && midname != null && firstname.length() != 0 && midname.length() != 0) {

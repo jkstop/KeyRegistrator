@@ -1,19 +1,23 @@
 package com.example.ivsmirnov.keyregistrator.activities;
 
+import android.app.ActivityManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -34,29 +38,22 @@ import android.widget.Toast;
 
 import com.acs.smartcard.Reader;
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.adapters.AdapterNavigationDrawerList;
+import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
-import com.example.ivsmirnov.keyregistrator.custom_views.SQLPreference;
 import com.example.ivsmirnov.keyregistrator.databases.DbShare;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
-import com.example.ivsmirnov.keyregistrator.fragments.DialogSearch;
+import com.example.ivsmirnov.keyregistrator.fragments.DialogUserAuth;
 import com.example.ivsmirnov.keyregistrator.fragments.JournalFr;
 import com.example.ivsmirnov.keyregistrator.fragments.MainFr;
 import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
-import com.example.ivsmirnov.keyregistrator.fragments.RoomsFr;
-import com.example.ivsmirnov.keyregistrator.fragments.SettingsFr;
-import com.example.ivsmirnov.keyregistrator.interfaces.CloseRoomInterface;
-import com.example.ivsmirnov.keyregistrator.interfaces.GetAccountInterface;
-import com.example.ivsmirnov.keyregistrator.interfaces.BaseWriterInterface;
+import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-import com.example.ivsmirnov.keyregistrator.fragments.Dialogs;
 
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 import com.example.ivsmirnov.keyregistrator.services.Alarm;
-import com.example.ivsmirnov.keyregistrator.services.NFC;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -70,14 +67,17 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Launcher extends AppCompatActivity implements
-        BaseWriterInterface,
-        CloseRoomInterface,
 ServerWriter.Callback,
 ServerReader.Callback,
 SQL_Connection.Callback,
+        BaseWriter.Callback,
+        DialogUserAuth.Callback,
+//NFC.Callback,
         GoogleApiClient.OnConnectionFailedListener,
         NavigationView.OnNavigationItemSelectedListener{
 
@@ -90,20 +90,12 @@ SQL_Connection.Callback,
     private Handler mHandler;
 
     //NFC reader
-    private NFC mNFCReader;
-
-    //adapters
-    public static AdapterNavigationDrawerList mAdapterNavigationDrawerList;
+    private NFC_reader mNFCReader;
 
     //account
     private TextView mAccountName, mAccountEmail;
     private ImageView mAccountImage, mAccountExit;
     private DrawerLayout mDrawer;
-
-    //interfaces
-    private GetAccountInterface mGetAccountInterface;
-    private BaseWriterInterface mBaseWriterInterface;
-    private CloseRoomInterface mCloseRoomInterface;
 
     private ServerWriter.Callback mServerWriteCallback;
     private SQL_Connection.Callback mSQLConnectCallback;
@@ -116,6 +108,7 @@ SQL_Connection.Callback,
     private Reader mReader;
     public static Reader.OnStateChangeListener sReaderStateChangeListener;
     public static boolean sCardConnected = false;
+    public String mCurrentRadioLabel;
 
     private static FrameLayout mContentFrame;
 
@@ -136,8 +129,6 @@ SQL_Connection.Callback,
         mResources = getResources();
 
         //init interfaces
-        mBaseWriterInterface = this;
-        mCloseRoomInterface = this;
 
         mServerWriteCallback = this;
         mServerReaderCallback = this;
@@ -178,13 +169,13 @@ SQL_Connection.Callback,
 
 
             showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
-            mNFCReader = new NFC();
+            mNFCReader = new NFC_reader();
         }
 
     }
 
     private void initAccount(){
-        PersonItem activePerson = FavoriteDB.getPersonItem(Settings.getActiveAccountID(), FavoriteDB.LOCAL_USER, false);
+        PersonItem activePerson = FavoriteDB.getPersonItem(Settings.getActiveAccountID(), false);
         System.out.println("active person " + activePerson);
         if (activePerson!=null){
             mAccountName.setText(activePerson.getLastname());
@@ -230,29 +221,11 @@ SQL_Connection.Callback,
                 showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
                 break;
             case R.id.navigation_item_persons:
-                //setToolbarTitle(R.string.toolbar_title_persons);
                 showFragment(getSupportFragmentManager(),PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_EDITOR, 0, null) ,R.string.toolbar_title_persons);
                 break;
             case R.id.navigation_item_journal:
                 showFragment(getSupportFragmentManager(), JournalFr.newInstance(),R.string.toolbar_title_journal);
                 break;
-            /*case R.id.navigation_item_rooms:
-                final RoomsFr roomsFr = RoomsFr.newInstance();
-                showFragment(getSupportFragmentManager(), roomsFr,R.string.toolbar_title_auditrooms);
-                mFAB.setVisibility(View.VISIBLE);
-                mFAB.setImageResource(R.drawable.ic_add_black_24dp);
-                mFAB.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Dialogs dialog = new Dialogs();
-                        Bundle b = new Bundle();
-                        b.putInt(Dialogs.DIALOG_TYPE, Dialogs.ADD_ROOM_DIALOG);
-                        dialog.setArguments(b);
-                        dialog.setTargetFragment(roomsFr, 0);
-                        dialog.show(getSupportFragmentManager(), "add_room");
-                    }
-                });
-                break;*/
             case R.id.navigation_item_settings:
                 startActivity(new Intent(mContext, Preferences.class));
                 break;
@@ -468,20 +441,6 @@ SQL_Connection.Callback,
     }
 
     @Override
-    public void onSuccessBaseWrite() {
-        showFragment(getSupportFragmentManager(), MainFr.newInstance(), R.string.navigation_drawer_item_home);
-    }
-
-    @Override
-    public void onRoomClosed() {
-        showFragment(getSupportFragmentManager(), MainFr.newInstance(), R.string.navigation_drawer_item_home);
-    }
-
-    private Fragment getFragmentByTag(int resID){
-        return getSupportFragmentManager().findFragmentByTag(getResources().getString(resID));
-    }
-
-    @Override
     public void onServerConnected(Connection connection, int callingTask) {
         System.out.println("CONNECTED : " + connection);
         switch (callingTask){
@@ -490,6 +449,9 @@ SQL_Connection.Callback,
                 break;
             case ServerReader.READ_ALL:
                 new ServerReader(ServerReader.READ_ALL, mContext, mServerReaderCallback).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+                break;
+            case ServerReader.READ_PERSON_ITEM:
+                new ServerReader(ServerReader.READ_PERSON_ITEM, mCurrentRadioLabel, mServerReaderCallback).execute(connection);
                 break;
             default:
                 break;
@@ -521,10 +483,189 @@ SQL_Connection.Callback,
     @Override
     public void onSuccessServerRead(Object result) {
         Snackbar.make(mContentFrame,"Чтение успешно",Snackbar.LENGTH_SHORT).show();
+        if (result!=null){
+            PersonItem personItem = (PersonItem)result;
+            if (FavoriteDB.addNewUser(personItem, Settings.getWriteServerStatus())){
+                write(personItem);
+            }
+        }
     }
 
     @Override
     public void onErrorServerRead(Exception e) {
         Snackbar.make(mContentFrame,"Ошибка при чтении",Snackbar.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void onSuccessBaseWrite() {
+
+        System.out.println("success base write 111");
+        MainFr.updateGrid();
+    }
+
+    @Override
+    public void onErrorBaseWrite() {
+        System.out.println("error base write");
+    }
+
+    private void write(PersonItem personItem){
+        new BaseWriter(BaseWriter.WRITE_NEW, mContext, this)
+                .execute(new BaseWriterParams()
+                        .setPersonTag(personItem.getRadioLabel())
+                        .setAccessType(personItem.getAccessType())
+                        .setAuditroom(UserAuth.mSelectedRoom));
+    }
+
+    public class NFC_reader{
+        private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+        private static final int RECEIVER_REQUEST_CODE = 100;
+        private Reader mReader;
+        private Context mContext;
+
+
+        public NFC_reader(){
+            mContext = getApplicationContext();
+            UsbManager manager = (UsbManager)mContext.getSystemService(Context.USB_SERVICE);
+            mReader = new Reader(manager);
+            mReader.setOnStateChangeListener(readerStateChangeListener);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, RECEIVER_REQUEST_CODE, new Intent(ACTION_USB_PERMISSION), 0);
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ACTION_USB_PERMISSION);
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+
+            mContext.registerReceiver(mReceiver, filter);
+
+            System.out.println("DEVICES " + manager.getDeviceList().values().size());
+            for (UsbDevice device : manager.getDeviceList().values()) {
+                manager.requestPermission(device,pendingIntent);
+            }
+        }
+
+        Reader.OnStateChangeListener readerStateChangeListener = new Reader.OnStateChangeListener(){
+            @Override
+            public void onStateChange(int i, int previousState, int currentState) {
+                if (currentState < Reader.CARD_UNKNOWN || currentState > Reader.CARD_SPECIFIC) currentState = Reader.CARD_UNKNOWN;
+
+                if (currentState == Reader.CARD_PRESENT){
+                    mCurrentRadioLabel = getRadioLabelValue();
+                    System.out.println("CARD CONNECTED " + mCurrentRadioLabel);
+
+                    DialogUserAuth dialogUserAuth = (DialogUserAuth)getSupportFragmentManager().findFragmentByTag(getString(R.string.title_activity_user_auth));
+
+                    if (dialogUserAuth!=null && dialogUserAuth.isVisible()){
+                        System.out.println("AUTH VISIBLE");
+                    }
+
+                   // System.out.println("dialog " + dialogUserAuth);
+                    //if (dialogUserAuth!=null){
+                    //
+                   // }
+                    //ActivityManager activityManager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
+                    //String runnungActivityName = activityManager.getRunningTasks(1).get(0).topActivity.getClassName();
+
+//                    if (runnungActivityName.equals(Launcher.class.getCanonicalName())){
+ //                       System.out.println("activity_launcher");
+ //                   } else if (runnungActivityName.equals(Preferences.class.getCanonicalName())){
+ //                       System.out.println("settings");
+  //                  } else if (runnungActivityName.equals(CloseDay.class.getCanonicalName())){
+  //                      System.out.println("close day");
+   //                 } else if (runnungActivityName.equals(UserAuth.class.getCanonicalName())){
+    //                    System.out.println("user auth");
+    //                    if (!FavoriteDB.isUserInBase(mCurrentRadioLabel)){
+     //                       System.out.println("user not in base");
+      //                      SQL_Connection.getConnection(null, ServerReader.READ_PERSON_ITEM, mSQLConnectCallback);
+       //                 } else {
+       //                     System.out.println("user in base");
+        //                    write(new PersonItem()
+        //                            .setRadioLabel(mCurrentRadioLabel)
+         //                           .setAccessType(FavoriteDB.CARD_USER_ACCESS));
+          //              }
+           //         } else{
+          //              System.out.println("hm. WTF?");
+          //          }
+              }
+
+                if (currentState == Reader.CARD_ABSENT){
+                    System.out.println("CARD DISCONNECTED");
+                }
+            }
+        };
+
+        private String getRadioLabelValue(){
+            try {
+                mReader.power(0, Reader.CARD_WARM_RESET);
+                mReader.setProtocol(0, Reader.PROTOCOL_T1 );
+                byte [] transmitCommand = new byte[]{(byte) 0xFF, (byte) 0xCA, (byte) 0x00, (byte) 0x00, (byte) 0x04};
+                byte [] response = new byte[100];
+                int responseLength = mReader.transmit(0,
+                        transmitCommand,
+                        transmitCommand.length,
+                        response,
+                        response.length);
+                return getStringFromByte(response, responseLength);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        private void openReader (final UsbDevice usbDevice){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        mReader.open(usbDevice);
+                        System.out.println("OPENED READER " + mReader.getReaderName());
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+
+        public void closeReader(){
+            if (mReader!=null && mContext!=null){
+                System.out.println("UNREGISTER READER " + mReader.getReaderName() + " WITH RECEIVER " + mReceiver.toString());
+                mReader.close();
+                mContext.unregisterReceiver(mReceiver);
+            }
+        }
+
+        private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (NFC_reader.ACTION_USB_PERMISSION.equals(intent.getAction())){
+                    synchronized (this){
+                        UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)){
+                            if (device!=null){
+                                openReader(device);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        private String getStringFromByte(byte[] buffer, int bufferLength) {
+            String bufferString = "";
+            for (int i = 0; i < bufferLength - 2; i++) {
+                String hexChar = Integer.toHexString(buffer[i] & 0xFF);
+                if (hexChar.length() == 1) {
+                    hexChar = "0" + hexChar;
+                }
+                if (i % 20 == 0) {
+                    if (!bufferString.equals("")) {
+                        bufferString = "";
+                    }
+                }
+                bufferString += hexChar.toUpperCase() + " ";
+            }
+            return bufferString + "00 00";
+        }
+    }
+
+
+
 }

@@ -12,8 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.adapters.AdapterEmailExtras;
-import com.example.ivsmirnov.keyregistrator.interfaces.EmailInterface;
+import com.example.ivsmirnov.keyregistrator.adapters.AdapterPreferenceExtra;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
 
 import java.util.ArrayList;
@@ -21,10 +20,10 @@ import java.util.ArrayList;
 /**
  * Created by ivsmirnov on 30.05.2016.
  */
-public class EmailRecipientsPreference extends DialogPreference implements AdapterEmailExtras.Callback {
+public class EmailRecipientsPreference extends DialogPreference implements AdapterPreferenceExtra.Callback {
 
     private Context mContext;
-    private AdapterEmailExtras mAdapter;
+    private AdapterPreferenceExtra mAdapter;
     private ArrayList<String> mRecepientList;
 
     private int pressedButton = 0;
@@ -46,7 +45,7 @@ public class EmailRecipientsPreference extends DialogPreference implements Adapt
         View dialogView = View.inflate(mContext, R.layout.view_email_extra_list, null);
         mRecepientList = Settings.getRecepients();
         RecyclerView recipientView = (RecyclerView)dialogView.findViewById(R.id.preference_email_extra_list);
-        mAdapter = new AdapterEmailExtras(mContext, AdapterEmailExtras.RECIPIENTS, mRecepientList, this);
+        mAdapter = new AdapterPreferenceExtra(mContext, AdapterPreferenceExtra.RECIPIENTS, mRecepientList, this);
         mAdapter.setHasStableIds(true);
         recipientView.setAdapter(mAdapter);
         recipientView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -61,8 +60,8 @@ public class EmailRecipientsPreference extends DialogPreference implements Adapt
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mRecepientList.contains(AdapterEmailExtras.ADD_NEW_ITEM)){
-                    mRecepientList.add(AdapterEmailExtras.ADD_NEW_ITEM);
+                if (!mRecepientList.contains(AdapterPreferenceExtra.ADD_NEW_ITEM)){
+                    mRecepientList.add(AdapterPreferenceExtra.ADD_NEW_ITEM);
                     mAdapter.notifyItemInserted(mRecepientList.size());
                 }
             }
@@ -79,8 +78,8 @@ public class EmailRecipientsPreference extends DialogPreference implements Adapt
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
         if (pressedButton == AlertDialog.BUTTON_POSITIVE){
-            if (mRecepientList.contains(AdapterEmailExtras.ADD_NEW_ITEM)){
-                mRecepientList.remove(AdapterEmailExtras.ADD_NEW_ITEM);
+            if (mRecepientList.contains(AdapterPreferenceExtra.ADD_NEW_ITEM)){
+                mRecepientList.remove(AdapterPreferenceExtra.ADD_NEW_ITEM);
             }
             Settings.setRecepients(mRecepientList);
             callChangeListener(mRecepientList);
@@ -98,7 +97,7 @@ public class EmailRecipientsPreference extends DialogPreference implements Adapt
     @Override
     public void onAddItem(String item) {
         mRecepientList.add(item);
-        mRecepientList.remove(AdapterEmailExtras.ADD_NEW_ITEM);
+        mRecepientList.remove(AdapterPreferenceExtra.ADD_NEW_ITEM);
         mAdapter.notifyDataSetChanged();
 
     }

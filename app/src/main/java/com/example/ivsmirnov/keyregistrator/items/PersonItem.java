@@ -1,8 +1,6 @@
 package com.example.ivsmirnov.keyregistrator.items;
 
 
-import com.example.ivsmirnov.keyregistrator.others.Values;
-
 import java.io.File;
 
 /**
@@ -19,14 +17,6 @@ public class PersonItem {
     private File PhotoFile;
     private String RadioLabel;
     private int AccessType;
-
-    public boolean isEmpty(){
-        return Lastname.equals(Values.EMPTY) &&
-                Firstname.equals(Values.EMPTY) &&
-                Midname.equals(Values.EMPTY) &&
-                Division.equals(Values.EMPTY) &&
-                RadioLabel.equals(Values.EMPTY);
-    }
 
     public void clear(){
         Lastname = null;

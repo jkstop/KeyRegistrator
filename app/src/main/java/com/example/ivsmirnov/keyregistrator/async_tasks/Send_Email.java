@@ -3,17 +3,13 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.AccountDB;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
-import com.example.ivsmirnov.keyregistrator.items.MailParams;
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.Settings;
-import com.example.ivsmirnov.keyregistrator.others.Values;
-import com.example.ivsmirnov.keyregistrator.services.Toasts;
 import com.google.android.gms.auth.GoogleAuthUtil;
 
 import java.io.ByteArrayInputStream;
@@ -22,8 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Properties;
 
 import javax.activation.CommandMap;
@@ -99,7 +93,7 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
 
             MimeMessage mMimeMessage = new MimeMessage(session);
 
-            if (mBody == null) mBody = Values.EMPTY;
+            if (mBody == null) mBody = "";
             DataHandler mHandler = new DataHandler(new ByteArrayDataSource(mBody.getBytes(), "multipart/mixed"));
 
             mMimeMessage.setSubject(mTheme);
