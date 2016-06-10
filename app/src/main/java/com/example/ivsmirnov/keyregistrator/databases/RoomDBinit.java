@@ -9,7 +9,7 @@ import android.util.Log;
 /**
  * ДБ помещений
  */
-public class RoomDBinit extends SQLiteOpenHelper implements BaseColumns {
+class RoomDBinit extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String name = "Rooms.db";
     private static final int version = 8;
@@ -21,8 +21,8 @@ public class RoomDBinit extends SQLiteOpenHelper implements BaseColumns {
     public static final String COLUMN_TIME = "Время";
     public static final String COLUMN_LAST_VISITER = "Последний";
     public static final String COLUMN_TAG = "Тэг";
-    public static final String COLUMN_PHOTO_PATH = "Фото";
-    public static final String CREATE_ROOMS_BASE = "CREATE TABLE " + TABLE_ROOMS + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+    private static final String COLUMN_PHOTO_PATH = "Фото";
+    private static final String CREATE_ROOMS_BASE = "CREATE TABLE " + TABLE_ROOMS + " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_ROOM + " text, "
             + COLUMN_STATUS + " integer, "
             + COLUMN_ACCESS + " integer, "
@@ -31,7 +31,7 @@ public class RoomDBinit extends SQLiteOpenHelper implements BaseColumns {
             + COLUMN_TAG + " text, "
             + COLUMN_PHOTO_PATH + " text);";
 
-    public static final String DELETE_ROOMS_BASE = "DROP TABLE IF EXISTS " + TABLE_ROOMS;
+    private static final String DELETE_ROOMS_BASE = "DROP TABLE IF EXISTS " + TABLE_ROOMS;
 
 
     public RoomDBinit(Context context) {

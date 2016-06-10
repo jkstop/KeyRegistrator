@@ -95,7 +95,7 @@ public class Journal extends Fragment implements
         showDateSpinner();
     }
 
-    public static ArrayList<String> getDates(){
+    private static ArrayList<String> getDates(){
         return JournalDB.readJournalDatesFromDB();
     }
 

@@ -29,8 +29,8 @@ import java.sql.Connection;
 public class DialogPersonInfo extends DialogFragment implements SQL_Connection.Callback {
 
 
-    public static final String BUNDLE_PERSON = "bundle_person";
-    public static final String BUNDLE_POSITION = "bundle_position";
+    private static final String BUNDLE_PERSON = "bundle_person";
+    private static final String BUNDLE_POSITION = "bundle_position";
 
     private static final int DELETE_USER = 1;
     private static final int UPDATE_USER = 2;

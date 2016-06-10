@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -20,7 +21,7 @@ import java.util.HashSet;
 
 
 /**
- * Created by ivsmirnov on 23.03.2016.
+ * Фрагмент настроек
  */
 public class Setting extends PreferenceFragment {
 
@@ -28,22 +29,21 @@ public class Setting extends PreferenceFragment {
     private static final int REQUEST_CODE_RESTORE = 204;
 
 
-    private android.preference.Preference backupLocationPreference;
+    private Preference backupLocationPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
-        final android.preference.Preference sendMailPreference = findPreference(getResources().getString(R.string.shared_preferences_email_send));
-        android.preference.Preference timeSetPreference = findPreference(getResources().getString(R.string.shared_preferences_sheduler_time));
-        android.preference.Preference dialogGridPreference = findPreference(getResources().getString(R.string.shared_preferences_main_grid_size));
-        android.preference.Preference taskPreference = findPreference(getResources().getString(R.string.shared_preferences_sheduler));
-        android.preference.Preference recipientsPreference = findPreference(getString(R.string.shared_preferences_email_recipients));
-        android.preference.Preference backupItemsPreference = findPreference(getString(R.string.shared_preferences_backup_items));
-        final android.preference.Preference backupNowPreference = findPreference(getString(R.string.shared_preferences_backup_now));
-        android.preference.Preference backupRestorePreference = findPreference(getString(R.string.shared_preferences_backup_restore));
-        android.preference.Preference erasePreference = findPreference(getString(R.string.shared_preferences_backup_erase_base));
+        final Preference sendMailPreference = findPreference(getResources().getString(R.string.shared_preferences_email_send));
+        Preference timeSetPreference = findPreference(getResources().getString(R.string.shared_preferences_sheduler_time));
+        Preference taskPreference = findPreference(getResources().getString(R.string.shared_preferences_sheduler));
+        Preference recipientsPreference = findPreference(getString(R.string.shared_preferences_email_recipients));
+        Preference backupItemsPreference = findPreference(getString(R.string.shared_preferences_backup_items));
+        final Preference backupNowPreference = findPreference(getString(R.string.shared_preferences_backup_now));
+        Preference backupRestorePreference = findPreference(getString(R.string.shared_preferences_backup_restore));
+        Preference erasePreference = findPreference(getString(R.string.shared_preferences_backup_erase_base));
 
         backupLocationPreference = findPreference(getString(R.string.shared_preferences_backup_location));
         backupLocationPreference.setSummary(SharedPrefs.getBackupLocation());
@@ -56,15 +56,6 @@ public class Setting extends PreferenceFragment {
                 return true;
             }
         });
-
-        //dialogGridPreference.setOnPreferenceClickListener(new android.preference.Preference.OnPreferenceClickListener() {
-        //    @Override
-        //    public boolean onPreferenceClick(android.preference.Preference preference) {
-        //        DialogPickers dialogPickers = new DialogPickers();
-        //        dialogPickers.show(((com.example.ivsmirnov.keyregistrator.activities.Preferences)getActivity()).getSupportFragmentManager(),"dialog_pickers");
-        //        return false;
-        //    }
-        //});
 
 
         timeSetPreference.setOnPreferenceChangeListener(new android.preference.Preference.OnPreferenceChangeListener() {
@@ -173,8 +164,6 @@ public class Setting extends PreferenceFragment {
             setPreferenceEnabled(false, backupNowPreference, getString(R.string.shared_preferences_backup_now_disable), getString(R.string.shared_preferences_backup_now_disable_summary));
         }
     }
-
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

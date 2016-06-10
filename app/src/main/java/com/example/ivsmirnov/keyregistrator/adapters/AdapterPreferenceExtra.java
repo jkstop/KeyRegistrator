@@ -24,8 +24,8 @@ public class AdapterPreferenceExtra extends RecyclerView.Adapter<RecyclerView.Vi
     public static final int ATTACHMENTS = 2;
     public static final int ROOMS = 3;
 
-    public static final int VIEW_SIMPLE = 10;
-    public static final int VIEW_ADD_NEW = 20;
+    private static final int VIEW_SIMPLE = 10;
+    private static final int VIEW_ADD_NEW = 20;
 
     private Context mContext;
     private int mType;

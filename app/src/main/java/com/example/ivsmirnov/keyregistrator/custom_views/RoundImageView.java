@@ -68,7 +68,7 @@ public class RoundImageView extends ImageView {
         canvas.drawBitmap(roundBitmap, 0,0, null);
     }
 
-    public static Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
+    private static Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
         Bitmap sbmp;
         if(bmp.getWidth() != radius || bmp.getHeight() != radius)
             sbmp = Bitmap.createScaledBitmap(bmp, radius, radius, false);

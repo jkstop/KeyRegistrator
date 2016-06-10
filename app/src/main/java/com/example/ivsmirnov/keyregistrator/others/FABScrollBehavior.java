@@ -10,7 +10,7 @@ import android.view.View;
 /**
  * FAB scroll
  */
-public class FABScrollBehavior extends FloatingActionButton.Behavior {
+class FABScrollBehavior extends FloatingActionButton.Behavior {
 
     public FABScrollBehavior(Context context, AttributeSet attributeSet){
         super();

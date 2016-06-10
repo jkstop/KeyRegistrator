@@ -29,10 +29,10 @@ import java.util.ArrayList;
 public class Rooms extends Fragment implements RecycleItemClickListener {
 
     public static RecyclerView mAuditroomGrid;
-    public static AdapterMainRoomGrid mAdapter;
+    private static AdapterMainRoomGrid mAdapter;
     private GridLayoutManager mGridManager;
     private Context mContext;
-    public static ArrayList<RoomItem> mRoomItems;
+    private static ArrayList<RoomItem> mRoomItems;
     private static long lastClickTime = 0;
 
     public static Rooms newInstance (){

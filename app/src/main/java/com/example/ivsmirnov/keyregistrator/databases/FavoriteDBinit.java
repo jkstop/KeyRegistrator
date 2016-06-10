@@ -9,7 +9,7 @@ import android.util.Log;
 /**
  * ДБ преподавателей
  */
-public class FavoriteDBinit extends SQLiteOpenHelper implements BaseColumns {
+class FavoriteDBinit extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String name = "Favorites.db";
     private static final int version = 13;
@@ -24,7 +24,7 @@ public class FavoriteDBinit extends SQLiteOpenHelper implements BaseColumns {
     public static final String COLUMN_SEX_FAVORITE = "Пол";
     public static final String COLUMN_PHOTO_PATH_FAVORITE = "Ссылка";
     public static final String COLUMN_ACCESS_TYPE_FAVORITE = "Доступ";
-    public static final String SQL_CREATE_TEACHERS_BASE = "create table " + TABLE_PERSONS + " (" + BaseColumns._ID + " integer primary key autoincrement, "
+    private static final String SQL_CREATE_TEACHERS_BASE = "create table " + TABLE_PERSONS + " (" + BaseColumns._ID + " integer primary key autoincrement, "
             + COLUMN_USER_ID_FAVORITE + " text, "
             + COLUMN_LASTNAME_FAVORITE + " text, "
             + COLUMN_FIRSTNAME_FAVORITE + " text, "
@@ -35,7 +35,7 @@ public class FavoriteDBinit extends SQLiteOpenHelper implements BaseColumns {
             + COLUMN_ACCESS_TYPE_FAVORITE + " integer, "
             + COLUMN_PHOTO_PATH_FAVORITE + " text);";
 
-    public static final String SQL_DELETE_TEACHERS_BASE = "DROP TABLE IF EXISTS "
+    private static final String SQL_DELETE_TEACHERS_BASE = "DROP TABLE IF EXISTS "
             + TABLE_PERSONS;
 
     public static  final String SQL_UPGRADE_TEACHERS_BASE = "ALTER TABLE " + TABLE_PERSONS + " ADD COLUMN " + COLUMN_ACCESS_TYPE_FAVORITE + " INTEGER";

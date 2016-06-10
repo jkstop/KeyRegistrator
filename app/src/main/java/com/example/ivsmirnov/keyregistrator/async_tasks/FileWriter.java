@@ -17,9 +17,9 @@ import java.util.ArrayList;
  */
 public class FileWriter extends AsyncTask <ArrayList<String>,Integer,Exception> {
 
-    public static final int WRITE_JOURNAL = 100;
-    public static final int WRITE_TEACHERS = 101;
-    public static final int WRITE_ROOMS = 123;
+    private static final int WRITE_JOURNAL = 100;
+    private static final int WRITE_TEACHERS = 101;
+    private static final int WRITE_ROOMS = 123;
 
     private int mType;
     private ProgressDialog mProgressDialog;

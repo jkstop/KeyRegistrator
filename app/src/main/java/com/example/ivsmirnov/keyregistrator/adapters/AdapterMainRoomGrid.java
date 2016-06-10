@@ -26,10 +26,9 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
     private ArrayList<RoomItem> mRoomItems;
     private RecycleItemClickListener mListener;
     private Context mContext;
-    private int mCurrentOrientation;
-    private int mGridHeight;
 
-    public View cellFree, cellBusy;
+    private View cellFree;
+    private View cellBusy;
 
     public AdapterMainRoomGrid(Context context, ArrayList<RoomItem> roomItems, RecycleItemClickListener listener) {
         this.mRoomItems = roomItems;
@@ -120,7 +119,7 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
         return viewHolder;
     }
 
-    public void scaleCells(View cell){
+    private void scaleCells(View cell){
         cell.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 Rooms.mAuditroomGrid.getHeight() / SharedPrefs.getGridRows()));
     }

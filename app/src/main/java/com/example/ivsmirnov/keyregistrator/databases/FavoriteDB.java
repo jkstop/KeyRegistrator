@@ -163,59 +163,22 @@ public class FavoriteDB {
         return false;
     }
 
-    public static String getPersonPhoto (String userTag, int photoLocation, int photoDimension){
+    public static String getPersonPhoto (String userTag){
         Cursor cursor = null;
         try {
-            switch (photoLocation){
-                case LOCAL_PHOTO:
-                    cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                            FavoriteDBinit.TABLE_PERSONS,
-                            new String[]{FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE},
-                            FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
-                            new String[]{userTag},
-                            null,
-                            null,
-                            "1");
-                    if (cursor.getCount()>0){
-                        cursor.moveToFirst();
-                        return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE));
-                    }
-                    return null;
-                /*case SERVER_PHOTO:
-                    Connection mConnection = SQL_Connection.getConnection(null, null);
-                    if (mConnection!=null){
-                        try {
-                            String mPhoto;
-                            Statement mStatement = mConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
-                            ResultSet mResult = mStatement.executeQuery("SELECT "
-                                    + SQL_Connection.COLUMN_ALL_STAFF_SEX + ","
-                                    + SQL_Connection.COLUMN_ALL_STAFF_PHOTO
-                                    + " FROM " + SQL_Connection.ALL_STAFF_TABLE
-                                    + " WHERE " + SQL_Connection.COLUMN_ALL_STAFF_TAG
-                                    + " = '" + userTag + "'");
-                            mResult.first();
-                            if (mResult.getRow()!=0){
-                                mPhoto = mResult.getString(SQL_Connection.COLUMN_ALL_STAFF_PHOTO);
-                                if (mPhoto == null) mPhoto = getBase64DefaultPhotoFromResources();
-                                switch (photoDimension){
-                                        case FULLSIZE_PHOTO:
-                                            return mPhoto;
-                                        case PREVIEW_PHOTO:
-                                            return getPhotoPreview(mPhoto);
-                                        default:
-                                            return mPhoto;
-                                }
-                            }
-                            if (mStatement!=null) mStatement.close();
-                            if (mResult!=null) mResult.close();
-                        } catch (Exception e){
-                            e.printStackTrace();
-                        }
-                    }
-                    return null;*/
-                default:
-                    return null;
+            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
+                    FavoriteDBinit.TABLE_PERSONS,
+                    new String[]{FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE},
+                    FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
+                    new String[]{userTag},
+                    null,
+                    null,
+                    "1");
+            if (cursor.getCount()>0){
+                cursor.moveToFirst();
+                return cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_PHOTO_PATH_FAVORITE));
             }
+            return null;
         } catch (Exception e){
             e.printStackTrace();
             return null;
@@ -669,32 +632,6 @@ public class FavoriteDB {
         }
     }
 
-    public static String getPhotoPreview(String photo){
-        try {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-
-            byte[] decodedString = Base64.decode(photo, Base64.DEFAULT);
-            BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
-
-            options.inSampleSize = calculateInSampleSize(options, 240, 320);
-            options.inJustDecodeBounds = false;
-            options.inPreferredConfig = Bitmap.Config.RGB_565;
-            options.inDither = true;
-
-            Bitmap bitmapPrew = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length, options);
-
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmapPrew.compress(Bitmap.CompressFormat.WEBP,100,byteArrayOutputStream);
-            byte[] byteArray = byteArrayOutputStream.toByteArray();
-
-            return Base64.encodeToString(byteArray,Base64.NO_WRAP);
-        } catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public static int getPersonsCount(){
 
         Cursor cursor = null;
@@ -714,7 +651,7 @@ public class FavoriteDB {
 
 
 
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
 
         final int height = options.outHeight;
         final int width = options.outWidth;

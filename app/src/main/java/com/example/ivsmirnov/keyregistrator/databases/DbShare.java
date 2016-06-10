@@ -13,13 +13,11 @@ public class DbShare {
     public static final int DB_FAVORITE = 0;
     public static final int DB_JOURNAL = 1;
     public static final int DB_ROOM = 2;
-    public static final int DB_ACCOUNT = 3;
 
     private static FavoriteDBinit mDataBaseFavoriteOpenHelper;
     private static JournalDBinit mDataBaseJournalOpenHelper;
     private static RoomDBinit mDataBaseRoomsOpenHelper;
-    private static AccountDBinit mDataBaseAccountOpenHelper;
-    private static SQLiteDatabase mDataBaseFavorite, mDataBaseJournal, mDataBaseRooms, mDataBaseAccount;
+    private static SQLiteDatabase mDataBaseFavorite, mDataBaseJournal, mDataBaseRooms;
     private static Cursor mCursor;
 
     public DbShare(){
@@ -27,7 +25,6 @@ public class DbShare {
         mDataBaseFavorite = getDataBase(DB_FAVORITE);
         mDataBaseJournal = getDataBase(DB_JOURNAL);
         mDataBaseRooms = getDataBase(DB_ROOM);
-        mDataBaseAccount = getDataBase(DB_ACCOUNT);
     }
 
     public static SQLiteDatabase getDataBase(int db){
@@ -53,13 +50,6 @@ public class DbShare {
                 }
                 return mDataBaseRooms;
 
-            case DB_ACCOUNT:
-                if (mDataBaseAccount == null || !mDataBaseAccount.isOpen()){
-                    mDataBaseAccountOpenHelper = new AccountDBinit(App.getAppContext());
-                    mDataBaseAccount = mDataBaseAccountOpenHelper.getWritableDatabase();
-                }
-                return mDataBaseAccount;
-
             default:
                     return null;
         }
@@ -80,8 +70,6 @@ public class DbShare {
         if (mDataBaseJournal!=null) mDataBaseJournal.close();
         if (mDataBaseRoomsOpenHelper!=null) mDataBaseRoomsOpenHelper.close();
         if (mDataBaseRooms!=null) mDataBaseRooms.close();
-        if (mDataBaseAccountOpenHelper!=null) mDataBaseAccountOpenHelper.close();
-        if (mDataBaseAccount!=null) mDataBaseAccount.close();
         if (mCursor !=null) mCursor.close();
     }
 }

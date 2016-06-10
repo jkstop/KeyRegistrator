@@ -174,7 +174,7 @@ public class FileLoader extends AsyncTask<Void,Integer,Boolean> {
 
     }
 
-    public static int getStringCount(File file)
+    private static int getStringCount(File file)
     {
         int i=0;
         BufferedReader bufferedReader;

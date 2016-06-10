@@ -17,20 +17,21 @@ import java.util.Set;
  */
 public class SharedPrefs {
 
-    public static final String AUTO_CLOSED_COUNT = "auto_closed_count";
-    public static final String ACTIVE_ACCOUNT_ID = "active_account_id";
-    public static final String MAIL_RECEPIENTS = getStringFromRes(R.string.shared_preferences_email_recipients);
-    public static final String MAIL_ATTACHMENTS = "mail_attachments";
-    public static final String SHEDULER_STATUS = getStringFromRes(R.string.shared_preferences_sheduler);
-    public static final String SHEDULER_TIME = getStringFromRes(R.string.shared_preferences_sheduler_time);
-    public static final String SERVER_WRITER = getStringFromRes(R.string.shared_preferences_write_server);
-    public static final String SERVER_NAME = getStringFromRes(R.string.shared_preferences_sql_settings);
-    public static final String SHEDULER_ITEMS = getStringFromRes(R.string.shared_preferences_local_tasks_key);
-    public static final String GRID_COLUMNS = "GRID_COLUMNS";
-    public static final String GRID_ROWS = "GRID_ROWS";
-    public static final String EMAIL_PERIOD = getStringFromRes(R.string.shared_preferences_email_period);
-    public static final String BACKUP_ITEMS = getStringFromRes(R.string.shared_preferences_backup_items);
-    public static final String BACKUP_LOCATION = getStringFromRes(R.string.shared_preferences_backup_location);
+    private static final String AUTO_CLOSED_COUNT = "auto_closed_count";
+    private static final String ACTIVE_ACCOUNT_ID = "active_account_id";
+    private static final String ACTIVE_ACCOUNT_EMAIL = "active_account_email";
+    private static final String MAIL_RECEPIENTS = getStringFromRes(R.string.shared_preferences_email_recipients);
+    private static final String MAIL_ATTACHMENTS = "mail_attachments";
+    private static final String SHEDULER_STATUS = getStringFromRes(R.string.shared_preferences_sheduler);
+    private static final String SHEDULER_TIME = getStringFromRes(R.string.shared_preferences_sheduler_time);
+    private static final String SERVER_WRITER = getStringFromRes(R.string.shared_preferences_write_server);
+    private static final String SERVER_NAME = getStringFromRes(R.string.shared_preferences_sql_settings);
+    private static final String SHEDULER_ITEMS = getStringFromRes(R.string.shared_preferences_local_tasks_key);
+    private static final String GRID_COLUMNS = "GRID_COLUMNS";
+    private static final String GRID_ROWS = "GRID_ROWS";
+    private static final String EMAIL_PERIOD = getStringFromRes(R.string.shared_preferences_email_period);
+    private static final String BACKUP_ITEMS = getStringFromRes(R.string.shared_preferences_backup_items);
+    private static final String BACKUP_LOCATION = getStringFromRes(R.string.shared_preferences_backup_location);
 
     private static android.content.SharedPreferences mPreferences;
     private static android.content.SharedPreferences.Editor mPreferencesEditor;
@@ -45,14 +46,14 @@ public class SharedPrefs {
         mPreferencesEditor = getPreferencesEditor();
     }
 
-    public static android.content.SharedPreferences getPreferences(){
+    private static android.content.SharedPreferences getPreferences(){
         if (mPreferences == null){
             mPreferences = PreferenceManager.getDefaultSharedPreferences(App.getAppContext());
         }
         return mPreferences;
     }
 
-    public static android.content.SharedPreferences.Editor getPreferencesEditor(){
+    private static android.content.SharedPreferences.Editor getPreferencesEditor(){
         if (mPreferencesEditor == null){
             mPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(App.getAppContext()).edit();
         }
@@ -173,6 +174,13 @@ public class SharedPrefs {
         return getPreferences().getString(ACTIVE_ACCOUNT_ID, App.getAppContext().getString(R.string.local_account));
     }
 
+    public static void setActiveAccountEmail(String accountEmail){
+        getPreferencesEditor().putString(ACTIVE_ACCOUNT_EMAIL, accountEmail).apply();
+    }
+
+    public static String getActiveAccountEmail(){
+        return getPreferences().getString(ACTIVE_ACCOUNT_EMAIL, null);
+    }
 
     public static void setAutoClosedRoomsCount(int closedRoomsCount){
         getPreferencesEditor().putInt(AUTO_CLOSED_COUNT, closedRoomsCount).apply();

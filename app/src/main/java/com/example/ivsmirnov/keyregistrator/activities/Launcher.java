@@ -83,7 +83,7 @@ SQL_Connection.Callback,
         GoogleApiClient.OnConnectionFailedListener,
         NavigationView.OnNavigationItemSelectedListener{
 
-    public static final int REQUEST_CODE_LOG_ON = 205;
+    private static final int REQUEST_CODE_LOG_ON = 205;
 
     private static final int HANDLER_ACCOUNT_WRITED = 100;
 
@@ -112,7 +112,7 @@ SQL_Connection.Callback,
     public static Reader.OnStateChangeListener sReaderStateChangeListener;
     public static boolean sCardConnected = false;
     public static boolean sDirectWrite = false;
-    public String mCurrentRadioLabel;
+    private String mCurrentRadioLabel;
 
     private static FrameLayout mContentFrame;
 
@@ -267,14 +267,14 @@ SQL_Connection.Callback,
                 .build();
     }
 
-    View.OnClickListener logOutClick = new View.OnClickListener() {
+    private View.OnClickListener logOutClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             showLogOutDialog();
         }
     };
 
-    View.OnClickListener logOnClick = new View.OnClickListener() {
+    private View.OnClickListener logOnClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
@@ -286,6 +286,7 @@ SQL_Connection.Callback,
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
+        System.out.println("result logon " + resultCode);
             if (resultCode == RESULT_OK){
                 if (requestCode == REQUEST_CODE_LOG_ON){
                     GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
@@ -294,6 +295,7 @@ SQL_Connection.Callback,
                     }
                 }
             } else {
+                SharedPrefs.setActiveAccountEmail(null);
                 SharedPrefs.setActiveAccountID(getString(R.string.local_account));
             }
     }
@@ -318,6 +320,7 @@ SQL_Connection.Callback,
                             SharedPrefs.getWriteServerStatus());
 
                     SharedPrefs.setActiveAccountID(account.getId());
+                    SharedPrefs.setActiveAccountEmail(account.getEmail());
 
                     mHandler.sendEmptyMessage(HANDLER_ACCOUNT_WRITED);
                 } catch (Exception e){
@@ -330,7 +333,7 @@ SQL_Connection.Callback,
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        System.out.println("connectionFAIL");
+        System.out.println("no connect");
     }
 
     public void setToolbarTitle (int resId){
@@ -339,7 +342,7 @@ SQL_Connection.Callback,
         }
     }
 
-    public static void showFragment(FragmentManager fragmentManager, Fragment fragment, int fragmentTagId){
+    private static void showFragment(FragmentManager fragmentManager, Fragment fragment, int fragmentTagId){
         fragmentManager.beginTransaction()
                 .replace(R.id.layout_main_content_frame,fragment, App.getAppContext().getString(fragmentTagId))
                 .commit();

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -41,8 +42,8 @@ public class Users extends Fragment implements
         DialogSearch.Callback{
 
     public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
-    public static final String PERSONS_FRAGMENT_TYPE = "persons_fragment_type";
-    public static final String PERSONS_ACCESS_TYPE = "persons_access_type";
+    private static final String PERSONS_FRAGMENT_TYPE = "persons_fragment_type";
+    private static final String PERSONS_ACCESS_TYPE = "persons_access_type";
     public static final String PERSONS_SELECTED_ROOM = "persons_selected_room";
     public static final int PERSONS_FRAGMENT_EDITOR = 115;
     public static final int PERSONS_FRAGMENT_SELECTOR = 116;
@@ -54,13 +55,13 @@ public class Users extends Fragment implements
     public static boolean contentNeedsForUpdate = false;
 
     private Context mContext;
-    public static RecyclerView mRecyclerView;
+    private static RecyclerView mRecyclerView;
     private ListView mListView;
 
     private Handler mHandler;
 
     private ArrayList <PersonItem> mPersonsList;
-    public AdapterPersonsGrid mAdapter;
+    private AdapterPersonsGrid mAdapter;
     private AdapterPersonsCharacters mListCharAdapter;
 
     private ArrayList<CharacterItem> mListCharacters;
@@ -93,7 +94,7 @@ public class Users extends Fragment implements
             bundleRoom = extras.getString(PERSONS_SELECTED_ROOM);
         }
 
-        mHandler = new Handler(){
+        mHandler = new Handler(Looper.getMainLooper()){
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what){

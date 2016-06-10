@@ -339,7 +339,7 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
         try {
             String userPhoto = null;
             //если радиометка не пустая (в помещении кто-то есть), нужно получить фото
-            if (roomItem.getTag() != null) userPhoto = FavoriteDB.getPersonPhoto(roomItem.getTag(), FavoriteDB.LOCAL_PHOTO, FavoriteDB.PREVIEW_PHOTO);
+            if (roomItem.getTag() != null) userPhoto = FavoriteDB.getPersonPhoto(roomItem.getTag());
             statement.executeUpdate("INSERT INTO " + SQL_Connection.ROOMS_TABLE + " VALUES ('"
             +roomItem.getAuditroom() + "',"
             +roomItem.getStatus() + ","
@@ -356,7 +356,7 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
     private void updateRoomItemToServer (ResultSet resultSet, RoomItem roomItem){
         try {
             String userPhoto = null;
-            if (roomItem.getTag() != null) userPhoto = FavoriteDB.getPersonPhoto(roomItem.getTag(), FavoriteDB.LOCAL_PHOTO, FavoriteDB.PREVIEW_PHOTO);
+            if (roomItem.getTag() != null) userPhoto = FavoriteDB.getPersonPhoto(roomItem.getTag());
             resultSet.updateInt(SQL_Connection.COLUMN_ROOMS_STATUS, roomItem.getStatus());
             resultSet.updateInt(SQL_Connection.COLUMN_ROOMS_ACCESS, roomItem.getAccessType());
             resultSet.updateLong(SQL_Connection.COLUMN_ROOMS_TIME, roomItem.getTime());

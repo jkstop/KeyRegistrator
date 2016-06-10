@@ -6,8 +6,6 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.databases.AccountDB;
-import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -79,11 +77,10 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
 
         try {
 
-            AccountItem mAccountItem = AccountDB.getAccount(SharedPrefs.getActiveAccountID());
-            String token = GoogleAuthUtil.getToken(mContext, mAccountItem.getEmail(),"oauth2:https://mail.google.com/");
+            String token = GoogleAuthUtil.getToken(mContext, SharedPrefs.getActiveAccountEmail(),"oauth2:https://mail.google.com/");
             String mTheme = mContext.getString(R.string.email_theme);
             String mBody = mContext.getString(R.string.email_message) + SharedPrefs.showDate();
-            InternetAddress from = new InternetAddress(mAccountItem.getEmail(), App.getAppContext().getResources().getString(R.string.app_name));
+            InternetAddress from = new InternetAddress(SharedPrefs.getActiveAccountEmail(), App.getAppContext().getResources().getString(R.string.app_name));
             ArrayList<String> mAttachments = SharedPrefs.getAttachments();
 
             Properties mProps = new Properties();
@@ -123,7 +120,7 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
             addMailCap();
 
             Transport mTransport = session.getTransport("smtp");
-            mTransport.connect("imap.gmail.com",mAccountItem.getEmail(),token);
+            mTransport.connect("imap.gmail.com", SharedPrefs.getActiveAccountEmail(), token);
             mTransport.sendMessage(mMimeMessage, mMimeMessage.getAllRecipients());
             mTransport.close();
 
@@ -151,15 +148,6 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
         public ByteArrayDataSource(byte[] data, String type) {
             super();
             this.data = data;
-            this.type = type;
-        }
-
-        public ByteArrayDataSource(byte[] data) {
-            super();
-            this.data = data;
-        }
-
-        public void setType(String type) {
             this.type = type;
         }
 

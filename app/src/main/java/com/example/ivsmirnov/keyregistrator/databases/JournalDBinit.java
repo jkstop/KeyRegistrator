@@ -9,7 +9,7 @@ import android.util.Log;
 /**
  * ДБ журнал
  */
-public class JournalDBinit extends SQLiteOpenHelper implements BaseColumns {
+class JournalDBinit extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String name = "Journal.db";
     private static final int version = 7;

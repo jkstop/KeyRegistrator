@@ -2,6 +2,7 @@
 
     <string name="app_name">Key Registrator</string>
 
+    <string name="server_client_id">127775171233-cudgtb5mc7s0e83jj3nbofkb5thhig8q.apps.googleusercontent.com</string>
     <string name="local_account">Локальный аккаунт</string>
 
     <!-- Titles -->
