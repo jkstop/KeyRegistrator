@@ -21,14 +21,7 @@ public class FileWriter extends AsyncTask <ArrayList<String>,Integer,Exception> 
     private static final int WRITE_TEACHERS = 101;
     private static final int WRITE_ROOMS = 123;
 
-    private int mType;
     private ProgressDialog mProgressDialog;
-    private String mPathExternal;
-    private boolean isShowDialog;
-
-
-    //private static final String JOURNAL = "/Journal.xls";
-    //private static final String TEACHERS = "/Teachers.csv";
 
     public FileWriter(Context context,  boolean isShowDialog){
         if (isShowDialog){
@@ -47,8 +40,9 @@ public class FileWriter extends AsyncTask <ArrayList<String>,Integer,Exception> 
         }
     }
 
+    @SafeVarargs
     @Override
-    protected Exception doInBackground(ArrayList<String>... params) {
+    protected final Exception doInBackground(ArrayList<String>... params) {
         String [] allWriteItems = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_backup_items_entries);
 
         try {
@@ -57,32 +51,18 @@ public class FileWriter extends AsyncTask <ArrayList<String>,Integer,Exception> 
                 publishProgress(WRITE_JOURNAL);
                 JournalDB.backupJournalToXLS();
                 JournalDB.backupJournalToCSV();
-
-                System.out.println("journal backuped");
-
-                // String srFileJournal = mPathExternal + JOURNAL;
-                // String dtFileJournal = SharedPrefs.getJournalBackupLocation() + JOURNAL;
-                // copyFile(srFileJournal, dtFileJournal);
             }
 
             if (params[0].contains(allWriteItems[1])){
                 //persons
                 publishProgress(WRITE_TEACHERS);
                 FavoriteDB.backupFavoriteStaffToFile();
-
-                System.out.println("persons backuped");
-
-                //String srFileTeachers = mPathExternal + TEACHERS;
-                //String dtFileTeachers = SharedPrefs.getPersonsBackupLocation() + TEACHERS;
-                //copyFile(srFileTeachers, dtFileTeachers);
             }
 
             if (params[0].contains(allWriteItems[2])){
                 //rooms
                 publishProgress(WRITE_ROOMS);
                 RoomDB.backupRoomsToFile();
-
-                System.out.println("rooms backuped");
             }
         } catch (Exception e){
             e.printStackTrace();

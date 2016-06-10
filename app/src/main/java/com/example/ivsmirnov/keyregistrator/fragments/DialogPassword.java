@@ -94,9 +94,8 @@ public class DialogPassword extends DialogFragment implements SQL_Connection.Cal
                             switch (mDialogTag){
                                 case ROOMS_ACCESS:
                                     if (mPersonTag!=null){
-                                        new BaseWriter(BaseWriter.UPDATE_CURRENT, mContext, (BaseWriter.Callback)getActivity())
+                                        new BaseWriter(BaseWriter.UPDATE_CURRENT, (BaseWriter.Callback)getActivity())
                                                 .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams().setPersonTag(mPersonTag));
-                                        //new CloseRooms(mContext, mPersonTag, (CloseRoomInterface)getActivity()).execute();
                                     }
                                     break;
                                 case ERASE_ACCESS:

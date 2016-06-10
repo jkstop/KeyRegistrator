@@ -19,7 +19,7 @@ import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 import java.util.ArrayList;
 
 /**
- * Created by ivsmirnov on 30.05.2016.
+ * ПОлучатели для рассылки
  */
 public class EmailRecipientsPreference extends DialogPreference implements AdapterPreferenceExtra.Callback {
 

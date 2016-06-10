@@ -1,6 +1,5 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
-import android.content.Context;
 import android.os.AsyncTask;
 
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
@@ -23,7 +22,6 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Exception> imple
     public static final int WRITE_NEW = 100;
     public static final int UPDATE_CURRENT = 200;
 
-    private Context mContext;
     private Callback mCallback;
     private int mType;
 
@@ -32,8 +30,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Exception> imple
     private long mRoomItemTimeIn;
 
 
-    public BaseWriter(int type, Context context, Callback callback){
-        mContext = context;
+    public BaseWriter(int type, Callback callback){
         mCallback = callback;
         mType = type;
     }
@@ -57,10 +54,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Exception> imple
         try {
             switch (mType){
                 case WRITE_NEW:
-                    System.out.println("person tag " + params[0].getPersonTag());
-
                     PersonItem person = FavoriteDB.getPersonItem(params[0].getPersonTag(), false);
-                    System.out.println("PERSON " + person);
 
                     final long timeIn = System.currentTimeMillis();
 

@@ -19,11 +19,9 @@ import java.io.File;
 import java.util.ArrayList;
 
 /**
- * Created by ivsmirnov on 30.05.2016.
+ * Файлы для рассылки
  */
 public class EmailAttachPreference extends DialogPreference implements AdapterPreferenceExtra.Callback{
-
-    public static final int REQUEST_CODE_SELECT_EMAIL_ATTACHMENT = 206;
 
     private Context mContext;
     private AdapterPreferenceExtra mAdapter;

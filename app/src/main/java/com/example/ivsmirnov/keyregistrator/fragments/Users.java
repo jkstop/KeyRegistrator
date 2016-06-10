@@ -41,7 +41,6 @@ public class Users extends Fragment implements
         DialogPersonInfo.Callback,
         DialogSearch.Callback{
 
-    public static final int REQUEST_CODE_SELECT_BACKUP_FAVORITE_STAFF_LOCATION = 204;
     private static final String PERSONS_FRAGMENT_TYPE = "persons_fragment_type";
     private static final String PERSONS_ACCESS_TYPE = "persons_access_type";
     public static final String PERSONS_SELECTED_ROOM = "persons_selected_room";
@@ -249,7 +248,7 @@ public class Users extends Fragment implements
     private void writeInBase(int clickedPosition, int accessType){
         if (SystemClock.elapsedRealtime() - lastClickTime < 1000) return;
         if (bundleRoom!=null){
-            new BaseWriter(BaseWriter.WRITE_NEW, mContext, (BaseWriter.Callback)getParentFragment())
+            new BaseWriter(BaseWriter.WRITE_NEW, (BaseWriter.Callback)getParentFragment())
                     .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
                             .setAccessType(accessType)
                             .setAuditroom(bundleRoom)

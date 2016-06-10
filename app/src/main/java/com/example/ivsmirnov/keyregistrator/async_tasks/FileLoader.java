@@ -18,18 +18,11 @@ import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 /**
  * Загрузка из файла
  */
 public class FileLoader extends AsyncTask<Void,Integer,Boolean> {
-
-    public static final int REQUEST_CODE_LOAD_FAVORITE_STAFF = 200;
-    public static final int REQUEST_CODE_LOAD_JOURNAL = 201;
-    public static final int REQUEST_CODE_LOAD_ROOMS = 202;
 
     private Context mContext;
     private String mPath;
@@ -55,8 +48,8 @@ public class FileLoader extends AsyncTask<Void,Integer,Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         File file;
-        int count = 0;
-        BufferedReader bufferedReader = null;
+        int count;
+        BufferedReader bufferedReader;
         int i = 0;
         String line;
 
@@ -188,13 +181,5 @@ public class FileLoader extends AsyncTask<Void,Integer,Boolean> {
             e.printStackTrace();
         }
         return i;
-    }
-
-    private static long parseDate(String text)
-            throws ParseException
-    {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss",
-                new Locale("ru"));
-        return dateFormat.parse(text).getTime();
     }
 }

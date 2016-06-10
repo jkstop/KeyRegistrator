@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
-import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 import java.io.File;
@@ -30,7 +29,6 @@ public class RoomDB {
             cv.put(RoomDBinit.COLUMN_TIME, roomItem.getTime());
             cv.put(RoomDBinit.COLUMN_LAST_VISITER, roomItem.getLastVisiter());
             cv.put(RoomDBinit.COLUMN_TAG,roomItem.getTag());
-            //cv.put(RoomDBinit.COLUMN_PHOTO_PATH, roomItem.getPhoto());
             DbShare.getDataBase(DbShare.DB_ROOM).insert(RoomDBinit.TABLE_ROOMS, null, cv);
         } catch (Exception e){
             e.printStackTrace();

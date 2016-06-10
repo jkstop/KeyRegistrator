@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.TimePicker;
 
 /**
- * Created by ivsmirnov on 23.03.2016.
+ * Выбор времени
  */
 public class TimePreference extends DialogPreference {
     private int lastHour=0;

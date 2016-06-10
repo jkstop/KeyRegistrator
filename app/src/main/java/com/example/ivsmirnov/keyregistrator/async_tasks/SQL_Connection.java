@@ -47,7 +47,6 @@ public class SQL_Connection {
     public static final String COLUMN_ROOMS_PHOTO = "PHOTO";
 
     public static final String COLUMN_ALL_STAFF_DIVISION = "NAME_DIVISION";
-    public static final String COLUMN_ALL_STAFF_POSITION = "NAME_POSITION";
     public static final String COLUMN_ALL_STAFF_LASTNAME = "LASTNAME";
     public static final String COLUMN_ALL_STAFF_FIRSTNAME = "FIRSTNAME";
     public static final String COLUMN_ALL_STAFF_MIDNAME = "MIDNAME";

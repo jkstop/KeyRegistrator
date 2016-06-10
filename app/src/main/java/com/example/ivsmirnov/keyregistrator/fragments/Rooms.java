@@ -104,7 +104,7 @@ public class Rooms extends Fragment implements RecycleItemClickListener {
         } else {
             if (mRoomItems.get(position).getAccessType() == FavoriteDB.CLICK_USER_ACCESS) {
 
-                new BaseWriter(BaseWriter.UPDATE_CURRENT, mContext, (BaseWriter.Callback)getActivity())
+                new BaseWriter(BaseWriter.UPDATE_CURRENT, (BaseWriter.Callback)getActivity())
                         .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams().setPersonTag(mRoomItems.get(position).getTag()));
             }else{
                 Toasts.handler.sendEmptyMessage(Toasts.TOAST_PUT_CARD_FIRST);

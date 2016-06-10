@@ -38,7 +38,7 @@ class FavoriteDBinit extends SQLiteOpenHelper implements BaseColumns {
     private static final String SQL_DELETE_TEACHERS_BASE = "DROP TABLE IF EXISTS "
             + TABLE_PERSONS;
 
-    public static  final String SQL_UPGRADE_TEACHERS_BASE = "ALTER TABLE " + TABLE_PERSONS + " ADD COLUMN " + COLUMN_ACCESS_TYPE_FAVORITE + " INTEGER";
+    //public static  final String SQL_UPGRADE_TEACHERS_BASE = "ALTER TABLE " + TABLE_PERSONS + " ADD COLUMN " + COLUMN_ACCESS_TYPE_FAVORITE + " INTEGER";
 
     public FavoriteDBinit(Context context) {
         super(context, name, null, version);

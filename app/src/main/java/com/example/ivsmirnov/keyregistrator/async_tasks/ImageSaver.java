@@ -1,16 +1,13 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.util.Base64;
 
 import com.example.ivsmirnov.keyregistrator.others.App;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -55,27 +52,6 @@ public class ImageSaver {
         }
         return null;
     }
-
-    /*public Bitmap load (){
-        FileInputStream fileInputStream = null;
-        try {
-            fileInputStream = new FileInputStream(createFile());
-            return BitmapFactory.decodeStream(fileInputStream);
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            try {
-                if (fileInputStream!=null) fileInputStream.close();
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }*/
-
-   // public File getImage (){
-   //     return createFile();
-   // }
 
     public static File getCustomPath(){
         return new File(App.getAppContext().getFilesDir() + TEMP);

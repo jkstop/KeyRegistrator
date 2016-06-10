@@ -319,7 +319,7 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
         if (items.size() != 0){
             for (int i=0; i < items.size(); i++) {
                 if (items.get(i).getClass().equals(String.class)){
-                    inClause.append("'" + items.get(i) + "'");
+                    inClause.append("'").append(items.get(i)).append("'");
                 } else {
                     inClause.append(items.get(i));
                 }

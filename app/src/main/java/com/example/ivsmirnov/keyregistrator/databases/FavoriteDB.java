@@ -28,16 +28,6 @@ import java.util.Comparator;
  */
 public class FavoriteDB {
 
-    public static final int LOCAL_USER = 1;
-    public static final int SERVER_USER = 2;
-    public static final int FULLSIZE_PHOTO = 3;
-    public static final int PREVIEW_PHOTO = 4;
-    public static final int ALL_PHOTO = 5;
-    public static final int NO_PHOTO = 6;
-
-    public static final int LOCAL_PHOTO = 7;
-    public static final int SERVER_PHOTO = 8;
-
     public static final int SHORT_INITIALS = 9;
     public static final int FULL_INITIALS = 10;
 
@@ -259,43 +249,6 @@ public class FavoriteDB {
         }
     }
 
-    public static ArrayList<String> getTagsForCurrentCharacter(String character){
-
-        Cursor cursor = null;
-        try {
-            ArrayList <String> mTags = new ArrayList<>();
-            String selection;
-            String [] selectionArgs;
-            if (character.equalsIgnoreCase("#")){
-                selection = null;
-                selectionArgs = null;
-            } else{
-                selection = FavoriteDBinit.COLUMN_LASTNAME_FAVORITE + " LIKE?";
-                selectionArgs = new String[]{character + "%"};
-            }
-            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_PERSONS,
-                    new String[]{FavoriteDBinit.COLUMN_TAG_FAVORITE},
-                    selection,
-                    selectionArgs,
-                    null,
-                    FavoriteDBinit.COLUMN_LASTNAME_FAVORITE + " ASC",
-                    null);
-            if (cursor.getCount()>0){
-                cursor.moveToPosition(-1);
-                while (cursor.moveToNext()){
-                    mTags.add(cursor.getString(cursor.getColumnIndex(FavoriteDBinit.COLUMN_TAG_FAVORITE)));
-                }
-            }
-            return mTags;
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ArrayList<>();
-        } finally {
-            closeCursor(cursor);
-        }
-    }
-
     public static ArrayList<CharacterItem> getPersonsCharacters(int accessType){
 
         Cursor cursor = null;
@@ -437,54 +390,6 @@ public class FavoriteDB {
             closeCursor(cursor);
         }
         return items;
-    }
-
-    public static void setPersonAccessType (String tag, int accessType){
-        Cursor cursor = null;
-        try {
-            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_PERSONS,
-                    new String[]{FavoriteDBinit._ID, FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE},
-                    FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
-                    new String[]{tag},
-                    null,
-                    null,
-                    "1");
-            if (cursor.getCount()>0){
-                cursor.moveToFirst();
-                ContentValues cv = new ContentValues();
-                cv.put(FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE, accessType);
-                DbShare.getDataBase(DbShare.DB_FAVORITE)
-                        .update(FavoriteDBinit.TABLE_PERSONS, cv, FavoriteDBinit._ID + " = " + cursor.getInt(cursor.getColumnIndex(FavoriteDBinit._ID)), null);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            closeCursor(cursor);
-        }
-    }
-
-    public static int getPersonAccessType (String tag){
-        Cursor cursor = null;
-        try {
-            cursor = DbShare.getCursor(DbShare.DB_FAVORITE,
-                    FavoriteDBinit.TABLE_PERSONS,
-                    new String[]{FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE},
-                    FavoriteDBinit.COLUMN_TAG_FAVORITE + " =?",
-                    new String[]{tag},
-                    null,
-                    null,
-                    "1");
-            if (cursor.getCount()>0){
-                cursor.moveToFirst();
-                return cursor.getInt(cursor.getColumnIndex(FavoriteDBinit.COLUMN_ACCESS_TYPE_FAVORITE));
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            closeCursor(cursor);
-        }
-        return -1;
     }
 
     public static boolean isUserInBase(String tag){
@@ -647,22 +552,6 @@ public class FavoriteDB {
             closeCursor(cursor);
         }
         return 0;
-    }
-
-
-
-    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-            final int heightRatio = Math.round((float) height / (float) reqHeight);
-            final int widthRatio = Math.round((float) width / (float) reqWidth);
-            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
-        }
-        return inSampleSize;
     }
 
     public static String getBase64DefaultPhotoFromResources(){

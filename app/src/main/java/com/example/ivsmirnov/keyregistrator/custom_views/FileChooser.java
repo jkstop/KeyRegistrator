@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -16,7 +15,7 @@ import java.io.FileFilter;
 import java.util.Arrays;
 
 /**
- * Created by ivsmirnov on 30.05.2016.
+ * Выбор файла
  */
 public class FileChooser {
     private static final String PARENT_DIR = "...";

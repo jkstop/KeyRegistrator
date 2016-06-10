@@ -1,6 +1,5 @@
 package com.example.ivsmirnov.keyregistrator.custom_views;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.preference.DialogPreference;

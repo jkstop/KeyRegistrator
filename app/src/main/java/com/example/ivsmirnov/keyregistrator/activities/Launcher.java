@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.usb.UsbDevice;
@@ -68,18 +67,15 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.sql.Connection;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 
 public class Launcher extends AppCompatActivity implements
-ServerWriter.Callback,
-ServerReader.Callback,
-SQL_Connection.Callback,
+        ServerWriter.Callback,
+        ServerReader.Callback,
+        SQL_Connection.Callback,
         BaseWriter.Callback,
         DialogUserAuth.Callback,
-//NFC.Callback,
         GoogleApiClient.OnConnectionFailedListener,
         NavigationView.OnNavigationItemSelectedListener{
 
@@ -88,7 +84,6 @@ SQL_Connection.Callback,
     private static final int HANDLER_ACCOUNT_WRITED = 100;
 
     private Context mContext;
-    private Resources mResources;
     private Handler mHandler;
 
     //NFC reader
@@ -108,7 +103,6 @@ SQL_Connection.Callback,
 
     private static long back_pressed;
 
-    private Reader mReader;
     public static Reader.OnStateChangeListener sReaderStateChangeListener;
     public static boolean sCardConnected = false;
     public static boolean sDirectWrite = false;
@@ -130,7 +124,6 @@ SQL_Connection.Callback,
         setContentView(R.layout.activity_launcher);
 
         mContext = this;
-        mResources = getResources();
 
         //init interfaces
 
@@ -513,7 +506,7 @@ SQL_Connection.Callback,
     }
 
     private void write(PersonItem personItem){
-        new BaseWriter(BaseWriter.WRITE_NEW, mContext, mBaseWriterCallback)
+        new BaseWriter(BaseWriter.WRITE_NEW, mBaseWriterCallback)
                 .execute(new BaseWriterParams()
                         .setPersonTag(personItem.getRadioLabel())
                         .setAccessType(personItem.getAccessType())
@@ -567,7 +560,7 @@ SQL_Connection.Callback,
 
                         } else if (rooms !=null && rooms.isVisible()){
                             if (RoomDB.getRoomItemForCurrentUser(mCurrentRadioLabel)!=null){
-                                new BaseWriter(BaseWriter.UPDATE_CURRENT, mContext, mBaseWriterCallback)
+                                new BaseWriter(BaseWriter.UPDATE_CURRENT, mBaseWriterCallback)
                                         .execute(new BaseWriterParams()
                                                 .setPersonTag(mCurrentRadioLabel));
                             } else {

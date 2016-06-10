@@ -189,7 +189,7 @@ public class DialogSearch extends DialogFragment implements
                     addNewUser(personItem);
 
                     if (mSelectedRoom!=null){
-                        new BaseWriter(BaseWriter.WRITE_NEW, mContext, (BaseWriter.Callback)getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
+                        new BaseWriter(BaseWriter.WRITE_NEW, (BaseWriter.Callback)getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
                                 .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
                                 .setAuditroom(mSelectedRoom)
                                 .setPersonTag(personItem.getRadioLabel()));
@@ -259,7 +259,7 @@ public class DialogSearch extends DialogFragment implements
             addNewUser(personItem);
 
             if (mSelectedRoom!=null){
-                new BaseWriter(BaseWriter.WRITE_NEW, mContext, (BaseWriter.Callback)getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
+                new BaseWriter(BaseWriter.WRITE_NEW, (BaseWriter.Callback)getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
                         .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
                         .setAuditroom(mSelectedRoom)
                         .setPersonTag(personItem.getRadioLabel()));
