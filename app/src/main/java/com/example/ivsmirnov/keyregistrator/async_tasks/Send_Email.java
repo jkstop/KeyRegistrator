@@ -76,7 +76,6 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
     protected Exception doInBackground(Void... params) {
 
         try {
-
             String token = GoogleAuthUtil.getToken(mContext, SharedPrefs.getActiveAccountEmail(),"oauth2:https://mail.google.com/");
             String mTheme = mContext.getString(R.string.email_theme);
             String mBody = mContext.getString(R.string.email_message) + SharedPrefs.showDate();
@@ -123,12 +122,11 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
             mTransport.connect("imap.gmail.com", SharedPrefs.getActiveAccountEmail(), token);
             mTransport.sendMessage(mMimeMessage, mMimeMessage.getAllRecipients());
             mTransport.close();
-
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
+            return e;
         }
-
-        return null;
     }
 
     private void addMailCap() {
