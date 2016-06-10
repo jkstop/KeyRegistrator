@@ -1,22 +1,18 @@
 package com.example.ivsmirnov.keyregistrator.adapters;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerReader;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.fragments.Rooms;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
-import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
@@ -123,8 +119,6 @@ public class AdapterMainRoomGrid extends RecyclerView.Adapter<RecyclerView.ViewH
         cell.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 Rooms.mAuditroomGrid.getHeight() / SharedPrefs.getGridRows()));
     }
-
-
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
