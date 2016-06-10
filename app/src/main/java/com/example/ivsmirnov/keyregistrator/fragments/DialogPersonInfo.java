@@ -24,7 +24,7 @@ import com.squareup.picasso.Picasso;
 import java.sql.Connection;
 
 /**
- * Created by ivsmirnov on 06.06.2016.
+ * Инфо о пользователе
  */
 public class DialogPersonInfo extends DialogFragment implements SQL_Connection.Callback {
 

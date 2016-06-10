@@ -14,7 +14,7 @@ import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 /**
- * Created by ivsmirnov on 26.05.2016.
+ * Статистика
  */
 public class Statistic extends Fragment {
 

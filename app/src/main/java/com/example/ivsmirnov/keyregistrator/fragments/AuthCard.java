@@ -19,25 +19,6 @@ import com.example.ivsmirnov.keyregistrator.R;
  */
 public class AuthCard extends Fragment {
 
-    private String mSelectedRoom;
-
-    public static AuthCard newInstance (String selectedRoom){
-        AuthCard authCard = new AuthCard();
-        Bundle bundle = new Bundle();
-        bundle.putString(Users.PERSONS_SELECTED_ROOM, selectedRoom);
-        authCard.setArguments(bundle);
-        return authCard;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Bundle extras = getArguments();
-        if (extras!=null){
-            mSelectedRoom = extras.getString(Users.PERSONS_SELECTED_ROOM, null);
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

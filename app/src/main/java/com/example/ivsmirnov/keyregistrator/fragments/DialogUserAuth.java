@@ -19,7 +19,7 @@ import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 
 /**
- * Created by ivsmirnov on 09.06.2016.
+ * Авторизация пользователя
  */
 public class DialogUserAuth extends DialogFragment implements
         BaseWriter.Callback,
@@ -79,7 +79,7 @@ public class DialogUserAuth extends DialogFragment implements
 
         mViewPager = (ViewPager)dialogView.findViewById(R.id.user_auth_pager_view);
         mViewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
-        mViewPagerAdapter.addFragment(AuthCard.newInstance(mSelectedRoom), getString(R.string.auth_tab_card));
+        mViewPagerAdapter.addFragment(new AuthCard(), getString(R.string.auth_tab_card));
         mViewPagerAdapter.addFragment(Users.newInstance(Users.PERSONS_FRAGMENT_SELECTOR, FavoriteDB.CLICK_USER_ACCESS, mSelectedRoom), getString(R.string.auth_tab_free));
         mViewPagerAdapter.addFragment(Users.newInstance(Users.PERSONS_FRAGMENT_SELECTOR, 0, mSelectedRoom), getString(R.string.auth_tab_all));
         mViewPagerAdapter.addFragment(DialogSearch.newInstance(mSelectedRoom, DialogSearch.LIKE_FRAGMENT), getString(R.string.auth_tab_new));
@@ -126,7 +126,7 @@ public class DialogUserAuth extends DialogFragment implements
 
     @Override
     public void onErrorBaseWrite() {
-
+        mCallback.onErrorBaseWrite();
     }
 
     @Override
