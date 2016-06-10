@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="@dimen/layout_default_margin"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@id/preference_item_sql_input_server"
+        android:hint="@string/sql_server_hint"
+        android:paddingStart="@dimen/content_default_margin"
+        android:paddingEnd="@dimen/content_default_margin"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@id/preference_item_sql_status"
+        app:errorEnabled="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@id/preference_item_sql_status"
+        android:src="@drawable/ic_cloud_off_black_48dp"
+        android:layout_toStartOf="@id/preference_item_sql_check_connect"
+        android:layout_centerVertical="true"
+        android:layout_margin="@dimen/content_default_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@id/preference_item_sql_check_connect"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="@dimen/content_default_margin"
+        android:src="@drawable/ic_sync_black_48dp"
+        android:clickable="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

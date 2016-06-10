@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -28,7 +29,7 @@ import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.interfaces.RecycleItemClickListener;
 import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 import java.io.File;
 import java.sql.Connection;
@@ -101,7 +102,7 @@ public class DialogSearch extends DialogFragment implements
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View dialogView = inflater.inflate(R.layout.view_dialog_search, container, false);
+        View dialogView = inflater.inflate(R.layout.dialog_search, container, false);
         mContext = getContext();
         mCallback = (Callback)getParentFragment();
         mPersonList = new ArrayList<>();
@@ -116,7 +117,7 @@ public class DialogSearch extends DialogFragment implements
         System.out.println("selected room " + mSelectedRoom);
         System.out.println("type " + mType);
 
-        mProgressBar = (ProgressBar)dialogView.findViewById(R.id.dialog_search_progress);
+        mProgressBar = (ProgressBar)dialogView.findViewById(R.id.progress_bar_main);
 
         Toolbar toolbar = (Toolbar)dialogView.findViewById(R.id.dialog_search_toolbar);
         if (mType != LIKE_FRAGMENT){
@@ -133,7 +134,7 @@ public class DialogSearch extends DialogFragment implements
 
 
         mPersonsAdapter = new AdapterPersonsGrid(mContext, mPersonList, AdapterPersonsGrid.SHOW_ALL_PERSONS, this);
-        mPersonsRecycler = (RecyclerView)dialogView.findViewById(R.id.dialog_search_recycler);
+        mPersonsRecycler = (RecyclerView)dialogView.findViewById(R.id.recycler_main);
         mPersonsRecycler.setLayoutManager(new GridLayoutManager(mContext, 3));
         mPersonsRecycler.setAdapter(mPersonsAdapter);
 
@@ -159,7 +160,7 @@ public class DialogSearch extends DialogFragment implements
             }
         });
 
-        ImageButton addUserButton = (ImageButton)dialogView.findViewById(R.id.dialog_search_add_button);
+        ImageView addUserButton = (ImageView) dialogView.findViewById(R.id.dialog_search_add_button);
         addUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -350,7 +351,7 @@ public class DialogSearch extends DialogFragment implements
 
     private void addNewUser (PersonItem personItem){
         String snackText;
-        if (FavoriteDB.addNewUser(personItem, Settings.getWriteServerStatus())){
+        if (FavoriteDB.addNewUser(personItem, SharedPrefs.getWriteServerStatus())){
             snackText = getResources().getString(R.string.snack_user_add_success);
         } else {
             snackText = getResources().getString(R.string.snack_user_add_error);

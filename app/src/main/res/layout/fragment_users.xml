@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListView
+        android:layout_alignParentEnd="true"
+        android:id="@id/users_index_list"
+        app:layout_widthPercent="3%"
+        android:layout_marginTop="@dimen/card_default_elevation"
+        android:layout_marginBottom="@dimen/card_default_elevation"
+        android:layout_marginStart="@dimen/content_default_margin"
+        android:layout_marginEnd="@dimen/content_default_margin"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:divider="@color/transparent"
+        android:dividerHeight="1dp"/>
+
+    <include layout="@layout/main_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toStartOf="@id/users_index_list"/>
+
+</android.support.percent.PercentRelativeLayout>

@@ -9,27 +9,27 @@
         android:layout_alignParentTop="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/toolbar_title_journal"/>
+        android:text="@string/title_journal"/>
 
     <CheckBox
         android:id="@id/dialog_erase_persons_check"
         android:layout_below="@id/dialog_erase_journal_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/toolbar_title_persons"/>
+        android:text="@string/title_users"/>
 
     <CheckBox
         android:id="@id/dialog_erase_rooms_check"
         android:layout_below="@id/dialog_erase_persons_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/toolbar_title_auditrooms"/>
+        android:text="@string/title_rooms"/>
 
     <TextView
         android:id="@id/dialog_erase_disclaimer"
         android:layout_below="@id/dialog_erase_rooms_check"
-        android:layout_marginTop="@dimen/default_content_margin"
-        android:layout_marginBottom="@dimen/default_content_margin"
+        android:layout_marginTop="@dimen/content_default_margin"
+        android:layout_marginBottom="@dimen/content_default_margin"
         android:text="@string/erase_disclaimer"
         android:gravity="center"
         android:textColor="@color/colorAccent"

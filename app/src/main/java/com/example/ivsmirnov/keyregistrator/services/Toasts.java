@@ -1,6 +1,5 @@
 package com.example.ivsmirnov.keyregistrator.services;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -26,29 +25,29 @@ public class Toasts {
 
     public static final Handler handler = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
-            View toastView = View.inflate(App.getAppContext(), R.layout.layout_toast_fullscreen, null);
+            View toastView = View.inflate(App.getAppContext(), R.layout.view_toast_fullsrceen, null);
             TextView toastText = (TextView) toastView.findViewById(R.id.toast_fullscreen_text);
 
             switch (msg.what) {
                 case TOAST_TAKE_KEY:
                     toastView.setBackgroundResource(R.color.colorPrimary);
-                    toastText.setText(App.getAppContext().getString(R.string.text_toast_take_key));
+                    toastText.setText(App.getAppContext().getString(R.string.toast_take_key));
                     break;
                 case TOAST_THANKS:
                     toastView.setBackgroundResource(R.color.colorPrimary);
-                    toastText.setText(App.getAppContext().getString(R.string.text_toast_thanks));
+                    toastText.setText(App.getAppContext().getString(R.string.toast_thanks));
                     break;
                 case TOAST_PUT_CARD_FIRST:
                     toastView.setBackgroundResource(R.color.colorAccent);
-                    toastText.setText(App.getAppContext().getString(R.string.text_toast_put_card));
+                    toastText.setText(App.getAppContext().getString(R.string.toast_put_card));
                     break;
                 case TOAST_WRONG_CARD:
                     toastView.setBackgroundResource(R.color.colorAccent);
-                    toastText.setText(App.getAppContext().getString(R.string.text_toast_incorrect_card));
+                    toastText.setText(App.getAppContext().getString(R.string.toast_incorrect_card));
                     break;
                 case TOAST_SELECT_ROOM_FIRST:
                     toastView.setBackgroundResource(R.color.colorAccent);
-                    toastText.setText(App.getAppContext().getString(R.string.text_toast_choise_room_in_first));
+                    toastText.setText(App.getAppContext().getString(R.string.toast_choise_room_in_first));
                     break;
             }
 

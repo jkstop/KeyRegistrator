@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.example.ivsmirnov.keyregistrator.others.App;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 import java.util.Calendar;
 
@@ -55,7 +55,7 @@ public class Alarm {
         Calendar mCloseCalendar = (Calendar)mNowCalendar.clone();
 
         if (closingTime == null){
-            closingTime = Settings.getShedulerTime();
+            closingTime = SharedPrefs.getShedulerTime();
         }
         String [] timeSplit = closingTime.split(":");
         mCloseCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeSplit[0]));

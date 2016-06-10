@@ -1,22 +1,16 @@
 package com.example.ivsmirnov.keyregistrator.fragments;
 
-import android.app.Dialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -24,11 +18,10 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 import com.squareup.picasso.Picasso;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 
 /**
  * Created by ivsmirnov on 06.06.2016.
@@ -81,7 +74,7 @@ public class DialogPersonInfo extends DialogFragment implements SQL_Connection.C
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View dialogView = inflater.inflate(R.layout.view_dialog_person_info, container, false);
+        View dialogView = inflater.inflate(R.layout.dialog_user_info, container, false);
 
         final TextInputLayout textLastname = (TextInputLayout)dialogView.findViewById(R.id.person_info_lastname);
         final TextInputLayout textFirstname = (TextInputLayout)dialogView.findViewById(R.id.person_info_firstname);
@@ -120,7 +113,7 @@ public class DialogPersonInfo extends DialogFragment implements SQL_Connection.C
                         FavoriteDB.updatePersonItem(personBundle[PERSON_TAG], updatablePersonItem);
 
                         //обновление на сервере
-                        if (Settings.getWriteServerStatus()){
+                        if (SharedPrefs.getWriteServerStatus()){
                             SQL_Connection.getConnection(null, UPDATE_USER, mConnectCallback);
                         }
 
@@ -134,7 +127,7 @@ public class DialogPersonInfo extends DialogFragment implements SQL_Connection.C
                         FavoriteDB.deleteUser(personBundle[PERSON_TAG]);
 
                         //удаление с сервера
-                        if (Settings.getWriteServerStatus()){
+                        if (SharedPrefs.getWriteServerStatus()){
                             SQL_Connection.getConnection(null, DELETE_USER, mConnectCallback);
                         }
 

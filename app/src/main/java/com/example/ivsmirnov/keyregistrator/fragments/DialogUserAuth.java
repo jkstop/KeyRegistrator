@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +40,7 @@ public class DialogUserAuth extends DialogFragment implements
 
     public static DialogUserAuth newInstance(String selectedRoom){
         Bundle bundle = new Bundle();
-        bundle.putString(PersonsFr.PERSONS_SELECTED_ROOM, selectedRoom);
+        bundle.putString(Users.PERSONS_SELECTED_ROOM, selectedRoom);
         DialogUserAuth dialogUserAuth = new DialogUserAuth();
         dialogUserAuth.setArguments(bundle);
         return dialogUserAuth;
@@ -51,7 +50,7 @@ public class DialogUserAuth extends DialogFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getContext();
-        mSelectedRoom = getArguments().getString(PersonsFr.PERSONS_SELECTED_ROOM);
+        mSelectedRoom = getArguments().getString(Users.PERSONS_SELECTED_ROOM);
         mCallback = (Callback)getActivity();
     }
 
@@ -67,9 +66,9 @@ public class DialogUserAuth extends DialogFragment implements
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View dialogView = View.inflate(mContext, R.layout.layout_autorization, null);
+        View dialogView = View.inflate(mContext, R.layout.dialog_user_auth, null);
         final Toolbar toolbar = (Toolbar) dialogView.findViewById(R.id.user_auth_toolbar);
-        toolbar.setTitle(R.string.title_activity_user_auth);
+        toolbar.setTitle(R.string.title_user_auth);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,19 +79,19 @@ public class DialogUserAuth extends DialogFragment implements
 
         mViewPager = (ViewPager)dialogView.findViewById(R.id.user_auth_pager_view);
         mViewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
-        mViewPagerAdapter.addFragment(UserAuthCard.newInstance(mSelectedRoom), getString(R.string.tab_card));
-        mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR, FavoriteDB.CLICK_USER_ACCESS, mSelectedRoom), getString(R.string.tab_free));
-        mViewPagerAdapter.addFragment(PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_SELECTOR, 0, mSelectedRoom), getString(R.string.tab_all));
-        mViewPagerAdapter.addFragment(DialogSearch.newInstance(mSelectedRoom, DialogSearch.LIKE_FRAGMENT), getString(R.string.tab_new));
+        mViewPagerAdapter.addFragment(AuthCard.newInstance(mSelectedRoom), getString(R.string.auth_tab_card));
+        mViewPagerAdapter.addFragment(Users.newInstance(Users.PERSONS_FRAGMENT_SELECTOR, FavoriteDB.CLICK_USER_ACCESS, mSelectedRoom), getString(R.string.auth_tab_free));
+        mViewPagerAdapter.addFragment(Users.newInstance(Users.PERSONS_FRAGMENT_SELECTOR, 0, mSelectedRoom), getString(R.string.auth_tab_all));
+        mViewPagerAdapter.addFragment(DialogSearch.newInstance(mSelectedRoom, DialogSearch.LIKE_FRAGMENT), getString(R.string.auth_tab_new));
 
         mViewPager.setAdapter(mViewPagerAdapter);
 
         mTabLayout = (TabLayout)dialogView.findViewById(R.id.user_auth_tabs);
         mTabLayout.setupWithViewPager(mViewPager);
-        mTabLayout.getTabAt(0).setIcon(R.drawable.ic_credit_card_black_24dp).setTag(getString(R.string.tab_card));
-        mTabLayout.getTabAt(1).setIcon(R.drawable.ic_touch_app_black_24dp).setTag(getString(R.string.tab_free));
-        mTabLayout.getTabAt(2).setIcon(R.drawable.ic_lock_black_24dp).setTag(getString(R.string.tab_all));
-        mTabLayout.getTabAt(3).setIcon(R.drawable.ic_person_add_black_24dp).setTag(getString(R.string.tab_new));
+        mTabLayout.getTabAt(0).setIcon(R.drawable.ic_credit_card_black_24dp).setTag(getString(R.string.auth_tab_card));
+        mTabLayout.getTabAt(1).setIcon(R.drawable.ic_touch_app_black_24dp).setTag(getString(R.string.auth_tab_free));
+        mTabLayout.getTabAt(2).setIcon(R.drawable.ic_lock_black_24dp).setTag(getString(R.string.auth_tab_all));
+        mTabLayout.getTabAt(3).setIcon(R.drawable.ic_person_add_black_24dp).setTag(getString(R.string.auth_tab_new));
 
         mTabLayout.setOnTabSelectedListener(
                 new TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
@@ -100,7 +99,7 @@ public class DialogUserAuth extends DialogFragment implements
                     public void onTabSelected(TabLayout.Tab tab) {
                         super.onTabSelected(tab);
 
-                        if (tab.getTag().equals(getString(R.string.tab_all))){
+                        if (tab.getTag().equals(getString(R.string.auth_tab_all))){
                             new DialogPassword().show(getChildFragmentManager(), DialogPassword.PERSONS_ACCESS);
                         }
                     }

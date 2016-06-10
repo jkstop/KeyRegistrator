@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@id/grid_size_pickers_x"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="X"/>
+
+    <biz.kasual.materialnumberpicker.MaterialNumberPicker
+        android:id="@id/grid_size_pickers_columns"
+        android:layout_margin="@dimen/layout_default_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@id/grid_size_pickers_x"
+        android:layout_centerVertical="true"
+        app:npMinValue="1"
+        app:npMaxValue="4"
+        app:npSeparatorColor="@color/colorAccent"/>
+
+    <biz.kasual.materialnumberpicker.MaterialNumberPicker
+        android:id="@id/grid_size_pickers_rows"
+        android:layout_margin="@dimen/layout_default_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/grid_size_pickers_x"
+        android:layout_centerVertical="true"
+        android:orientation="horizontal"
+        app:npMinValue="1"
+        app:npMaxValue="4"
+        app:npDefaultValue="3"
+        app:npSeparatorColor="@color/colorAccent"/>
+
+</RelativeLayout>

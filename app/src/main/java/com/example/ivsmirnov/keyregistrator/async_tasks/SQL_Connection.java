@@ -1,18 +1,12 @@
 package com.example.ivsmirnov.keyregistrator.async_tasks;
 
-import android.os.AsyncTask;
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Соединение с сервером
@@ -93,7 +87,7 @@ public class SQL_Connection {
             if (connectThread == null){
                 connectThread = new Thread(null, getConnect, "MSSQLServerConnect");
 
-                if (serverName == null) mServerName = Settings.getServerName();
+                if (serverName == null) mServerName = SharedPrefs.getServerName();
 
                 connectThread.start();
             }

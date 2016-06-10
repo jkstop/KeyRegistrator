@@ -2,23 +2,11 @@ package com.example.ivsmirnov.keyregistrator.activities;
 
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
-import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
-import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
-import com.example.ivsmirnov.keyregistrator.fragments.StatFr;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import com.example.ivsmirnov.keyregistrator.fragments.Statistic;
 
 
 public class CloseDay extends AppCompatActivity {
@@ -30,7 +18,7 @@ public class CloseDay extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_close_day_activity);
+        setContentView(R.layout.activity_statistic);
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.layout_main_app_bar);
         if (mToolbar != null) {
@@ -44,14 +32,14 @@ public class CloseDay extends AppCompatActivity {
             case STAT_TITLE:
                 break;
             case CLOSE_TITLE:
-                getSupportActionBar().setTitle(getString(R.string.title_activity_close_day_dialog_end));
+                getSupportActionBar().setTitle(getString(R.string.title_statistic_end));
                 getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorAccent)));
                 break;
             default:
                 break;
         }
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.layout_main_content_frame, StatFr.newInstance(), "statistics").commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.layout_main_content_frame, Statistic.newInstance(), "statistics").commit();
 
     }
 }

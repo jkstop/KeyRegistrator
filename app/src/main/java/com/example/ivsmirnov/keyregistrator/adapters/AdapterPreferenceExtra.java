@@ -47,7 +47,7 @@ public class AdapterPreferenceExtra extends RecyclerView.Adapter<RecyclerView.Vi
 
         switch (viewType){
             case VIEW_SIMPLE:
-                final View rowView = layoutInflater.inflate(R.layout.view_email_extra_item,parent,false);
+                final View rowView = layoutInflater.inflate(R.layout.view_pref_extra_item,parent,false);
                 viewHolder = new viewHolderEmailExtra(rowView);
                 ImageView deleteItem = (ImageView)rowView.findViewById(R.id.card_email_extra_delete);
                 final RecyclerView.ViewHolder finalViewHolder = viewHolder;
@@ -61,7 +61,7 @@ public class AdapterPreferenceExtra extends RecyclerView.Adapter<RecyclerView.Vi
                 });
                 break;
             case VIEW_ADD_NEW:
-                View rowViewNEW = layoutInflater.inflate(R.layout.view_email_add_new_recipient,parent,false);
+                View rowViewNEW = layoutInflater.inflate(R.layout.view_pref_extra_new,parent,false);
                 viewHolder = new viewHolderAddNew(rowViewNEW);
                 ImageView save = (ImageView)rowViewNEW.findViewById(R.id.card_email_extra_new_recipient_add);
                 ImageView delete = (ImageView)rowViewNEW.findViewById(R.id.card_email_extra_new_recipient_delete);
@@ -90,7 +90,7 @@ public class AdapterPreferenceExtra extends RecyclerView.Adapter<RecyclerView.Vi
                                     if (inputText.contains("@") && inputText.contains(".")){
                                         mCallback.onAddItem(inputText);
                                     } else {
-                                        textInputLayout.setError(mContext.getResources().getString(R.string.email_fragment_error_not_email_entered));
+                                        textInputLayout.setError(mContext.getResources().getString(R.string.email_input_error));
                                     }
                                     break;
                                 case ROOMS:
@@ -108,7 +108,6 @@ public class AdapterPreferenceExtra extends RecyclerView.Adapter<RecyclerView.Vi
                     @Override
                     public void onClick(View v) {
                         mCallback.onDeleteItem(finalViewHolder1.getLayoutPosition());
-                        //mEmailInterface.onDeleteRecepient(finalViewHolder1.getLayoutPosition(), v.getId());
                     }
                 });
 
@@ -116,7 +115,6 @@ public class AdapterPreferenceExtra extends RecyclerView.Adapter<RecyclerView.Vi
         }
         return viewHolder;
     }
-
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {

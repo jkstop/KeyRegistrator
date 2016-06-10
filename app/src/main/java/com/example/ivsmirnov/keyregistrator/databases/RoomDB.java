@@ -5,7 +5,7 @@ import android.database.Cursor;
 
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.others.App;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -141,32 +141,9 @@ public class RoomDB {
                         .setAccessType(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_ACCESS)))
                         .setTime(cursor.getLong(cursor.getColumnIndex(RoomDBinit.COLUMN_TIME)))
                         .setLastVisiter(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_LAST_VISITER)))
-                        .setGridOrient(App.getAppContext().getResources().getConfiguration().orientation)
                         .setTag(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG))));
-                        //.setPhoto(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_PHOTO_PATH))));
             }
             return roomItems;
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ArrayList<>();
-        } finally {
-            closeCursor(cursor);
-        }
-    }
-
-    public static ArrayList<String> getRoomsTags(){
-        Cursor cursor = null;
-        try {
-            ArrayList<String> tags = new ArrayList<>();
-            cursor = DbShare.getCursor(DbShare.DB_ROOM,
-                    RoomDBinit.TABLE_ROOMS,
-                    new String[]{RoomDBinit.COLUMN_TAG},
-                    null,null,null,null,null);
-            cursor.moveToPosition(-1);
-            while (cursor.moveToNext()){
-                tags.add(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG)));
-            }
-            return tags;
         } catch (Exception e){
             e.printStackTrace();
             return new ArrayList<>();
@@ -278,7 +255,7 @@ public class RoomDB {
         Cursor cursor = null;
         try {
             FileOutputStream fileOutputStream;
-            File file = new File(Settings.getBackupLocation() + "/Rooms.csv");
+            File file = new File(SharedPrefs.getBackupLocation() + "/Rooms.csv");
 
             cursor = DbShare.getCursor(DbShare.DB_ROOM,
                     RoomDBinit.TABLE_ROOMS,

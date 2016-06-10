@@ -3,32 +3,41 @@ package com.example.ivsmirnov.keyregistrator.custom_views;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.DialogPreference;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPreferenceExtra;
+import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
+import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 /**
- * Created by Илья on 07.06.2016.
+ * Настройка списка помещений
  */
-public class RoomsPreference extends DialogPreference implements AdapterPreferenceExtra.Callback{
+public class RoomsPreference extends DialogPreference implements
+        SQL_Connection.Callback,
+        AdapterPreferenceExtra.Callback{
 
     private Context mContext;
     private ArrayList<String> mRoomList;
     private ArrayList<String> mPreviousRoomList;
+    private ArrayList<String> mChangedList, mDeletedList;
     private AdapterPreferenceExtra mAdapter;
     private int pressedButton = 0;
 
@@ -45,11 +54,12 @@ public class RoomsPreference extends DialogPreference implements AdapterPreferen
 
     @Override
     protected View onCreateDialogView() {
-        View dialogView = View.inflate(mContext, R.layout.view_email_extra_list, null);
+        View dialogView = View.inflate(mContext, R.layout.main_recycler, null);
         mRoomList = new ArrayList<>();
         mRoomList.addAll(RoomDB.getRoomList());
         mPreviousRoomList = new ArrayList<>(mRoomList);
-        RecyclerView roomListRecycler = (RecyclerView)dialogView.findViewById(R.id.preference_email_extra_list);
+        RecyclerView roomListRecycler = (RecyclerView)dialogView.findViewById(R.id.recycler_main);
+        roomListRecycler.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
         mAdapter = new AdapterPreferenceExtra(mContext, AdapterPreferenceExtra.ROOMS, mRoomList, this);
         roomListRecycler.setLayoutManager(new LinearLayoutManager(mContext));
         roomListRecycler.setAdapter(mAdapter);
@@ -82,6 +92,9 @@ public class RoomsPreference extends DialogPreference implements AdapterPreferen
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
         if (pressedButton == AlertDialog.BUTTON_POSITIVE){
+            mChangedList = new ArrayList<>();
+            mDeletedList = new ArrayList<>();
+
             if (mRoomList.contains(AdapterPreferenceExtra.ADD_NEW_ITEM)){
                 mRoomList.remove(AdapterPreferenceExtra.ADD_NEW_ITEM);
             }
@@ -92,13 +105,22 @@ public class RoomsPreference extends DialogPreference implements AdapterPreferen
                             .setAuditroom(s)
                             .setStatus(RoomDB.ROOM_IS_FREE)
                             .setAccessType(FavoriteDB.CLICK_USER_ACCESS));
+                    mChangedList.add(s);
+                    //SQL_Connection.getConnection(null, ServerWriter.ROOMS_UPDATE, this);
                 }
             }
 
             for (String s : mPreviousRoomList){
                 if (!mRoomList.contains(s)){ //помещение было, но его удалили
                     RoomDB.deleteFromRoomsDB(s);
+                    mDeletedList.add(s);
+                    //SQL_Connection.getConnection(null, ServerWriter.DELETE_ONE, this);
                 }
+            }
+
+            if (SharedPrefs.getWriteServerStatus()){
+                SQL_Connection.getConnection(null, ServerWriter.ROOMS_UPDATE, this);
+                SQL_Connection.getConnection(null, ServerWriter.DELETE_ONE, this);
             }
 
             pressedButton = 0;
@@ -125,5 +147,32 @@ public class RoomsPreference extends DialogPreference implements AdapterPreferen
         });
 
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onServerConnected(Connection connection, int callingTask) {
+        switch (callingTask){
+            case ServerWriter.ROOMS_UPDATE:
+                if (mChangedList!=null && !mChangedList.isEmpty()){
+                    for (String s: mChangedList){
+                        new ServerWriter(ServerWriter.ROOMS_UPDATE, RoomDB.getRoomItem(s), null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+                    }
+                }
+                break;
+            case ServerWriter.DELETE_ONE:
+                if (mDeletedList!=null && !mDeletedList.isEmpty()){
+                    for (String s : mDeletedList){
+                        new ServerWriter(ServerWriter.DELETE_ONE, new RoomItem().setAuditroom(s), null).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onServerConnectException(Exception e) {
+
     }
 }

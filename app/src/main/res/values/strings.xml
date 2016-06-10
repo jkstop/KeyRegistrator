@@ -1,216 +1,83 @@
 <resources>
+
     <string name="app_name">Key Registrator</string>
-
-
-    <!-- Fragment tags
-    <string name="fragment_tag_journal">fragment_tag_journal</string>
-    <string name="fragment_tag_rooms">fragment_tag_rooms</string>
-    <string name="fragment_tag_email">fragment_tag_email</string>
-    <string name="fragment_tag_persons">fragment_tag_persons</string>
-    <string name="fragment_tag_main">fragment_tag_main</string>
-    -->
-
-    <string name="server_client_id">127775171233-cudgtb5mc7s0e83jj3nbofkb5thhig8q.apps.googleusercontent.com</string>
 
     <string name="local_account">Локальный аккаунт</string>
 
-    <string name="text_empty_auds">Список пуст. Добавьте аудитории через настройки.</string>
-    <string name="fragment_tag_nfc">fragment_tag_nfc</string>
-    <string name="fragment_tag_search">fragment_tag_search</string>
-
     <!-- Titles -->
-    <string name="toolbar_title_main">Загруженность аудиторий</string>
-    <string name="toolbar_title_persons">Пользователи</string>
-    <string name="toolbar_title_journal">Журнал</string>
-    <string name="toolbar_title_auditrooms">Аудитории</string>
-    <string name="toolbar_title_shedule">Расписание</string>
-    <string name="toolbar_title_email">E-mail рассылка</string>
-    <string name="title_activity_close_day_dialog">Статистика</string>
-    <string name="title_activity_close_day_dialog_end">Занятия завершены!</string>
-    <string name="title_delete_room_dialog">Удаление</string>
-    <string name="title_add_new_staff">Добавление нового пользователя</string>
-    <string name="title_dialog_log_out">Отсоединение аккаунта</string>
-    <string name="title_activity_user_auth">Авторизация пользователя</string>
+    <string name="title_rooms_loading">Загруженность аудиторий</string>
+    <string name="title_users">Пользователи</string>
+    <string name="title_journal">Журнал</string>
+    <string name="title_rooms">Помещения</string>
+    <string name="title_statistic">Статистика</string>
+    <string name="title_statistic_end">Занятия завершены!</string>
+    <string name="title_log_out">Отсоединение аккаунта</string>
+    <string name="title_user_auth">Авторизация пользователя</string>
+    <string name="title_settings">Настройки</string>
+    <string name="title_upload_all_to_server">Загрузка на сервер</string>
+    <string name="title_download_all_from_server">Загрузка с сервера</string>
 
+    <string name="auth_instruction">Приложите свою кампусную карту к считывателю</string>
 
-    <string name="label_add_button">Добавить</string>
-
-    <string name="text_warning">Уважаемые преподаватели!\n
+    <string name="auth_disclaimer">Уважаемые преподаватели!\n
     Брать и сдавать ключи необходимо лично Вам!\n
     Не оставляйте компьютерный класс открытым!</string>
 
     <string name="erase_disclaimer">Внимание!\n
     При очистке данных с устройства будет удалена вся информация, накопленная приложением.\n
     Убедитесь в наличии резервной копии.</string>
+
+    <string name="log_out_disclaimer">Вы точно хотите отсоединить этот аккаунт? \n
+        Все введенные данные останутся невредимы.</string>
+
     <string name="erase_server_also">Удалить также информацию на сервере</string>
-    <!-- Navigation Drawer -->
 
     <string name="navigation_drawer_opened">The navigation drawer is opened</string>
     <string name="navigation_drawer_closed">The navigation drawer is closed</string>
 
-    <!-- Dialogs -->
-    <string name="dialog_clear_journal_title">Очистка журнала посещений</string>
-    <string name="dialog_clear_teachers_title">Очистка базы пользователей</string>
-    <string name="dialog_clear_journal_erase_local">Удалить все записи на этом устройстве</string>
-    <string name="dialog_clear_journal_erase_server">Удалить все записи на сервере</string>
+    <string name="menu_title_add">Добавить</string>
 
-    <string name="dialog_clear_teachers_message">Из базы данных преподавателей будут удалены все записи. Продолжить?</string>
-
-    <string name="dialog_clear_rooms_title">Очистка базы помещений</string>
-    <string name="dialog_clear_rooms_message">Из базы  будут удалены все записи. Продолжить?</string>
-
-    <string name="fragment_add_new_staff_edit_hint">Начните вводить фамилию</string>
-
-    <string name="done">Готово!</string>
-
-    <string name="add">Добавить</string>
-
-    <string name="title_check_sql_server_connect">Проверка подключения к SQL - серверу</string>
-
-
-    <string name="dialog_delete_room_message">Удалить аудиторию </string>
-    <string name="dialog_columns_title">Выберите количество колонок</string>
-    <string name="delete">Удалить</string>
-
-    <string name="empty_text_journal_item_room">AUD</string>
-    <string name="empty_text_journal_item_time">00:00:00</string>
-
-    <string name="title_dialog_delete_journal_item">Удаление записи</string>
-    <string name="message_dialog_delete_journal_item_from_journal">Удалить из журнала</string>
-    <string name="message_dialg_delete_journal_item_from_server_also">Удалить с сервера</string>
-
-    <string name="title_dailog_delete_room_item">Удаление помещения </string>
-    <string name="message_dialog_delete_room_item_local">Удалить с устройства</string>
-    <string name="message_dialog_delete_room_item_server">Удалить с сервера</string>
+    <string name="text_room_empty">AUD</string>
 
     <!-- Toasts -->
-    <string name="text_toast_put_card">Для сдачи ключей просто приложите карту</string>
-    <string name="text_toast_choise_room_in_first">Вы не выбрали аудиторию!</string>
-    <string name="text_toast_incorrect_card">Не удалось считать карту!</string>
-    <string name="text_toast_thanks">Спасибо!</string>
-    <string name="text_toast_take_key">Возьмите ключ</string>
+    <string name="toast_put_card">Для сдачи ключей просто приложите карту</string>
+    <string name="toast_choise_room_in_first">Вы не выбрали аудиторию!</string>
+    <string name="toast_incorrect_card">Не удалось считать карту!</string>
+    <string name="toast_thanks">Спасибо!</string>
+    <string name="toast_take_key">Возьмите ключ</string>
 
     <!-- Navigation drawer -->
-    <string name="navigation_drawer_list_item_content_description_image">navigation_drawer_list_item_content_description</string>
-    <string name="navigation_drawer_item_home">Главная</string>
-    <string name="navigation_drawer_item_persons">Преподаватели</string>
-    <string name="navigation_drawer_item_journal">Журнал</string>
-    <string name="navigation_drawer_item_rooms">Аудитории</string>
-    <string name="navigation_drawer_item_shedule">Расписание</string>
-    <string name="navigation_drawer_item_settings">Настройки</string>
-    <string name="navigation_drawer_item_mail">E-mail</string>
-    <string name="navigation_drawer_item_sql">SQL-сервер</string>
-    <string name="navigation_drawer_item_stat">Статистика</string>
 
-    <string name="person_card_icon_division_descryption">person_card_icon_division_descryption</string>
-    <string name="person_information_photo_descryption">person_information_photo_descryption</string>
-    <string name="auditroom_grid_free_image_descryption">auditroom_grid_free_image_descryption</string>
-    <string name="auditroom_grid_busy_image_person_description">auditroom_grid_busy_image_description</string>
-    <string name="auditroom_grid_busy_image_key_description">auditroom_grid_busy_image_key_description</string>
-    <string name="navigation_drawer_change_account_image_descritpion">navigation_drawer_change_account_image_descritpion</string>
-    <string name="image_description_email_fragment_account_image">image_description_email_fragment_account_image</string>
-    <string name="image_description_email_fragment_add_recipient">email_fragment_add_recipient</string>
-    <string name="image_description_email_fragment_add_attachment">email_fragment_add_attachment</string>
-    <string name="image_description_email_fragment_icon_attachment">image_description_email_fragment_icon_attachment</string>
-    <string name="image_description_email_fragment_icon_delete_attachment">image_description_email_fragment_icon_delete_attachment</string>
-    <string name="image_description_statistic_image_persons">image_description_statistic_image_person</string>
-    <string name="image_description_statistic_image_journal">image_description_statistic_image_journal</string>
-    <string name="image_description_sql_server_status">image_description_sql_server_status</string>
-    <string name="image_description_sql_server_refresh">image_description_sql_server_refresh</string>
-    <string name="image_description_sql_journal_item_timer">image_description_sql_journal_item_timer</string>
-    <string name="image_description_sql_journal_item_access">image_description_sql_journal_item_access</string>
-    <string name="nfc_fragment_aud_image_descryption">nfc_fragment_aud_image_descryption</string>
-    <string name="descryption_navigation_drawer_list_item_image">descryption_navigation_drawer_list_item_image</string>
-    <string name="descryption_person_card_image_user">descryption_person_card_image_user</string>
-    <string name="descryption_nfc_fragment_reader_image">descryption_nfc_fragment_reader_image</string>
-    <string name="descryption_card_email_add_new_recipient_delete">descryption_card_email_add_new_recipient_delete</string>
-    <string name="descryption_card_email_add_new_recipient_save">descryption_card_email_add_new_recipient_save</string>
-    <string name="descryption_person_card_icon_access">descryption_person_card_icon_access</string>
+    <string name="enter_password_hint">Пароль</string>
+    <string name="enter_password_title">Требуется пароль</string>
+    <string name="enter_password_error">Неверный пароль!</string>
 
-    <string name="view_enter_password_hint_password">Пароль</string>
-    <string name="view_enter_password_title">Требуется пароль</string>
-    <string name="view_enter_password_entered_incorrect">Неверный пароль!</string>
+    <string name="lesson_is_during">Идёт занятие</string>
 
-    <string name="view_enter_auditroom_hint_room">Помещение</string>
-    <string name="view_enter_auditroom_title">Добавить</string>
-
-    <string name="journal_card_during_lesson">Идёт занятие</string>
-
-    <string name="person_information_text_lastname">Фамилия</string>
-    <string name="person_information_text_firstname">Имя</string>
-    <string name="person_information_text_midname">Отчество</string>
-    <string name="person_information_text_division">Подразделение</string>
-    <string name="person_information_access_type">Доступ без карты</string>
-
-    <string name="snack_user_added">Пользователь добавлен!</string>
-    <string name="snack_cancel">Отменить</string>
-    <string name="snack_cancelled">Отменено</string>
+    <string name="person_info_lastname">Фамилия</string>
+    <string name="person_info_firstname">Имя</string>
+    <string name="person_info_midname">Отчество</string>
+    <string name="person_info_division">Подразделение</string>
+    <string name="person_info_access_type">Доступ без карты</string>
 
     <string name="input_empty_error">Введите хотя бы один символ!</string>
-    <string name="input_already_exist_error">Такое помещение уже есть!</string>
     <string name="input_sql_server_name_error">Имя сервера не может быть пустым!</string>
 
-    <string name="view_resize_title">Для изменения размера элементов перетащите ползунок справа</string>
+    <string name="email_input_error">Некорректный e-mail </string>
 
-    <string name="dialog_log_out_message">Вы точно хотите отсоединить этот аккаунт? Все введенные данные останутся невредимы.</string>
+    <string name="statistic_today_count">Посещений за день:</string>
+    <string name="statistic_autoclose_count">Закрыто автоматически:</string>
 
-    <string name="email_fragment_input_theme_hint">Тема</string>
-    <string name="email_fragment_input_message_hint">Текст сообщения</string>
-    <string name="email_fragment_recepients_text">Получатели</string>
-    <string name="email_fragment_attachments_text">Вложения</string>
-    <string name="email_fragment_logon">Для отправки писем сначала войдите в аккаунт</string>
-    <string name="email_fragment_error_not_email_entered">Некорректный e-mail </string>
-    <string name="card_email_add_new_recepient_input">Введите e-mail</string>
-
-    <string name="card_statistic_today_count">Посещений за день:</string>
-    <string name="card_statistic_autoclose_count">Закрыто автоматически:</string>
-    <string name="card_statistic_head_stat">Статистика</string>
-    <string name="card_statistic_head_close">Занятия завершены!</string>
-
-    <string name="nfc_fragment_head">Приложите свою кампусную карту к считывателю</string>
-    <string name="nfc_fragment_free_users">Нажмите тут, если нет карты</string>
-
-    <string name="dialog_sql_server_connected">Соединение установлено</string>
-    <string name="dialog_sql_server_disconnected">Отключено</string>
-    <string name="dialog_sql_server_hint_server">Имя или IP-адрес сервера</string>
-    <string name="dialog_sql_server_hint_user">Логин</string>
-    <string name="dialog_sql_server_hint_password">Пароль</string>
+    <string name="sql_server_hint">Имя или IP-адрес сервера</string>
 
     <string name="toast_press_back_again">Нажмите НАЗАД еще раз, чтобы выйти из программы</string>
 
-    <!-- menu items -->
-    <string name="menu_auditrooms_set_columns_number">Количество колонок</string>
-    <string name="menu_auditrooms_save_to_file">Сохранить</string>
-    <string name="menu_auditrooms_load_from_file">Загрузить</string>
-    <string name="menu_auditrooms_clear">Очистить</string>
-    <string name="menu_auditrooms_upload_to_server">Загрузить на сервер</string>
-    <string name="menu_auditrooms_download_from_server">Загрузить с сервера</string>
-    <string name="menu_journal_save_to_file">Сохранить</string>
-    <string name="menu_journal_download_from_file">Загрузить из файла</string>
-    <string name="menu_journal_delete">Очистить</string>
-    <string name="menu_journal_select_location_for_copy">Указать папку для копии</string>
-    <string name="menu_journal_upload_to_server">Загрузить на сервер</string>
-    <string name="menu_journal_download_from_server">Загрузить с сервера</string>
-    <string name="menu_teachers_save_to_file">Сохранить</string>
-    <string name="menu_teachers_download_favorite">Загрузить из файла</string>
-    <string name="menu_teachers_delete">Очистить</string>
-    <string name="menu_teachers_select_location_for_copy">Указать папку для копии</string>
-    <string name="menu_teachers_upload_to_server">Загрузить на сервер</string>
-    <string name="menu_teachers_download_from_server">Загрузить с сервера</string>
-    <string name="menu_main_items_size">Размер элементов</string>
-    <string name="menu_main_upload_all_to_server">Загрузка на сервер</string>
-    <string name="menu_main_download_all_from_server">Загрузка с сервера</string>
-    <string name="menu_nfc_all_persons">Все пользователи</string>
-    
-    <string name="tab_card">По карте</string>
-    <string name="tab_free">Без карты</string>
-    <string name="tab_all">По паролю</string>
-    <string name="tab_new">Новый</string>
+    <string name="auth_tab_card">По карте</string>
+    <string name="auth_tab_free">Без карты</string>
+    <string name="auth_tab_all">По паролю</string>
+    <string name="auth_tab_new">Новый</string>
 
-    <!--Preferences-->
-
-    <string name="shared_preferences_screen">PrefereceScreen</string>
-
+    <!--Setting-->
     <string name="shared_preferences_category_sheduler">Планировщик</string>
     <string name="shared_preferences_category_server">Сервер</string>
     <string name="shared_preferences_category_basic">Общие</string>
@@ -244,9 +111,6 @@
     </string-array>
 
     <string name="shared_preferences_category_email">Рассылка</string>
-    <string name="shared_preferences_email_status">Регулярная рассылка</string>
-    <string name="shared_preferences_email_status_summary_on">включена</string>
-    <string name="shared_preferences_email_status_summary_off">отключена</string>
     <string name="shared_preferences_email_period">Периодичность</string>
     <string name="shared_preferences_email_period_summary">Дни недели для рассылки</string>
     <string-array name="shared_preferences_email_period_entries">
@@ -294,10 +158,6 @@
     <string name="shared_preferences_backup_erase_base">Очистка базы данных</string>
     <string name="shared_preferences_backup_erase_base_summary">Удаление накопленной в приложении информации</string>
 
-    <string name="view_table_landscape">Альбомный</string>
-    <string name="view_table_portrait">Портретный</string>
-    <string name="view_table_title">Размер сетки</string>
-
     <string name="email_theme">Рассылка</string>
     <string name="email_message">Рассылка от \u0020</string>
     <string name="email_sending">Отправка сообщения</string>
@@ -305,7 +165,14 @@
     <string name="email_sending_error">Ошибка при отправке</string>
 
     <string name="dialog_search_query_hint">Начните вводить фамилию</string>
+
+    <!--Snacks-->
     <string name="snack_user_add_success">Пользователь добавлен!</string>
     <string name="snack_user_add_error">Ошибка при добавлении пользователя!</string>
+    <string name="snack_server_connect_error">Нет соединения с сервером</string>
+    <string name="snack_server_write_success">Запись на сервер завершена</string>
+    <string name="snack_server_write_error">Ошибка при записи на сервер</string>
+    <string name="snack_server_read_success">Чтение с сервера завершено</string>
+    <string name="snack_server_read_error">Ошибка при чтении с сервера</string>
 
 </resources>

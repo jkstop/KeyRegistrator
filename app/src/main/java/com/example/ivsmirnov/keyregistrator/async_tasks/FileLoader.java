@@ -3,18 +3,17 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.design.widget.Snackbar;
 import android.widget.Toast;
 
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
-import com.example.ivsmirnov.keyregistrator.fragments.JournalFr;
-import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
+import com.example.ivsmirnov.keyregistrator.fragments.Journal;
+import com.example.ivsmirnov.keyregistrator.fragments.Users;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -90,7 +89,7 @@ public class FileLoader extends AsyncTask<Void,Integer,Boolean> {
                                         .setRadioLabel(split[5])
                                         .setAccessType(Integer.parseInt(split[6]))
                                         .setPhoto(split[7]),
-                                        Settings.getWriteServerStatus());
+                                        SharedPrefs.getWriteServerStatus());
 
                                 publishProgress(i);
                                 i++;
@@ -99,7 +98,7 @@ public class FileLoader extends AsyncTask<Void,Integer,Boolean> {
                             }
                         }
                     }
-                    PersonsFr.contentNeedsForUpdate = true;
+                    Users.contentNeedsForUpdate = true;
                     break;
                 case JournalDB.JOURNAL_VALIDATE:
                     System.out.println("*************journal file**************");
@@ -122,7 +121,7 @@ public class FileLoader extends AsyncTask<Void,Integer,Boolean> {
                             i++;
                         }
                     }
-                    JournalFr.contentNeedsForUpdate = true;
+                    Journal.contentNeedsForUpdate = true;
                     break;
                 case RoomDB.ROOMS_VALIDATE:
                     System.out.println("************rooms file**********");

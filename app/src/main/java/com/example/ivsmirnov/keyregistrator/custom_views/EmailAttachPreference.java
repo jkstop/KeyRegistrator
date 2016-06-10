@@ -8,11 +8,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.activities.Preferences;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPreferenceExtra;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,10 +43,11 @@ public class EmailAttachPreference extends DialogPreference implements AdapterPr
 
     @Override
     protected View onCreateDialogView() {
-        View dialogView = View.inflate(mContext, R.layout.view_email_extra_list, null);
-        mAttachList = Settings.getAttachments();
+        View dialogView = View.inflate(mContext, R.layout.main_recycler, null);
+        mAttachList = SharedPrefs.getAttachments();
         mAdapter = new AdapterPreferenceExtra(mContext, AdapterPreferenceExtra.ATTACHMENTS, mAttachList, this);
-        RecyclerView attachListView = (RecyclerView)dialogView.findViewById(R.id.preference_email_extra_list);
+        RecyclerView attachListView = (RecyclerView)dialogView.findViewById(R.id.recycler_main);
+        attachListView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
         attachListView.setAdapter(mAdapter);
         attachListView.setLayoutManager(new LinearLayoutManager(mContext));
         return dialogView;
@@ -71,7 +73,7 @@ public class EmailAttachPreference extends DialogPreference implements AdapterPr
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Settings.setAttachments(mAttachList);
+                SharedPrefs.setAttachments(mAttachList);
                 dialog.dismiss();
             }
         });

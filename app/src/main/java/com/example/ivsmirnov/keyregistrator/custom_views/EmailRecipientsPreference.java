@@ -9,11 +9,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.adapters.AdapterPreferenceExtra;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 import java.util.ArrayList;
 
@@ -42,9 +43,10 @@ public class EmailRecipientsPreference extends DialogPreference implements Adapt
 
     @Override
     protected View onCreateDialogView() {
-        View dialogView = View.inflate(mContext, R.layout.view_email_extra_list, null);
-        mRecepientList = Settings.getRecepients();
-        RecyclerView recipientView = (RecyclerView)dialogView.findViewById(R.id.preference_email_extra_list);
+        View dialogView = View.inflate(mContext, R.layout.main_recycler, null);
+        mRecepientList = SharedPrefs.getRecepients();
+        RecyclerView recipientView = (RecyclerView)dialogView.findViewById(R.id.recycler_main);
+        recipientView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
         mAdapter = new AdapterPreferenceExtra(mContext, AdapterPreferenceExtra.RECIPIENTS, mRecepientList, this);
         mAdapter.setHasStableIds(true);
         recipientView.setAdapter(mAdapter);
@@ -81,7 +83,7 @@ public class EmailRecipientsPreference extends DialogPreference implements Adapt
             if (mRecepientList.contains(AdapterPreferenceExtra.ADD_NEW_ITEM)){
                 mRecepientList.remove(AdapterPreferenceExtra.ADD_NEW_ITEM);
             }
-            Settings.setRecepients(mRecepientList);
+            SharedPrefs.setRecepients(mRecepientList);
             callChangeListener(mRecepientList);
             pressedButton = 0;
         }

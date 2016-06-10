@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/layout_default_margin">
+
+    <RelativeLayout
+        android:id="@id/close_day_info_layout"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@id/close_day_date"
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:layout_marginBottom="@dimen/layout_default_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@id/close_day_visit_text"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_below="@id/close_day_date"
+            android:text="@string/statistic_today_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@id/close_day_visit_count"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/content_default_margin"
+            android:layout_toEndOf="@id/close_day_visit_text"
+            android:layout_alignBottom="@id/close_day_visit_text"/>
+
+        <TextView
+            android:id="@id/close_day_closed_text"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_below="@id/close_day_visit_text"
+            android:text="@string/statistic_autoclose_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/close_day_visit_text"
+            android:layout_marginTop="@dimen/content_default_margin" />
+
+        <TextView
+            android:id="@id/close_day_closed_count"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/close_day_closed_text"
+            android:layout_alignBottom="@id/close_day_closed_text"
+            android:layout_marginStart="@dimen/content_default_margin" />
+
+        <TextView
+            android:id="@id/close_day_journal_count"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_default_margin"
+            android:layout_below="@id/close_day_closed_count"
+            android:layout_alignEnd="@id/close_day_closed_count"/>
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@id/close_day_journal_icon"
+            android:src="@drawable/ic_format_list_bulleted_black_18dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/content_default_margin"
+            android:layout_toStartOf="@id/close_day_journal_count"
+            android:layout_alignBottom="@id/close_day_journal_count"/>
+
+        <TextView
+            android:id="@id/close_day_persons_count"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/close_day_journal_icon"
+            android:layout_alignBottom="@id/close_day_journal_icon"/>
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@id/close_day_persons_icon"
+            android:src="@drawable/ic_person_black_18dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/close_day_persons_count"
+            android:layout_alignBottom="@id/close_day_persons_count"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

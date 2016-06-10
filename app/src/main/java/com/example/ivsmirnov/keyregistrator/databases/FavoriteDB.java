@@ -13,7 +13,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.items.CharacterItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.others.App;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -123,7 +123,7 @@ public class FavoriteDB {
                 }
 
                 ContentValues cv = new ContentValues();
-                cv.put(FavoriteDBinit.COLUMN_USER_ID_FAVORITE, Settings.getActiveAccountID());
+                cv.put(FavoriteDBinit.COLUMN_USER_ID_FAVORITE, SharedPrefs.getActiveAccountID());
                 cv.put(FavoriteDBinit.COLUMN_LASTNAME_FAVORITE, personItem.getLastname());
                 cv.put(FavoriteDBinit.COLUMN_FIRSTNAME_FAVORITE, personItem.getFirstname());
                 cv.put(FavoriteDBinit.COLUMN_MIDNAME_FAVORITE, personItem.getMidname());
@@ -565,7 +565,7 @@ public class FavoriteDB {
         try {
 
             FileOutputStream fileOutputStream;
-            File file = new File(Settings.getBackupLocation(), "/Persons.csv");
+            File file = new File(SharedPrefs.getBackupLocation(), "/Persons.csv");
 
             cursor = DbShare.getCursor(DbShare.DB_FAVORITE, FavoriteDBinit.TABLE_PERSONS, null,null,null,null,null,null);
             cursor.moveToPosition(-1);

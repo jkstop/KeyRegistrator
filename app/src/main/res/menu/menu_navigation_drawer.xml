@@ -5,23 +5,23 @@
         <item
             android:id="@id/navigation_item_home"
             android:icon="@drawable/ic_home_black_24dp"
-            android:title="@string/toolbar_title_main" />
+            android:title="@string/title_rooms_loading" />
         <item
             android:id="@id/navigation_item_persons"
             android:icon="@drawable/ic_person_black_24dp"
-            android:title="@string/toolbar_title_persons" />
+            android:title="@string/title_users" />
         <item
             android:id="@id/navigation_item_journal"
             android:icon="@drawable/ic_format_list_bulleted_black_24dp"
-            android:title="@string/toolbar_title_journal" />
+            android:title="@string/title_journal" />
         <item
             android:id="@id/navigation_item_settings"
             android:icon="@drawable/ic_settings_black_24dp"
-            android:title="@string/navigation_drawer_item_settings"/>
+            android:title="@string/title_settings"/>
         <item
             android:id="@id/navigation_item_stat"
             android:icon="@drawable/ic_info_black_24dp"
-            android:title="@string/navigation_drawer_item_stat"/>
+            android:title="@string/title_statistic"/>
     </group>
 
     <item
@@ -29,12 +29,12 @@
         <menu>
             <item
                 android:id="@+id/navigation_item_upload_all_to_server"
-                android:title="@string/menu_main_upload_all_to_server"
+                android:title="@string/title_upload_all_to_server"
                 android:icon="@drawable/ic_cloud_upload_black_24dp" />
 
             <item
                 android:id="@+id/navigation_item_download_all_from_server"
-                android:title="@string/menu_main_download_all_from_server"
+                android:title="@string/title_download_all_from_server"
                 android:icon="@drawable/ic_cloud_download_black_24dp" />
         </menu>
 

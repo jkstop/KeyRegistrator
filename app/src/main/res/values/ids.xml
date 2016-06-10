@@ -2,20 +2,21 @@
 <resources>
 
     <item name="app_bar_main_layout" type="id"/>
-    <item name="action_button_main" type="id"/>
 
     <item name="recycler_main" type="id"/>
+    <item name="progress_bar_main" type="id"/>
+
+    <item name="users_index_list" type="id"/>
+    <item name="users_index_text" type="id"/>
+
+    <item name="toast_fullscreen_text" type="id"/>
 
     <item name="user_auth_appbar" type="id"/>
     <item name="user_auth_layout" type="id"/>
     <item name="user_auth_disclaimer" type="id"/>
-    <item name="user_auth_appbar_layout" type="id"/>
     <item name="user_auth_toolbar" type="id"/>
     <item name="user_auth_tabs" type="id"/>
     <item name="user_auth_pager_view" type="id"/>
-    <item name="user_auth_disclaimer_layout" type="id"/>
-    <item name="user_auth_room" type="id"/>
-    <item name="user_auth_fab" type="id"/>
 
     <item name="user_auth_card_layout" type="id"/>
     <item name="user_auth_card_disclaimer" type="id"/>
@@ -23,13 +24,11 @@
 
     <item name="enter_pass_input_layout" type="id"/>
     <item name="enter_pass_input_text" type="id"/>
-    <item name="enter_pass_ok_button" type="id"/>
 
     <item name="dialog_search_appbar" type="id"/>
     <item name="dialog_search_toolbar" type="id"/>
     <item name="dialog_search_input" type="id"/>
     <item name="dialog_search_add_button" type="id"/>
-    <item name="dialog_search_recycler" type="id"/>
     <item name="dialog_search_progress" type="id"/>
 
     <item name="dialog_erase_journal_check" type="id"/>
@@ -43,6 +42,7 @@
     <item name="layout_main_navigation_view" type="id"/>
     <item name="layout_main_app_bar" type="id"/>
 
+    <item name="navigation_drawer_account_view" type="id"/>
     <item name="navigation_header_account_image" type="id"/>
     <item name="navigation_header_account_info" type="id"/>
     <item name="navigation_header_account_title" type="id"/>
@@ -52,43 +52,12 @@
     <item name="navigation_item_home" type="id"/>
     <item name="navigation_item_persons" type="id"/>
     <item name="navigation_item_journal" type="id"/>
-    <item name="navigation_item_rooms" type="id"/>
     <item name="navigation_item_settings" type="id"/>
-    <item name="navigation_item_sql_connect" type="id"/>
-    <item name="navigation_item_email" type="id"/>
     <item name="navigation_item_stat" type="id"/>
 
     <item name="preference_item_sql_input_server" type="id"/>
     <item name="preference_item_sql_check_connect" type="id"/>
     <item name="preference_item_sql_status" type="id"/>
-
-    <item name="preference_item_grid_size_tabs" type="id"/>
-    <item name="preference_item_grid_size_page_picker" type="id"/>
-    <item name="preference_item_grid_size_toolbar" type="id"/>
-
-    <item name="account_fr" type="id"/>
-    <item name="account_fr_head" type="id"/>
-    <item name="account_fr_image" type="id"/>
-    <item name="account_fr_name" type="id"/>
-    <item name="account_fr_email" type="id"/>
-
-    <item name="period_fr" type="id"/>
-    <item name="period_fr_head" type="id"/>
-    <item name="period_fr_days_group" type="id"/>
-    <item name="period_fr_status_task_icon" type="id"/>
-    <item name="period_fr_status_task_text" type="id"/>
-
-    <item name="recipients_fr" type="id"/>
-    <item name="recipients_fr_head" type="id"/>
-    <item name="recipietns_fr_add" type="id"/>
-    <item name="recipients_fr_list" type="id"/>
-
-    <item name="attachments_fr" type="id"/>
-    <item name="attachments_fr_head" type="id"/>
-    <item name="attachments_fr_add" type="id"/>
-    <item name="attachments_fr_list" type="id"/>
-
-    <item name="preference_email_extra_list" type="id"/>
 
     <item name="card_email_extra_icon" type="id"/>
     <item name="card_email_extra_title" type="id"/>
@@ -99,7 +68,6 @@
     <item name="card_email_extra_new_recipient_delete" type="id"/>
     <item name="card_email_extra_new_recipient_add" type="id"/>
 
-    <item name="close_day_logo" type="id"/>
     <item name="close_day_date" type="id"/>
     <item name="close_day_info_layout" type="id"/>
     <item name="close_day_visit_text" type="id"/>
@@ -122,14 +90,13 @@
     
     <item name="person_card" type="id"/>
     <item name="person_card_info_layout" type="id"/>
-    <item name="person_card_user_photo" type="id"/>
     <item name="person_card_user_lastname" type="id"/>
     <item name="person_card_user_firstname" type="id"/>
     <item name="person_card_user_midname" type="id"/>
     <item name="person_card_user_division_text" type="id"/>
-    <item name="person_card_user_division_icon" type="id"/>
     <item name="person_card_user_access_icon" type="id"/>
 
+    <item name="journal_card" type="id"/>
     <item name="journal_card_room" type="id"/>
     <item name="journal_card_photo_container" type="id"/>
     <item name="journal_card_photo" type="id"/>
@@ -139,6 +106,21 @@
     <item name="journal_card_time_icon" type="id"/>
     <item name="journal_card_access_icon" type="id"/>
     <item name="journal_card_delete" type="id"/>
+
+    <item name="room_busy_card" type="id"/>
+    <item name="room_busy_card_image_layout" type="id"/>
+    <item name="room_busy_card_image_user" type="id"/>
+    <item name="room_busy_card_image_key" type="id"/>
+    <item name="room_busy_card_text_room" type="id"/>
+    <item name="room_busy_card_text_user" type="id"/>
+
+    <item name="room_free_card" type="id"/>
+    <item name="room_free_card_image_key" type="id"/>
+    <item name="room_free_card_text_room" type="id"/>
+
+    <item name="grid_size_pickers_x" type="id"/>
+    <item name="grid_size_pickers_rows" type="id"/>
+    <item name="grid_size_pickers_columns" type="id"/>
 
     <item name="menu_person_add" type="id"/>
     <item name="menu_person_info_save" type="id"/>

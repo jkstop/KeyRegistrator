@@ -14,7 +14,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.Send_Email;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.others.App;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 import com.example.ivsmirnov.keyregistrator.activities.CloseDay;
 
 import java.sql.Connection;
@@ -34,37 +34,30 @@ public class CloseDayService extends Service implements SQL_Connection.Callback 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        System.out.println("START SHEDULER");
-
         try {
 
-            ArrayList<String> selectedTasks = Settings.getShedulerItems();
+            ArrayList<String> selectedTasks = SharedPrefs.getShedulerItems();
             String[] allTasks = App.getAppContext().getResources().getStringArray(R.array.shared_preferences_local_tasks_entries);
 
             //закрываем открытые помещения
             if (selectedTasks.contains(allTasks[0])){
-                Settings.setAutoClosedRoomsCount(RoomDB.closeAllRooms());
+                SharedPrefs.setAutoClosedRoomsCount(RoomDB.closeAllRooms());
             }
 
             //запись файлов
             if (selectedTasks.contains(allTasks[1])){
-                new FileWriter(null, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, Settings.getBackupItems());
+                new FileWriter(null, false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, SharedPrefs.getBackupItems());
             }
 
             //запись на сервер
             if (selectedTasks.contains(allTasks[2])){
                 SQL_Connection.getConnection(null, 0, this);
-                //new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.JOURNAL_UPDATE);
-                //new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.PERSON_UPDATE);
-                //new ServerWriter().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ServerWriter.ROOMS_UPDATE);
             }
 
             //рассылка email
             if (selectedTasks.contains(allTasks[3])){
-
-                    if (Settings.getEmailPeriods().contains(
+                if (SharedPrefs.getEmailPeriods().contains(
                             String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)))){
-
                         new Send_Email(context, Send_Email.DIALOG_DISABLED).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                     }
             }

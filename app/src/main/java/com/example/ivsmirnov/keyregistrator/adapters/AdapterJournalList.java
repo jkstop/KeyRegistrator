@@ -34,7 +34,7 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
 
     @Override
     public ViewHolderJournalItem onCreateViewHolder(ViewGroup parent, int viewType) {
-        View rowView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_journal_item,parent,false);
+        View rowView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_journal_item,parent,false);
         final ViewHolderJournalItem viewHolderJournalItem = new ViewHolderJournalItem(rowView);
         rowView.findViewById(R.id.journal_card_delete).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,7 +59,7 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
         holder.mTextTimeIn.setText(String.valueOf(new Time(mBindedItem.getTimeIn())));
 
         if (mBindedItem.getTimeOut() == 0){
-            holder.mTextTimeOut.setText(R.string.journal_card_during_lesson);
+            holder.mTextTimeOut.setText(R.string.lesson_is_during);
         } else {
             holder.mTextTimeOut.setText(String.valueOf(new Time(mBindedItem.getTimeOut())));
         }
@@ -107,7 +107,7 @@ public class AdapterJournalList extends RecyclerView.Adapter<AdapterJournalList.
             mImagePerson = (ImageView)itemView.findViewById(R.id.journal_card_photo);
             mTextPesonInitials = (TextView)itemView.findViewById(R.id.journal_card_user);
             mImageAccess = (ImageView)itemView.findViewById(R.id.journal_card_access_icon);
-            mCard = (CardView)itemView.findViewById(R.id.card_journal_item);
+            mCard = (CardView)itemView.findViewById(R.id.journal_card);
             mDelete = (ImageView)itemView.findViewById(R.id.journal_card_delete);
         }
     }

@@ -9,7 +9,7 @@ import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.AccountDB;
 import com.example.ivsmirnov.keyregistrator.items.AccountItem;
 import com.example.ivsmirnov.keyregistrator.others.App;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 import com.google.android.gms.auth.GoogleAuthUtil;
 
 import java.io.ByteArrayInputStream;
@@ -79,12 +79,12 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
 
         try {
 
-            AccountItem mAccountItem = AccountDB.getAccount(Settings.getActiveAccountID());
+            AccountItem mAccountItem = AccountDB.getAccount(SharedPrefs.getActiveAccountID());
             String token = GoogleAuthUtil.getToken(mContext, mAccountItem.getEmail(),"oauth2:https://mail.google.com/");
             String mTheme = mContext.getString(R.string.email_theme);
-            String mBody = mContext.getString(R.string.email_message) + Settings.showDate();
+            String mBody = mContext.getString(R.string.email_message) + SharedPrefs.showDate();
             InternetAddress from = new InternetAddress(mAccountItem.getEmail(), App.getAppContext().getResources().getString(R.string.app_name));
-            ArrayList<String> mAttachments = Settings.getAttachments();
+            ArrayList<String> mAttachments = SharedPrefs.getAttachments();
 
             Properties mProps = new Properties();
             mProps.put("mail.smtp.ssl.enable", "true");
@@ -100,7 +100,7 @@ public class Send_Email extends AsyncTask<Void, Void, Exception> {
             mMimeMessage.setFrom(from);
             mMimeMessage.setDataHandler(mHandler);
 
-            for (String recepient : Settings.getRecepients()){
+            for (String recepient : SharedPrefs.getRecepients()){
                 mMimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(recepient));
             }
 

@@ -2,10 +2,7 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Message;
-import android.widget.Toast;
 
-import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
@@ -13,7 +10,7 @@ import com.example.ivsmirnov.keyregistrator.items.JournalItem;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 import com.example.ivsmirnov.keyregistrator.services.Toasts;
 
 import java.sql.Connection;
@@ -68,7 +65,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Exception> imple
                     final long timeIn = System.currentTimeMillis();
 
                     mJournalItem = new JournalItem()
-                            .setAccountID(Settings.getActiveAccountID())
+                            .setAccountID(SharedPrefs.getActiveAccountID())
                             .setAuditroom(params[0].getAuditroom())
                             .setAccessType(params[0].getAccessType())
                             .setTimeIn(timeIn)
@@ -113,7 +110,7 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Exception> imple
     protected void onPostExecute(Exception e) {
         if (e == null){
             if (mCallback!=null) mCallback.onSuccessBaseWrite();
-            if (Settings.getWriteServerStatus()){
+            if (SharedPrefs.getWriteServerStatus()){
                 SQL_Connection.getConnection(null, mType, this);
             }
         } else {

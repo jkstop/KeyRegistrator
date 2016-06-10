@@ -1,50 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:override="true">
-    <!-- App Main Palette
-    <color name="primary">@color/green_500</color>
-    <color name="primaryDark">@color/green_700</color>
-    <color name="colorAccent">#FFD50000</color>-->
 
     <color name="colorPrimary">#4CAF50</color>
     <color name="colorPrimaryDark">#388E3C</color>
     <color name="primary_light">#C8E6C9</color>
     <color name="colorAccent">#D50000</color>
-    <color name="primary_text">#212121</color>
-    <color name="secondary_text">#727272</color>
-    <color name="icons">#FFFFFF</color>
-    <color name="divider">#B6B6B6</color>
 
-    <!-- Text -->
-
-    <!-- NavigationDrawer -->
-
-    <!-- Green -->
-    <color name="green_500">#4caf50</color>
-
-    <color name="green_700">#388e3c</color>
-
-    <!-- Grey -->
-
-    <!-- Blue -->
-
-    <!-- Amber -->
-
-    <!-- Black and White -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="black_alpha_50">#80000000</color>
-    <color name="background_floating_material_dark">#424242</color>
-    <color name="primary_text_material_dark">#ffffff</color>
-
     <color name="transparent">#00FFFFFF</color>
-
-    <color name="person_card_text_secondary">@color/material_grey_900</color>
-
-    <color name="toast_fullscreen_background">#a4000000</color>
-    <color name="toast_fullscreen_text">#ffffff</color>
-
-    <!--<color name="auditroom_card">@color/primary_dark</color>
-    <color name="auditroom_busy_card">#FFD50000</color>-->
-    <color name="grey_400">#bdbdbd</color>
 </resources>

@@ -1,13 +1,11 @@
 package com.example.ivsmirnov.keyregistrator.activities;
 
-import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -47,15 +45,14 @@ import com.example.ivsmirnov.keyregistrator.databases.DbShare;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.fragments.DialogUserAuth;
-import com.example.ivsmirnov.keyregistrator.fragments.JournalFr;
-import com.example.ivsmirnov.keyregistrator.fragments.MainFr;
-import com.example.ivsmirnov.keyregistrator.fragments.PersonsFr;
+import com.example.ivsmirnov.keyregistrator.fragments.Journal;
+import com.example.ivsmirnov.keyregistrator.fragments.Rooms;
+import com.example.ivsmirnov.keyregistrator.fragments.Users;
 import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 
-import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.others.App;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 import com.example.ivsmirnov.keyregistrator.services.Alarm;
 import com.example.ivsmirnov.keyregistrator.services.Toasts;
 import com.google.android.gms.auth.api.Auth;
@@ -71,8 +68,9 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class Launcher extends AppCompatActivity implements
@@ -113,6 +111,7 @@ SQL_Connection.Callback,
     private Reader mReader;
     public static Reader.OnStateChangeListener sReaderStateChangeListener;
     public static boolean sCardConnected = false;
+    public static boolean sDirectWrite = false;
     public String mCurrentRadioLabel;
 
     private static FrameLayout mContentFrame;
@@ -163,6 +162,8 @@ SQL_Connection.Callback,
 
         initAccount();
 
+        mNFCReader = new NFC_reader();
+
         if (savedInstanceState == null){
             //connect to server
             SQL_Connection.getConnection(null, 0, mSQLConnectCallback);
@@ -170,18 +171,18 @@ SQL_Connection.Callback,
             //init DataBases
             //new DbShare();
 
-            //init SharedPreferences
-            //new Settings();
+            //init SharedPrefs
+            //new SharedPrefs();
 
 
-            showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
-            mNFCReader = new NFC_reader();
+            showFragment(getSupportFragmentManager(), Rooms.newInstance(),R.string.title_rooms_loading);
+
         }
 
     }
 
     private void initAccount(){
-        PersonItem activePerson = FavoriteDB.getPersonItem(Settings.getActiveAccountID(), false);
+        PersonItem activePerson = FavoriteDB.getPersonItem(SharedPrefs.getActiveAccountID(), false);
         System.out.println("active person " + activePerson);
         if (activePerson!=null){
             mAccountName.setText(activePerson.getLastname());
@@ -224,13 +225,13 @@ SQL_Connection.Callback,
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.navigation_item_home:
-                showFragment(getSupportFragmentManager(), MainFr.newInstance(),R.string.toolbar_title_main);
+                showFragment(getSupportFragmentManager(), Rooms.newInstance(),R.string.title_rooms_loading);
                 break;
             case R.id.navigation_item_persons:
-                showFragment(getSupportFragmentManager(),PersonsFr.newInstance(PersonsFr.PERSONS_FRAGMENT_EDITOR, 0, null) ,R.string.toolbar_title_persons);
+                showFragment(getSupportFragmentManager(), Users.newInstance(Users.PERSONS_FRAGMENT_EDITOR, 0, null) ,R.string.title_users);
                 break;
             case R.id.navigation_item_journal:
-                showFragment(getSupportFragmentManager(), JournalFr.newInstance(),R.string.toolbar_title_journal);
+                showFragment(getSupportFragmentManager(), Journal.newInstance(),R.string.title_journal);
                 break;
             case R.id.navigation_item_settings:
                 startActivity(new Intent(mContext, Preferences.class));
@@ -253,11 +254,6 @@ SQL_Connection.Callback,
         mDrawer.closeDrawer(GravityCompat.START);
 
         return true;
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 
     private void initGoogleAPI(){
@@ -298,7 +294,7 @@ SQL_Connection.Callback,
                     }
                 }
             } else {
-                Settings.setActiveAccountID(getString(R.string.local_account));
+                SharedPrefs.setActiveAccountID(getString(R.string.local_account));
             }
     }
 
@@ -312,7 +308,6 @@ SQL_Connection.Callback,
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
                     byte[] byteArray = byteArrayOutputStream .toByteArray();
                     String encoded = Base64.encodeToString(byteArray, Base64.NO_WRAP);
-                    System.out.println("Encoded image " + encoded);
 
                     FavoriteDB.addNewUser(new PersonItem()
                             .setLastname(account.getDisplayName())
@@ -320,9 +315,9 @@ SQL_Connection.Callback,
                             .setRadioLabel(account.getId())
                             .setAccessType(FavoriteDB.CLICK_USER_ACCESS)
                             .setPhoto(encoded),
-                            Settings.getWriteServerStatus());
+                            SharedPrefs.getWriteServerStatus());
 
-                    Settings.setActiveAccountID(account.getId());
+                    SharedPrefs.setActiveAccountID(account.getId());
 
                     mHandler.sendEmptyMessage(HANDLER_ACCOUNT_WRITED);
                 } catch (Exception e){
@@ -338,12 +333,6 @@ SQL_Connection.Callback,
         System.out.println("connectionFAIL");
     }
 
-
-    public static String getStringFromResources(int resId){
-        Resources resources = App.getAppContext().getResources();
-        return resources.getString(resId);
-    }
-
     public void setToolbarTitle (int resId){
         if (getSupportActionBar()!=null){
             getSupportActionBar().setTitle(getResources().getString(resId));
@@ -352,14 +341,14 @@ SQL_Connection.Callback,
 
     public static void showFragment(FragmentManager fragmentManager, Fragment fragment, int fragmentTagId){
         fragmentManager.beginTransaction()
-                .replace(R.id.layout_main_content_frame,fragment,getStringFromResources(fragmentTagId))
+                .replace(R.id.layout_main_content_frame,fragment, App.getAppContext().getString(fragmentTagId))
                 .commit();
     }
 
     private void showLogOutDialog(){
         new AlertDialog.Builder(mContext)
-                .setTitle(getString(R.string.title_dialog_log_out))
-                .setMessage(getString(R.string.dialog_log_out_message))
+                .setTitle(getString(R.string.title_log_out))
+                .setMessage(getString(R.string.log_out_disclaimer))
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -379,7 +368,7 @@ SQL_Connection.Callback,
                             public void onResult(@NonNull Status status) {
                             }
                         });
-                        Settings.setActiveAccountID(getResources().getString(R.string.local_account));
+                        SharedPrefs.setActiveAccountID(getResources().getString(R.string.local_account));
 
                         mAccountName.setText(getString(R.string.local_account));
                         mAccountEmail.setText("");
@@ -392,20 +381,11 @@ SQL_Connection.Callback,
                 .show();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        System.out.println("RESUME");
-        System.out.println("IS ALARM SET " + Alarm.isAlarmSet());
-    }
+
 
     private void setSheduler(){
-        System.out.println("sheduler status " + Settings.getShedulerStatus());
-        if (Settings.getShedulerStatus()){
-            System.out.println("alarm is set? " + Alarm.isAlarmSet());
-
+        if (SharedPrefs.getShedulerStatus()){
             Alarm.setAlarm(Alarm.getClosingTime(null));
-            System.out.println("done");
         }
     }
 
@@ -413,7 +393,6 @@ SQL_Connection.Callback,
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        System.out.println("DESTROY");
 
         Alarm.cancelAlarm();
 
@@ -427,12 +406,6 @@ SQL_Connection.Callback,
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        System.out.println("STOP");
-    }
-
-    @Override
     public void onBackPressed() {
         if (mDrawer!=null && mDrawer.isDrawerOpen(GravityCompat.START)){
             mDrawer.closeDrawer(GravityCompat.START);
@@ -440,7 +413,7 @@ SQL_Connection.Callback,
             if (back_pressed + 2000 > System.currentTimeMillis()){
                 finish();
             } else {
-                Toast.makeText(getBaseContext(), getStringFromResources(R.string.toast_press_back_again), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), getString(R.string.toast_press_back_again), Toast.LENGTH_SHORT).show();
                 back_pressed = System.currentTimeMillis();
             }
         }
@@ -448,7 +421,6 @@ SQL_Connection.Callback,
 
     @Override
     public void onServerConnected(Connection connection, int callingTask) {
-        System.out.println("CONNECTED : " + connection);
         switch (callingTask){
             case ServerWriter.UPDATE_ALL:
                 new ServerWriter(ServerWriter.UPDATE_ALL, null, false, mServerWriteCallback).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, connection);
@@ -466,8 +438,8 @@ SQL_Connection.Callback,
 
     @Override
     public void onServerConnectException(Exception e) {
-        Snackbar.make(mContentFrame,"Нет соединения с сервером",Snackbar.LENGTH_SHORT)
-                .setAction("Настройки", new View.OnClickListener() {
+        Snackbar.make(mContentFrame,getString(R.string.snack_server_connect_error),Snackbar.LENGTH_SHORT)
+                .setAction(getString(R.string.title_settings), new View.OnClickListener() {
                     @Override
                     public void onClick(View v){
                         startActivity(new Intent(mContext, Preferences.class));
@@ -478,51 +450,63 @@ SQL_Connection.Callback,
 
     @Override
     public void onSuccessServerWrite() {
-        Snackbar.make(mContentFrame,"Запись прошла успешно",Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mContentFrame,getString(R.string.snack_server_write_success),Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void onErrorServerWrite() {
-        Snackbar.make(mContentFrame,"Ошибка при записи",Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mContentFrame,getString(R.string.snack_server_write_error),Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSuccessServerRead(int task, Object result) {
-        Snackbar.make(mContentFrame,"Чтение успешно",Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mContentFrame,getString(R.string.snack_server_read_success),Snackbar.LENGTH_SHORT).show();
         switch (task){
             case ServerReader.READ_PERSON_ITEM:
                 if (result!=null){
                     PersonItem personItem = (PersonItem)result;
-                    if (FavoriteDB.addNewUser(personItem, Settings.getWriteServerStatus())){
+                    if (FavoriteDB.addNewUser(personItem, SharedPrefs.getWriteServerStatus())){
                         write(personItem);
                     }
+                } else {
+                    Toasts.handler.sendEmptyMessage(Toasts.TOAST_WRONG_CARD);
                 }
+                break;
+            case ServerReader.READ_ALL:
+                Rooms rooms = (Rooms) getSupportFragmentManager().findFragmentByTag(getString(R.string.title_rooms_loading));
+                Users users = (Users) getSupportFragmentManager().findFragmentByTag(getString(R.string.title_users));
+                Journal journal = (Journal) getSupportFragmentManager().findFragmentByTag(getString(R.string.title_journal));
+                if (rooms!=null && rooms.isVisible()){
+                    Rooms.updateGrid();
+                } else if (users!=null && users.isVisible()){
+                    users.initPersons("#", true).start();
+                } else if (journal!=null && journal.isVisible()){
+                    journal.getJournal(new Date(System.currentTimeMillis())).start();
+                }
+
                 break;
             default:
                 break;
         }
-
     }
 
     @Override
     public void onErrorServerRead(Exception e) {
-        Snackbar.make(mContentFrame,"Ошибка при чтении",Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mContentFrame,getString(R.string.snack_server_read_error),Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void onSuccessBaseWrite() {
 
-        System.out.println("success base write 111");
-        DialogUserAuth dialogUserAuth = (DialogUserAuth)getSupportFragmentManager().findFragmentByTag(getString(R.string.title_activity_user_auth));
+        DialogUserAuth dialogUserAuth = (DialogUserAuth)getSupportFragmentManager().findFragmentByTag(getString(R.string.title_user_auth));
         if (dialogUserAuth!=null && dialogUserAuth.isVisible()){
             dialogUserAuth.getDialog().cancel();
         }
-        MainFr.updateGrid();
+        Rooms.updateGrid();
     }
 
     @Override
     public void onErrorBaseWrite() {
-        System.out.println("error base write");
     }
 
     private void write(PersonItem personItem){
@@ -530,7 +514,7 @@ SQL_Connection.Callback,
                 .execute(new BaseWriterParams()
                         .setPersonTag(personItem.getRadioLabel())
                         .setAccessType(personItem.getAccessType())
-                        .setAuditroom(UserAuth.mSelectedRoom));
+                        .setAuditroom(DialogUserAuth.mSelectedRoom));
     }
 
     public class NFC_reader{
@@ -539,12 +523,11 @@ SQL_Connection.Callback,
         private Reader mReader;
         private Context mContext;
 
-
         public NFC_reader(){
             mContext = getApplicationContext();
             UsbManager manager = (UsbManager)mContext.getSystemService(Context.USB_SERVICE);
             mReader = new Reader(manager);
-            mReader.setOnStateChangeListener(readerStateChangeListener);
+
             PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, RECEIVER_REQUEST_CODE, new Intent(ACTION_USB_PERMISSION), 0);
             IntentFilter filter = new IntentFilter();
             filter.addAction(ACTION_USB_PERMISSION);
@@ -553,62 +536,57 @@ SQL_Connection.Callback,
 
             mContext.registerReceiver(mReceiver, filter);
 
-            System.out.println("DEVICES " + manager.getDeviceList().values().size());
             for (UsbDevice device : manager.getDeviceList().values()) {
                 manager.requestPermission(device,pendingIntent);
             }
-        }
 
-        private Thread getUser(final String userTag){
-            return new Thread(new Runnable() {
+            sReaderStateChangeListener = new Reader.OnStateChangeListener(){
                 @Override
-                public void run() {
-                    if (!FavoriteDB.isUserInBase(userTag)){
+                public void onStateChange(int i, int previousState, int currentState) {
+                    if (currentState < Reader.CARD_UNKNOWN || currentState > Reader.CARD_SPECIFIC) currentState = Reader.CARD_UNKNOWN;
 
+                    if (currentState == Reader.CARD_PRESENT){
+                        sCardConnected = true;
+                        mCurrentRadioLabel = getRadioLabelValue();
+
+                        DialogUserAuth dialogUserAuth = (DialogUserAuth)getSupportFragmentManager().findFragmentByTag(getString(R.string.title_user_auth));
+                        Rooms rooms = (Rooms) getSupportFragmentManager().findFragmentByTag(getString(R.string.title_rooms_loading));
+
+                        if (sDirectWrite){
+                            write(FavoriteDB.getPersonItem(mCurrentRadioLabel, false));
+                            sDirectWrite = false;
+                        }else if (dialogUserAuth!=null){
+                            if (!FavoriteDB.isUserInBase(mCurrentRadioLabel)){
+                                SQL_Connection.getConnection(null, ServerReader.READ_PERSON_ITEM, mSQLConnectCallback);
+                            } else {
+                                write(FavoriteDB.getPersonItem(mCurrentRadioLabel, false));
+                            }
+
+                        } else if (rooms !=null && rooms.isVisible()){
+                            if (RoomDB.getRoomItemForCurrentUser(mCurrentRadioLabel)!=null){
+                                new BaseWriter(BaseWriter.UPDATE_CURRENT, mContext, mBaseWriterCallback)
+                                        .execute(new BaseWriterParams()
+                                                .setPersonTag(mCurrentRadioLabel));
+                            } else {
+                                if (FavoriteDB.isUserInBase(mCurrentRadioLabel)){
+                                    Toasts.handler.sendEmptyMessage(Toasts.TOAST_SELECT_ROOM_FIRST);
+                                } else {
+                                    Toasts.handler.sendEmptyMessage(Toasts.TOAST_WRONG_CARD);
+                                }
+
+                            }
+                        }
+                    }
+
+                    if (currentState == Reader.CARD_ABSENT){
+                        sCardConnected = false;
                     }
                 }
-            });
+            };
+
+            mReader.setOnStateChangeListener(sReaderStateChangeListener);
         }
 
-        Reader.OnStateChangeListener readerStateChangeListener = new Reader.OnStateChangeListener(){
-            @Override
-            public void onStateChange(int i, int previousState, int currentState) {
-                if (currentState < Reader.CARD_UNKNOWN || currentState > Reader.CARD_SPECIFIC) currentState = Reader.CARD_UNKNOWN;
-
-                if (currentState == Reader.CARD_PRESENT){
-                    sCardConnected = true;
-                    mCurrentRadioLabel = getRadioLabelValue();
-                    System.out.println("CARD CONNECTED " + mCurrentRadioLabel);
-
-                    DialogUserAuth dialogUserAuth = (DialogUserAuth)getSupportFragmentManager().findFragmentByTag(getString(R.string.title_activity_user_auth));
-                    MainFr mainFr = (MainFr) getSupportFragmentManager().findFragmentByTag(getString(R.string.toolbar_title_main));
-
-                    if (dialogUserAuth!=null && dialogUserAuth.isVisible()){
-                        System.out.println("AUTH VISIBLE");
-                        if (!FavoriteDB.isUserInBase(mCurrentRadioLabel)){
-                            SQL_Connection.getConnection(null, ServerReader.READ_PERSON_ITEM, mSQLConnectCallback);
-                        } else {
-                            onSuccessServerRead(ServerReader.READ_PERSON_ITEM, FavoriteDB.getPersonItem(mCurrentRadioLabel, false));
-                        }
-
-                    } else if (mainFr!=null && mainFr.isVisible()){
-                        if (RoomDB.getRoomItemForCurrentUser(mCurrentRadioLabel)!=null){
-                            new BaseWriter(BaseWriter.UPDATE_CURRENT, mContext, mBaseWriterCallback)
-                                    .execute(new BaseWriterParams()
-                                            .setPersonTag(mCurrentRadioLabel));
-                        } else {
-                            Toasts.handler.sendEmptyMessage(Toasts.TOAST_SELECT_ROOM_FIRST);
-                        }
-                    }
-
-                }
-
-                if (currentState == Reader.CARD_ABSENT){
-                    System.out.println("CARD DISCONNECTED");
-                    sCardConnected = false;
-                }
-            }
-        };
 
         private String getRadioLabelValue(){
             try {
@@ -634,7 +612,6 @@ SQL_Connection.Callback,
                 public void run() {
                     try {
                         mReader.open(usbDevice);
-                        System.out.println("OPENED READER " + mReader.getReaderName());
                     } catch (Exception e){
                         e.printStackTrace();
                     }
@@ -644,7 +621,6 @@ SQL_Connection.Callback,
 
         public void closeReader(){
             if (mReader!=null && mContext!=null){
-                System.out.println("UNREGISTER READER " + mReader.getReaderName() + " WITH RECEIVER " + mReceiver.toString());
                 mReader.close();
                 mContext.unregisterReceiver(mReceiver);
             }

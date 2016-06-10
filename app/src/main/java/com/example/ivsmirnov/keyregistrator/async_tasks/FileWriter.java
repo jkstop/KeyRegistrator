@@ -3,22 +3,13 @@ package com.example.ivsmirnov.keyregistrator.async_tasks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
 
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.others.App;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 /**
@@ -70,7 +61,7 @@ public class FileWriter extends AsyncTask <ArrayList<String>,Integer,Exception> 
                 System.out.println("journal backuped");
 
                 // String srFileJournal = mPathExternal + JOURNAL;
-                // String dtFileJournal = Settings.getJournalBackupLocation() + JOURNAL;
+                // String dtFileJournal = SharedPrefs.getJournalBackupLocation() + JOURNAL;
                 // copyFile(srFileJournal, dtFileJournal);
             }
 
@@ -82,7 +73,7 @@ public class FileWriter extends AsyncTask <ArrayList<String>,Integer,Exception> 
                 System.out.println("persons backuped");
 
                 //String srFileTeachers = mPathExternal + TEACHERS;
-                //String dtFileTeachers = Settings.getPersonsBackupLocation() + TEACHERS;
+                //String dtFileTeachers = SharedPrefs.getPersonsBackupLocation() + TEACHERS;
                 //copyFile(srFileTeachers, dtFileTeachers);
             }
 

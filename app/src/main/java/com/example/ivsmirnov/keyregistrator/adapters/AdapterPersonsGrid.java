@@ -6,11 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ivsmirnov.keyregistrator.R;
@@ -40,7 +37,7 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
         mType = type;
 
         this.mListener = listener;
-        //isFreeUsers = Settings.getFreeUsers();
+        //isFreeUsers = SharedPrefs.getFreeUsers();
     }
 
 
@@ -66,7 +63,7 @@ public class AdapterPersonsGrid extends RecyclerView.Adapter<AdapterPersonsGrid.
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View rowView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_person,parent,false);
+        View rowView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_person_item,parent,false);
         final ViewHolder viewHolder = new ViewHolder(rowView);
 
         rowView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, AbsListView.LayoutParams.WRAP_CONTENT));

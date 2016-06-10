@@ -70,11 +70,11 @@ public class DialogPassword extends DialogFragment implements SQL_Connection.Cal
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View dialogView = View.inflate(mContext, R.layout.view_enter_password, null);
+        View dialogView = View.inflate(mContext, R.layout.dialog_password, null);
         final TextInputLayout textInputLayout = (TextInputLayout)dialogView.findViewById(R.id.enter_pass_input_layout);
         final AlertDialog dialogPass = new AlertDialog.Builder(mContext)
                 .setView(dialogView)
-                .setTitle(getString(R.string.view_enter_password_title))
+                .setTitle(getString(R.string.enter_password_title))
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
@@ -100,13 +100,13 @@ public class DialogPassword extends DialogFragment implements SQL_Connection.Cal
                                     }
                                     break;
                                 case ERASE_ACCESS:
-                                    if (mEraseItems.contains(getString(R.string.toolbar_title_journal))){
+                                    if (mEraseItems.contains(getString(R.string.title_journal))){
                                         JournalDB.clear();
                                     }
-                                    if (mEraseItems.contains(getString(R.string.toolbar_title_persons))){
+                                    if (mEraseItems.contains(getString(R.string.title_users))){
                                         FavoriteDB.clear();
                                     }
-                                    if (mEraseItems.contains(getString(R.string.toolbar_title_auditrooms))){
+                                    if (mEraseItems.contains(getString(R.string.title_rooms))){
                                         RoomDB.clear();
                                     }
 
@@ -121,7 +121,7 @@ public class DialogPassword extends DialogFragment implements SQL_Connection.Cal
 
                             dialog.dismiss();
                         } else {
-                            textInputLayout.setError(getString(R.string.view_enter_password_entered_incorrect));
+                            textInputLayout.setError(getString(R.string.enter_password_error));
                         }
                     }
                 });

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.preference.DialogPreference;
 import android.support.design.widget.TextInputLayout;
@@ -17,12 +18,12 @@ import android.widget.ImageView;
 import com.example.ivsmirnov.keyregistrator.R;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.others.App;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 import java.sql.Connection;
 
 /**
- * Created by ivsmirnov on 24.05.2016.
+ * Настройка подключения MSSQL
  */
 public class SQLPreference extends DialogPreference implements SQL_Connection.Callback {
 
@@ -42,7 +43,7 @@ public class SQLPreference extends DialogPreference implements SQL_Connection.Ca
         mContext = context;
         mCallback = this;
 
-        mHandler = new Handler(){
+        mHandler = new Handler(Looper.getMainLooper()){
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
@@ -70,7 +71,7 @@ public class SQLPreference extends DialogPreference implements SQL_Connection.Ca
 
     @Override
     protected View onCreateDialogView() {
-        View dialogLayout = View.inflate(mContext, R.layout.view_preference_sql, null);
+        View dialogLayout = View.inflate(mContext, R.layout.dialog_sql_pref, null);
 
         //анимация поворота стрелки
         final Animation rotationAnim = AnimationUtils.loadAnimation(mContext, R.anim.rotate);
@@ -81,7 +82,7 @@ public class SQLPreference extends DialogPreference implements SQL_Connection.Ca
         mCheckServerConnect = (ImageView)dialogLayout.findViewById(R.id.preference_item_sql_check_connect);
         mServerStatus = (ImageView)dialogLayout.findViewById(R.id.preference_item_sql_status);
 
-        mServerName.setText(Settings.getServerName());
+        mServerName.setText(SharedPrefs.getServerName());
 
         mCheckServerConnect.startAnimation(rotationAnim);
 
@@ -116,9 +117,8 @@ public class SQLPreference extends DialogPreference implements SQL_Connection.Ca
     public void onClick(DialogInterface dialog, int which) {
         switch (which){
             case DialogInterface.BUTTON_POSITIVE:
-                Settings.setServerName(mServerName.getText().toString());
+                SharedPrefs.setServerName(mServerName.getText().toString());
                 connect(mServerName.getText().toString(), null);
-                //SQL_Connection.getConnection(mServerName.getText().toString(), null);
                 break;
             case DialogInterface.BUTTON_NEGATIVE:
                 dialog.cancel();

@@ -3,24 +3,17 @@ package com.example.ivsmirnov.keyregistrator.databases;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
-import android.os.Environment;
-import android.support.design.widget.Snackbar;
 
-import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.items.JournalItem;
-import com.example.ivsmirnov.keyregistrator.others.App;
-import com.example.ivsmirnov.keyregistrator.others.Settings;
+import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.sql.Time;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Set;
 
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -59,7 +52,6 @@ public class JournalDB {
                     new String[]{JournalDBinit.COLUMN_TIME_IN},
                     null, null, null, null, null);
 
-            Settings.setTotalJournalCount(cursor.getCount());
             return position;
         }catch (Exception e){
             e.printStackTrace();
@@ -79,7 +71,7 @@ public class JournalDB {
                     JournalDBinit.TABLE_JOURNAL,
                     new String[]{JournalDBinit.COLUMN_TIME_IN},
                     JournalDBinit.COLUMN_USER_ID + " =?",
-                    new String[]{Settings.getActiveAccountID()},
+                    new String[]{SharedPrefs.getActiveAccountID()},
                     null,
                     JournalDBinit.COLUMN_TIME_IN,
                     null);
@@ -113,7 +105,7 @@ public class JournalDB {
                     JournalDBinit.TABLE_JOURNAL,
                     null,
                     JournalDBinit.COLUMN_USER_ID + " =?",
-                    new String[]{Settings.getActiveAccountID()},
+                    new String[]{SharedPrefs.getActiveAccountID()},
                     null,
                     JournalDBinit.COLUMN_TIME_IN,
                     null);
@@ -183,7 +175,7 @@ public class JournalDB {
                     JournalDBinit.TABLE_JOURNAL,
                     new String[]{JournalDBinit.COLUMN_TIME_IN},
                     JournalDBinit.COLUMN_USER_ID + " =?",
-                    new String[]{Settings.getActiveAccountID()},
+                    new String[]{SharedPrefs.getActiveAccountID()},
                     null,
                     JournalDBinit.COLUMN_TIME_IN,
                     null);
@@ -285,7 +277,7 @@ public class JournalDB {
                     JournalDBinit.TABLE_JOURNAL,
                     new String[]{JournalDBinit.COLUMN_TIME_IN},
                     JournalDBinit.COLUMN_USER_ID + " =?",
-                    new String[]{Settings.getActiveAccountID()},
+                    new String[]{SharedPrefs.getActiveAccountID()},
                     null,
                     null,
                     null);
@@ -320,7 +312,7 @@ public class JournalDB {
                     JournalDBinit.TABLE_JOURNAL,
                     new String[]{JournalDBinit.COLUMN_TIME_IN},
                     JournalDBinit.COLUMN_USER_ID + " =?",
-                    new String[]{Settings.getActiveAccountID()},
+                    new String[]{SharedPrefs.getActiveAccountID()},
                     null,
                     JournalDBinit.COLUMN_TIME_IN + " DESC",
                     null);
@@ -365,7 +357,7 @@ public class JournalDB {
 
     public static  void backupJournalToXLS(){
 
-        File file = new File(Settings.getBackupLocation(),"/Journal.xls");
+        File file = new File(SharedPrefs.getBackupLocation(),"/Journal.xls");
         Cursor cursor = null;
 
         WorkbookSettings workbookSettings = new WorkbookSettings();
@@ -383,7 +375,7 @@ public class JournalDB {
                         new String[]{JournalDBinit.COLUMN_USER_ID, JournalDBinit.COLUMN_AUD, JournalDBinit.COLUMN_TIME_IN, JournalDBinit.COLUMN_TIME_OUT,
                                 JournalDBinit.COLUMN_PERSON_INITIALS},
                         JournalDBinit.COLUMN_USER_ID + " =?",
-                        new String[]{Settings.getActiveAccountID()},
+                        new String[]{SharedPrefs.getActiveAccountID()},
                         null,
                         null,
                         null);
@@ -402,7 +394,7 @@ public class JournalDB {
 
                         while (cursor.moveToNext()){
                             if (datesString.get(i).equals(dateFormat.format(new Date(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN)))))){
-                                if (Settings.getActiveAccountID().equals(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_USER_ID)))){
+                                if (SharedPrefs.getActiveAccountID().equals(cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_USER_ID)))){
                                     daySheet.addCell(new Label(0,row,cursor.getString(cursor.getColumnIndex(JournalDBinit.COLUMN_AUD))));
                                     daySheet.addCell(new Label(1,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_IN))))));
                                     daySheet.addCell(new Label(2,row,String.valueOf(new Time(cursor.getLong(cursor.getColumnIndex(JournalDBinit.COLUMN_TIME_OUT))))));
@@ -431,7 +423,7 @@ public class JournalDB {
 
         Cursor cursor = null;
         try {
-            File file = new File(Settings.getBackupLocation(),"/Journal.csv");
+            File file = new File(SharedPrefs.getBackupLocation(),"/Journal.csv");
             FileOutputStream fileOutputStream;
 
             cursor = DbShare.getCursor(DbShare.DB_JOURNAL,
