@@ -44,35 +44,33 @@
 
         </android.support.percent.PercentRelativeLayout>
 
-        <android.support.percent.PercentRelativeLayout
+        <RelativeLayout
             android:layout_toEndOf="@id/room_busy_card_image_layout"
             android:layout_marginStart="@dimen/content_default_margin"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
+            <TextView
                 android:id="@id/room_busy_card_text_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_heightPercent="70%"
                 android:maxLines="2"
                 android:textColor="@color/black"
-                android:textSize="200sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4"
                 android:gravity="center" />
 
-            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
+            <TextView
                 android:id="@id/room_busy_card_text_user"
-                android:layout_below="@id/room_busy_card_text_room"
-                android:maxLines="2"
-                android:textColor="@color/black"
-                android:textSize="150sp"
-                app:layout_heightPercent="30%"
+
+                android:maxLines="3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                />
+                android:gravity="center_horizontal|bottom"
+                android:layout_alignParentBottom="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textSize="38sp"/>
 
-        </android.support.percent.PercentRelativeLayout>
+        </RelativeLayout>
 
     </android.support.percent.PercentRelativeLayout>
 

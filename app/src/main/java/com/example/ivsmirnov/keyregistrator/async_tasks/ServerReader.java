@@ -190,6 +190,7 @@ public class ServerReader extends AsyncTask<Connection,Integer,Exception> {
                                     .setMidname(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_MIDNAME))
                                     .setDivision(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_DIVISION))
                                     .setRadioLabel(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_TAG))
+                                    .setAccessType(personItemResult.getInt(SQL_Connection.COLUMN_PERSONS_ACCESS))
                                     .setSex(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_SEX))
                                     .setPhoto(personItemResult.getString(SQL_Connection.COLUMN_PERSONS_PHOTO_BASE64)),
                                     false);

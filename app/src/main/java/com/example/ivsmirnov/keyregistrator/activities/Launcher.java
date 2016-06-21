@@ -103,9 +103,8 @@ public class Launcher extends AppCompatActivity implements
 
     private static long back_pressed;
 
-    public static Reader.OnStateChangeListener sReaderStateChangeListener;
-    public static boolean sCardConnected = false;
-    public static boolean sDirectWrite = false;
+    private Reader mReader;
+    private Reader.OnStateChangeListener mReaderStateChangeListener;
     private String mCurrentRadioLabel;
 
     private static FrameLayout mContentFrame;
@@ -516,7 +515,7 @@ public class Launcher extends AppCompatActivity implements
     public class NFC_reader{
         private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
         private static final int RECEIVER_REQUEST_CODE = 100;
-        private Reader mReader;
+
         private Context mContext;
 
         public NFC_reader(){
@@ -536,22 +535,19 @@ public class Launcher extends AppCompatActivity implements
                 manager.requestPermission(device,pendingIntent);
             }
 
-            sReaderStateChangeListener = new Reader.OnStateChangeListener(){
+            mReaderStateChangeListener = new Reader.OnStateChangeListener(){
                 @Override
                 public void onStateChange(int i, int previousState, int currentState) {
                     if (currentState < Reader.CARD_UNKNOWN || currentState > Reader.CARD_SPECIFIC) currentState = Reader.CARD_UNKNOWN;
 
                     if (currentState == Reader.CARD_PRESENT){
-                        sCardConnected = true;
+
                         mCurrentRadioLabel = getRadioLabelValue();
 
                         DialogUserAuth dialogUserAuth = (DialogUserAuth)getSupportFragmentManager().findFragmentByTag(getString(R.string.title_user_auth));
                         Rooms rooms = (Rooms) getSupportFragmentManager().findFragmentByTag(getString(R.string.title_rooms_loading));
 
-                        if (sDirectWrite){
-                            write(FavoriteDB.getPersonItem(mCurrentRadioLabel, false));
-                            sDirectWrite = false;
-                        }else if (dialogUserAuth!=null){
+                        if (dialogUserAuth!=null){
                             if (!FavoriteDB.isUserInBase(mCurrentRadioLabel)){
                                 SQL_Connection.getConnection(null, ServerReader.READ_PERSON_ITEM, mSQLConnectCallback);
                             } else {
@@ -573,14 +569,10 @@ public class Launcher extends AppCompatActivity implements
                             }
                         }
                     }
-
-                    if (currentState == Reader.CARD_ABSENT){
-                        sCardConnected = false;
-                    }
                 }
             };
 
-            mReader.setOnStateChangeListener(sReaderStateChangeListener);
+            mReader.setOnStateChangeListener(mReaderStateChangeListener);
         }
 
 

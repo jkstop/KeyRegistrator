@@ -38,6 +38,7 @@ public class SQL_Connection {
     public static final String COLUMN_PERSONS_ACCESS = "ACCESS";
     public static final String COLUMN_PERSONS_PHOTO_BASE64 = "PHOTO_BASE64";
 
+    public static final String COLUMN_ROOMS_ACCOUNT_ID = "ACCOUNT_ID";
     public static final String COLUMN_ROOMS_ROOM = "ROOM";
     public static final String COLUMN_ROOMS_STATUS = "STATUS";
     public static final String COLUMN_ROOMS_ACCESS = "ACCESS";
@@ -60,8 +61,6 @@ public class SQL_Connection {
 
     private static String mServerName;
     private static Callback mCallback;
-    //private static SQL_Connection mConnectTask;
-
 
     private static final String NET_SOURCEFORGE_JTDS_JDBC_DRIVER = "net.sourceforge.jtds.jdbc.Driver";
     private static final String DB = "KeyRegistratorBase";

@@ -25,7 +25,7 @@
             android:layout_centerVertical="true"
             android:layout_margin="@dimen/content_default_margin"/>
 
-        <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
+        <TextView
             android:id="@id/room_free_card_text_room"
             android:layout_toEndOf="@id/room_free_card_image_key"
             android:layout_alignParentTop="true"
@@ -34,9 +34,10 @@
             android:layout_margin="@dimen/content_default_margin"
             android:gravity="center"
             android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display4"
             android:text="@string/text_room_empty"
             android:textColor="@color/black"
-            android:textSize="120sp" />
+             />
 
     </android.support.percent.PercentRelativeLayout>
 

@@ -94,13 +94,7 @@ public class Rooms extends Fragment implements RecycleItemClickListener {
             return;
         }
         if (mRoomItems.get(position).getStatus() == RoomDB.ROOM_IS_FREE) {
-            if (Launcher.sCardConnected && Launcher.sReaderStateChangeListener!=null){
-                Launcher.sDirectWrite = true;
-                Launcher.sReaderStateChangeListener.onStateChange(0, 1, 2);
-            } else {
-                DialogUserAuth.newInstance(mRoomItems.get(position).getAuditroom()).show(getActivity().getSupportFragmentManager(),getString(R.string.title_user_auth));
-            }
-
+            DialogUserAuth.newInstance(mRoomItems.get(position).getAuditroom()).show(getActivity().getSupportFragmentManager(),getString(R.string.title_user_auth));
         } else {
             if (mRoomItems.get(position).getAccessType() == FavoriteDB.CLICK_USER_ACCESS) {
 

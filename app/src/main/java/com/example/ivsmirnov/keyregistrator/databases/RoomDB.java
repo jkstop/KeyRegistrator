@@ -223,7 +223,6 @@ public class RoomDB {
         return 0;
     }
 
-
     public static ArrayList<String> getRoomList(){
         Cursor cursor = null;
         ArrayList<String> items = new ArrayList<>();

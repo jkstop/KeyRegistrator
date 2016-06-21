@@ -237,7 +237,8 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
                         //если передан RoomItem, то обновляем на сервере одно помещение. Если RoomItem == null, то обновляем все помещения
                         if (mRoomItem != null){
                             mResult = mStatement.executeQuery("SELECT * FROM " +SQL_Connection.ROOMS_TABLE
-                                    + " WHERE " + SQL_Connection.COLUMN_ROOMS_ROOM + " = '" + mRoomItem.getAuditroom() + "'");
+                                    + " WHERE " + SQL_Connection.COLUMN_ROOMS_ACCOUNT_ID + " = '" + SharedPrefs.getActiveAccountID()+ "'"
+                                    + " AND "+ SQL_Connection.COLUMN_ROOMS_ROOM + " = '" + mRoomItem.getAuditroom() + "'");
                             mResult.first();
 
                             //если помещение отсутствует на сервере,пишем его
@@ -309,16 +310,6 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
     }
 
     private void writePersonItemToServer(Statement statement, PersonItem personItem){
-        System.out.println(SharedPrefs.getActiveAccountID());
-        System.out.println(personItem.getLastname());
-        System.out.println(personItem.getFirstname());
-        System.out.println(personItem.getMidname());
-        System.out.println(personItem.getDivision());
-        System.out.println(personItem.getRadioLabel());
-        System.out.println(personItem.getSex());
-        System.out.println(personItem.getAccessType());
-        System.out.println(personItem.getPhotoPath());
-        System.out.println(personItem.getPhoto());
         try {
             statement.executeUpdate("INSERT INTO " + SQL_Connection.PERSONS_TABLE + " VALUES ('"
                     + SharedPrefs.getActiveAccountID() + "','"
@@ -341,13 +332,14 @@ public class ServerWriter extends AsyncTask<Connection,Void,Exception> {
             //если радиометка не пустая (в помещении кто-то есть), нужно получить фото
             if (roomItem.getTag() != null) userPhoto = FavoriteDB.getPersonPhoto(roomItem.getTag());
             statement.executeUpdate("INSERT INTO " + SQL_Connection.ROOMS_TABLE + " VALUES ('"
-            +roomItem.getAuditroom() + "',"
-            +roomItem.getStatus() + ","
-            +roomItem.getAccessType() + ","
-            +roomItem.getTime() + ",'"
-            +roomItem.getLastVisiter() + "','"
-            +roomItem.getTag() + "','"
-            +userPhoto + "')");
+                    +SharedPrefs.getActiveAccountID() + "','"
+                    +roomItem.getAuditroom() + "',"
+                    +roomItem.getStatus() + ","
+                    +roomItem.getAccessType() + ","
+                    +roomItem.getTime() + ",'"
+                    +roomItem.getLastVisiter() + "','"
+                    +roomItem.getTag() + "','"
+                    +userPhoto + "')");
         } catch (Exception e){
             e.printStackTrace();
         }
