@@ -1,4 +1,7 @@
 # KeyRegistrator
+
+Приложения для контроля доступа в помещения Финансового университета при правительстве РФ.
+
 ![alt tag](https://cloud.githubusercontent.com/assets/13080767/16265884/826e1680-388a-11e6-9ee7-2c8ef62ec846.png)
 ![alt tag](https://cloud.githubusercontent.com/assets/13080767/16265888/8756a446-388a-11e6-85d2-5b905a7bc2c7.png)
 ![alt tag](https://cloud.githubusercontent.com/assets/13080767/16265889/88c3adba-388a-11e6-9516-dcfcf37cc4f0.png)
