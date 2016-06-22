@@ -2,10 +2,10 @@
 
 Приложения для контроля доступа в помещения Финансового университета при правительстве РФ.
 
-![alt tag](https://cloud.githubusercontent.com/assets/13080767/16265884/826e1680-388a-11e6-9ee7-2c8ef62ec846.png)
-![alt tag](https://cloud.githubusercontent.com/assets/13080767/16265888/8756a446-388a-11e6-85d2-5b905a7bc2c7.png)
-![alt tag](https://cloud.githubusercontent.com/assets/13080767/16265889/88c3adba-388a-11e6-9516-dcfcf37cc4f0.png)
-![alt tag](https://cloud.githubusercontent.com/assets/13080767/16265890/8b6487c4-388a-11e6-8e7e-6843af9ff151.png)
-![alt tag](https://cloud.githubusercontent.com/assets/13080767/16265892/8b7f8c72-388a-11e6-9ab0-6a900cde8a88.png)
-![alt tag](https://cloud.githubusercontent.com/assets/13080767/16265893/8b8c7996-388a-11e6-90d5-d8c7b4f5f391.png)
-![alt tag](https://cloud.githubusercontent.com/assets/13080767/16265894/8b8dadd4-388a-11e6-9af9-134da7fab3fd.png)
+![alt tag](https://cloud.githubusercontent.com/assets/13080767/16266381/43d8c99e-388d-11e6-93cb-d1fe4dae36b2.png)
+![alt tag](https://cloud.githubusercontent.com/assets/13080767/16266382/43f3bbaa-388d-11e6-85e2-5088d3bbb91b.png)
+![alt tag](https://cloud.githubusercontent.com/assets/13080767/16266385/440403ac-388d-11e6-83dd-0b1edf5ef44f.png)
+![alt tag](https://cloud.githubusercontent.com/assets/13080767/16266384/44034994-388d-11e6-9b7a-7d9108c5b3b6.png)
+![alt tag](https://cloud.githubusercontent.com/assets/13080767/16266383/44029026-388d-11e6-8be8-6a3c394fc673.png)
+![alt tag](https://cloud.githubusercontent.com/assets/13080767/16266386/4405f6f8-388d-11e6-876e-19da34dad36e.png)
+![alt tag](https://cloud.githubusercontent.com/assets/13080767/16266387/440a7ab6-388d-11e6-85d5-911a19d4f0e5.png)
