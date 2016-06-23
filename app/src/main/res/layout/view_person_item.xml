@@ -6,7 +6,6 @@
     android:foreground="?android:attr/selectableItemBackground"
     app:cardUseCompatPadding="true"
     app:cardElevation="@dimen/card_default_elevation"
-    app:contentPadding="@dimen/content_default_margin"
     app:cardBackgroundColor="@color/primary_light"
     android:id="@id/person_card">
 
@@ -36,6 +35,7 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_marginStart="16dp"
+            android:padding="@dimen/content_default_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
