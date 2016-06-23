@@ -14,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import com.example.ivsmirnov.keyregistrator.R;
+import com.example.ivsmirnov.keyregistrator.activities.Launcher;
 import com.example.ivsmirnov.keyregistrator.async_tasks.BaseWriter;
 import com.example.ivsmirnov.keyregistrator.async_tasks.SQL_Connection;
 import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
@@ -21,6 +22,7 @@ import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.JournalDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
 import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -91,11 +93,19 @@ public class DialogPassword extends DialogFragment implements SQL_Connection.Cal
                     @Override
                     public void onClick(View v) {
                         if (textInputLayout.getEditText().getText().toString().equals("1212")){
+                            dialogPass.cancel();
                             switch (mDialogTag){
                                 case ROOMS_ACCESS:
                                     if (mPersonTag!=null){
-                                        new BaseWriter(BaseWriter.UPDATE_CURRENT, (BaseWriter.Callback)getActivity())
-                                                .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams().setPersonTag(mPersonTag));
+                                        ArrayList<RoomItem> items = RoomDB.getRoomItemsForCurrentUser(mPersonTag);
+                                        if (items.size()!=0 && items.size() > 1){
+                                            DialogCloseRoomSelection.newInstance(mPersonTag).show(getActivity().getSupportFragmentManager(), getString(R.string.title_dialog_close_room_choise));
+                                        } else if (items.size()==1){
+                                            new BaseWriter(BaseWriter.UPDATE_CURRENT, (BaseWriter.Callback)getActivity())
+                                                    .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
+                                                            .setPersonTag(mPersonTag)
+                                                            .setOpenTime(items.get(0).getTime()));
+                                        }
                                     }
                                     break;
                                 case ERASE_ACCESS:
@@ -117,8 +127,6 @@ public class DialogPassword extends DialogFragment implements SQL_Connection.Cal
                                 default:
                                     break;
                             }
-
-                            dialog.dismiss();
                         } else {
                             textInputLayout.setError(getString(R.string.enter_password_error));
                         }

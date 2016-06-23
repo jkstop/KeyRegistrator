@@ -43,6 +43,7 @@ import com.example.ivsmirnov.keyregistrator.async_tasks.ServerWriter;
 import com.example.ivsmirnov.keyregistrator.databases.DbShare;
 import com.example.ivsmirnov.keyregistrator.databases.FavoriteDB;
 import com.example.ivsmirnov.keyregistrator.databases.RoomDB;
+import com.example.ivsmirnov.keyregistrator.fragments.DialogCloseRoomSelection;
 import com.example.ivsmirnov.keyregistrator.fragments.DialogUserAuth;
 import com.example.ivsmirnov.keyregistrator.fragments.Journal;
 import com.example.ivsmirnov.keyregistrator.fragments.Rooms;
@@ -50,6 +51,7 @@ import com.example.ivsmirnov.keyregistrator.fragments.Users;
 import com.example.ivsmirnov.keyregistrator.items.BaseWriterParams;
 import com.example.ivsmirnov.keyregistrator.items.PersonItem;
 
+import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.others.App;
 import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 import com.example.ivsmirnov.keyregistrator.services.Alarm;
@@ -67,6 +69,7 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -555,17 +558,20 @@ public class Launcher extends AppCompatActivity implements
                             }
 
                         } else if (rooms !=null && rooms.isVisible()){
-                            if (RoomDB.getRoomItemForCurrentUser(mCurrentRadioLabel)!=null){
+                            ArrayList<RoomItem> items = RoomDB.getRoomItemsForCurrentUser(mCurrentRadioLabel);
+                            if (items.size()!=0 && items.size() > 1){
+                                DialogCloseRoomSelection.newInstance(mCurrentRadioLabel).show(getSupportFragmentManager(), getString(R.string.title_dialog_close_room_choise));
+                            } else if (items.size() == 1){
                                 new BaseWriter(BaseWriter.UPDATE_CURRENT, mBaseWriterCallback)
-                                        .execute(new BaseWriterParams()
-                                                .setPersonTag(mCurrentRadioLabel));
+                                        .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
+                                                .setPersonTag(mCurrentRadioLabel)
+                                                .setOpenTime(items.get(0).getTime()));
                             } else {
                                 if (FavoriteDB.isUserInBase(mCurrentRadioLabel)){
                                     Toasts.handler.sendEmptyMessage(Toasts.TOAST_SELECT_ROOM_FIRST);
                                 } else {
                                     Toasts.handler.sendEmptyMessage(Toasts.TOAST_WRONG_CARD);
                                 }
-
                             }
                         }
                     }

@@ -97,9 +97,15 @@ public class Rooms extends Fragment implements RecycleItemClickListener {
             DialogUserAuth.newInstance(mRoomItems.get(position).getAuditroom()).show(getActivity().getSupportFragmentManager(),getString(R.string.title_user_auth));
         } else {
             if (mRoomItems.get(position).getAccessType() == FavoriteDB.CLICK_USER_ACCESS) {
-
-                new BaseWriter(BaseWriter.UPDATE_CURRENT, (BaseWriter.Callback)getActivity())
-                        .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams().setPersonTag(mRoomItems.get(position).getTag()));
+                ArrayList<RoomItem> items = RoomDB.getRoomItemsForCurrentUser(mRoomItems.get(position).getTag());
+                if (items.size()!=0 && items.size() > 1){
+                    DialogCloseRoomSelection.newInstance(mRoomItems.get(position).getTag()).show(getChildFragmentManager(), getString(R.string.title_dialog_close_room_choise));
+                } else if (items.size() == 1){
+                    new BaseWriter(BaseWriter.UPDATE_CURRENT, (BaseWriter.Callback)getActivity())
+                            .executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, new BaseWriterParams()
+                                    .setPersonTag(mRoomItems.get(position).getTag())
+                                    .setOpenTime(mRoomItems.get(position).getTime()));
+                }
             }else{
                 Toasts.handler.sendEmptyMessage(Toasts.TOAST_PUT_CARD_FIRST);
             }

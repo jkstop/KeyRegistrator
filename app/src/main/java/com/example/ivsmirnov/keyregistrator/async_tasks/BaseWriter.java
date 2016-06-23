@@ -13,6 +13,7 @@ import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
 import com.example.ivsmirnov.keyregistrator.services.Toasts;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 
 /**
  * Получение пользователя из базы; создание journalItem, запись в журнал посещений; запись в БД помещений
@@ -78,7 +79,12 @@ public class BaseWriter extends AsyncTask<BaseWriterParams,Void,Exception> imple
                     RoomDB.updateRoom(mRoomItem);
                     break;
                 case UPDATE_CURRENT:
-                    mRoomItem = RoomDB.getRoomItemForCurrentUser(params[0].getPersonTag());
+                    ArrayList <RoomItem> items = RoomDB.getRoomItemsForCurrentUser(params[0].getPersonTag());
+                    for (RoomItem roomItem : items){
+                        if (roomItem.getTime() == params[0].getOpenTime()){
+                            mRoomItem = roomItem;
+                        }
+                    }
                     mRoomItemTimeIn = mRoomItem.getTime();
 
                     JournalDB.updateDB(mRoomItemTimeIn, System.currentTimeMillis());

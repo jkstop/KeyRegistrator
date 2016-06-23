@@ -25,7 +25,7 @@
             android:layout_centerVertical="true"
             android:layout_margin="@dimen/content_default_margin"/>
 
-        <TextView
+        <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
             android:id="@id/room_free_card_text_room"
             android:layout_toEndOf="@id/room_free_card_image_key"
             android:layout_alignParentTop="true"

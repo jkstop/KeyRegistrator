@@ -8,7 +8,16 @@ public class BaseWriterParams {
     private String personTag;
     private String auditroom;
     private int accessType;
+    private long openTime;
 
+    public BaseWriterParams setOpenTime (long openTime){
+        this.openTime = openTime;
+        return this;
+    }
+
+    public long getOpenTime(){
+        return openTime;
+    }
 
     public BaseWriterParams setPersonTag (String personTag){
         this.personTag = personTag;

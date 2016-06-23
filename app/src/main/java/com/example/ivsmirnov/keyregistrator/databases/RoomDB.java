@@ -2,6 +2,7 @@ package com.example.ivsmirnov.keyregistrator.databases;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 
 import com.example.ivsmirnov.keyregistrator.items.RoomItem;
 import com.example.ivsmirnov.keyregistrator.others.SharedPrefs;
@@ -64,8 +65,9 @@ public class RoomDB {
         return updatedRooms;
     }
 
-    public static RoomItem getRoomItemForCurrentUser(String tag){
+    public static ArrayList<RoomItem> getRoomItemsForCurrentUser(@NonNull String tag){
         Cursor cursor = null;
+        ArrayList<RoomItem> items = new ArrayList<>();
         try {
             if (tag!=null){
                 cursor = DbShare.getCursor(DbShare.DB_ROOM,
@@ -75,27 +77,25 @@ public class RoomDB {
                         new String[]{tag},
                         null,
                         null,
-                        "1");
+                        null);
                 if (cursor.getCount() > 0){
-                    cursor.moveToFirst();
-                    return new RoomItem().setAuditroom(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_ROOM)))
-                            .setStatus(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_STATUS)))
-                            .setAccessType(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_ACCESS)))
-                            .setLastVisiter(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_LAST_VISITER)))
-                            .setTime(cursor.getLong(cursor.getColumnIndex(RoomDBinit.COLUMN_TIME)))
-                            .setTag(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG))); /* photo is null for speed*/
-                }else{
-                    return null;
+                    cursor.moveToPosition(-1);
+                    while (cursor.moveToNext()){
+                        items.add(new RoomItem().setAuditroom(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_ROOM)))
+                                .setStatus(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_STATUS)))
+                                .setAccessType(cursor.getInt(cursor.getColumnIndex(RoomDBinit.COLUMN_ACCESS)))
+                                .setLastVisiter(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_LAST_VISITER)))
+                                .setTime(cursor.getLong(cursor.getColumnIndex(RoomDBinit.COLUMN_TIME)))
+                                .setTag(cursor.getString(cursor.getColumnIndex(RoomDBinit.COLUMN_TAG))));
+                    }
                 }
-            }else{
-                return null;
             }
         } catch (Exception e){
             e.printStackTrace();
-            return new RoomItem();
         } finally {
             closeCursor(cursor);
         }
+        return items;
     }
 
     public static void deleteFromRoomsDB(String aud){

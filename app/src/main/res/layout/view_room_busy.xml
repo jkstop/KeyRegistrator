@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:id="@id/room_busy_card"
     app:cardElevation="@dimen/card_default_elevation"
-    app:contentPadding="@dimen/content_default_margin"
     app:cardUseCompatPadding="true"
     android:foreground="?android:attr/selectableItemBackground"
     app:cardBackgroundColor="@color/colorAccent">
@@ -21,7 +20,7 @@
             android:id="@id/room_busy_card_image_layout"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_margin="@dimen/content_default_margin"
+            android:layout_marginEnd="@dimen/content_default_margin"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true">
 
@@ -44,33 +43,35 @@
 
         </android.support.percent.PercentRelativeLayout>
 
-        <RelativeLayout
+        <android.support.percent.PercentRelativeLayout
             android:layout_toEndOf="@id/room_busy_card_image_layout"
             android:layout_marginStart="@dimen/content_default_margin"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
+            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                 android:id="@id/room_busy_card_text_room"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:maxLines="2"
                 android:textColor="@color/black"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+                android:layout_above="@id/room_busy_card_text_user"
                 android:gravity="center" />
 
-            <TextView
+            <com.example.ivsmirnov.keyregistrator.custom_views.AutoResizeTextView
                 android:id="@id/room_busy_card_text_user"
-
                 android:maxLines="3"
                 android:layout_width="match_parent"
+                app:layout_heightPercent = "40%"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal|bottom"
                 android:layout_alignParentBottom="true"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:textSize="38sp"/>
+                android:layout_margin="@dimen/content_default_margin"
+                android:textSize="42sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
-        </RelativeLayout>
+        </android.support.percent.PercentRelativeLayout>
 
     </android.support.percent.PercentRelativeLayout>
 
