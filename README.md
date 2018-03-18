@@ -1,5 +1,7 @@
 # KeyRegistrator
 
+This project is not maintained anymore
+
 Приложения для контроля доступа в помещения Финансового университета при правительстве РФ.
 
 ![alt tag](https://cloud.githubusercontent.com/assets/13080767/16266381/43d8c99e-388d-11e6-93cb-d1fe4dae36b2.png)
